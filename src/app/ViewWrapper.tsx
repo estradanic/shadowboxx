@@ -1,6 +1,7 @@
 import React from "react";
 import {RouteProps} from "./routes";
 import {Route} from "react-router-dom";
+import {useNavigationContext} from "./NavigationContext";
 
 const ViewWrapper = ({
   viewId,
@@ -10,6 +11,15 @@ const ViewWrapper = ({
   exact = true,
 }: RouteProps) => {
   const Layout = require(`../components/Layout/${layout}`).default;
+
+  const {prevRoutes, setPrevRoutes} = useNavigationContext();
+  const newPrevRoutes = prevRoutes;
+  if (viewId === prevRoutes[0]) {
+    newPrevRoutes.shift();
+  } else {
+    newPrevRoutes.splice(0, 0, viewId);
+  }
+  setPrevRoutes(newPrevRoutes);
 
   return (
     <>

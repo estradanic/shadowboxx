@@ -1,9 +1,17 @@
 import React from "react";
-import {AppBar, AppBarProps, Toolbar, Button, Link, IconButton} from "@material-ui/core";
+import {
+  AppBar,
+  AppBarProps,
+  Toolbar,
+  Button,
+  Link,
+  IconButton,
+} from "@material-ui/core";
 import {Person, Menu, ArrowBack} from "@material-ui/icons";
 import {makeStyles, Theme} from "@material-ui/core/styles";
 import Breadcrumbs from "../Breadcrumbs/Breadcrumbs";
 import Strings from "../../resources/Strings";
+import {useNavigationContext} from "../../app/NavigationContext";
 
 const useStyles = makeStyles((theme: Theme) => ({
   backButton: {
@@ -33,6 +41,7 @@ export interface HeaderProps extends AppBarProps {
 
 const Header = ({viewId, ...rest}: HeaderProps) => {
   const classes = useStyles();
+  const {prevRoutes} = useNavigationContext();
 
   return (
     <header>
@@ -41,11 +50,31 @@ const Header = ({viewId, ...rest}: HeaderProps) => {
           <Link className={classes.logo} href="/" color="inherit">
             {Strings.appName()}
           </Link>
-          <Button size="small" className={classes.loginButton} variant="outlined" color="inherit" startIcon={<Person />}>{Strings.login()}</Button>
-          <IconButton color="inherit"><Menu /></IconButton>
+          <Button
+            size="small"
+            className={classes.loginButton}
+            variant="outlined"
+            color="inherit"
+            startIcon={<Person />}
+          >
+            {Strings.login()}
+          </Button>
+          <IconButton color="inherit">
+            <Menu />
+          </IconButton>
         </Toolbar>
         <Toolbar variant="dense">
-          <Button className={classes.backButton} variant="outlined" color="inherit" size="small" startIcon={<ArrowBack />}>{Strings.back()}</Button>
+          {prevRoutes[1] && prevRoutes[1] === viewId && (
+            <Button
+              className={classes.backButton}
+              variant="outlined"
+              color="inherit"
+              size="small"
+              startIcon={<ArrowBack />}
+            >
+              {Strings.back()}
+            </Button>
+          )}
           <Breadcrumbs viewId={viewId} />
         </Toolbar>
       </AppBar>

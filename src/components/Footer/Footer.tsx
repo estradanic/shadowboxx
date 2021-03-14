@@ -11,7 +11,7 @@ const useStyles = makeStyles((theme: Theme) => ({
   },
   copyright: {
     margin: "auto",
-  }
+  },
 }));
 
 const Footer = () => {

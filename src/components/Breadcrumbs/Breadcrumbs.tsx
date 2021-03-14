@@ -23,7 +23,12 @@ const Breadcrumbs = ({viewId, ...rest}: BreadcrumbsProps) => {
   const breadcrumbs = getBreadcrumbs(viewId);
 
   return (
-    <MatBreadcrumbs aria-label="breadcrumb" color="inherit" separator="‣" {...rest}>
+    <MatBreadcrumbs
+      aria-label="breadcrumb"
+      color="inherit"
+      separator="‣"
+      {...rest}
+    >
       {breadcrumbs.map((breadcrumb, i) =>
         i === breadcrumbs.length - 1 ? (
           <Typography
