@@ -1,11 +1,10 @@
 import React from "react";
 import LayoutProps from "./LayoutProps";
+import Header from "../Header/Header";
 
 const DefaultLayout = ({viewId, children}: LayoutProps) => (
   <>
-    <div>
-      <h1>{viewId}</h1>
-    </div>
+    <Header viewId={viewId} position="sticky" />
     <div>{children}</div>
   </>
 );

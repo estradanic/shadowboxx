@@ -8,7 +8,7 @@ const App = () => (
     <div>
       <Switch>
         {Object.keys(routes).map((routeKey) => (
-          <ViewWrapper {...routes[routeKey]} />
+          <ViewWrapper key={routeKey} {...routes[routeKey]} />
         ))}
       </Switch>
     </div>

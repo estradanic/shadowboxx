@@ -6,16 +6,14 @@ import {MuiThemeProvider, createMuiTheme} from "@material-ui/core/styles";
 
 import blue from "@material-ui/core/colors/lightBlue";
 
-const theme = () => {
-  return createMuiTheme({
-    palette: {
-      primary: {
-        ...blue,
-        "500": "#01579B",
-      },
+const theme = createMuiTheme({
+  palette: {
+    primary: {
+      ...blue,
+      "500": "#01579B",
     },
-  });
-};
+  },
+});
 
 ReactDOM.render(
   <React.StrictMode>
