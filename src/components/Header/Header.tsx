@@ -8,11 +8,13 @@ export interface HeaderProps extends AppBarProps {
 
 const Header = ({viewId, ...rest}: HeaderProps) => {
   return (
-    <AppBar {...rest}>
-      <Toolbar>
-        <Breadcrumbs viewId={viewId} />
-      </Toolbar>
-    </AppBar>
+    <header>
+      <AppBar {...rest}>
+        <Toolbar>
+          <Breadcrumbs viewId={viewId} />
+        </Toolbar>
+      </AppBar>
+    </header>
   );
 };
 

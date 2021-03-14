@@ -5,15 +5,7 @@ import {
   Link,
   Breadcrumbs as MatBreadcrumbs,
 } from "@material-ui/core";
-import {Panorama} from "@material-ui/icons";
-import {makeStyles, Theme} from "@material-ui/core/styles";
-
-const useStyles = makeStyles((theme: Theme) => ({
-  logo: {
-    backgroundColor: "green",
-    borderRadius: "30%",
-  },
-}));
+import Strings from "../../resources/Strings";
 
 export interface BreadcrumbsProps {
   viewId: string;
@@ -28,14 +20,12 @@ const getBreadcrumbs = (viewId: string = ""): RouteProps[] => {
 };
 
 const Breadcrumbs = ({viewId}: BreadcrumbsProps) => {
-  const classes = useStyles();
-
   const breadcrumbs = getBreadcrumbs(viewId);
 
   return (
     <MatBreadcrumbs color="inherit" separator="‣">
       <Link href="/" color="inherit">
-        <Panorama className={classes.logo} fontSize="large" />
+        {Strings.appName}
       </Link>
       {breadcrumbs.map((breadcrumb, i) =>
         i === breadcrumbs.length - 1 ? (
