@@ -4,10 +4,10 @@ import {
   Typography,
   Link,
   Breadcrumbs as MatBreadcrumbs,
+  BreadcrumbsProps as MatBreadcrumbsProps,
 } from "@material-ui/core";
-import Strings from "../../resources/Strings";
 
-export interface BreadcrumbsProps {
+export interface BreadcrumbsProps extends MatBreadcrumbsProps {
   viewId: string;
 }
 
@@ -19,25 +19,23 @@ const getBreadcrumbs = (viewId: string = ""): RouteProps[] => {
   }
 };
 
-const Breadcrumbs = ({viewId}: BreadcrumbsProps) => {
+const Breadcrumbs = ({viewId, ...rest}: BreadcrumbsProps) => {
   const breadcrumbs = getBreadcrumbs(viewId);
 
   return (
-    <MatBreadcrumbs color="inherit" separator="‣">
-      <Link href="/" color="inherit">
-        {Strings.appName}
-      </Link>
+    <MatBreadcrumbs aria-label="breadcrumb" color="inherit" separator="‣" {...rest}>
       {breadcrumbs.map((breadcrumb, i) =>
         i === breadcrumbs.length - 1 ? (
           <Typography
             key={`breadcrumb${breadcrumb.viewId}`}
-            variant="h6"
+            variant="overline"
             color="inherit"
           >
             {breadcrumb.viewName}
           </Typography>
         ) : (
           <Link
+            variant="overline"
             key={`breadcrumb${breadcrumb.viewId}`}
             color="inherit"
             href={breadcrumb.path}
