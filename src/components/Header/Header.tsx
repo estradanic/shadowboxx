@@ -84,8 +84,9 @@ const Header = ({viewId, ...rest}: HeaderProps) => {
               className={classes.loginButton}
               variant="outlined"
               color="inherit"
+              onClick={() => history.push("/login")}
             >
-              {Strings.login()}
+              {Strings.loginSignup()}
             </Button>
           )}
         </Toolbar>

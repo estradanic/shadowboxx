@@ -18,13 +18,15 @@ const Footer = () => {
   const classes = useStyles();
 
   return (
-    <AppBar position="fixed" color="primary" className={classes.appBar}>
-      <Toolbar variant="dense">
-        <Typography className={classes.copyright} color="inherit">
-          {Strings.copyright()}
-        </Typography>
-      </Toolbar>
-    </AppBar>
+    <footer>
+      <AppBar position="fixed" color="primary" className={classes.appBar}>
+        <Toolbar variant="dense">
+          <Typography className={classes.copyright} color="inherit">
+            {Strings.copyright()}
+          </Typography>
+        </Toolbar>
+      </AppBar>
+    </footer>
   );
 };
 
