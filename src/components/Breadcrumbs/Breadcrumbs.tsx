@@ -1,5 +1,5 @@
 import React from "react";
-import {routes, RouteProps} from "../../app/routes";
+import {useRoutes, RouteProps} from "../../app/routes";
 import {
   Typography,
   Breadcrumbs as MatBreadcrumbs,
@@ -8,6 +8,7 @@ import {
 } from "@material-ui/core";
 import {makeStyles, Theme, useTheme} from "@material-ui/core/styles";
 import Link from "../Link/Link";
+import {useNavigationContext} from "../../app/NavigationContext";
 
 const useStyles = makeStyles((theme: Theme) => ({
   breadcrumbs: {
@@ -30,19 +31,28 @@ export interface BreadcrumbsProps extends MatBreadcrumbsProps {
   viewId: string;
 }
 
-const getBreadcrumbs = (viewId: string = ""): RouteProps[] => {
+const getBreadcrumbs = (
+  viewId: string = "",
+  routes: {[key: string]: RouteProps},
+): RouteProps[] => {
   if (viewId) {
-    return [...getBreadcrumbs(routes[viewId].parentKey), routes[viewId]];
+    return [
+      ...getBreadcrumbs(routes[viewId].parentKey, routes),
+      routes[viewId],
+    ];
   } else {
     return [];
   }
 };
 
 const Breadcrumbs = ({viewId, ...rest}: BreadcrumbsProps) => {
-  const breadcrumbs = getBreadcrumbs(viewId);
+  const {routes, getRoutePath} = useRoutes();
   const classes = useStyles();
   const theme = useTheme();
   const xs = useMediaQuery(theme.breakpoints.down("xs"));
+  const {routeParams} = useNavigationContext();
+
+  const breadcrumbs = getBreadcrumbs(viewId, routes);
 
   return (
     <MatBreadcrumbs
@@ -67,7 +77,7 @@ const Breadcrumbs = ({viewId, ...rest}: BreadcrumbsProps) => {
             variant="overline"
             key={`breadcrumb${breadcrumb.viewId}`}
             color="inherit"
-            to={breadcrumb.path}
+            to={getRoutePath(breadcrumb.viewId, routeParams)}
           >
             {breadcrumb.viewName}
           </Link>

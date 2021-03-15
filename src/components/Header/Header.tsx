@@ -15,7 +15,7 @@ import {useNavigationContext} from "../../app/NavigationContext";
 import {useUserContext} from "../../app/UserContext";
 import Link from "../Link/Link";
 import {useHistory} from "react-router-dom";
-import {routes} from "../../app/routes";
+import {useRoutes} from "../../app/routes";
 
 const useStyles = makeStyles((theme: Theme) => ({
   backButton: {
@@ -27,7 +27,7 @@ const useStyles = makeStyles((theme: Theme) => ({
   },
   logo: {
     fontFamily: "Alex Brush",
-    fontSize: ({xs}: any) => xs ? "xx-large" : "xxx-large",
+    fontSize: ({xs}: any) => (xs ? "xx-large" : "xxx-large"),
     marginRight: theme.spacing(3),
     "&:hover": {
       textDecoration: "none",
@@ -46,16 +46,26 @@ const Header = ({viewId, ...rest}: HeaderProps) => {
   const theme = useTheme();
   const xs = useMediaQuery(theme.breakpoints.down("xs"));
   const classes = useStyles({xs});
-  const {prevRoutes, setPrevRoutes} = useNavigationContext();
+  const {routeHistory, setRouteHistory, routeParams} = useNavigationContext();
   const {loggedIn} = useUserContext();
   const history = useHistory();
+  const {getRoutePath} = useRoutes();
 
   const navigateBack = () => {
-    const newPrevRoutes = prevRoutes;
-    newPrevRoutes.shift();
-    setPrevRoutes(newPrevRoutes);
-    history.push(routes[newPrevRoutes[0]].path);
+    const newRouteHistory = routeHistory;
+    newRouteHistory.shift();
+    setRouteHistory(newRouteHistory);
+    history.push(getRoutePath(newRouteHistory[0], routeParams));
+  };
+
+  let showBackButton = false;
+  if (routeHistory.length === 1) {
+    showBackButton = routeHistory[0] !== viewId;
+  } else if (routeHistory.length > 1) {
+    showBackButton = routeHistory[1] !== viewId;
   }
+
+  console.log(routeHistory, viewId);
 
   return (
     <header>
@@ -64,23 +74,23 @@ const Header = ({viewId, ...rest}: HeaderProps) => {
           <Link className={classes.logo} to="/" color="inherit">
             {Strings.appName()}
           </Link>
-          {
-            loggedIn ?
-              <IconButton color="inherit">
-                <Menu />
-              </IconButton> :
-              <Button
-                size={xs ? "small" : "medium"}
-                className={classes.loginButton}
-                variant="outlined"
-                color="inherit"
-              >
-                {Strings.login()}
-              </Button>
-          }
+          {loggedIn ? (
+            <IconButton color="inherit">
+              <Menu />
+            </IconButton>
+          ) : (
+            <Button
+              size={xs ? "small" : "medium"}
+              className={classes.loginButton}
+              variant="outlined"
+              color="inherit"
+            >
+              {Strings.login()}
+            </Button>
+          )}
         </Toolbar>
         <Toolbar variant="dense">
-          {prevRoutes[1] && prevRoutes[1] !== viewId && (
+          {showBackButton && (
             <Button
               className={classes.backButton}
               variant="outlined"

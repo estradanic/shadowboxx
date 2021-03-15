@@ -1,5 +1,7 @@
 import {ComponentType} from "react";
-import {Home, About} from "../views";
+import {Home, About, Dynamic} from "../views";
+import {RouteParams} from "./NavigationContext";
+import {isEmpty} from "lodash";
 
 export interface RouteProps {
   viewName: string;
@@ -11,12 +13,12 @@ export interface RouteProps {
   exact?: boolean;
 }
 
-export const routes: {[key: string]: RouteProps} = {
-  AboutChild3: {
-    viewId: "AboutChild3",
+const routes: {[key: string]: RouteProps} = {
+  AboutDynamic: {
+    viewId: "AboutDynamic",
     viewName: "Hola",
-    view: About,
-    path: "/about/child/child2/child3",
+    view: Dynamic,
+    path: "/about/child/child2/:someParam",
     parentKey: "AboutChild2",
   },
   AboutChild2: {
@@ -52,3 +54,29 @@ export const routes: {[key: string]: RouteProps} = {
     path: "/",
   },
 };
+
+const getRoutePath = (viewId: string, routeParams: RouteParams): string => {
+  const templatePath = routes[viewId]?.path;
+  if (!templatePath) {
+    return "";
+  }
+
+  if (isEmpty(routeParams)) {
+    return templatePath;
+  }
+
+  // @ts-ignore: routeParams is definitely not empty as per above check
+  const params = routeParams[viewId];
+  if (!params || isEmpty(params)) {
+    return templatePath;
+  }
+
+  let path = templatePath;
+  Object.keys(params).forEach((param) => {
+    path = path.replace(`:${param}`, params[param]);
+  });
+
+  return path;
+};
+
+export const useRoutes = () => ({getRoutePath, routes});

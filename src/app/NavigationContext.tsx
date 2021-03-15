@@ -1,21 +1,23 @@
 import React, {useState, useEffect, createContext, useContext} from "react";
 import {isEmpty, isMatch} from "lodash";
 
-type RouteParams = {[viewId: string]: {[param: string]: string}};
-type PrevRoutes = string[];
+export type RouteParams = {[viewId: string]: {[param: string]: string}};
+export type RouteHistory = string[];
 
 interface NavigationContextValue {
   routeParams: RouteParams;
   setRouteParams: React.Dispatch<React.SetStateAction<RouteParams>>;
-  prevRoutes: PrevRoutes;
-  setPrevRoutes: React.Dispatch<React.SetStateAction<PrevRoutes>>;
+  routeHistory: RouteHistory;
+  setRouteHistory: React.Dispatch<React.SetStateAction<RouteHistory>>;
 }
 
 const NavigationContext = createContext({
   routeParams: {},
   setRouteParams: (_: RouteParams | ((_: RouteParams) => RouteParams)) => {},
-  prevRoutes: [""],
-  setPrevRoutes: (_: PrevRoutes | ((_: PrevRoutes) => PrevRoutes)) => {},
+  routeHistory: [""],
+  setRouteHistory: (
+    _: RouteHistory | ((_: RouteHistory) => RouteHistory),
+  ) => {},
 });
 
 interface NavigationInfo {
@@ -30,14 +32,14 @@ interface NavigationContextProviderProps {
 export const NavigationContextProvider = ({
   children,
 }: NavigationContextProviderProps) => {
-  const [prevRoutes, setPrevRoutes] = useState<PrevRoutes>([]);
+  const [routeHistory, setRouteHistory] = useState<RouteHistory>([]);
   const [routeParams, setRouteParams] = useState<RouteParams>({});
 
   const value: NavigationContextValue = {
     routeParams,
     setRouteParams,
-    prevRoutes,
-    setPrevRoutes,
+    routeHistory,
+    setRouteHistory,
   };
 
   return (
@@ -47,13 +49,18 @@ export const NavigationContextProvider = ({
   );
 };
 
-export const useNavigationContext = ({
+export const useNavigationContext = () => useContext(NavigationContext);
+
+export const useNavigationContextEffect = ({
   routeParams: piRouteParams = {},
   routeParamsUpdateTriggers = [],
 }: NavigationInfo = {}) => {
-  const {routeParams, setRouteParams, prevRoutes, setPrevRoutes} = useContext(
-    NavigationContext,
-  );
+  const {
+    routeParams,
+    setRouteParams,
+    routeHistory,
+    setRouteHistory,
+  } = useNavigationContext();
 
   useEffect(() => {
     if (!isEmpty(piRouteParams) && !isMatch(routeParams, piRouteParams)) {
@@ -70,5 +77,5 @@ export const useNavigationContext = ({
     ...routeParamsUpdateTriggers,
   ]);
 
-  return {routeParams, setRouteParams, prevRoutes, setPrevRoutes};
+  return {routeParams, setRouteParams, routeHistory, setRouteHistory};
 };

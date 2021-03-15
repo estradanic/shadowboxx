@@ -22,9 +22,7 @@ interface UserContextProviderProps {
   children: React.ReactNode;
 }
 
-export const UserContextProvider = ({
-  children,
-}: UserContextProviderProps) => {
+export const UserContextProvider = ({children}: UserContextProviderProps) => {
   const [loggedIn, setLoggedIn] = useState<boolean>(false);
   const [username, setUsername] = useState<string>("");
   const [name, setName] = useState<string>("");
@@ -38,11 +36,7 @@ export const UserContextProvider = ({
     setName,
   };
 
-  return (
-    <UserContext.Provider value={value}>
-      {children}
-    </UserContext.Provider>
-  )
-}
+  return <UserContext.Provider value={value}>{children}</UserContext.Provider>;
+};
 
 export const useUserContext = () => useContext(UserContext);

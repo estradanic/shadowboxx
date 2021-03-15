@@ -1,8 +1,13 @@
-import {Link as RouterLink, LinkProps as RouterLinkProps} from "react-router-dom";
+import {
+  Link as RouterLink,
+  LinkProps as RouterLinkProps,
+} from "react-router-dom";
 import {Link as MatLink, LinkProps as MatLinkProps} from "@material-ui/core";
 import {makeStyles, Theme} from "@material-ui/core/styles";
 
-export interface LinkProps extends Omit<MatLinkProps, "href">, Pick<RouterLinkProps, "to" | "replace"> {}
+export interface LinkProps
+  extends Omit<MatLinkProps, "href">,
+    Pick<RouterLinkProps, "to" | "replace"> {}
 
 const useStyles = makeStyles((theme: Theme) => ({
   link: {
@@ -10,7 +15,6 @@ const useStyles = makeStyles((theme: Theme) => ({
     color: "inherit",
   },
 }));
-
 
 const Link = ({children, to, replace, ...rest}: LinkProps) => {
   const classes = useStyles();
