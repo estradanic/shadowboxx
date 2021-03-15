@@ -3,8 +3,9 @@ import ReactDOM from "react-dom";
 import "./index.css";
 import App from "./app/App";
 import {MuiThemeProvider, createMuiTheme} from "@material-ui/core/styles";
-
 import blue from "@material-ui/core/colors/lightBlue";
+import {UserContextProvider} from "./app/UserContext";
+import {NavigationContextProvider} from "./app/NavigationContext";
 
 const theme = createMuiTheme({
   palette: {
@@ -18,7 +19,11 @@ const theme = createMuiTheme({
 ReactDOM.render(
   <React.StrictMode>
     <MuiThemeProvider theme={theme}>
-      <App />
+      <NavigationContextProvider>
+        <UserContextProvider>
+          <App />
+        </UserContextProvider>
+      </NavigationContextProvider>
     </MuiThemeProvider>
   </React.StrictMode>,
   document.getElementById("root"),

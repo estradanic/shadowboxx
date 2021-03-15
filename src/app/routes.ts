@@ -12,6 +12,20 @@ export interface RouteProps {
 }
 
 export const routes: {[key: string]: RouteProps} = {
+  AboutChild3: {
+    viewId: "AboutChild3",
+    viewName: "Hola",
+    view: About,
+    path: "/about/child/child2/child3",
+    parentKey: "AboutChild2",
+  },
+  AboutChild2: {
+    viewId: "AboutChild2",
+    viewName: "2319",
+    view: About,
+    path: "/about/child/child2",
+    parentKey: "AboutChild",
+  },
   AboutChild: {
     viewId: "AboutChild",
     viewName: "About Child",

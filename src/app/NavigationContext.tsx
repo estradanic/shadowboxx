@@ -14,7 +14,7 @@ interface NavigationContextValue {
 const NavigationContext = createContext({
   routeParams: {},
   setRouteParams: (_: RouteParams | ((_: RouteParams) => RouteParams)) => {},
-  prevRoutes: ["", ""],
+  prevRoutes: [""],
   setPrevRoutes: (_: PrevRoutes | ((_: PrevRoutes) => PrevRoutes)) => {},
 });
 
@@ -62,7 +62,13 @@ export const useNavigationContext = ({
         ...piRouteParams,
       }));
     }
-  }, [piRouteParams, routeParams, ...routeParamsUpdateTriggers]);
+  }, [
+    piRouteParams,
+    routeParams,
+    setRouteParams,
+    // eslint-disable-next-line
+    ...routeParamsUpdateTriggers,
+  ]);
 
   return {routeParams, setRouteParams, prevRoutes, setPrevRoutes};
 };

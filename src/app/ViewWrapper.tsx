@@ -1,9 +1,9 @@
-import React from "react";
+import React, {memo} from "react";
 import {RouteProps} from "./routes";
 import {Route} from "react-router-dom";
 import {useNavigationContext} from "./NavigationContext";
 
-const ViewWrapper = ({
+const ViewWrapper = memo(({
   viewId,
   view,
   path,
@@ -14,9 +14,7 @@ const ViewWrapper = ({
 
   const {prevRoutes, setPrevRoutes} = useNavigationContext();
   const newPrevRoutes = prevRoutes;
-  if (viewId === prevRoutes[0]) {
-    newPrevRoutes.shift();
-  } else {
+  if (viewId !== prevRoutes[0]) {
     newPrevRoutes.splice(0, 0, viewId);
   }
   setPrevRoutes(newPrevRoutes);
@@ -28,6 +26,6 @@ const ViewWrapper = ({
       </Layout>
     </>
   );
-};
+});
 
 export default ViewWrapper;
