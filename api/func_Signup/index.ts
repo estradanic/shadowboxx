@@ -79,11 +79,13 @@ const httpTrigger: AzureFunction = async function (context: Context, req: HttpRe
 
     const today = new Date();
     const nextWeek = new Date(today.getFullYear(), today.getMonth(), today.getDate() + 7);
+
+    const secure = req.headers["x-forwarded-host"] == "localhost:3000" ? "" : "Secure; ";
     
     context.res = {
         body: true,
         headers: {
-          "Set-Cookie": `sessionid=${sessionId}; Expires=${nextWeek.toUTCString()};`,
+          "Set-Cookie": `sessionid=${sessionId}; Expires=${nextWeek.toUTCString()}; SameSite=Lax; ${secure}HttpOnly;`,
         },
     };
 };
