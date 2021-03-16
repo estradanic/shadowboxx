@@ -65,8 +65,6 @@ const Header = ({viewId, ...rest}: HeaderProps) => {
     showBackButton = routeHistory[1] !== viewId;
   }
 
-  console.log(routeHistory, viewId);
-
   return (
     <header>
       <AppBar {...rest}>

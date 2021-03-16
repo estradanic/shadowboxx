@@ -32,7 +32,7 @@ const useStyles = makeStyles((theme: Theme) => ({
     borderRadius: 0,
   },
   grid: {
-    minHeight: "calc(75vh - 160px)",
+    minHeight: "calc(85vh - 160px)",
   },
   submitButton: {
     backgroundColor: theme.palette.primary.main,
@@ -45,7 +45,7 @@ const useStyles = makeStyles((theme: Theme) => ({
   },
 }));
 
-const Login = () => {
+const Signup = () => {
   const classes = useStyles();
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
@@ -59,11 +59,33 @@ const Login = () => {
         justify="center"
         className={classes.grid}
       >
-        <Grid item sm={8}>
+        <Grid item md={8}>
           <Card>
             <Grid container direction="row">
               <Grid className={classes.cardTitle} item xs={12}>
-                <Typography variant="h4">{Strings.login()}</Typography>
+                <Typography variant="h4">{Strings.signup()}</Typography>
+              </Grid>
+              <Grid item xs={12}>
+                <TextField
+                  variant="filled"
+                  fullWidth
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  label={Strings.firstName()}
+                  id="firstName"
+                  type="text"
+                />
+              </Grid>
+              <Grid item xs={12}>
+                <TextField
+                  variant="filled"
+                  fullWidth
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  label={Strings.lastName()}
+                  id="lastName"
+                  type="text"
+                />
               </Grid>
               <Grid item xs={12}>
                 <TextField
@@ -95,11 +117,11 @@ const Login = () => {
         </Grid>
         <br />
         <br />
-        <Typography variant="h6">{Strings.noAccount()}</Typography>
-        <Link to="/signup">{Strings.signup()}</Link>
+        <Typography variant="h6">{Strings.alreadyHaveAccount()}</Typography>
+        <Link to="/login">{Strings.login()}</Link>
       </Grid>
     </Container>
   );
 };
 
-export default Login;
+export default Signup;

@@ -13,6 +13,7 @@ const useStyles = makeStyles((theme: Theme) => ({
   link: {
     textDecoration: "none",
     color: "inherit",
+    fontFamily: `"Roboto", "Helvetica", "Arial", sans-serif`,
   },
 }));
 
@@ -20,7 +21,13 @@ const Link = ({children, to, replace, ...rest}: LinkProps) => {
   const classes = useStyles();
   return (
     <RouterLink className={classes.link} to={to} replace={replace}>
-      <MatLink className={classes.link} component="span" href="#" {...rest}>
+      <MatLink
+        variant="h6"
+        className={classes.link}
+        component="span"
+        href="#"
+        {...rest}
+      >
         {children}
       </MatLink>
     </RouterLink>
