@@ -1,8 +1,8 @@
-import { JsonDB } from "node-json-db";
-import { Config } from "node-json-db/dist/lib/JsonDBConfig";
+import {JsonDB} from "node-json-db";
+import {Config} from "node-json-db/dist/lib/JsonDBConfig";
 import * as AsyncLock from "async-lock";
 
-const lock = new AsyncLock({ timeout: 5000 });
+const lock = new AsyncLock({timeout: 5000});
 const DATABASE_LOCK_KEY = "database";
 
 const database = new JsonDB(new Config("data/database", true, false, "/"));
@@ -12,14 +12,14 @@ const sanitizeKey = (key: string) =>
 
 export const put = async (key: string, value: unknown) => {
   await lock.acquire(DATABASE_LOCK_KEY, () =>
-    database.push(sanitizeKey(key), value)
+    database.push(sanitizeKey(key), value),
   );
 };
 
 export const get = async <V>(key: string): Promise<V> => {
   try {
     const data = await lock.acquire(DATABASE_LOCK_KEY, () =>
-      database.getData(sanitizeKey(key))
+      database.getData(sanitizeKey(key)),
     );
     return data;
   } catch {
@@ -29,15 +29,15 @@ export const get = async <V>(key: string): Promise<V> => {
 
 export const merge = async (
   key: string,
-  value: Array<unknown> | Record<string, unknown>
+  value: Array<unknown> | Record<string, unknown>,
 ) => {
   return await lock.acquire(DATABASE_LOCK_KEY, () =>
-    database.push(sanitizeKey(key), value, false)
+    database.push(sanitizeKey(key), value, false),
   );
 };
 
 export const drop = async (key: string) => {
   return await lock.acquire(DATABASE_LOCK_KEY, () =>
-    database.delete(sanitizeKey(key))
+    database.delete(sanitizeKey(key)),
   );
 };
