@@ -10,6 +10,14 @@ import {
 } from "@material-ui/core";
 import Strings from "../../resources/Strings";
 import {PasswordField, Link} from "../../components";
+import {sendHTTPRequest} from "../../utils/requestUtils";
+import {generate as generateHash} from "password-hash";
+import {
+  ErrorState,
+  validateEmail,
+  validatePassword,
+} from "../../utils/formUtils";
+import {isNullOrWhitespace} from "../../utils/stringUtils";
 
 const useStyles = makeStyles((theme: Theme) => ({
   container: {
@@ -45,10 +53,95 @@ const useStyles = makeStyles((theme: Theme) => ({
   },
 }));
 
+interface SignupRequest {
+  email: string;
+  firstName: string;
+  lastName: string;
+  password: string;
+}
+
 const Signup = () => {
   const classes = useStyles();
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
+  const [firstName, setFirstName] = useState<string>("");
+  const [lastName, setLastName] = useState<string>("");
+  const [errors, setErrors] = useState<
+    ErrorState<"email" | "firstName" | "lastName" | "password">
+  >({
+    email: {isError: false, errorMessage: ""},
+    firstName: {isError: false, errorMessage: ""},
+    lastName: {isError: false, errorMessage: ""},
+    password: {isError: false, errorMessage: ""},
+  });
+
+  const validate = (): boolean => {
+    const newErrors = {
+      email: {isError: false, errorMessage: ""},
+      firstName: {isError: false, errorMessage: ""},
+      lastName: {isError: false, errorMessage: ""},
+      password: {isError: false, errorMessage: ""},
+    };
+
+    if (!validateEmail(email)) {
+      newErrors.email = {
+        isError: true,
+        errorMessage: Strings.invalidEmail(email),
+      };
+    }
+    if (!validatePassword(password)) {
+      newErrors.password = {
+        isError: true,
+        errorMessage: Strings.invalidPassword(password),
+      };
+    }
+    if (isNullOrWhitespace(firstName)) {
+      newErrors.firstName = {
+        isError: true,
+        errorMessage: Strings.pleaseEnterA(Strings.firstName()),
+      };
+    }
+    if (isNullOrWhitespace(lastName)) {
+      newErrors.lastName = {
+        isError: true,
+        errorMessage: Strings.pleaseEnterA(Strings.firstName()),
+      };
+    }
+
+    setErrors(newErrors);
+    return !(
+      newErrors.email.isError ||
+      newErrors.firstName.isError ||
+      newErrors.lastName.isError ||
+      newErrors.password.isError
+    );
+  };
+
+  const signupSucceed = (response: unknown) => {
+    console.log(response);
+  };
+
+  const signupFail = (error: unknown) => {
+    console.log(error);
+  };
+
+  const signup = () => {
+    if (validate()) {
+      const signupRequest = {
+        email,
+        firstName,
+        lastName,
+        password: generateHash(password),
+      };
+      sendHTTPRequest<SignupRequest>({
+        method: "POST",
+        url: "/api/func_Signup",
+        data: signupRequest,
+        callback: signupSucceed,
+        errorCallback: signupFail,
+      });
+    }
+  };
 
   return (
     <Container maxWidth="xl" className={classes.container}>
@@ -67,10 +160,12 @@ const Signup = () => {
               </Grid>
               <Grid item xs={12}>
                 <TextField
+                  error={errors.firstName.isError}
+                  helperText={errors.firstName.errorMessage}
                   variant="filled"
                   fullWidth
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
+                  value={firstName}
+                  onChange={(e) => setFirstName(e.target.value)}
                   label={Strings.firstName()}
                   id="firstName"
                   type="text"
@@ -78,10 +173,12 @@ const Signup = () => {
               </Grid>
               <Grid item xs={12}>
                 <TextField
+                  error={errors.lastName.isError}
+                  helperText={errors.lastName.errorMessage}
                   variant="filled"
                   fullWidth
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
+                  value={lastName}
+                  onChange={(e) => setLastName(e.target.value)}
                   label={Strings.lastName()}
                   id="lastName"
                   type="text"
@@ -89,6 +186,8 @@ const Signup = () => {
               </Grid>
               <Grid item xs={12}>
                 <TextField
+                  error={errors.email.isError}
+                  helperText={errors.email.errorMessage}
                   variant="filled"
                   fullWidth
                   value={email}
@@ -100,6 +199,8 @@ const Signup = () => {
               </Grid>
               <Grid item xs={12}>
                 <PasswordField
+                  error={errors.password.isError}
+                  helperText={errors.password.errorMessage}
                   fullWidth
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
@@ -108,7 +209,12 @@ const Signup = () => {
                 />
               </Grid>
               <Grid item xs={12}>
-                <Button fullWidth className={classes.submitButton} size="large">
+                <Button
+                  fullWidth
+                  className={classes.submitButton}
+                  size="large"
+                  onClick={signup}
+                >
                   {Strings.submit()}
                 </Button>
               </Grid>

@@ -1,5 +1,5 @@
 import {ComponentType} from "react";
-import {Home, About, Dynamic, Login, Signup} from "../views";
+import {Home, Login, Signup} from "../views";
 import {RouteParams} from "./NavigationContext";
 import {isEmpty} from "lodash";
 
@@ -14,33 +14,6 @@ export interface RouteProps {
 }
 
 const routes: {[key: string]: RouteProps} = {
-  AboutDynamic: {
-    viewId: "AboutDynamic",
-    viewName: "Hola",
-    view: Dynamic,
-    path: "/about/child/child2/:someParam",
-    parentKey: "AboutChild2",
-  },
-  AboutChild2: {
-    viewId: "AboutChild2",
-    viewName: "2319",
-    view: About,
-    path: "/about/child/child2",
-    parentKey: "AboutChild",
-  },
-  AboutChild: {
-    viewId: "AboutChild",
-    viewName: "About Child",
-    view: About,
-    path: "/about/child",
-    parentKey: "About",
-  },
-  About: {
-    viewId: "About",
-    viewName: "About",
-    view: About,
-    path: "/about",
-  },
   Home: {
     viewId: "Home",
     viewName: "Home",

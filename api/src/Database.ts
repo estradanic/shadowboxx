@@ -17,9 +17,14 @@ export const put = async (key: string, value: unknown) => {
 };
 
 export const get = async <V>(key: string): Promise<V> => {
-  return await lock.acquire(DATABASE_LOCK_KEY, () =>
-    database.getData(sanitizeKey(key))
-  );
+  try {
+    const data = await lock.acquire(DATABASE_LOCK_KEY, () =>
+      database.getData(sanitizeKey(key))
+    );
+    return data;
+  } catch {
+    return null;
+  }
 };
 
 export const merge = async (

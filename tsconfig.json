@@ -21,6 +21,6 @@
     "jsx": "react-jsx"
   },
   "include": [
-    "src"
+    "src", "api/src/resources", "api/src/utils"
   ]
 }

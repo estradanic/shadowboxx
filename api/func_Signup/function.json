@@ -1,15 +1,11 @@
 {
   "bindings": [
     {
-      "route": "test",
       "authLevel": "anonymous",
       "type": "httpTrigger",
       "direction": "in",
       "name": "req",
-      "methods": [
-        "get",
-        "post"
-      ]
+      "methods": ["post"]
     },
     {
       "type": "http",
@@ -17,5 +13,5 @@
       "name": "res"
     }
   ],
-  "scriptFile": "../dist/zTest/index.js"
+  "scriptFile": "../dist/func_Signup/index.js"
 }
