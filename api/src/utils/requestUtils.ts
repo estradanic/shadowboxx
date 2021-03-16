@@ -4,6 +4,7 @@ export interface RequestParams<Request> {
   data?: Request;
   callback?: (result: any) => void;
   errorCallback?: (error: any) => void;
+  headers?: {[key: string]: string};
 }
 
 export const sendHTTPRequest = <Request>({
@@ -12,6 +13,7 @@ export const sendHTTPRequest = <Request>({
   data,
   callback,
   errorCallback,
+  headers,
 }: RequestParams<Request>) => {
   var xhr = new XMLHttpRequest();
   xhr.open(method, url, true);
@@ -32,6 +34,11 @@ export const sendHTTPRequest = <Request>({
     xhr.onerror = (error) => {
       errorCallback(error);
     };
+  }
+  if (headers) {
+    Object.keys(headers).forEach((header) => {
+      xhr.setRequestHeader(header, headers[header]);
+    });
   }
   if (data) {
     xhr.setRequestHeader("Content-Type", "application/json");

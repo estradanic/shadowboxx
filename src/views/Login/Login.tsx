@@ -10,6 +10,13 @@ import {
 } from "@material-ui/core";
 import Strings from "../../resources/Strings";
 import {PasswordField, Link} from "../../components";
+import {sendHTTPRequest} from "../../utils/requestUtils";
+import md5 from "md5";
+import {
+  ErrorState,
+  validateEmail,
+  validatePassword,
+} from "../../utils/formUtils";
 
 const useStyles = makeStyles((theme: Theme) => ({
   container: {
@@ -45,10 +52,67 @@ const useStyles = makeStyles((theme: Theme) => ({
   },
 }));
 
+interface LoginRequest {
+  email: string;
+  password: string;
+}
+
+const DefaultErrorState = {
+  email: {isError: false, errorMessage: ""},
+  password: {isError: false, errorMessage: ""},
+};
+
 const Login = () => {
   const classes = useStyles();
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
+  const [errors, setErrors] = useState<ErrorState<"email" | "password">>(
+    DefaultErrorState,
+  );
+
+  const validate = (): boolean => {
+    const newErrors = {...DefaultErrorState};
+
+    if (!validateEmail(email)) {
+      newErrors.email = {
+        isError: true,
+        errorMessage: Strings.invalidEmail(email),
+      };
+    }
+    if (!validatePassword(password)) {
+      newErrors.password = {
+        isError: true,
+        errorMessage: Strings.invalidPassword(password),
+      };
+    }
+
+    setErrors(newErrors);
+    return !(newErrors.email.isError || newErrors.password.isError);
+  };
+
+  const loginSucceed = (response: any) => {
+    console.log(response);
+  };
+
+  const loginFail = (error: any) => {
+    console.log(error);
+  };
+
+  const login = () => {
+    if (validate()) {
+      const loginRequest = {
+        email,
+        password: md5(password),
+      };
+      sendHTTPRequest<LoginRequest>({
+        method: "POST",
+        url: "/api/func_Login",
+        data: loginRequest,
+        callback: loginSucceed,
+        errorCallback: loginFail,
+      });
+    }
+  };
 
   return (
     <Container maxWidth="xl" className={classes.container}>
@@ -74,6 +138,8 @@ const Login = () => {
                   label={Strings.email()}
                   id="email"
                   type="email"
+                  error={errors.email.isError}
+                  helperText={errors.email.errorMessage}
                 />
               </Grid>
               <Grid item xs={12}>
@@ -83,10 +149,17 @@ const Login = () => {
                   onChange={(e) => setPassword(e.target.value)}
                   label={Strings.password()}
                   id="password"
+                  error={errors.password.isError}
+                  helperText={errors.password.errorMessage}
                 />
               </Grid>
               <Grid item xs={12}>
-                <Button fullWidth className={classes.submitButton} size="large">
+                <Button
+                  onClick={login}
+                  fullWidth
+                  className={classes.submitButton}
+                  size="large"
+                >
                   {Strings.submit()}
                 </Button>
               </Grid>

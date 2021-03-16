@@ -25,7 +25,7 @@ const validate = (
       errorMessage: Strings.invalidEmail(email),
     };
   }
-  if (!password.startsWith("sha1$")) {
+  if (isNullOrWhitespace(password)) {
     errors.password = {
       isError: true,
       errorMessage: Strings.invalidPassword(password),
@@ -67,6 +67,7 @@ const httpTrigger: AzureFunction = async function (
     context.log(errorMessage);
     context.res = {
       status: 400,
+      error: errorMessage,
     };
     return;
   }
@@ -75,7 +76,8 @@ const httpTrigger: AzureFunction = async function (
   if (existingUserData) {
     context.log(Strings.emailExists(req.body.email));
     context.res = {
-      status: 400,
+      status: 409,
+      error: Strings.emailExists(req.body.email),
     };
     return;
   }
@@ -101,7 +103,7 @@ const httpTrigger: AzureFunction = async function (
     req.headers["x-forwarded-host"] == "localhost:3000" ? "" : "Secure; ";
 
   context.res = {
-    body: true,
+    body: userData,
     headers: {
       "Set-Cookie": `sessionid=${sessionId}; Expires=${nextWeek.toUTCString()}; SameSite=Lax; ${secure}HttpOnly;`,
     },

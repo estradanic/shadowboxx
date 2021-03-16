@@ -11,7 +11,7 @@ import {
 import Strings from "../../resources/Strings";
 import {PasswordField, Link} from "../../components";
 import {sendHTTPRequest} from "../../utils/requestUtils";
-import {generate as generateHash} from "password-hash";
+import md5 from "md5";
 import {
   ErrorState,
   validateEmail,
@@ -60,6 +60,13 @@ interface SignupRequest {
   password: string;
 }
 
+const DefaultErrorState = {
+  email: {isError: false, errorMessage: ""},
+  firstName: {isError: false, errorMessage: ""},
+  lastName: {isError: false, errorMessage: ""},
+  password: {isError: false, errorMessage: ""},
+};
+
 const Signup = () => {
   const classes = useStyles();
   const [email, setEmail] = useState<string>("");
@@ -68,20 +75,10 @@ const Signup = () => {
   const [lastName, setLastName] = useState<string>("");
   const [errors, setErrors] = useState<
     ErrorState<"email" | "firstName" | "lastName" | "password">
-  >({
-    email: {isError: false, errorMessage: ""},
-    firstName: {isError: false, errorMessage: ""},
-    lastName: {isError: false, errorMessage: ""},
-    password: {isError: false, errorMessage: ""},
-  });
+  >(DefaultErrorState);
 
   const validate = (): boolean => {
-    const newErrors = {
-      email: {isError: false, errorMessage: ""},
-      firstName: {isError: false, errorMessage: ""},
-      lastName: {isError: false, errorMessage: ""},
-      password: {isError: false, errorMessage: ""},
-    };
+    const newErrors = {...DefaultErrorState};
 
     if (!validateEmail(email)) {
       newErrors.email = {
@@ -131,7 +128,7 @@ const Signup = () => {
         email,
         firstName,
         lastName,
-        password: generateHash(password),
+        password: md5(password),
       };
       sendHTTPRequest<SignupRequest>({
         method: "POST",
