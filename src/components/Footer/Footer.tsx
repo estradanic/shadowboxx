@@ -14,6 +14,10 @@ const useStyles = makeStyles((theme: Theme) => ({
   },
 }));
 
+/**
+ * Component to display info at the bottom of a page
+ * @returns
+ */
 const Footer = () => {
   const classes = useStyles();
 

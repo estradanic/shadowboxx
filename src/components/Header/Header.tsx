@@ -15,7 +15,6 @@ import {useNavigationContext} from "../../app/NavigationContext";
 import {useUserContext} from "../../app/UserContext";
 import Link from "../Link/Link";
 import {useHistory} from "react-router-dom";
-import {useRoutes} from "../../app/routes";
 
 const useStyles = makeStyles((theme: Theme) => ({
   backButton: {
@@ -33,30 +32,35 @@ const useStyles = makeStyles((theme: Theme) => ({
       textDecoration: "none",
     },
   },
+  menuButton: {
+    marginLeft: "auto",
+    marginRight: theme.spacing(1),
+  },
   toolbar: {
     paddingRight: 0,
   },
 }));
 
+/**
+ * Interface defining props for Header
+ */
 export interface HeaderProps extends AppBarProps {
+  /** Key for the current route */
   viewId: string;
 }
 
+/**
+ * Component to provide navigation and user info and functionality at the top of a page
+ * @param param0
+ * @returns
+ */
 const Header = ({viewId, ...rest}: HeaderProps) => {
   const theme = useTheme();
   const xs = useMediaQuery(theme.breakpoints.down("xs"));
   const classes = useStyles({xs});
-  const {routeHistory, setRouteHistory, routeParams} = useNavigationContext();
+  const {routeHistory, navigateBack} = useNavigationContext();
   const {loggedIn} = useUserContext();
   const history = useHistory();
-  const {getRoutePath} = useRoutes();
-
-  const navigateBack = () => {
-    const newRouteHistory = routeHistory;
-    newRouteHistory.shift();
-    setRouteHistory(newRouteHistory);
-    history.push(getRoutePath(newRouteHistory[0], routeParams));
-  };
 
   let showBackButton = false;
   if (routeHistory.length === 1) {
@@ -73,7 +77,7 @@ const Header = ({viewId, ...rest}: HeaderProps) => {
             {Strings.appName()}
           </Link>
           {loggedIn ? (
-            <IconButton color="inherit">
+            <IconButton className={classes.menuButton} color="inherit">
               <Menu />
             </IconButton>
           ) : (

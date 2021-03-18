@@ -27,7 +27,11 @@ const useStyles = makeStyles((theme: Theme) => ({
   },
 }));
 
+/**
+ * Interface defining props for Breadcrumbs
+ */
 export interface BreadcrumbsProps extends MatBreadcrumbsProps {
+  /** Key of the current route */
   viewId: string;
 }
 
@@ -45,6 +49,11 @@ const getBreadcrumbs = (
   }
 };
 
+/**
+ * Component to allow easy hierarchical navigation of the site
+ * @param param0
+ * @returns
+ */
 const Breadcrumbs = ({viewId, ...rest}: BreadcrumbsProps) => {
   const {routes, getRoutePath} = useRoutes();
   const classes = useStyles();

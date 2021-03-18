@@ -3,6 +3,11 @@ import LayoutProps from "./LayoutProps";
 import Header from "../Header/Header";
 import Footer from "../Footer/Footer";
 
+/**
+ * Default layout component, comprised of a Header, Body, and Footer
+ * @param param0
+ * @returns
+ */
 const DefaultLayout = ({viewId, children}: LayoutProps) => (
   <>
     <Header viewId={viewId} position="sticky" />

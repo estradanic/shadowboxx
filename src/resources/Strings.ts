@@ -1,3 +1,7 @@
+/**
+ * Object providing dynamic access to strings used throughout the site.
+ * Needed to avoid string literals for consistency.
+ */
 const Strings: {[key: string]: (params?: any) => string} = {
   alreadyHaveAccount: () => "Already have an account?",
   appName: () => "Albums",

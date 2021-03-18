@@ -47,8 +47,8 @@ const httpTrigger: AzureFunction = async function (
     return;
   }
 
-  const existingUserData = await get(`users/${req.body.email}`);
-  if (!existingUserData) {
+  const userData = await get(`users/${req.body.email}`);
+  if (!userData) {
     context.log(Strings.noEmailExists(req.body.email));
     context.res = {
       error: Strings.noEmailExists(req.body.email),
@@ -57,7 +57,7 @@ const httpTrigger: AzureFunction = async function (
     return;
   }
 
-  if (!verify(req.body.password, existingUserData["password"])) {
+  if (!verify(req.body.password, userData["password"])) {
     context.log(Strings.incorrectPassword());
     context.res = {
       status: 401,
@@ -66,9 +66,9 @@ const httpTrigger: AzureFunction = async function (
     return;
   }
 
-  const sessionId = uuid();
-  existingUserData["sessionId"] = sessionId;
-  await put(`users/${req.body.email}`, existingUserData);
+  const sessionId = `${req.body.email}|${uuid()}`;
+  userData["sessionId"] = sessionId;
+  await put(`users/${req.body.email}`, userData);
 
   const today = new Date();
   const nextWeek = new Date(
@@ -81,9 +81,13 @@ const httpTrigger: AzureFunction = async function (
     req.headers["x-forwarded-host"] == "localhost:3000" ? "" : "Secure; ";
 
   context.res = {
-    body: existingUserData,
+    body: {
+      firstName: userData["firstName"],
+      lastName: userData["lastName"],
+      email: userData["email"],
+    },
     headers: {
-      "Set-Cookie": `sessionid=${sessionId}; Expires=${nextWeek.toUTCString()}; SameSite=Lax; ${secure}HttpOnly;`,
+      "Set-Cookie": `sessionId=${sessionId}; Expires=${nextWeek.toUTCString()}; SameSite=Lax; ${secure}HttpOnly;`,
     },
   };
 };

@@ -82,7 +82,7 @@ const httpTrigger: AzureFunction = async function (
     return;
   }
 
-  const sessionId = uuid();
+  const sessionId = `${req.body.email}|${uuid()}`;
   const userData = {
     email: req.body.email,
     password: generateHash(req.body.password),
@@ -103,9 +103,13 @@ const httpTrigger: AzureFunction = async function (
     req.headers["x-forwarded-host"] == "localhost:3000" ? "" : "Secure; ";
 
   context.res = {
-    body: userData,
+    body: {
+      firstName: userData["firstName"],
+      lastName: userData["lastName"],
+      email: userData["email"],
+    },
     headers: {
-      "Set-Cookie": `sessionid=${sessionId}; Expires=${nextWeek.toUTCString()}; SameSite=Lax; ${secure}HttpOnly;`,
+      "Set-Cookie": `sessionId=${sessionId}; Expires=${nextWeek.toUTCString()}; SameSite=Lax; ${secure}HttpOnly;`,
     },
   };
 };

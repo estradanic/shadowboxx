@@ -16,9 +16,15 @@ const useStyles = makeStyles((theme: Theme) => ({
   },
 }));
 
+/**
+ * Interface defining props for PasswordField
+ */
 export interface PasswordFieldProps
   extends Omit<FilledTextFieldProps, "type" | "variant"> {}
 
+/**
+ * Component for entering passwords and other "hidden" text
+ */
 const PasswordField = ({
   className: piClassName,
   InputProps: piInputProps,

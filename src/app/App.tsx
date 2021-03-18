@@ -1,6 +1,6 @@
 import React from "react";
 import {BrowserRouter as Router, Switch} from "react-router-dom";
-import ViewWrapper from "./ViewWrapper";
+import ViewWrapper from "./RouteWrapper";
 import {useRoutes} from "./routes";
 
 const App = () => {
@@ -8,13 +8,11 @@ const App = () => {
 
   return (
     <Router>
-      <div>
-        <Switch>
-          {Object.keys(routes).map((routeKey) => (
-            <ViewWrapper key={routeKey} {...routes[routeKey]} />
-          ))}
-        </Switch>
-      </div>
+      <Switch>
+        {Object.keys(routes).map((routeKey) => (
+          <ViewWrapper key={routeKey} {...routes[routeKey]} />
+        ))}
+      </Switch>
     </Router>
   );
 };

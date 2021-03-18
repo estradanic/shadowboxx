@@ -7,7 +7,9 @@ import {
   Grid,
   Typography,
   Button,
+  Snackbar,
 } from "@material-ui/core";
+import {Alert} from "@material-ui/lab";
 import Strings from "../../resources/Strings";
 import {PasswordField, Link} from "../../components";
 import {sendHTTPRequest} from "../../utils/requestUtils";
@@ -18,6 +20,11 @@ import {
   validatePassword,
 } from "../../utils/formUtils";
 import {isNullOrWhitespace} from "../../utils/stringUtils";
+import {UserInfo, useUserContext} from "../../app/UserContext";
+import {useNavigationContext} from "../../app/NavigationContext";
+import {useHistory} from "react-router-dom";
+import {useRoutes} from "../../app/routes";
+import {useView} from "../View";
 
 const useStyles = makeStyles((theme: Theme) => ({
   container: {
@@ -53,10 +60,17 @@ const useStyles = makeStyles((theme: Theme) => ({
   },
 }));
 
+/**
+ * Interface defining the body of a signup request
+ */
 interface SignupRequest {
+  /** User's email */
   email: string;
+  /** User's first name */
   firstName: string;
+  /** User's last name */
   lastName: string;
+  /** Md5 hash of the user's password */
   password: string;
 }
 
@@ -67,15 +81,27 @@ const DefaultErrorState = {
   password: {isError: false, errorMessage: ""},
 };
 
+/**
+ * Signup page for the site
+ * @returns
+ */
 const Signup = () => {
+  useView("Signup");
+
   const classes = useStyles();
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
   const [firstName, setFirstName] = useState<string>("");
   const [lastName, setLastName] = useState<string>("");
+  const [errorOpen, setErrorOpen] = useState<boolean>(false);
+  const [errorMessage, setErrorMessage] = useState<string>("");
   const [errors, setErrors] = useState<
     ErrorState<"email" | "firstName" | "lastName" | "password">
   >(DefaultErrorState);
+  const {redirectRoute} = useNavigationContext();
+  const {routes} = useRoutes();
+  const history = useHistory();
+  const {loginSucceed} = useUserContext();
 
   const validate = (): boolean => {
     const newErrors = {...DefaultErrorState};
@@ -114,12 +140,15 @@ const Signup = () => {
     );
   };
 
-  const signupSucceed = (response: unknown) => {
-    console.log(response);
+  const signupFail = (error: unknown) => {
+    setErrorMessage(error as string);
+    setErrorOpen(true);
   };
 
-  const signupFail = (error: unknown) => {
-    console.log(error);
+  const handleErrorClose = (_: any, reason: string) => {
+    if (reason !== "clickaway") {
+      setErrorOpen(false);
+    }
   };
 
   const signup = () => {
@@ -130,11 +159,18 @@ const Signup = () => {
         lastName,
         password: md5(password),
       };
-      sendHTTPRequest<SignupRequest>({
+      sendHTTPRequest<SignupRequest, UserInfo>({
         method: "POST",
         url: "/api/func_Signup",
         data: signupRequest,
-        callback: signupSucceed,
+        callback: (response: UserInfo) => {
+          loginSucceed(response);
+          if (redirectRoute?.viewId) {
+            history.push(redirectRoute.path);
+          } else {
+            history.push(routes["Home"].path);
+          }
+        },
         errorCallback: signupFail,
       });
     }
@@ -223,6 +259,13 @@ const Signup = () => {
         <Typography variant="h6">{Strings.alreadyHaveAccount()}</Typography>
         <Link to="/login">{Strings.login()}</Link>
       </Grid>
+      <Snackbar
+        open={errorOpen}
+        autoHideDuration={3000}
+        onClose={handleErrorClose}
+      >
+        <Alert severity="error">{errorMessage}</Alert>
+      </Snackbar>
     </Container>
   );
 };

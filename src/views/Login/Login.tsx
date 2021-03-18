@@ -7,7 +7,9 @@ import {
   Grid,
   Typography,
   Button,
+  Snackbar,
 } from "@material-ui/core";
+import {Alert} from "@material-ui/lab";
 import Strings from "../../resources/Strings";
 import {PasswordField, Link} from "../../components";
 import {sendHTTPRequest} from "../../utils/requestUtils";
@@ -17,6 +19,11 @@ import {
   validateEmail,
   validatePassword,
 } from "../../utils/formUtils";
+import {useUserContext, UserInfo} from "../../app/UserContext";
+import {useNavigationContext} from "../../app/NavigationContext";
+import {useHistory} from "react-router-dom";
+import {useRoutes} from "../../app/routes";
+import {useView} from "../View";
 
 const useStyles = makeStyles((theme: Theme) => ({
   container: {
@@ -52,8 +59,13 @@ const useStyles = makeStyles((theme: Theme) => ({
   },
 }));
 
+/**
+ * Interface defining the body for a login request
+ */
 interface LoginRequest {
+  /** User's email */
   email: string;
+  /** Md5 hash of the user's password */
   password: string;
 }
 
@@ -62,13 +74,25 @@ const DefaultErrorState = {
   password: {isError: false, errorMessage: ""},
 };
 
+/**
+ * Login page for the site
+ * @returns
+ */
 const Login = () => {
+  useView("Login");
+
   const classes = useStyles();
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
+  const [errorOpen, setErrorOpen] = useState<boolean>(false);
+  const [errorMessage, setErrorMessage] = useState<string>("");
   const [errors, setErrors] = useState<ErrorState<"email" | "password">>(
     DefaultErrorState,
   );
+  const {loginSucceed} = useUserContext();
+  const {redirectRoute} = useNavigationContext();
+  const history = useHistory();
+  const {routes} = useRoutes();
 
   const validate = (): boolean => {
     const newErrors = {...DefaultErrorState};
@@ -90,12 +114,15 @@ const Login = () => {
     return !(newErrors.email.isError || newErrors.password.isError);
   };
 
-  const loginSucceed = (response: any) => {
-    console.log(response);
+  const loginFail = (error: any) => {
+    setErrorMessage(error as string);
+    setErrorOpen(true);
   };
 
-  const loginFail = (error: any) => {
-    console.log(error);
+  const handleErrorClose = (_: any, reason: string) => {
+    if (reason !== "clickaway") {
+      setErrorOpen(false);
+    }
   };
 
   const login = () => {
@@ -104,11 +131,18 @@ const Login = () => {
         email,
         password: md5(password),
       };
-      sendHTTPRequest<LoginRequest>({
+      sendHTTPRequest<LoginRequest, UserInfo>({
         method: "POST",
         url: "/api/func_Login",
         data: loginRequest,
-        callback: loginSucceed,
+        callback: (response: UserInfo) => {
+          loginSucceed(response);
+          if (redirectRoute?.viewId) {
+            history.push(redirectRoute.path);
+          } else {
+            history.push(routes["Home"].path);
+          }
+        },
         errorCallback: loginFail,
       });
     }
@@ -171,6 +205,13 @@ const Login = () => {
         <Typography variant="h6">{Strings.noAccount()}</Typography>
         <Link to="/signup">{Strings.signup()}</Link>
       </Grid>
+      <Snackbar
+        open={errorOpen}
+        autoHideDuration={3000}
+        onClose={handleErrorClose}
+      >
+        <Alert severity="error">{errorMessage}</Alert>
+      </Snackbar>
     </Container>
   );
 };
