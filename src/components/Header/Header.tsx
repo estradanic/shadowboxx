@@ -1,24 +1,38 @@
-import React from "react";
+import React, {useState} from "react";
 import {
   AppBar,
   AppBarProps,
   Toolbar,
   Button,
   IconButton,
+  SwipeableDrawer,
+  List,
+  ListItemIcon,
   useMediaQuery,
+  ListItemText,
 } from "@material-ui/core";
-import {Menu, ArrowBack} from "@material-ui/icons";
+import {Menu, ArrowBack, Home, ExitToApp} from "@material-ui/icons";
 import {makeStyles, Theme, useTheme} from "@material-ui/core/styles";
 import Breadcrumbs from "../Breadcrumbs/Breadcrumbs";
 import Strings from "../../resources/Strings";
 import {useNavigationContext} from "../../app/NavigationContext";
 import {useUserContext} from "../../app/UserContext";
 import Link from "../Link/Link";
+import ListItemLink from "../Link/ListItemLink";
 import {useHistory} from "react-router-dom";
 
 const useStyles = makeStyles((theme: Theme) => ({
   backButton: {
     marginRight: theme.spacing(3),
+  },
+  drawer: {
+    backgroundColor: theme.palette.primary.dark,
+    color: theme.palette.primary.contrastText,
+    width: "40%",
+    paddingTop: theme.spacing(2),
+  },
+  listItemIcon: {
+    color: theme.palette.primary.contrastText,
   },
   loginButton: {
     marginLeft: "auto",
@@ -59,8 +73,10 @@ const Header = ({viewId, ...rest}: HeaderProps) => {
   const xs = useMediaQuery(theme.breakpoints.down("xs"));
   const classes = useStyles({xs});
   const {routeHistory, navigateBack} = useNavigationContext();
-  const {loggedIn} = useUserContext();
+  const {loggedIn, logout} = useUserContext();
   const history = useHistory();
+
+  const [drawerOpen, setDrawerOpen] = useState<boolean>(false);
 
   let showBackButton = false;
   if (routeHistory.length === 1) {
@@ -77,9 +93,37 @@ const Header = ({viewId, ...rest}: HeaderProps) => {
             {Strings.appName()}
           </Link>
           {loggedIn ? (
-            <IconButton className={classes.menuButton} color="inherit">
-              <Menu />
-            </IconButton>
+            <>
+              <IconButton
+                onClick={() => setDrawerOpen(true)}
+                className={classes.menuButton}
+                color="inherit"
+              >
+                <Menu />
+              </IconButton>
+              <SwipeableDrawer
+                classes={{paper: classes.drawer}}
+                onClose={() => setDrawerOpen(false)}
+                onOpen={() => setDrawerOpen(true)}
+                anchor="right"
+                open={drawerOpen}
+              >
+                <List>
+                  <ListItemLink to="/">
+                    <ListItemIcon className={classes.listItemIcon}>
+                      <Home color="inherit" />
+                    </ListItemIcon>
+                    <ListItemText primary={Strings.home()} />
+                  </ListItemLink>
+                  <ListItemLink onClick={logout} to="/login">
+                    <ListItemIcon className={classes.listItemIcon}>
+                      <ExitToApp />
+                    </ListItemIcon>
+                    <ListItemText primary={Strings.logout()} />
+                  </ListItemLink>
+                </List>
+              </SwipeableDrawer>
+            </>
           ) : (
             <Button
               size={xs ? "small" : "medium"}

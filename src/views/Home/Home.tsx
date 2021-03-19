@@ -1,11 +1,7 @@
 import React from "react";
-import Strings from "../../resources/Strings";
 import {useView} from "../View";
-import {makeStyles, Theme} from "@material-ui/core/styles";
 import {PageContainer} from "../../components";
 import {useUserContext} from "../../app/UserContext";
-
-const useStyles = makeStyles((theme: Theme) => ({}));
 
 const HomePage = () => {
   return <h1>Home page</h1>;

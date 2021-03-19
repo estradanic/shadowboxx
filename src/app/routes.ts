@@ -25,6 +25,8 @@ export interface RouteProps {
   tryAuthenticate?: boolean;
   /** Redirect to login page if not authenticated */
   redirectOnAuthFail?: boolean;
+  /** Function to run on page load */
+  middleware?: () => void;
 }
 
 /**

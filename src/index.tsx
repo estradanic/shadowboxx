@@ -2,7 +2,10 @@ import React from "react";
 import ReactDOM from "react-dom";
 import "./index.css";
 import App from "./app/App";
-import {MuiThemeProvider, createMuiTheme} from "@material-ui/core/styles";
+import {
+  MuiThemeProvider,
+  unstable_createMuiStrictModeTheme as createMuiTheme,
+} from "@material-ui/core/styles";
 import {UserContextProvider} from "./app/UserContext";
 import {NavigationContextProvider} from "./app/NavigationContext";
 

@@ -4,3 +4,4 @@ export {default as Header} from "./Header/Header";
 export {default as PasswordField} from "./PasswordField/PasswordField";
 export {default as Link} from "./Link/Link";
 export {default as PageContainer} from "./PageContainer/PageContainer";
+export {default as ListItemLink} from "./Link/ListItemLink";

@@ -1,4 +1,5 @@
 import React, {useState, createContext, useContext} from "react";
+import {sendHTTPRequest} from "../utils/requestUtils";
 
 /**
  * Interface defining information about the logged in user
@@ -34,6 +35,8 @@ interface UserContextValue {
   setLastName: React.Dispatch<React.SetStateAction<string>>;
   /** Helper function to be called on a successful login */
   loginSucceed: (info: UserInfo) => void;
+  /** Helper function to log out the user */
+  logout: () => void;
 }
 
 /**
@@ -49,6 +52,7 @@ const UserContext = createContext({
   lastName: "",
   setLastName: (_: string | ((_: string) => string)) => {},
   loginSucceed: (_: UserInfo) => {},
+  logout: () => {},
 });
 
 /**
@@ -73,6 +77,19 @@ export const UserContextProvider = ({children}: UserContextProviderProps) => {
     setLoggedIn(true);
   };
 
+  const logout = () => {
+    sendHTTPRequest<never, never>({
+      method: "POST",
+      url: "/api/func_Logout",
+      callback: () => {
+        setEmail("");
+        setFirstName("");
+        setLastName("");
+        setLoggedIn(false);
+      },
+    });
+  };
+
   const value: UserContextValue = {
     loggedIn,
     setLoggedIn,
@@ -83,6 +100,7 @@ export const UserContextProvider = ({children}: UserContextProviderProps) => {
     lastName,
     setLastName,
     loginSucceed,
+    logout,
   };
 
   return <UserContext.Provider value={value}>{children}</UserContext.Provider>;
