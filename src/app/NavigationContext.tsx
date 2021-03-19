@@ -57,7 +57,7 @@ const NavigationContext = createContext({
 
 /**
  * Interface defining what to pass to useNavigationContextEffect
- * */
+ */
 interface NavigationInfo {
   /** Historical React Router url parameters mapped to route viewId */
   routeParams?: RouteParams;
@@ -67,7 +67,7 @@ interface NavigationInfo {
 
 /**
  * Interface defining props for NavigationContextProvider
- * */
+ */
 interface NavigationContextProviderProps {
   /** Child node */
   children: React.ReactNode;
@@ -113,7 +113,7 @@ export const NavigationContextProvider = ({
 
 /**
  * Alias to useContext(NavigationContext)
- * */
+ */
 export const useNavigationContext = () => useContext(NavigationContext);
 
 /**

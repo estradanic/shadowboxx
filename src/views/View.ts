@@ -8,14 +8,14 @@ import {useEffect} from "react";
 
 /**
  * Interface to define access to React Router path parameters.
- * */
+ */
 export interface ViewProps<Params> {
   /** Match property provided by React Router */
   match: match<Params>;
 }
 
 /**
- * Helper function to be run in a useEffect at the beginning of every View component.
+ * Hook that handles navigation and authentication management at the beginning of every View component.
  * @param currentViewId
  */
 export const useView = (currentViewId: string) => {
@@ -33,7 +33,7 @@ export const useView = (currentViewId: string) => {
 
   useEffect(() => {
     if (loggedIn) {
-      if (!currentRoute.authenticate) {
+      if (!currentRoute.redirectOnAuthFail) {
         if (redirectRoute?.viewId) {
           const redirectPath = getRoutePath(redirectRoute?.viewId, routeParams);
           setRedirectRoute({viewId: "", path: ""});
@@ -46,33 +46,25 @@ export const useView = (currentViewId: string) => {
           setRouteHistory(newRouteHistory);
         }
       }
-    } else if (currentRoute.authenticate) {
+    } else if (currentRoute.tryAuthenticate) {
       sendHTTPRequest<string, UserInfo>({
         method: "POST",
         url: "/api/func_SessionAuthenticate",
         callback: loginSucceed,
         errorCallback: () => {
-          const loginRoute = routes["Login"];
-          setRedirectRoute({
-            viewId: currentViewId,
-            path: getRoutePath(currentViewId, routeParams),
-          });
-          history.push(loginRoute.path);
+          if (currentRoute.redirectOnAuthFail) {
+            const loginRoute = routes["Login"];
+            setRedirectRoute({
+              viewId: currentViewId,
+              path: getRoutePath(currentViewId, routeParams),
+            });
+            history.push(loginRoute.path);
+          }
         },
       });
     }
-  }, [
-    loggedIn,
-    currentRoute.authenticate,
-    currentViewId,
-    getRoutePath,
-    history,
-    loginSucceed,
-    redirectRoute?.viewId,
-    routeHistory,
-    routeParams,
-    routes,
-    setRedirectRoute,
-    setRouteHistory,
-  ]);
+    // Only rerun when loggedIn or routeParams changes.
+    // Eslint is being over-protective here.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [loggedIn, routeParams]);
 };

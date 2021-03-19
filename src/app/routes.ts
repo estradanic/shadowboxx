@@ -21,8 +21,10 @@ export interface RouteProps {
   layout?: string;
   /** Does path have to match exactly */
   exact?: boolean;
-  /** Whether or not this page needs authentication */
-  authenticate?: boolean;
+  /** Whether to try to sessionId authenticate on page load */
+  tryAuthenticate?: boolean;
+  /** Redirect to login page if not authenticated */
+  redirectOnAuthFail?: boolean;
 }
 
 /**
@@ -34,28 +36,25 @@ const routes: {[key: string]: RouteProps} = {
     viewName: "Home",
     view: Home,
     path: "/home",
-    authenticate: false,
+    tryAuthenticate: true,
   },
   Login: {
     viewId: "Login",
     viewName: "Login",
     view: Login,
     path: "/login",
-    authenticate: false,
   },
   Signup: {
     viewId: "Signup",
     viewName: "Signup",
     view: Signup,
     path: "/signup",
-    authenticate: false,
   },
   Root: {
     viewId: "Root",
     viewName: "Home",
     view: Home,
     path: "/",
-    authenticate: false,
   },
 };
 
