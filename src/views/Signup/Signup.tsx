@@ -1,14 +1,6 @@
 import React, {useState} from "react";
 import {makeStyles, Theme} from "@material-ui/core/styles";
-import {
-  Card,
-  TextField,
-  Grid,
-  Typography,
-  Button,
-  Snackbar,
-} from "@material-ui/core";
-import {Alert} from "@material-ui/lab";
+import {Card, TextField, Grid, Typography, Button} from "@material-ui/core";
 import Strings from "../../resources/Strings";
 import {PasswordField, Link, PageContainer} from "../../components";
 import {sendHTTPRequest} from "../../utils/requestUtils";
@@ -84,15 +76,13 @@ const Signup = () => {
   const [password, setPassword] = useState<string>("");
   const [firstName, setFirstName] = useState<string>("");
   const [lastName, setLastName] = useState<string>("");
-  const [errorOpen, setErrorOpen] = useState<boolean>(false);
-  const [errorMessage, setErrorMessage] = useState<string>("");
   const [errors, setErrors] = useState<
     ErrorState<"email" | "firstName" | "lastName" | "password">
   >(DefaultErrorState);
   const {redirectRoute} = useNavigationContext();
   const {routes} = useRoutes();
   const history = useHistory();
-  const {loginSucceed} = useUserContext();
+  const {loginSucceed, loginFail} = useUserContext();
 
   const validate = (): boolean => {
     const newErrors = {...DefaultErrorState};
@@ -131,17 +121,6 @@ const Signup = () => {
     );
   };
 
-  const signupFail = (error: unknown) => {
-    setErrorMessage(error as string);
-    setErrorOpen(true);
-  };
-
-  const handleErrorClose = (_: any, reason: string) => {
-    if (reason !== "clickaway") {
-      setErrorOpen(false);
-    }
-  };
-
   const signup = () => {
     if (validate()) {
       const signupRequest = {
@@ -162,7 +141,7 @@ const Signup = () => {
             history.push(routes["Home"].path);
           }
         },
-        errorCallback: signupFail,
+        errorCallback: loginFail,
       });
     }
   };
@@ -242,13 +221,6 @@ const Signup = () => {
       <br />
       <Typography variant="h6">{Strings.alreadyHaveAccount()}</Typography>
       <Link to="/login">{Strings.login()}</Link>
-      <Snackbar
-        open={errorOpen}
-        autoHideDuration={3000}
-        onClose={handleErrorClose}
-      >
-        <Alert severity="error">{errorMessage}</Alert>
-      </Snackbar>
     </PageContainer>
   );
 };

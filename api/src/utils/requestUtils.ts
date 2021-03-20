@@ -6,7 +6,7 @@ export interface RequestParams<Request, Response> {
   url: string;
   data?: Request;
   callback?: (result: Response) => void;
-  errorCallback?: (error: unknown) => void;
+  errorCallback?: (error: any) => void;
   headers?: {[key: string]: string};
 }
 
@@ -33,6 +33,8 @@ export const sendHTTPRequest = <Request, Response>({
           result = xhr.response as Response;
         }
         callback(result);
+      } else if (errorCallback) {
+        errorCallback(xhr.response as string);
       }
     };
   }
@@ -51,38 +53,6 @@ export const sendHTTPRequest = <Request, Response>({
     xhr.send(JSON.stringify(data));
   } else {
     xhr.send();
-  }
-};
-
-/**
- * Helper function to send an http request using async/await
- */
-export const sendAsyncHTTPRequest = async <Request, Response>({
-  method,
-  url,
-  data,
-  headers,
-}: RequestParams<Request, Response>) => {
-  const response = await fetch(url, {
-    method,
-    headers,
-    body: JSON.stringify(data),
-  });
-
-  if (response.status >= 200 && response.status < 400) {
-    let result: Response;
-    try {
-      result = JSON.parse(await response.json()) as Response;
-    } catch {
-      result = ((await response.text()) as unknown) as Response;
-    }
-    return new Promise<Response>((resolve) => {
-      resolve(result);
-    });
-  } else {
-    return new Promise<any>((resolve) => {
-      resolve(response.statusText);
-    });
   }
 };
 

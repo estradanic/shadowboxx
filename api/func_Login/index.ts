@@ -41,7 +41,7 @@ const httpTrigger: AzureFunction = async function (
   if (!isNullOrWhitespace(errorMessage)) {
     context.log(errorMessage);
     context.res = {
-      error: errorMessage,
+      body: errorMessage,
       status: 400,
     };
     return;
@@ -51,7 +51,7 @@ const httpTrigger: AzureFunction = async function (
   if (!userData) {
     context.log(Strings.noEmailExists(req.body.email));
     context.res = {
-      error: Strings.noEmailExists(req.body.email),
+      body: Strings.noEmailExists(req.body.email),
       status: 401,
     };
     return;
@@ -61,7 +61,7 @@ const httpTrigger: AzureFunction = async function (
     context.log(Strings.incorrectPassword());
     context.res = {
       status: 401,
-      error: Strings.incorrectPassword(),
+      body: Strings.incorrectPassword(),
     };
     return;
   }

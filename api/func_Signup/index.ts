@@ -67,7 +67,7 @@ const httpTrigger: AzureFunction = async function (
     context.log(errorMessage);
     context.res = {
       status: 400,
-      error: errorMessage,
+      body: errorMessage,
     };
     return;
   }
@@ -77,7 +77,7 @@ const httpTrigger: AzureFunction = async function (
     context.log(Strings.emailExists(req.body.email));
     context.res = {
       status: 409,
-      error: Strings.emailExists(req.body.email),
+      body: Strings.emailExists(req.body.email),
     };
     return;
   }

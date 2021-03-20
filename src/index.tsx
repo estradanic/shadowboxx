@@ -8,6 +8,7 @@ import {
 } from "@material-ui/core/styles";
 import {UserContextProvider} from "./app/UserContext";
 import {NavigationContextProvider} from "./app/NavigationContext";
+import {SnackbarProvider} from "./components";
 
 const theme = createMuiTheme({
   palette: {
@@ -17,17 +18,43 @@ const theme = createMuiTheme({
       contrastText: "#FFFFFF",
       light: "#1B71B5",
     },
+    error: {
+      main: "#B22222",
+      dark: "#A01E1E",
+      light: "#C14E4E",
+      contrastText: "#FFFFFF",
+    },
+    success: {
+      main: "#24A56C",
+      dark: "#209461",
+      light: "#4CA980",
+      contrastText: "#FFFFFF",
+    },
+    info: {
+      main: "#01579B",
+      dark: "#01467C",
+      contrastText: "#FFFFFF",
+      light: "#1B71B5",
+    },
+    warning: {
+      main: "#FB8C00",
+      dark: "#E17E00",
+      contrastText: "#FFFFFF",
+      light: "#E79732",
+    },
   },
 });
 
 ReactDOM.render(
   <React.StrictMode>
     <MuiThemeProvider theme={theme}>
-      <NavigationContextProvider>
-        <UserContextProvider>
-          <App />
-        </UserContextProvider>
-      </NavigationContextProvider>
+      <SnackbarProvider>
+        <NavigationContextProvider>
+          <UserContextProvider>
+            <App />
+          </UserContextProvider>
+        </NavigationContextProvider>
+      </SnackbarProvider>
     </MuiThemeProvider>
   </React.StrictMode>,
   document.getElementById("root"),

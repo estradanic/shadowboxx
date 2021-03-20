@@ -1,23 +1,11 @@
 import React, {useState} from "react";
 import {makeStyles, Theme} from "@material-ui/core/styles";
-import {
-  Card,
-  TextField,
-  Grid,
-  Typography,
-  Button,
-  Snackbar,
-} from "@material-ui/core";
-import {Alert} from "@material-ui/lab";
+import {Card, TextField, Grid, Typography, Button} from "@material-ui/core";
 import Strings from "../../resources/Strings";
 import {PasswordField, Link, PageContainer} from "../../components";
 import {sendHTTPRequest} from "../../utils/requestUtils";
 import md5 from "md5";
-import {
-  ErrorState,
-  validateEmail,
-  validatePassword,
-} from "../../utils/formUtils";
+import {ErrorState, validateEmail} from "../../utils/formUtils";
 import {useUserContext, UserInfo} from "../../app/UserContext";
 import {useNavigationContext} from "../../app/NavigationContext";
 import {useHistory} from "react-router-dom";
@@ -75,12 +63,10 @@ const Login = () => {
   const classes = useStyles();
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
-  const [errorOpen, setErrorOpen] = useState<boolean>(false);
-  const [errorMessage, setErrorMessage] = useState<string>("");
   const [errors, setErrors] = useState<ErrorState<"email" | "password">>(
     DefaultErrorState,
   );
-  const {loginSucceed} = useUserContext();
+  const {loginSucceed, loginFail} = useUserContext();
   const {redirectRoute} = useNavigationContext();
   const history = useHistory();
   const {routes} = useRoutes();
@@ -94,26 +80,8 @@ const Login = () => {
         errorMessage: Strings.invalidEmail(email),
       };
     }
-    if (!validatePassword(password)) {
-      newErrors.password = {
-        isError: true,
-        errorMessage: Strings.invalidPassword(password),
-      };
-    }
-
     setErrors(newErrors);
     return !(newErrors.email.isError || newErrors.password.isError);
-  };
-
-  const loginFail = (error: any) => {
-    setErrorMessage(error as string);
-    setErrorOpen(true);
-  };
-
-  const handleErrorClose = (_: any, reason: string) => {
-    if (reason !== "clickaway") {
-      setErrorOpen(false);
-    }
   };
 
   const login = () => {
@@ -188,13 +156,6 @@ const Login = () => {
       <br />
       <Typography variant="h6">{Strings.noAccount()}</Typography>
       <Link to="/signup">{Strings.signup()}</Link>
-      <Snackbar
-        open={errorOpen}
-        autoHideDuration={3000}
-        onClose={handleErrorClose}
-      >
-        <Alert severity="error">{errorMessage}</Alert>
-      </Snackbar>
     </PageContainer>
   );
 };

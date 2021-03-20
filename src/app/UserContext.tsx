@@ -1,5 +1,7 @@
 import React, {useState, createContext, useContext} from "react";
 import {sendHTTPRequest} from "../utils/requestUtils";
+import {useSnackbar} from "../components";
+import Strings from "../resources/Strings";
 
 /**
  * Interface defining information about the logged in user
@@ -35,6 +37,8 @@ interface UserContextValue {
   setLastName: React.Dispatch<React.SetStateAction<string>>;
   /** Helper function to be called on a successful login */
   loginSucceed: (info: UserInfo) => void;
+  /** Helper function to be called on a failed login */
+  loginFail: (error: string) => void;
   /** Helper function to log out the user */
   logout: () => void;
 }
@@ -52,6 +56,7 @@ const UserContext = createContext({
   lastName: "",
   setLastName: (_: string | ((_: string) => string)) => {},
   loginSucceed: (_: UserInfo) => {},
+  loginFail: (_: string) => {},
   logout: () => {},
 });
 
@@ -69,12 +74,24 @@ export const UserContextProvider = ({children}: UserContextProviderProps) => {
   const [email, setEmail] = useState<string>("");
   const [firstName, setFirstName] = useState<string>("");
   const [lastName, setLastName] = useState<string>("");
+  const {enqueueErrorSnackbar, enqueueSuccessSnackbar} = useSnackbar();
 
   const loginSucceed = (info: UserInfo) => {
     setEmail(info.email);
     setFirstName(info.firstName);
     setLastName(info.lastName);
     setLoggedIn(true);
+    enqueueSuccessSnackbar(
+      Strings.welcomeUser({firstName: info.firstName, lastName: info.lastName}),
+    );
+  };
+
+  const loginFail = (error: string) => {
+    if (error) {
+      enqueueErrorSnackbar(error);
+    } else {
+      enqueueErrorSnackbar(Strings.commonError());
+    }
   };
 
   const logout = () => {
@@ -100,6 +117,7 @@ export const UserContextProvider = ({children}: UserContextProviderProps) => {
     lastName,
     setLastName,
     loginSucceed,
+    loginFail,
     logout,
   };
 

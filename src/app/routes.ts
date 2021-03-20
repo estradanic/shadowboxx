@@ -1,5 +1,5 @@
 import {ComponentType} from "react";
-import {Home, Login, Signup} from "../views";
+import {Home, Login, Settings, Signup} from "../views";
 import {RouteParams} from "./NavigationContext";
 import {isEmpty} from "lodash";
 
@@ -45,6 +45,14 @@ const routes: {[key: string]: RouteProps} = {
     viewName: "Login",
     view: Login,
     path: "/login",
+  },
+  Settings: {
+    viewId: "Settings",
+    viewName: "Settings",
+    view: Settings,
+    path: "/settings",
+    tryAuthenticate: true,
+    redirectOnAuthFail: true,
   },
   Signup: {
     viewId: "Signup",

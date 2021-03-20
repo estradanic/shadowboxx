@@ -23,6 +23,7 @@
     "lodash": "^4.17.21",
     "md5": "^2.3.0",
     "mkdirp": "^1.0.4",
+    "notistack": "^1.0.5",
     "password-hash": "^1.2.2",
     "prettier": "^2.2.1",
     "react": "^17.0.1",

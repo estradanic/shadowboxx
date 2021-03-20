@@ -6,6 +6,7 @@ const Strings: {[key: string]: (params?: any) => string} = {
   alreadyHaveAccount: () => "Already have an account?",
   appName: () => "Albums",
   back: () => "Back",
+  commonError: () => "Something went wrong!",
   copyright: () => `© Nicholas Estrada ${new Date().getFullYear()}`,
   email: () => "Email",
   emailExists: (email: string) => `User with email already exists (${email})`,
@@ -23,8 +24,11 @@ const Strings: {[key: string]: (params?: any) => string} = {
   noEmailExists: (email: string) => `Email doesn't exist (${email})`,
   password: () => "Password",
   pleaseEnterA: (field: string) => `Please enter a ${field}`,
+  settings: () => "Settings",
   signup: () => "Sign Up",
   submit: () => "Submit",
+  welcomeUser: (name: {firstName: string; lastName: string}) =>
+    `Welcome, ${name.firstName} ${name.lastName}!`,
 };
 
 export default Strings;

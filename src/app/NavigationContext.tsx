@@ -1,7 +1,5 @@
 import React, {useState, useEffect, createContext, useContext} from "react";
 import {isEmpty, isMatch} from "lodash";
-import {useHistory} from "react-router-dom";
-import {useRoutes} from "./routes";
 
 /**
  * Historical React Router url parameters mapped to route viewId
@@ -34,8 +32,6 @@ interface NavigationContextValue {
   redirectRoute: RedirectRouteInfo;
   /** React state setter for redirectRoute */
   setRedirectRoute: React.Dispatch<React.SetStateAction<RedirectRouteInfo>>;
-  /** Helper function to navigate to previous page while maintaining history */
-  navigateBack: () => void;
 }
 
 /**
@@ -52,7 +48,6 @@ const NavigationContext = createContext({
   setRedirectRoute: (
     _: RedirectRouteInfo | ((_: RedirectRouteInfo) => RedirectRouteInfo),
   ) => {},
-  navigateBack: () => {},
 });
 
 /**
@@ -84,16 +79,6 @@ export const NavigationContextProvider = ({
     path: "",
   });
 
-  const {getRoutePath} = useRoutes();
-  const history = useHistory();
-
-  const navigateBack = () => {
-    const newRouteHistory = [...routeHistory];
-    newRouteHistory.shift();
-    setRouteHistory(newRouteHistory);
-    history.push(getRoutePath(newRouteHistory[0], routeParams));
-  };
-
   const value: NavigationContextValue = {
     routeParams,
     setRouteParams,
@@ -101,7 +86,6 @@ export const NavigationContextProvider = ({
     setRouteHistory,
     redirectRoute,
     setRedirectRoute,
-    navigateBack,
   };
 
   return (
