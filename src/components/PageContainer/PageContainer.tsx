@@ -9,14 +9,24 @@ const useStyles = makeStyles((theme: Theme) => ({
     color: theme.palette.primary.contrastText,
   },
   grid: {
-    minHeight: "calc(75vh - 160px)",
+    minHeight: ({contentHeight}: any) => {
+      switch (contentHeight) {
+        case "low": return "calc(100vh - 160px)";
+        case "middle": return "calc(75vh - 160px)";
+        case "high": return "calc(50vh - 160px)";
+        case "top": return "calc(40vh - 160px)";
+        default: return "calc(75vh - 160px)";
+      }
+    },
   },
 }));
 
-export interface PageContainerProps extends Omit<ContainerProps, "maxWidth"> {}
+export interface PageContainerProps extends Omit<ContainerProps, "maxWidth"> {
+  contentHeight?: "top" | "high" | "middle" | "low",
+}
 
-const PageContainer = ({children, ...rest}: PageContainerProps) => {
-  const classes = useStyles();
+const PageContainer = ({children, contentHeight = "middle", ...rest}: PageContainerProps) => {
+  const classes = useStyles({contentHeight});
 
   return (
     <Container maxWidth={false} className={classes.container}>

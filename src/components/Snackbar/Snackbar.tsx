@@ -10,22 +10,21 @@ import {Typography} from "@material-ui/core";
 
 const useStyles = makeStyles((theme: Theme) => ({
   variantSuccess: {
-    backgroundColor: theme.palette.success.main,
-    color: theme.palette.success.contrastText,
+    backgroundColor: `${theme.palette.success.main} !important`,
+    color: `${theme.palette.success.contrastText} !important`,
   },
   variantInfo: {
-    backgroundColor: theme.palette.info.main,
-    color: theme.palette.info.contrastText,
+    backgroundColor: `${theme.palette.info.main} !important`,
+    color: `${theme.palette.info.contrastText} !important`,
   },
   variantWarning: {
-    backgroundColor: theme.palette.warning.main,
-    color: theme.palette.warning.contrastText,
+    backgroundColor: `${theme.palette.warning.main} !important`,
+    color: `${theme.palette.warning.contrastText} !important`,
   },
   variantError: {
-    backgroundColor: theme.palette.error.main,
-    color: theme.palette.error.contrastText,
-  },
-  message: {
+    backgroundColor: `${theme.palette.error.main} !important`,
+    color: `${theme.palette.error.contrastText} !important`,
+  },  message: {
     "& *:nth-child(1)": {
       marginRight: theme.spacing(2),
     },
@@ -39,18 +38,31 @@ const useStyles = makeStyles((theme: Theme) => ({
 
 export const useSnackbar = () => {
   const {enqueueSnackbar} = notistackUseSnackbar();
+  const classes = useStyles();
 
   const enqueueSuccessSnackbar = (message: string) => {
-    enqueueSnackbar(<Typography>{message}</Typography>, {variant: "success"});
+    enqueueSnackbar(<Typography>{message}</Typography>, {
+      variant: "success",
+      className: classes.variantSuccess,
+    });
   };
   const enqueueInfoSnackbar = (message: string) => {
-    enqueueSnackbar(<Typography>{message}</Typography>, {variant: "info"});
+    enqueueSnackbar(<Typography>{message}</Typography>, {
+      variant: "info",
+      className: classes.variantInfo,
+    });
   };
   const enqueueWarningSnackbar = (message: string) => {
-    enqueueSnackbar(<Typography>{message}</Typography>, {variant: "warning"});
+    enqueueSnackbar(<Typography>{message}</Typography>, {
+      variant: "warning",
+      className: classes.variantWarning,
+    });
   };
   const enqueueErrorSnackbar = (message: string) => {
-    enqueueSnackbar(<Typography>{message}</Typography>, {variant: "error"});
+    enqueueSnackbar(<Typography>{message}</Typography>, {
+      variant: "error",
+      className: classes.variantError,
+    });
   };
 
   return {

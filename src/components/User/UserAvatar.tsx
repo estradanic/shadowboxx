@@ -5,7 +5,8 @@ import {UserInfo} from "../../app/UserContext";
 
 const useStyles = makeStyles((theme: Theme) => ({
   avatar: {
-
+    backgroundColor: theme.palette.error.dark,
+    color: theme.palette.error.contrastText,
   },
 }));
 
@@ -20,7 +21,8 @@ const UserAvatar = ({user}: UserAvatarProps) => {
     <Avatar
       alt={`${user.firstName} ${user.lastName}`}
       className={classes.avatar}
-      src={`/api/func_UserImage?email=${user.email}`} />
+      src={`/api/func_UserProfileImage?email=${user.email}`}
+    />
   );
 };
 

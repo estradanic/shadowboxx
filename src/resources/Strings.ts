@@ -3,6 +3,7 @@
  * Needed to avoid string literals for consistency.
  */
 const Strings: {[key: string]: (params?: any) => string} = {
+  addAlbum: () => "Add album",
   alreadyHaveAccount: () => "Already have an account?",
   appName: () => "Albums",
   back: () => "Back",
@@ -17,7 +18,8 @@ const Strings: {[key: string]: (params?: any) => string} = {
   incorrectPassword: () => "Incorrect password",
   invalidEmail: (email: string) => `Invalid email (${email})`,
   invalidPassword: (password: string) => `Invalid password (${password})`,
-  lastEdited: (lastEdited: Date) => `Edited: ${lastEdited.toLocaleDateString()}`,
+  lastEdited: (lastEdited: Date) =>
+    `Edited: ${lastEdited.toLocaleDateString()}`,
   lastName: () => "Last Name",
   login: () => "Login",
   logout: () => "Logout",
