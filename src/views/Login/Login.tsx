@@ -13,9 +13,6 @@ import {useRoutes} from "../../app/routes";
 import {useView} from "../View";
 
 const useStyles = makeStyles((theme: Theme) => ({
-  card: {
-    borderRadius: theme.spacing(0.5),
-  },
   cardTitle: {
     "& *": {
       fontFamily: "Alex Brush",
@@ -25,7 +22,6 @@ const useStyles = makeStyles((theme: Theme) => ({
     },
     backgroundColor: theme.palette.primary.main,
     padding: theme.spacing(2, 0),
-    borderRadius: 0,
   },
   submitButton: {
     backgroundColor: theme.palette.primary.main,
