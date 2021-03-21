@@ -24,7 +24,8 @@ const useStyles = makeStyles((theme: Theme) => ({
   variantError: {
     backgroundColor: `${theme.palette.error.main} !important`,
     color: `${theme.palette.error.contrastText} !important`,
-  },  message: {
+  },
+  message: {
     "& *:nth-child(1)": {
       marginRight: theme.spacing(2),
     },

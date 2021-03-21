@@ -1,5 +1,6 @@
 import {AzureFunction, Context, HttpRequest} from "@azure/functions";
 import {get} from "../src/Database";
+import Strings from "../src/resources/Strings";
 import {getCookie} from "../src/utils/requestUtils";
 
 const httpTrigger: AzureFunction = async function (
@@ -26,20 +27,20 @@ const httpTrigger: AzureFunction = async function (
     } else if (userData) {
       context.res = {
         status: 401,
-        errorMessage: "Session id has expired",
+        body: Strings.wrongSessionId(),
       };
       return;
     } else {
       context.res = {
         status: 401,
-        errorMessage: "User with that email does not exist",
+        body: Strings.noEmailExists(email),
       };
       return;
     }
   }
   context.res = {
     status: 400,
-    errorMessage: "No session id provided",
+    body: Strings.noSessionId(),
   };
 };
 

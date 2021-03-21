@@ -13,6 +13,8 @@ export interface UserInfo {
   firstName: string;
   /** User's last name */
   lastName: string;
+  /** User's password */
+  password?: string;
 }
 
 /**
