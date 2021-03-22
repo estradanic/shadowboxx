@@ -65,6 +65,7 @@ const Settings = () => {
   const [lastName, setLastName] = useState<string>(globalLastName);
   const [email, setEmail] = useState<string>(globalEmail);
   const [profilePicture, setProfilePicture] = useState<string>("");
+  const [profilePictureName, setProfilePictureName] = useState<string>("");
   const [errors, setErrors] = useState<
     ErrorState<
       "email" | "firstName" | "lastName" | "password" | "profilePicture"
@@ -157,7 +158,15 @@ const Settings = () => {
                 <Typography variant="h4">{Strings.settings()}</Typography>
               </Grid>
               <Grid item xs={12}>
-                <ImageField />
+                <ImageField
+                  value={profilePicture}
+                  onChange={(value, imageName) => {
+                    setProfilePicture(value);
+                    setProfilePictureName(imageName);
+                  }}
+                  imageName={profilePictureName}
+                  label={Strings.profilePicture()}
+                />
               </Grid>
               <Grid item xs={12}>
                 <TextField

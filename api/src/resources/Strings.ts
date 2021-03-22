@@ -4,6 +4,8 @@
  */
 const Strings: {[key: string]: (params?: any) => string} = {
   addAlbum: () => "Add album",
+  addFromFile: () => "Add from file",
+  addFromUrl: () => "Add from URL",
   alreadyHaveAccount: () => "Already have an account?",
   appName: () => "Albums",
   back: () => "Back",
@@ -16,6 +18,7 @@ const Strings: {[key: string]: (params?: any) => string} = {
   firstName: () => "First Name",
   fullName: () => "Full Name",
   home: () => "Home",
+  imageUrl: () => "Image URL",
   incorrectPassword: () => "Incorrect password",
   invalidEmail: (email: string) => `Invalid email (${email})`,
   invalidPassword: (password: string) => `Invalid password (${password})`,
