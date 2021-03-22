@@ -3,6 +3,8 @@ import {sendHTTPRequest} from "../utils/requestUtils";
 import {useSnackbar} from "../components";
 import Strings from "../resources/Strings";
 
+export type ProfilePicture = {src: string, name: string};
+
 /**
  * Interface defining information about the logged in user
  */
@@ -15,6 +17,8 @@ export interface UserInfo {
   lastName: string;
   /** User's password */
   password?: string;
+  /** User's profile picture */
+  profilePicture?: ProfilePicture;
 }
 
 /**
@@ -37,6 +41,10 @@ interface UserContextValue {
   lastName: string;
   /** React State setter for lastName */
   setLastName: React.Dispatch<React.SetStateAction<string>>;
+  /** User's profile picture */
+  profilePicture: ProfilePicture;
+  /** React state setter for profilePicture */
+  setProfilePicture: React.Dispatch<React.SetStateAction<ProfilePicture>>;
   /** Helper function to be called on a successful login */
   loginSucceed: (info: UserInfo) => void;
   /** Helper function to be called on a failed login */
@@ -57,6 +65,8 @@ const UserContext = createContext({
   setFirstName: (_: string | ((_: string) => string)) => {},
   lastName: "",
   setLastName: (_: string | ((_: string) => string)) => {},
+  profilePicture: {src: "", name: ""},
+  setProfilePicture: (_: ProfilePicture | ((_: ProfilePicture) => ProfilePicture)) => {},
   loginSucceed: (_: UserInfo) => {},
   loginFail: (_: string) => {},
   logout: () => {},
@@ -76,6 +86,7 @@ export const UserContextProvider = ({children}: UserContextProviderProps) => {
   const [email, setEmail] = useState<string>("");
   const [firstName, setFirstName] = useState<string>("");
   const [lastName, setLastName] = useState<string>("");
+  const [profilePicture, setProfilePicture] = useState<ProfilePicture>({src: "", name: ""});
   const {enqueueErrorSnackbar, enqueueSuccessSnackbar} = useSnackbar();
 
   const loginSucceed = (info: UserInfo) => {
@@ -118,6 +129,8 @@ export const UserContextProvider = ({children}: UserContextProviderProps) => {
     setFirstName,
     lastName,
     setLastName,
+    profilePicture,
+    setProfilePicture,
     loginSucceed,
     loginFail,
     logout,

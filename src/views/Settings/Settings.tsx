@@ -2,7 +2,7 @@ import React, {useEffect, useState} from "react";
 import {useView} from "../View";
 import {PageContainer, PasswordField, ImageField} from "../../components";
 import {TextField, Grid, Card, Button, Typography} from "@material-ui/core";
-import {UserInfo, useUserContext} from "../../app/UserContext";
+import {ProfilePicture, UserInfo, useUserContext} from "../../app/UserContext";
 import Strings from "../../resources/Strings";
 import {makeStyles, Theme} from "@material-ui/core/styles";
 import {
@@ -56,16 +56,17 @@ const Settings = () => {
     firstName: globalFirstName,
     lastName: globalLastName,
     email: globalEmail,
+    profilePicture: globalProfilePicture,
     setFirstName: setGlobalFirstName,
     setLastName: setGlobalLastName,
     setEmail: setGlobalEmail,
+    setProfilePicture: setGlobalProfilePicture,
   } = useUserContext();
   const [password, setPassword] = useState<string>("");
   const [firstName, setFirstName] = useState<string>(globalFirstName);
   const [lastName, setLastName] = useState<string>(globalLastName);
   const [email, setEmail] = useState<string>(globalEmail);
-  const [profilePicture, setProfilePicture] = useState<string>("");
-  const [profilePictureName, setProfilePictureName] = useState<string>("");
+  const [profilePicture, setProfilePicture] = useState<ProfilePicture>(globalProfilePicture);
   const [errors, setErrors] = useState<
     ErrorState<
       "email" | "firstName" | "lastName" | "password" | "profilePicture"
@@ -83,10 +84,13 @@ const Settings = () => {
     if (!email) {
       setEmail(globalEmail);
     }
+    if (!profilePicture) {
+      setProfilePicture(globalProfilePicture);
+    }
     // Only rerun when global values change.
     // Eslint is being over-protective here.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [globalFirstName, globalLastName, globalEmail]);
+  }, [globalFirstName, globalLastName, globalEmail, globalProfilePicture]);
 
   const validate = (): boolean => {
     const newErrors = {...DefaultErrorState};
@@ -133,12 +137,19 @@ const Settings = () => {
         url: "/api/func_ChangeUserInfo",
         data: {
           email: globalEmail,
-          newInfo: {email, firstName, lastName, password: md5(password)},
+          newInfo: {
+            email,
+            firstName,
+            lastName,
+            password: md5(password),
+            profilePicture,
+          },
         },
         callback: (info: UserInfo) => {
           setGlobalEmail(info.email);
           setGlobalFirstName(info.firstName);
           setGlobalLastName(info.lastName);
+          setGlobalProfilePicture(info.profilePicture ?? {src: "", name: ""});
           enqueueSuccessSnackbar(Strings.settingsSaved());
         },
         errorCallback: (error: any) => {
@@ -160,11 +171,9 @@ const Settings = () => {
               <Grid item xs={12}>
                 <ImageField
                   value={profilePicture}
-                  onChange={(value, imageName) => {
-                    setProfilePicture(value);
-                    setProfilePictureName(imageName);
+                  onChange={(profilePicture) => {
+                    setProfilePicture(profilePicture);
                   }}
-                  imageName={profilePictureName}
                   label={Strings.profilePicture()}
                 />
               </Grid>

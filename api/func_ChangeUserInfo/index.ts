@@ -108,6 +108,7 @@ const httpTrigger: AzureFunction = async function (
     firstName: req.body.newInfo.firstName,
     lastName: req.body.newInfo.lastName,
     password: generateHash(req.body.newInfo.password),
+    profilePicture: req.body.newInfo.profilePicture,
     sessionId,
   });
 
@@ -126,6 +127,7 @@ const httpTrigger: AzureFunction = async function (
       email: req.body.newInfo.email,
       firstName: req.body.newInfo.firstName,
       lastName: req.body.newInfo.lastName,
+      profilePicture: req.body.newInfo.profilePicture,
     },
     headers: {
       "Set-Cookie": `sessionId=${sessionId}; Expires=${nextWeek.toUTCString()}; SameSite=Lax; ${secure}HttpOnly;`,

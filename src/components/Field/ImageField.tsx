@@ -23,14 +23,15 @@ const useStyles = makeStyles((theme: Theme) => ({
   },
 }));
 
+export type Image = {src: string, name: string};
+
 export interface ImageFieldProps {
-  value: string;
-  onChange: (value: string, imageName: string) => void;
-  imageName: string;
+  value: Image;
+  onChange: (value: Image) => void;
   label?: string;
 }
 
-const ImageField = ({value, onChange, imageName, label}: ImageFieldProps) => {
+const ImageField = ({value, onChange, label}: ImageFieldProps) => {
   const classes = useStyles();
 
   const [showUrlInput, setShowUrlInput] = useState<boolean>(false);
@@ -44,10 +45,10 @@ const ImageField = ({value, onChange, imageName, label}: ImageFieldProps) => {
       const reader = new FileReader();
       reader.readAsDataURL(event.target.files[0]);
       reader.onload = (readerEvent) => {
-        onChange(
-          (readerEvent?.target?.result as string) ?? "",
-          event.target.files[0].name,
-        );
+        onChange({
+          src: (readerEvent?.target?.result as string) ?? "",
+          name: event.target.files[0].name,
+        });
       };
     }
   };
@@ -55,7 +56,7 @@ const ImageField = ({value, onChange, imageName, label}: ImageFieldProps) => {
   const addImageFromUrl = () => {
     const name = imageUrl.substring(imageUrl.lastIndexOf("/") + 1);
     setShowUrlInput(false);
-    onChange(imageUrl, name);
+    onChange({src: imageUrl, name});
   };
 
   const openUrlInput = () => {
@@ -71,7 +72,6 @@ const ImageField = ({value, onChange, imageName, label}: ImageFieldProps) => {
         inputRef={(input) => input && input.focus()}
         variant="filled"
         fullWidth
-        onBlur={() => setShowUrlInput(false)}
         onChange={(event) => setImageUrl(event.target.value)}
         onKeyPress={(event) => {
           if (event.key === "Enter") {
@@ -109,7 +109,7 @@ const ImageField = ({value, onChange, imageName, label}: ImageFieldProps) => {
           endAdornment: (
             <>
               <InputAdornment onClick={openUrlInput} position="end">
-                <Tooltip title={Strings.addFromUrl()}>
+                <Tooltip arrow title={Strings.addFromUrl()}>
                   <Link className={classes.endAdornment} />
                 </Tooltip>
               </InputAdornment>
@@ -117,12 +117,12 @@ const ImageField = ({value, onChange, imageName, label}: ImageFieldProps) => {
                 position="end"
                 onClick={() => document.getElementById(inputId)?.click()}
               >
-                <Tooltip title={Strings.addFromFile()}>
-                  {value ? (
+                <Tooltip arrow title={Strings.addFromFile()}>
+                  {value.src ? (
                     <Avatar
                       className={classes.endAdornmentAvatar}
-                      src={value}
-                      alt={imageName}
+                      src={value.src}
+                      alt={value.name}
                     />
                   ) : (
                     <AddAPhoto className={classes.endAdornment} />
@@ -131,9 +131,9 @@ const ImageField = ({value, onChange, imageName, label}: ImageFieldProps) => {
               </InputAdornment>
             </>
           ),
-          startAdornment: imageName && (
+          startAdornment: value.name && (
             <InputAdornment position="start">
-              <Typography variant="body1">{elide(imageName, 20, 3)}</Typography>
+              <Typography variant="body1">{elide(value.name, 20, 3)}</Typography>
             </InputAdornment>
           ),
           readOnly: true,

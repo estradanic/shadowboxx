@@ -6,6 +6,7 @@ import {
   Button,
   useMediaQuery,
   Typography,
+  Avatar,
 } from "@material-ui/core";
 import {makeStyles, Theme, useTheme} from "@material-ui/core/styles";
 import Breadcrumbs from "../Breadcrumbs/Breadcrumbs";
@@ -36,6 +37,11 @@ const useStyles = makeStyles((theme: Theme) => ({
   name: {
     marginLeft: "auto",
   },
+  profile: {
+    marginLeft: "auto",
+    marginRight: theme.spacing(-1.5),
+    marginBottom: theme.spacing(1),
+  },
   toolbar: {
     paddingRight: 0,
   },
@@ -59,7 +65,7 @@ const Header = ({viewId, ...rest}: HeaderProps) => {
   const xs = useMediaQuery(theme.breakpoints.down("xs"));
   const classes = useStyles({xs});
   const {routeHistory} = useNavigationContext();
-  const {loggedIn, firstName, lastName} = useUserContext();
+  const {loggedIn, firstName, lastName, profilePicture} = useUserContext();
   const history = useHistory();
 
   let showBackButton = false;
@@ -101,10 +107,15 @@ const Header = ({viewId, ...rest}: HeaderProps) => {
           )}
           <Breadcrumbs viewId={viewId} />
           {loggedIn && (
-            <Typography
-              className={classes.name}
-              variant="overline"
-            >{`${firstName} ${lastName}`}</Typography>
+            <>
+              {profilePicture.src ?
+                <Avatar className={classes.profile} src={profilePicture.src} alt={profilePicture.name} /> :
+                <Typography
+                  className={classes.name}
+                  variant="overline"
+                >{`${firstName} ${lastName}`}</Typography>
+              }
+            </>
           )}
         </Toolbar>
       </AppBar>
