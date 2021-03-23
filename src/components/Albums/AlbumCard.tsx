@@ -25,9 +25,6 @@ const useStyles = makeStyles((theme: Theme) => ({
     height: 0,
     paddingTop: "56.25%", // 16:9
   },
-  avatar: {
-    backgroundColor: theme.palette.success.main,
-  },
   favorite: {
     color: theme.palette.warning.light,
   },

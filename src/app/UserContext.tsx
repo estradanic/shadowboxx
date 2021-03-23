@@ -3,7 +3,7 @@ import {sendHTTPRequest} from "../utils/requestUtils";
 import {useSnackbar} from "../components";
 import Strings from "../resources/Strings";
 
-export type ProfilePicture = {src: string, name: string};
+export type ProfilePicture = {src: string; name: string};
 
 /**
  * Interface defining information about the logged in user
@@ -66,7 +66,9 @@ const UserContext = createContext({
   lastName: "",
   setLastName: (_: string | ((_: string) => string)) => {},
   profilePicture: {src: "", name: ""},
-  setProfilePicture: (_: ProfilePicture | ((_: ProfilePicture) => ProfilePicture)) => {},
+  setProfilePicture: (
+    _: ProfilePicture | ((_: ProfilePicture) => ProfilePicture),
+  ) => {},
   loginSucceed: (_: UserInfo) => {},
   loginFail: (_: string) => {},
   logout: () => {},
@@ -86,13 +88,17 @@ export const UserContextProvider = ({children}: UserContextProviderProps) => {
   const [email, setEmail] = useState<string>("");
   const [firstName, setFirstName] = useState<string>("");
   const [lastName, setLastName] = useState<string>("");
-  const [profilePicture, setProfilePicture] = useState<ProfilePicture>({src: "", name: ""});
+  const [profilePicture, setProfilePicture] = useState<ProfilePicture>({
+    src: "",
+    name: "",
+  });
   const {enqueueErrorSnackbar, enqueueSuccessSnackbar} = useSnackbar();
 
   const loginSucceed = (info: UserInfo) => {
     setEmail(info.email);
     setFirstName(info.firstName);
     setLastName(info.lastName);
+    setProfilePicture(info.profilePicture ?? {src: "", name: ""});
     setLoggedIn(true);
     enqueueSuccessSnackbar(
       Strings.welcomeUser({firstName: info.firstName, lastName: info.lastName}),

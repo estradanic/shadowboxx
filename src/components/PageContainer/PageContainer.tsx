@@ -9,36 +9,17 @@ const useStyles = makeStyles((theme: Theme) => ({
     color: theme.palette.primary.contrastText,
   },
   grid: {
-    minHeight: ({contentHeight}: any) => {
-      switch (contentHeight) {
-        case "low":
-          return "calc(100vh - 160px)";
-        case "middle":
-          return "calc(75vh - 160px)";
-        case "high":
-          return "calc(50vh - 160px)";
-        case "top":
-          return "calc(40vh - 160px)";
-        default:
-          return "calc(75vh - 160px)";
-      }
-    },
+    paddingTop: theme.spacing(10),
   },
 }));
 
-export interface PageContainerProps extends Omit<ContainerProps, "maxWidth"> {
-  contentHeight?: "top" | "high" | "middle" | "low";
-}
+export interface PageContainerProps extends Omit<ContainerProps, "maxWidth"> {}
 
-const PageContainer = ({
-  children,
-  contentHeight = "middle",
-  ...rest
-}: PageContainerProps) => {
-  const classes = useStyles({contentHeight});
+const PageContainer = ({children, ...rest}: PageContainerProps) => {
+  const classes = useStyles();
 
   return (
-    <Container maxWidth={false} className={classes.container}>
+    <Container maxWidth={false} className={classes.container} {...rest}>
       <Grid
         container
         direction="column"

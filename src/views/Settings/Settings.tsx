@@ -66,7 +66,9 @@ const Settings = () => {
   const [firstName, setFirstName] = useState<string>(globalFirstName);
   const [lastName, setLastName] = useState<string>(globalLastName);
   const [email, setEmail] = useState<string>(globalEmail);
-  const [profilePicture, setProfilePicture] = useState<ProfilePicture>(globalProfilePicture);
+  const [profilePicture, setProfilePicture] = useState<ProfilePicture>(
+    globalProfilePicture,
+  );
   const [errors, setErrors] = useState<
     ErrorState<
       "email" | "firstName" | "lastName" | "password" | "profilePicture"

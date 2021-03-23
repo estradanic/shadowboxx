@@ -65,9 +65,7 @@ const Home = () => {
 
   const {loggedIn} = useUserContext();
   return (
-    <PageContainer contentHeight="top">
-      {loggedIn ? <HomePage /> : <LandingPage />}
-    </PageContainer>
+    <PageContainer>{loggedIn ? <HomePage /> : <LandingPage />}</PageContainer>
   );
 };
 

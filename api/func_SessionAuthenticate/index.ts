@@ -21,6 +21,7 @@ const httpTrigger: AzureFunction = async function (
           email: userData["email"],
           firstName: userData["firstName"],
           lastName: userData["lastName"],
+          profilePicture: userData["profilePicture"],
         },
       };
       return;

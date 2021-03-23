@@ -6,7 +6,6 @@ import {
   Button,
   useMediaQuery,
   Typography,
-  Avatar,
 } from "@material-ui/core";
 import {makeStyles, Theme, useTheme} from "@material-ui/core/styles";
 import Breadcrumbs from "../Breadcrumbs/Breadcrumbs";
@@ -17,6 +16,7 @@ import Link from "../Link/Link";
 import BackButton from "../Button/BackButton";
 import AppMenu from "../Menu/AppMenu";
 import {useHistory} from "react-router-dom";
+import {UserAvatar} from "..";
 
 const useStyles = makeStyles((theme: Theme) => ({
   backButton: {
@@ -108,13 +108,14 @@ const Header = ({viewId, ...rest}: HeaderProps) => {
           <Breadcrumbs viewId={viewId} />
           {loggedIn && (
             <>
-              {profilePicture.src ?
-                <Avatar className={classes.profile} src={profilePicture.src} alt={profilePicture.name} /> :
+              {profilePicture.src ? (
+                <UserAvatar className={classes.profile} />
+              ) : (
                 <Typography
                   className={classes.name}
                   variant="overline"
                 >{`${firstName} ${lastName}`}</Typography>
-              }
+              )}
             </>
           )}
         </Toolbar>

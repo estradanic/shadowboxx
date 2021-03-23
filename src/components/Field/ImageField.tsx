@@ -23,7 +23,7 @@ const useStyles = makeStyles((theme: Theme) => ({
   },
 }));
 
-export type Image = {src: string, name: string};
+export type Image = {src: string; name: string};
 
 export interface ImageFieldProps {
   value: Image;
@@ -133,7 +133,9 @@ const ImageField = ({value, onChange, label}: ImageFieldProps) => {
           ),
           startAdornment: value.name && (
             <InputAdornment position="start">
-              <Typography variant="body1">{elide(value.name, 20, 3)}</Typography>
+              <Typography variant="body1">
+                {elide(value.name, 20, 3)}
+              </Typography>
             </InputAdornment>
           ),
           readOnly: true,
