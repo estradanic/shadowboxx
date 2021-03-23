@@ -12,6 +12,18 @@ const useStyles = makeStyles((theme: Theme) => ({
     color: theme.palette.primary.light,
     cursor: "pointer",
   },
+  input: {
+    backgroundColor: `${theme.palette.background.default} !important`,
+    color: `${theme.palette.text.primary} !important`,
+    "&:-webkit-autofill, &:-moz-autofill, &:-o-autofill, &:-khtml-autofill, &:-internal-autofill-selected": {
+      backgroundColor: `${theme.palette.background.default} !important`,
+      color: `${theme.palette.text.primary} !important`,
+      "&:focus": {
+        backgroundColor: `${theme.palette.background.default} !important`,
+        color: `${theme.palette.text.primary} !important`,
+      },
+    },
+  },
 }));
 
 /**
@@ -34,6 +46,8 @@ const PasswordField = ({
     <TextField
       type={passwordIsMasked ? "password" : "text"}
       variant="filled"
+      className={classes.input}
+      inputProps={{className: classes.input}}
       InputProps={{
         endAdornment: (
           <InputAdornment position="end">
@@ -50,6 +64,7 @@ const PasswordField = ({
             )}
           </InputAdornment>
         ),
+        className: classes.input,
         ...piInputProps,
       }}
       {...rest}

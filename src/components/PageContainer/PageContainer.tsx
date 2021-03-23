@@ -4,7 +4,7 @@ import {makeStyles, Theme} from "@material-ui/core/styles";
 
 const useStyles = makeStyles((theme: Theme) => ({
   container: {
-    backgroundColor: theme.palette.primary.light,
+    backgroundColor: theme.palette.secondary.main,
     height: "calc(100vh - 160px)",
     color: theme.palette.primary.contrastText,
   },

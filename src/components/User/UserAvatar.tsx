@@ -1,4 +1,4 @@
-import React, {memo} from "react";
+import React from "react";
 import {Avatar, AvatarProps} from "@material-ui/core";
 import {makeStyles, Theme} from "@material-ui/core/styles";
 import {UserInfo, useUserContext} from "../../app/UserContext";
@@ -17,37 +17,39 @@ export interface UserAvatarProps extends AvatarProps {
   user?: UserInfo;
 }
 
-const UserAvatar = memo(
-  ({user, className: piClassName = "", ...rest}: UserAvatarProps) => {
-    const classes = useStyles();
-    const globalUser = useUserContext();
-    let src = "";
+const UserAvatar = ({
+  user,
+  className: piClassName = "",
+  ...rest
+}: UserAvatarProps) => {
+  const classes = useStyles();
+  const globalUser = useUserContext();
+  let src = "";
 
-    if (!user) {
-      user = globalUser;
-      src = globalUser.profilePicture?.src ?? "";
-    } else if (user.email === globalUser.email) {
-      src = globalUser.profilePicture?.src ?? "";
-    } else {
-      sendHTTPRequest<string, string>({
-        method: "POST",
-        url: "/api/func_ProfilePicture",
-        data: user.email,
-        callback: (result) => {
-          src = result;
-        },
-      });
-    }
+  if (!user) {
+    user = globalUser;
+    src = globalUser.profilePicture?.src ?? "";
+  } else if (user.email === globalUser.email) {
+    src = globalUser.profilePicture?.src ?? "";
+  } else {
+    sendHTTPRequest<string, string>({
+      method: "POST",
+      url: "/api/func_ProfilePicture",
+      data: user.email,
+      callback: (result) => {
+        src = result;
+      },
+    });
+  }
 
-    return (
-      <Avatar
-        alt={`${user.firstName} ${user.lastName}`}
-        className={cx(classes.avatar, piClassName)}
-        src={src}
-        {...rest}
-      />
-    );
-  },
-);
+  return (
+    <Avatar
+      alt={`${user.firstName} ${user.lastName}`}
+      className={cx(classes.avatar, piClassName)}
+      src={src}
+      {...rest}
+    />
+  );
+};
 
 export default UserAvatar;

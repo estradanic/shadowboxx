@@ -26,12 +26,6 @@ const validate = (
       errorMessage: Strings.invalidEmail(email),
     };
   }
-  if (isNullOrWhitespace(password)) {
-    errors.password = {
-      isError: true,
-      errorMessage: Strings.invalidPassword(password),
-    };
-  }
   if (isNullOrWhitespace(firstName)) {
     errors.firstName = {
       isError: true,
@@ -107,8 +101,11 @@ const httpTrigger: AzureFunction = async function (
     email: req.body.newInfo.email,
     firstName: req.body.newInfo.firstName,
     lastName: req.body.newInfo.lastName,
-    password: generateHash(req.body.newInfo.password),
+    password: req.body.newInfo.password
+      ? generateHash(req.body.newInfo.password)
+      : userData["password"],
     profilePicture: req.body.newInfo.profilePicture,
+    darkThemeEnabled: req.body.newInfo.darkThemeEnabled,
     sessionId,
   });
 
@@ -128,6 +125,7 @@ const httpTrigger: AzureFunction = async function (
       firstName: req.body.newInfo.firstName,
       lastName: req.body.newInfo.lastName,
       profilePicture: req.body.newInfo.profilePicture,
+      darkThemeEnabled: req.body.newInfo.darkThemeEnabled,
     },
     headers: {
       "Set-Cookie": `sessionId=${sessionId}; Expires=${nextWeek.toUTCString()}; SameSite=Lax; ${secure}HttpOnly;`,

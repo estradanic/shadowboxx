@@ -67,9 +67,6 @@ const AlbumCard = ({
   viewers = [],
 }: AlbumCardProps) => {
   const {firstName, lastName, email} = useUserContext();
-  if (!owner) {
-    owner = {firstName, lastName, email};
-  }
   const [favorite, setFavorite] = useState<boolean>(piFavorite);
   const toggleFavorite = () => {
     setFavorite((prev) => !prev);
@@ -81,7 +78,7 @@ const AlbumCard = ({
     <Card className={classes.card}>
       <CardHeader
         classes={{title: classes.title}}
-        avatar={<UserAvatar user={owner} />}
+        avatar={<UserAvatar user={owner ?? {firstName, lastName, email}} />}
         action={
           <IconButton>
             <MoreVert />

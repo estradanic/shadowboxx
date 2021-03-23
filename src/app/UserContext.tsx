@@ -19,6 +19,8 @@ export interface UserInfo {
   password?: string;
   /** User's profile picture */
   profilePicture?: ProfilePicture;
+  /** Whether or not darkTheme is enabled */
+  darkThemeEnabled?: boolean;
 }
 
 /**
@@ -51,6 +53,10 @@ interface UserContextValue {
   loginFail: (error: string) => void;
   /** Helper function to log out the user */
   logout: () => void;
+  /** Whether or not darkTheme is enabled */
+  darkThemeEnabled: boolean;
+  /** React state setter for darkThemeEnabled */
+  setDarkThemeEnabled: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 /**
@@ -72,6 +78,8 @@ const UserContext = createContext({
   loginSucceed: (_: UserInfo) => {},
   loginFail: (_: string) => {},
   logout: () => {},
+  darkThemeEnabled: false,
+  setDarkThemeEnabled: (_: boolean | ((_: boolean) => boolean)) => {},
 });
 
 /**
@@ -92,13 +100,16 @@ export const UserContextProvider = ({children}: UserContextProviderProps) => {
     src: "",
     name: "",
   });
+  const [darkThemeEnabled, setDarkThemeEnabled] = useState<boolean>(false);
   const {enqueueErrorSnackbar, enqueueSuccessSnackbar} = useSnackbar();
 
   const loginSucceed = (info: UserInfo) => {
+    console.log(info);
     setEmail(info.email);
     setFirstName(info.firstName);
     setLastName(info.lastName);
     setProfilePicture(info.profilePicture ?? {src: "", name: ""});
+    setDarkThemeEnabled(info.darkThemeEnabled ?? false);
     setLoggedIn(true);
     enqueueSuccessSnackbar(
       Strings.welcomeUser({firstName: info.firstName, lastName: info.lastName}),
@@ -140,6 +151,8 @@ export const UserContextProvider = ({children}: UserContextProviderProps) => {
     loginSucceed,
     loginFail,
     logout,
+    darkThemeEnabled,
+    setDarkThemeEnabled,
   };
 
   return <UserContext.Provider value={value}>{children}</UserContext.Provider>;

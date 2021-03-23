@@ -22,6 +22,7 @@ const httpTrigger: AzureFunction = async function (
           firstName: userData["firstName"],
           lastName: userData["lastName"],
           profilePicture: userData["profilePicture"],
+          darkThemeEnabled: userData["darkThemeEnabled"],
         },
       };
       return;

@@ -5,6 +5,7 @@ import {
   Tooltip,
   Avatar,
   Typography,
+  FilledTextFieldProps,
 } from "@material-ui/core";
 import {Close, AddAPhoto, Link, Check} from "@material-ui/icons";
 import {makeStyles, Theme} from "@material-ui/core/styles";
@@ -21,17 +22,21 @@ const useStyles = makeStyles((theme: Theme) => ({
     backgroundColor: theme.palette.primary.light,
     cursor: "pointer",
   },
+  input: {
+    cursor: "text",
+    visibility: "hidden",
+  },
 }));
 
 export type Image = {src: string; name: string};
 
-export interface ImageFieldProps {
+export interface ImageFieldProps
+  extends Omit<FilledTextFieldProps, "value" | "onChange" | "variant"> {
   value: Image;
   onChange: (value: Image) => void;
-  label?: string;
 }
 
-const ImageField = ({value, onChange, label}: ImageFieldProps) => {
+const ImageField = ({value, onChange, label, ...rest}: ImageFieldProps) => {
   const classes = useStyles();
 
   const [showUrlInput, setShowUrlInput] = useState<boolean>(false);
@@ -102,7 +107,11 @@ const ImageField = ({value, onChange, label}: ImageFieldProps) => {
         onChange={addImageFromFile}
         fullWidth
         variant="filled"
-        inputProps={{accept: "image/*", multiple: true, style: {opacity: 0}}}
+        inputProps={{
+          accept: "image/*",
+          multiple: true,
+          className: classes.input,
+        }}
         type="file"
         label={label}
         InputProps={{
@@ -140,6 +149,7 @@ const ImageField = ({value, onChange, label}: ImageFieldProps) => {
           ),
           readOnly: true,
         }}
+        {...rest}
       />
     </>
   );

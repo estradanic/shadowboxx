@@ -12,6 +12,7 @@ const Strings: {[key: string]: (params?: any) => string} = {
   commonError: () => "Something went wrong!",
   copyright: () => `© Nicholas Estrada ${new Date().getFullYear()}`,
   created: (created: Date) => `Created: ${created.toLocaleDateString()}`,
+  darkMode: () => "Dark Mode",
   dragOrBrowse: (what: string) => `Drag ${what} here or click to browse`,
   email: () => "Email",
   emailExists: (email: string) => `User with email already exists (${email})`,
@@ -28,6 +29,7 @@ const Strings: {[key: string]: (params?: any) => string} = {
   login: () => "Login",
   logout: () => "Logout",
   loginSignup: () => "Login / Sign Up",
+  newPassword: () => "New Password",
   noAccount: () => "Don't have an account?",
   noEmailExists: (email: string) => `Email doesn't exist (${email})`,
   noSessionId: () => "No session id provided",
@@ -40,6 +42,7 @@ const Strings: {[key: string]: (params?: any) => string} = {
   settingsSaved: () => "Settings saved successfully",
   signup: () => "Sign Up",
   submit: () => "Submit",
+  unlockPassword: () => "Change Password",
   welcomeUser: (name: {firstName: string; lastName: string}) =>
     `Welcome, ${name.firstName} ${name.lastName}!`,
   wrongSessionId: () => "Wrong session id or session id has expired",

@@ -1,7 +1,17 @@
 import React, {useEffect, useState} from "react";
 import {useView} from "../View";
 import {PageContainer, PasswordField, ImageField} from "../../components";
-import {TextField, Grid, Card, Button, Typography} from "@material-ui/core";
+import {
+  TextField,
+  Grid,
+  Card,
+  Button,
+  Typography,
+  FormControlLabel,
+  Switch,
+  FormControl,
+} from "@material-ui/core";
+import {Brightness7, Brightness2, Lock, LockOpen} from "@material-ui/icons";
 import {ProfilePicture, UserInfo, useUserContext} from "../../app/UserContext";
 import Strings from "../../resources/Strings";
 import {makeStyles, Theme} from "@material-ui/core/styles";
@@ -35,6 +45,44 @@ const useStyles = makeStyles((theme: Theme) => ({
       backgroundColor: theme.palette.primary.dark,
     },
   },
+  switchRoot: {
+    marginLeft: "auto",
+    marginRight: theme.spacing(0.5),
+  },
+  switchBase: {
+    "&&": {
+      paddingTop: theme.spacing(11 / 12),
+      color: theme.palette.warning.light,
+      "&$switchChecked + $switchTrack": {
+        backgroundColor: theme.palette.primary.dark,
+        opacity: 1,
+      },
+    },
+  },
+  switchChecked: {},
+  switchTrack: {
+    backgroundColor: theme.palette.primary.light,
+    opacity: 1,
+  },
+  unlockPassword: {
+    backgroundColor: theme.palette.warning.dark,
+    "&:hover, &:focus, &:active": {
+      backgroundColor: theme.palette.warning.dark,
+    },
+  },
+  darkThemeLabel: {
+    marginLeft: theme.spacing(1.5),
+    marginRight: 0,
+  },
+  darkTheme: {
+    borderBottom: "1px solid rgba(0, 0, 0, 0.42)",
+    "&:hover": {
+      borderBottom: "1px solid white",
+    },
+    "&:active": {
+      borderBottom: `2px solid ${theme.palette.primary.main}`,
+    },
+  },
 }));
 
 const DefaultErrorState = {
@@ -61,6 +109,8 @@ const Settings = () => {
     setLastName: setGlobalLastName,
     setEmail: setGlobalEmail,
     setProfilePicture: setGlobalProfilePicture,
+    darkThemeEnabled: globalDarkThemeEnabled,
+    setDarkThemeEnabled: setGlobalDarkThemeEnabled,
   } = useUserContext();
   const [password, setPassword] = useState<string>("");
   const [firstName, setFirstName] = useState<string>(globalFirstName);
@@ -68,6 +118,13 @@ const Settings = () => {
   const [email, setEmail] = useState<string>(globalEmail);
   const [profilePicture, setProfilePicture] = useState<ProfilePicture>(
     globalProfilePicture,
+  );
+  const [darkThemeEnabled, setDarkThemeEnabled] = useState<boolean>(
+    globalDarkThemeEnabled,
+  );
+  const [passwordUnlocked, setPasswordUnlocked] = useState<boolean>(false);
+  const [hoveringUnlockPassword, setHoveringUnlockPassword] = useState<boolean>(
+    false,
   );
   const [errors, setErrors] = useState<
     ErrorState<
@@ -86,13 +143,22 @@ const Settings = () => {
     if (!email) {
       setEmail(globalEmail);
     }
-    if (!profilePicture) {
+    if (!profilePicture.src) {
       setProfilePicture(globalProfilePicture);
+    }
+    if (!darkThemeEnabled) {
+      setDarkThemeEnabled(globalDarkThemeEnabled);
     }
     // Only rerun when global values change.
     // Eslint is being over-protective here.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [globalFirstName, globalLastName, globalEmail, globalProfilePicture]);
+  }, [
+    globalFirstName,
+    globalLastName,
+    globalEmail,
+    globalProfilePicture,
+    globalDarkThemeEnabled,
+  ]);
 
   const validate = (): boolean => {
     const newErrors = {...DefaultErrorState};
@@ -103,7 +169,7 @@ const Settings = () => {
         errorMessage: Strings.invalidEmail(email),
       };
     }
-    if (!validatePassword(password)) {
+    if (password && !validatePassword(password)) {
       newErrors.password = {
         isError: true,
         errorMessage: Strings.invalidPassword(password),
@@ -143,8 +209,9 @@ const Settings = () => {
             email,
             firstName,
             lastName,
-            password: md5(password),
+            password: password ? md5(password) : "",
             profilePicture,
+            darkThemeEnabled,
           },
         },
         callback: (info: UserInfo) => {
@@ -152,10 +219,12 @@ const Settings = () => {
           setGlobalFirstName(info.firstName);
           setGlobalLastName(info.lastName);
           setGlobalProfilePicture(info.profilePicture ?? {src: "", name: ""});
+          setGlobalDarkThemeEnabled(info.darkThemeEnabled ?? false);
+          setPasswordUnlocked(false);
           enqueueSuccessSnackbar(Strings.settingsSaved());
         },
         errorCallback: (error: any) => {
-          enqueueErrorSnackbar(Strings.settingsNotChanged());
+          enqueueErrorSnackbar(Strings.settingsNotSaved());
         },
       });
     }
@@ -171,7 +240,32 @@ const Settings = () => {
                 <Typography variant="h4">{Strings.settings()}</Typography>
               </Grid>
               <Grid item xs={12}>
+                <FormControl fullWidth className={classes.darkTheme}>
+                  <FormControlLabel
+                    control={
+                      <Switch
+                        classes={{
+                          root: classes.switchRoot,
+                          switchBase: classes.switchBase,
+                          track: classes.switchTrack,
+                          checked: classes.switchChecked,
+                        }}
+                        color="primary"
+                        checked={darkThemeEnabled}
+                        onChange={(_, checked) => setDarkThemeEnabled(checked)}
+                        icon={<Brightness7 />}
+                        checkedIcon={<Brightness2 />}
+                      />
+                    }
+                    label={Strings.darkMode()}
+                    labelPlacement="start"
+                    className={classes.darkThemeLabel}
+                  />
+                </FormControl>
+              </Grid>
+              <Grid item xs={12}>
                 <ImageField
+                  autoComplete="none"
                   value={profilePicture}
                   onChange={(profilePicture) => {
                     setProfilePicture(profilePicture);
@@ -181,6 +275,7 @@ const Settings = () => {
               </Grid>
               <Grid item xs={12}>
                 <TextField
+                  autoComplete="none"
                   error={errors.firstName.isError}
                   helperText={errors.firstName.errorMessage}
                   variant="filled"
@@ -194,6 +289,7 @@ const Settings = () => {
               </Grid>
               <Grid item xs={12}>
                 <TextField
+                  autoComplete="none"
                   error={errors.lastName.isError}
                   helperText={errors.lastName.errorMessage}
                   variant="filled"
@@ -207,6 +303,7 @@ const Settings = () => {
               </Grid>
               <Grid item xs={12}>
                 <TextField
+                  autoComplete="none"
                   error={errors.email.isError}
                   helperText={errors.email.errorMessage}
                   variant="filled"
@@ -219,14 +316,27 @@ const Settings = () => {
                 />
               </Grid>
               <Grid item xs={12}>
+                <Button
+                  fullWidth
+                  className={classes.unlockPassword}
+                  size="small"
+                  onClick={() => setPasswordUnlocked(true)}
+                  style={{display: passwordUnlocked ? "none" : "inherit"}}
+                  onMouseEnter={() => setHoveringUnlockPassword(true)}
+                  onMouseLeave={() => setHoveringUnlockPassword(false)}
+                  startIcon={hoveringUnlockPassword ? <LockOpen /> : <Lock />}
+                >
+                  {Strings.unlockPassword()}
+                </Button>
                 <PasswordField
+                  style={{display: passwordUnlocked ? "inherit" : "none"}}
                   autoComplete="new-password"
                   error={errors.password.isError}
                   helperText={errors.password.errorMessage}
                   fullWidth
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  label={Strings.password()}
+                  label={Strings.newPassword()}
                   id="password"
                 />
               </Grid>

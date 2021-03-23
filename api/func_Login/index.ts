@@ -86,6 +86,7 @@ const httpTrigger: AzureFunction = async function (
       lastName: userData["lastName"],
       email: userData["email"],
       profilePicture: userData["profilePicture"],
+      darkThemeEnabled: userData["darkThemeEnabled"],
     },
     headers: {
       "Set-Cookie": `sessionId=${sessionId}; Expires=${nextWeek.toUTCString()}; SameSite=Lax; ${secure}HttpOnly;`,
