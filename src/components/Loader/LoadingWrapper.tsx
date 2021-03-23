@@ -23,7 +23,7 @@ const useStyles = makeStyles((theme: Theme) => ({
     justifyContent: "center",
   },
   spinner: {
-    color: theme.palette.error.main,
+    color: theme.palette.error.light,
     margin: "auto",
   },
 }));

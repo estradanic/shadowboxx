@@ -82,7 +82,7 @@ const Signup = () => {
   const {redirectRoute} = useNavigationContext();
   const {routes} = useRoutes();
   const history = useHistory();
-  const {loginSucceed, loginFail} = useUserContext();
+  const {loginSucceed, loginFail, setLoggingIn} = useUserContext();
 
   const validate = (): boolean => {
     const newErrors = {...DefaultErrorState};
@@ -129,6 +129,7 @@ const Signup = () => {
         lastName,
         password: md5(password),
       };
+      setLoggingIn(true);
       sendHTTPRequest<SignupRequest, UserInfo>({
         method: "POST",
         url: "/api/func_Signup",

@@ -2,6 +2,7 @@ import React from "react";
 import {Container, ContainerProps, Grid} from "@material-ui/core";
 import {makeStyles, Theme} from "@material-ui/core/styles";
 import LoadingWrapper from "../Loader/LoadingWrapper";
+import {useUserContext} from "../../app/UserContext";
 
 const useStyles = makeStyles((theme: Theme) => ({
   container: {
@@ -20,9 +21,10 @@ export interface PageContainerProps extends Omit<ContainerProps, "maxWidth"> {
 
 const PageContainer = ({children, loading, ...rest}: PageContainerProps) => {
   const classes = useStyles();
+  const {loggingIn} = useUserContext();
 
   return (
-    <LoadingWrapper loading={loading}>
+    <LoadingWrapper loading={loading || loggingIn}>
       <Container maxWidth={false} className={classes.container} {...rest}>
         <Grid
           container

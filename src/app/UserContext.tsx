@@ -57,6 +57,10 @@ interface UserContextValue {
   darkThemeEnabled: boolean;
   /** React state setter for darkThemeEnabled */
   setDarkThemeEnabled: React.Dispatch<React.SetStateAction<boolean>>;
+  /** Whether the view is currently trying to log in */
+  loggingIn: boolean;
+  /** React state setter for loggingIn */
+  setLoggingIn: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 /**
@@ -80,6 +84,8 @@ const UserContext = createContext({
   logout: () => {},
   darkThemeEnabled: false,
   setDarkThemeEnabled: (_: boolean | ((_: boolean) => boolean)) => {},
+  loggingIn: false,
+  setLoggingIn: (_: boolean | ((_: boolean) => boolean)) => {},
 });
 
 /**
@@ -101,9 +107,11 @@ export const UserContextProvider = ({children}: UserContextProviderProps) => {
     name: "",
   });
   const [darkThemeEnabled, setDarkThemeEnabled] = useState<boolean>(false);
+  const [loggingIn, setLoggingIn] = useState<boolean>(false);
   const {enqueueErrorSnackbar, enqueueSuccessSnackbar} = useSnackbar();
 
   const loginSucceed = (info: UserInfo) => {
+    setLoggingIn(false);
     setEmail(info.email);
     setFirstName(info.firstName);
     setLastName(info.lastName);
@@ -116,6 +124,7 @@ export const UserContextProvider = ({children}: UserContextProviderProps) => {
   };
 
   const loginFail = (error: string) => {
+    setLoggingIn(false);
     if (error) {
       enqueueErrorSnackbar(error);
     } else {
@@ -152,6 +161,8 @@ export const UserContextProvider = ({children}: UserContextProviderProps) => {
     logout,
     darkThemeEnabled,
     setDarkThemeEnabled,
+    loggingIn,
+    setLoggingIn,
   };
 
   return <UserContext.Provider value={value}>{children}</UserContext.Provider>;

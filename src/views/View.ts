@@ -26,7 +26,7 @@ export const useView = (currentViewId: string) => {
     setRedirectRoute,
     routeParams,
   } = useNavigationContext();
-  const {loggedIn, loginSucceed} = useUserContext();
+  const {loggedIn, loginSucceed, setLoggingIn} = useUserContext();
   const {getRoutePath, routes} = useRoutes();
   const history = useHistory();
   const currentRoute = routes[currentViewId];
@@ -47,11 +47,13 @@ export const useView = (currentViewId: string) => {
         }
       }
     } else if (currentRoute.tryAuthenticate) {
+      setLoggingIn(true);
       sendHTTPRequest<string, UserInfo>({
         method: "POST",
         url: "/api/func_SessionAuthenticate",
         callback: loginSucceed,
         errorCallback: () => {
+          setLoggingIn(false);
           if (currentRoute.redirectOnAuthFail) {
             const loginRoute = routes["Login"];
             setRedirectRoute({

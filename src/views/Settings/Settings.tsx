@@ -79,9 +79,6 @@ const useStyles = makeStyles((theme: Theme) => ({
     "&:hover": {
       borderBottom: "1px solid white",
     },
-    "&:active": {
-      borderBottom: `2px solid ${theme.palette.primary.main}`,
-    },
   },
 }));
 

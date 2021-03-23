@@ -62,7 +62,7 @@ const Login = () => {
   const [errors, setErrors] = useState<ErrorState<"email" | "password">>(
     DefaultErrorState,
   );
-  const {loginSucceed, loginFail} = useUserContext();
+  const {loginSucceed, loginFail, setLoggingIn} = useUserContext();
   const {redirectRoute} = useNavigationContext();
   const history = useHistory();
   const {routes} = useRoutes();
@@ -86,6 +86,7 @@ const Login = () => {
         email,
         password: md5(password),
       };
+      setLoggingIn(true);
       sendHTTPRequest<LoginRequest, UserInfo>({
         method: "POST",
         url: "/api/func_Login",
