@@ -18,9 +18,6 @@ const theme = createMuiTheme({
       contrastText: "#FFFFFF",
       light: "#1B71B5",
     },
-    secondary: {
-      main: "#1B71B5", // app background, since I can't use default or paper
-    },
     error: {
       main: "#B22222",
       dark: "#A01E1E",
@@ -46,7 +43,7 @@ const theme = createMuiTheme({
       light: "#E79732",
     },
     background: {
-      default: "#FFFFFF",
+      default: "#1B71B5",
       paper: "#FFFFFF",
     },
   },

@@ -19,13 +19,10 @@ const App = () => {
         ? {
             palette: {
               primary: {
-                main: "#01467C",
+                main: "#003F6F",
                 dark: "#003156",
                 contrastText: "#FFFFFF",
                 light: "#01579B",
-              },
-              secondary: {
-                main: "#003156", // app background since I can't use default or primary
               },
               error: {
                 main: "#A01E1E",
@@ -52,7 +49,7 @@ const App = () => {
                 light: "#FB8C00",
               },
               background: {
-                default: "#222222",
+                default: "#00182B",
                 paper: "#222222",
               },
               text: {

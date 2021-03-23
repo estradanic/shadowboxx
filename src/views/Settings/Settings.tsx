@@ -112,6 +112,7 @@ const Settings = () => {
     darkThemeEnabled: globalDarkThemeEnabled,
     setDarkThemeEnabled: setGlobalDarkThemeEnabled,
   } = useUserContext();
+  const [loading, setLoading] = useState<boolean>(false);
   const [password, setPassword] = useState<string>("");
   const [firstName, setFirstName] = useState<string>(globalFirstName);
   const [lastName, setLastName] = useState<string>(globalLastName);
@@ -134,21 +135,11 @@ const Settings = () => {
   const {enqueueErrorSnackbar, enqueueSuccessSnackbar} = useSnackbar();
 
   useEffect(() => {
-    if (!firstName) {
-      setFirstName(globalFirstName);
-    }
-    if (!lastName) {
-      setLastName(globalLastName);
-    }
-    if (!email) {
-      setEmail(globalEmail);
-    }
-    if (!profilePicture.src) {
-      setProfilePicture(globalProfilePicture);
-    }
-    if (!darkThemeEnabled) {
-      setDarkThemeEnabled(globalDarkThemeEnabled);
-    }
+    setFirstName(globalFirstName);
+    setLastName(globalLastName);
+    setEmail(globalEmail);
+    setProfilePicture(globalProfilePicture);
+    setDarkThemeEnabled(globalDarkThemeEnabled);
     // Only rerun when global values change.
     // Eslint is being over-protective here.
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -200,6 +191,7 @@ const Settings = () => {
 
   const changeUserInfo = () => {
     if (validate()) {
+      setLoading(true);
       sendHTTPRequest<{email: string; newInfo: UserInfo}, UserInfo>({
         method: "POST",
         url: "/api/func_ChangeUserInfo",
@@ -222,8 +214,10 @@ const Settings = () => {
           setGlobalDarkThemeEnabled(info.darkThemeEnabled ?? false);
           setPasswordUnlocked(false);
           enqueueSuccessSnackbar(Strings.settingsSaved());
+          setLoading(false);
         },
         errorCallback: (error: any) => {
+          setLoading(false);
           enqueueErrorSnackbar(Strings.settingsNotSaved());
         },
       });
@@ -231,7 +225,7 @@ const Settings = () => {
   };
 
   return (
-    <PageContainer>
+    <PageContainer loading={loading}>
       <Grid item sm={8}>
         <Card>
           <form autoComplete="off">

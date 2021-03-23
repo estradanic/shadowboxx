@@ -104,7 +104,6 @@ export const UserContextProvider = ({children}: UserContextProviderProps) => {
   const {enqueueErrorSnackbar, enqueueSuccessSnackbar} = useSnackbar();
 
   const loginSucceed = (info: UserInfo) => {
-    console.log(info);
     setEmail(info.email);
     setFirstName(info.firstName);
     setLastName(info.lastName);
