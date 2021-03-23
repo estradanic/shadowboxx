@@ -50,7 +50,7 @@ const App = () => {
               },
               background: {
                 default: "#00182B",
-                paper: "#222222",
+                paper: "#0F1111",
               },
               text: {
                 primary: "#FFFFFF",

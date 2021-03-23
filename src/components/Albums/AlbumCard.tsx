@@ -37,6 +37,9 @@ const useStyles = makeStyles((theme: Theme) => ({
   title: {
     fontWeight: "bold",
   },
+  icon: {
+    color: theme.palette.text.primary,
+  },
 }));
 
 export interface AlbumCardProps {
@@ -81,7 +84,7 @@ const AlbumCard = ({
         avatar={<UserAvatar user={owner ?? {firstName, lastName, email}} />}
         action={
           <IconButton>
-            <MoreVert />
+            <MoreVert className={classes.icon} />
           </IconButton>
         }
         title={name}
@@ -127,10 +130,10 @@ const AlbumCard = ({
       </CardContent>
       <CardActions disableSpacing>
         <IconButton onClick={toggleFavorite}>
-          <Star className={favorite ? classes.favorite : undefined} />
+          <Star className={favorite ? classes.favorite : classes.icon} />
         </IconButton>
         <IconButton className={classes.share}>
-          <Share />
+          <Share className={classes.icon} />
         </IconButton>
       </CardActions>
     </Card>
