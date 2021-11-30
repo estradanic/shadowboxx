@@ -33,13 +33,7 @@ interface NotificationsContextValue {
 }
 
 /** Context to manage Notifications */
-const NotificationsContext = createContext<NotificationsContextValue>({
-  notifications: [],
-  setNotifications: (
-    _: Notification[] | ((_: Notification[]) => Notification[])
-  ) => {},
-  addNotification: ({ title }) => ({ id: "", title, remove: () => {} }),
-});
+const NotificationsContext = createContext<NotificationsContextValue | undefined>(undefined);
 
 /**
  * Interface defining props for the NotificationsContextProvider
@@ -86,4 +80,10 @@ export const NotificationsContextProvider = ({
 };
 
 /** Alias to useContext(NotificationsContext) */
-export const useNotificationsContext = () => useContext(NotificationsContext);
+export const useNotificationsContext = () => {
+  const context = useContext(NotificationsContext);
+  if (!context) {
+    throw new Error('No NotificationsContextProvider!');
+  }
+  return context;
+}

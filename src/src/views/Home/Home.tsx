@@ -75,7 +75,7 @@ const HomePage = memo(() => {
           gotAlbums.current = true;
         })
         .catch((error) => {
-          enqueueErrorSnackbar(error);
+          enqueueErrorSnackbar(error?.message);
           setGlobalLoading(false);
           gotAlbums.current = true;
         });
