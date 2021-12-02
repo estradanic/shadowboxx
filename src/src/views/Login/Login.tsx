@@ -15,7 +15,6 @@ import { useHistory } from "react-router-dom";
 import { useRoutes } from "../../app/routes";
 import { useView } from "../View";
 import Parse from "parse";
-import md5 from "md5";
 
 const useStyles = makeStyles((theme: Theme) => ({
   cardTitle: {
@@ -79,7 +78,7 @@ const Login = () => {
       setGlobalLoading(true);
       const user = new Parse.User();
       user.set("username", email);
-      user.set("password", md5(password));
+      user.set("password", password);
       user
         .logIn()
         .then((response) => {

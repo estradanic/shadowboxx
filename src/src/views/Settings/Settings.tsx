@@ -29,7 +29,6 @@ import {
   validatePassword,
 } from "../../utils/formUtils";
 import { isNullOrWhitespace } from "../../utils/stringUtils";
-import md5 from "md5";
 import Parse from "parse";
 
 const useStyles = makeStyles((theme: Theme) => ({
@@ -210,7 +209,7 @@ const Settings = () => {
       const newInfo: Parse.Attributes = {
         firstName,
         lastName,
-        password: password ? md5(password) : "",
+        password: password ?? "",
         isDarkThemeEnabled,
       };
       if (

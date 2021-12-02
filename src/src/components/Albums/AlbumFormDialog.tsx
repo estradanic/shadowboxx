@@ -61,9 +61,9 @@ const useStyles = makeStyles((theme: Theme) => ({
 export interface AlbumFormDialogProps
   extends Pick<ActionDialogProps, "open" | "handleCancel"> {
   /** Value for the component */
-  value: Parse.Object;
+  value: Parse.Object<Album>;
   /** Function to run when the confirm button is clicked */
-  handleConfirm: (value: Parse.Object) => void;
+  handleConfirm: (value: Parse.Object<Album>) => void;
   /** Whether to reset dialog state when confirm button is clicked */
   resetOnConfirm?: boolean;
 }

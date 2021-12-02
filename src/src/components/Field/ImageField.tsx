@@ -13,10 +13,10 @@ import { makeStyles, Theme } from "@material-ui/core/styles";
 import { elide } from "../../utils/stringUtils";
 import Strings from "../../resources/Strings";
 import { uniqueId } from "lodash";
-import LoadingWrapper from "../Loader/LoadingWrapper";
 import TextField, { TextFieldProps } from "../Field/TextField";
 import Parse from "parse";
-import { ParseFile } from "../../app/UserContext";
+import Image from "../../types/Image";
+import { useSnackbar } from "../Snackbar/Snackbar";
 
 const useStyles = makeStyles((theme: Theme) => ({
   endAdornment: {
@@ -86,9 +86,9 @@ const useStyles = makeStyles((theme: Theme) => ({
 export interface ImageFieldProps
   extends Omit<TextFieldProps, "value" | "onChange"> {
   /** Value of the field, array of Images */
-  value: ParseFile[];
+  value: Parse.Object<Image>[];
   /** Function to run when the value changes */
-  onChange: (value: ParseFile[]) => void;
+  onChange: (value: Parse.Object<Image>[]) => void;
   /** Whether to only save the thumbnail or not */
   thumbnailOnly?: boolean;
   /** Whether multiple images can be selected or not */
@@ -97,69 +97,52 @@ export interface ImageFieldProps
 
 /** Component to input images from the filesystem or online */
 const ImageField = ({
-  onChange: userOnChange,
+  onChange,
   label,
   thumbnailOnly = false,
   value = [],
   multiple = false,
   ...rest
 }: ImageFieldProps) => {
-  const thumbnailWidth = 300;
   const classes = useStyles();
 
-  const [loading, setLoading] = useState<boolean>(false);
   const [showUrlInput, setShowUrlInput] = useState<boolean>(false);
   const [imageUrl, setImageUrl] = useState<string>("");
 
   const inputId = uniqueId("profile-pic-input");
   const urlInputId = uniqueId("image-url-input");
 
-  const onChange = (value: ParseFile[]) => {
-    const fileNames: { [fileName: string]: number } = {};
-    userOnChange(
-      value.map((image) => {
-        if (!image) {
-          return null;
-        }
-        const changedImage = image;
-        if (fileNames[image.name?.()]) {
-          changedImage.setMetadata({
-            name: `(${fileNames[image.name?.()]})${image.name?.()}`,
-          });
-          fileNames[image.name?.()]++;
-        } else {
-          fileNames[image.name?.()] = 1;
-        }
-        return changedImage;
-      })
-    );
-  };
+  const {enqueueErrorSnackbar} = useSnackbar();
 
   const addFromFile = (event: any) => {
     if (event.target.files?.[0]) {
-      setLoading(true);
       const max = multiple ? event.target.files.length : 1;
-      const newImages: ParseFile[] = [];
+      const newImages: Parse.Object<Image>[] = [];
       for (let i = 0; i < max; i++) {
         const file: any = event.target.files[i];
-        newImages.push(new Parse.File(file.name, file));
-        const newValue = multiple ? [...value, ...newImages] : newImages;
-        if (i === max - 1) {
-          setLoading(false);
-        }
-        onChange(newValue);
+        const parseFile = new Parse.File(file.name, file);
+        newImages.push(new Parse.Object<Image>("Image", {
+          file: parseFile,
+          isCoverImage: false,
+        }));
       }
+      const newValue = multiple ? [...value, ...newImages] : newImages;
+      onChange(newValue);
     }
   };
 
   const addImageFromUrl = () => {
     const fileName = imageUrl.substring(imageUrl.lastIndexOf("/") + 1);
     const parseFile = new Parse.File(fileName, { uri: imageUrl });
+    const newImage = new Parse.Object<Image>("Image", {
+      file: parseFile,
+      isCoverImage: false,
+    });
     setShowUrlInput(false);
     if (multiple) {
-      onChange([...value, parseFile]);
+      onChange([...value, newImage]);
     } else {
-      onChange([parseFile]);
+      onChange([newImage]);
     }
   };
 
@@ -228,23 +211,25 @@ const ImageField = ({
                   <AddAPhoto className={classes.endAdornment} />
                 </Tooltip>
               </InputAdornment>
-              {value[0]?.url?.() && !multiple && (
-                <InputAdornment position="end">
-                  <Avatar
-                    className={classes.endAdornmentAvatar}
-                    src={value[0]?.url?.()}
-                    alt={value[0]?.name?.()}
-                  />
-                </InputAdornment>
-              )}
+              {
+                !!value.length && !multiple && (
+                  <InputAdornment position="end">
+                    <Avatar
+                      className={classes.endAdornmentAvatar}
+                      src={value[0].get("file").url()}
+                      alt={value[0].get("file").name()}
+                    />
+                  </InputAdornment>
+                )
+              }
             </>
           ),
-          startAdornment: value[0]?.name?.() && (
+          startAdornment: !!value.length && (
             <InputAdornment position="start">
               <Typography variant="body1">
-                {value.length > 1
-                  ? Strings.multipleImages()
-                  : elide(value[0]?.name?.(), 20, 3)}
+                {(value.length > 1 && multiple)
+                  ? Strings.multipleImages(value.length)
+                  : elide(value[0].get("file").name(), 20, 3)}
               </Typography>
             </InputAdornment>
           ),
@@ -253,44 +238,42 @@ const ImageField = ({
         {...rest}
       />
       {multiple && !!value.length && (
-        <LoadingWrapper loading={loading}>
-          <div className={classes.multiImageContainer}>
-            {value.map((image: ParseFile) => (
-              <div
-                className={classes.imageWrapper}
-                key={uniqueId(image?.name?.())}
-              >
-                <Remove
-                  fontSize="large"
-                  className={classes.removeImage}
-                  onClick={() =>
-                    onChange(
-                      value.filter((img) => img?.name?.() !== image?.name?.())
-                    )
-                  }
-                />
-                {image?.metadata()?.isCoverImage ? (
-                  <Star
-                    fontSize="large"
-                    className={classes.coverImage}
-                    onClick={() => image?.setMetadata({ isCoverImage: false })}
-                  />
+        <div className={classes.multiImageContainer}>
+          {value.map((image: Parse.Object<Image>) => {
+            const file = image.get("file");
+            return (
+              <div className={classes.imageWrapper} key={uniqueId(image.get("objectId"))}>
+                <Remove fontSize="large" className={classes.removeImage} onClick={() => {
+                  const newValue =
+                    value.filter((valueImage) => image.get("objectId") !== valueImage.get("objectId"));
+                  onChange(newValue);
+                }} />
+                {image.get("isCoverImage") ? (
+                  <Star fontSize="large" className={classes.coverImage} onClick={async () => {
+                    image.set("isCoverImage", false);
+                    try {
+                      await image.save();
+                    } catch (error: any) {
+                      enqueueErrorSnackbar(error?.message ?? Strings.commonError());
+                      image.set("isCoverImage", true);
+                    }
+                  }} />
                 ) : (
-                  <StarBorder
-                    fontSize="large"
-                    className={classes.coverImage}
-                    onClick={() => image?.setMetadata({ isCoverImage: true })}
-                  />
+                  <StarBorder fontSize="large" className={classes.coverImage} onClick={async () => {
+                    image.set("isCoverImage", true);
+                    try {
+                      image.save();
+                    } catch (error: any) {
+                      enqueueErrorSnackbar(error?.message ?? Strings.commonError());
+                      image.set("isCoverImage", false);
+                    }
+                  }} />
                 )}
-                <img
-                  className={classes.multiImage}
-                  src={image?.url?.()}
-                  alt={image?.name?.()}
-                />
+                <img className={classes.multiImage} src={file.url()} alt={file.name()} />
               </div>
-            ))}
-          </div>
-        </LoadingWrapper>
+            )
+          })}
+        </div>
       )}
     </>
   );

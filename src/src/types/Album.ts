@@ -1,12 +1,14 @@
 import Parse from "parse";
-import { ParseFile } from "../app/UserContext";
+import Image from "./Image";
 
 /** Interface defining an Album */
 export default interface Album {
+  /** Unique Id of the album in the database */
+  objectId?: string,
   /** User that owns this album */
   owner: Parse.Pointer;
   /** Images in the album */
-  images: ParseFile[];
+  images: Parse.Relation<Parse.Object<Album>, Parse.Object<Image>>;
   /** Name of the album */
   name: string;
   /** Description of the album */

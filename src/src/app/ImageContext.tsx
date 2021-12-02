@@ -4,16 +4,7 @@ import { useNotificationsContext } from "./NotificationsContext";
 import Strings from "../resources/Strings";
 import { CircularProgress } from "@material-ui/core";
 import { useSnackbar } from "../components";
-
-/** Interface defining the Image table */
-export interface Image {
-  /** The actual saved file */
-  file: Parse.File,
-  /** The Album that the image belongs to */
-  album: Parse.Pointer,
-  /** Whether the image is the selected cover image for the album */
-  isCoverImage: boolean,
-}
+import Image from "../types/Image";
 
 export enum ImageActionCommand {
   DELETE,
