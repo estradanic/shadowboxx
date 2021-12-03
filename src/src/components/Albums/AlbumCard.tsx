@@ -23,9 +23,10 @@ import { useSnackbar } from "../Snackbar/Snackbar";
 import { AlbumFormDialog } from "..";
 import Tooltip from "../Tooltip/Tooltip";
 import { useActionDialogContext } from "../Dialog/ActionDialog";
-import { isNullOrWhitespace } from "../../utils/stringUtils";
 import { useRoutes } from "../../app/routes";
 import Parse from "parse";
+import { useParseQuery } from "@parse/react";
+import { useParseQueryOptions } from "../../constants/useParseQueryOptions";
 
 const useStyles = makeStyles((theme: Theme) => ({
   card: {
@@ -90,39 +91,45 @@ export interface AlbumCardProps {
 }
 
 /** Component for displaying basic information about an album */
-const AlbumCard = ({ value, onChange }: AlbumCardProps) => {
-  const [collaborators, setCollaborators] = useState<Parse.User[]>();
-  const [viewers, setViewers] = useState<Parse.User[]>();
-  const [coOwners, setCoOwners] = useState<Parse.User[]>();
-  const [owner, setOwner] = useState<Parse.User>();
+const AlbumCard = ({ value: initialValue, onChange }: AlbumCardProps) => {
+  const [value, setValue] = useState<Parse.Object<Album>>(initialValue);
+
+  useEffect(() => {
+    setValue(initialValue);
+  }, [initialValue]);
+
+  const { results: collaborators } = useParseQuery(
+    value.get("collaborators").query(),
+    useParseQueryOptions
+  );
+  const { results: coOwners } = useParseQuery(
+    value.get("coOwners").query(),
+    useParseQueryOptions
+  );
+  const { results: viewers } = useParseQuery(
+    value.get("viewers").query(),
+    useParseQueryOptions
+  );
+  const { results: images } = useParseQuery(
+    value.get("images").query(),
+    useParseQueryOptions
+  );
+  const { results: ownerResult } = useParseQuery(
+    new Parse.Query<Parse.User>("User").equalTo(
+      "objectId",
+      value.get("owner").objectId
+    ),
+    useParseQueryOptions
+  );
+
+  const owner = useMemo(() => ownerResult?.[0], [ownerResult]);
+
   const [isFavorite, setIsFavorite] = useState<boolean>(
     value?.get("isFavorite") ?? false
   );
   const [isPublic, setIsPublic] = useState<boolean>(
     value?.get("isPublic") ?? false
   );
-
-  useEffect(() => {
-    value
-      ?.get("collaborators")
-      ?.query()
-      .findAll()
-      .then((response) => setCollaborators(response));
-    value
-      ?.get("viewers")
-      ?.query()
-      .findAll()
-      .then((response) => setViewers(response));
-    value
-      ?.get("coOwners")
-      ?.query()
-      .findAll()
-      .then((response) => setCoOwners(response));
-    new Parse.Query<Parse.User>("User")
-      .equalTo("objectId", value?.get("owner")?.objectId)
-      .first()
-      .then((response) => setOwner(response));
-  }, [value]);
 
   const { enqueueErrorSnackbar, enqueueSuccessSnackbar } = useSnackbar();
   const [anchorEl, setAnchorEl] = useState<Element>();
@@ -132,24 +139,12 @@ const AlbumCard = ({ value, onChange }: AlbumCardProps) => {
   const history = useHistory();
   const { routes } = useRoutes();
   const coverImage = useMemo(
-    () =>
-      value?.get("images")?.find((image) => image?.metadata()?.isCoverImage) ??
-      value?.get("images")?.[0],
-    [value]
+    () => images?.find((image) => image.get("isCoverImage")) ?? images?.[0],
+    [images]
   );
-  const coverImageSrc = useMemo(() => {
-    if (isNullOrWhitespace(coverImage?.url())) {
-      if (isNullOrWhitespace(coverImage?.name())) {
-        return null;
-      } else {
-        const url = new URL("/api/GetImage", window.location.origin);
-        url.searchParams.append("fileName", coverImage?.name() ?? "");
-        return url.href;
-      }
-    } else {
-      return coverImage?.url();
-    }
-  }, [coverImage]);
+  const coverImageSrc = useMemo(() => coverImage?.get("file")?.url(), [
+    coverImage,
+  ]);
 
   const classes = useStyles();
   const theme = useTheme();
@@ -208,15 +203,15 @@ const AlbumCard = ({ value, onChange }: AlbumCardProps) => {
             </>
           }
           title={value?.get("name")}
-          subheader={`${Strings.numOfPhotos(
-            value?.get("images")?.length ?? 0
-          )} ${value?.get("description") ?? ""}`}
+          subheader={`${Strings.numOfPhotos(images?.length ?? 0)} ${
+            value?.get("description") ?? ""
+          }`}
         />
         {coverImageSrc ? (
           <CardMedia
             className={classes.media}
             image={coverImageSrc}
-            title={coverImage?.name()}
+            title={coverImage?.get("file").name()}
             onClick={navigateToAlbum}
           />
         ) : (

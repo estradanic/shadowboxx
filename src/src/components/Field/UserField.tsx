@@ -48,16 +48,24 @@ const UserField = forwardRef(
   ) => {
     const classes = useStyles();
     const [options, setOptions] = useState<Parse.User[]>([]);
-    const onChange = (_: any, value: (Parse.User | string)[]) => {
-      piOnChange(
-        value.map((option) => {
-          if (typeof option === "string") {
-            return new Parse.User({ email: option });
-          } else {
-            return option;
-          }
-        })
-      );
+    const onChange = async (_: any, value: (Parse.User | string)[]) => {
+      const newUsers = [];
+      for (let i = 0; i < value.length; i++) {
+        const option = value[i];
+        if (typeof option === "string") {
+          // Will this work or do I need to use signup?
+          newUsers.push(
+            await new Parse.User({
+              email: option,
+              username: option,
+              password: "",
+            })
+          );
+        } else {
+          newUsers.push(option);
+        }
+      }
+      piOnChange(newUsers);
     };
 
     const getOptions = debounce((value) => {

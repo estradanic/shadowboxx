@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import ActionDialog, {
   ActionDialogProps,
   useActionDialogContext,
@@ -22,6 +22,8 @@ import UserField from "../Field/UserField";
 import TextField from "../Field/TextField";
 import Tooltip from "../Tooltip/Tooltip";
 import Parse from "parse";
+import { useParseQuery } from "@parse/react";
+import { useParseQueryOptions } from "../../constants/useParseQueryOptions";
 
 const useStyles = makeStyles((theme: Theme) => ({
   checkboxLabel: {
@@ -70,18 +72,35 @@ export interface AlbumFormDialogProps
 
 /** Component to input values for creating or editing an Album */
 const AlbumFormDialog = ({
-  value,
+  value: initialValue,
   open,
   handleCancel: piHandleCancel,
   handleConfirm: piHandleConfirm,
   resetOnConfirm,
 }: AlbumFormDialogProps) => {
+  const [value, setValue] = useState<Parse.Object<Album>>(initialValue);
+  const { results: collaborators } = useParseQuery(
+    value.get("collaborators").query(),
+    useParseQueryOptions
+  );
+  const { results: coOwners } = useParseQuery(
+    value.get("coOwners").query(),
+    useParseQueryOptions
+  );
+  const { results: viewers } = useParseQuery(
+    value.get("viewers").query(),
+    useParseQueryOptions
+  );
+  const { results: images } = useParseQuery(
+    value.get("images").query(),
+    useParseQueryOptions
+  );
+
   const classes = useStyles();
   const theme = useTheme();
   const sm = useMediaQuery(theme.breakpoints.down("sm"));
   const { enqueueErrorSnackbar } = useSnackbar();
   const { openConfirm } = useActionDialogContext();
-  const initialAttributes = value.attributes;
 
   const defaultErrors = {
     name: {
@@ -92,7 +111,7 @@ const AlbumFormDialog = ({
   const [errors, setErrors] = useState<ErrorState<"name">>(defaultErrors);
 
   const resetState = () => {
-    value.set(initialAttributes);
+    setValue(initialValue);
     setErrors(defaultErrors);
   };
 
@@ -122,14 +141,17 @@ const AlbumFormDialog = ({
   const handleConfirm = () => {
     if (validate()) {
       const nonExistentCollaborators = [
-        ...(value.get("viewers") ?? []),
-        ...(value.get("collaborators") ?? []),
-        ...(value.get("coOwners") ?? []),
-      ].filter((collaborator) => collaborator.email === collaborator.firstName);
+        ...(viewers ?? []),
+        ...(collaborators ?? []),
+        ...(coOwners ?? []),
+      ].filter(
+        (collaborator) =>
+          collaborator.getEmail() === collaborator.get("firstName")
+      );
       if (!!nonExistentCollaborators.length) {
         openConfirm(
           Strings.nonExistentCollaboratorWarning(
-            nonExistentCollaborators[0].email
+            nonExistentCollaborators[0].getEmail()
           ),
           () => {
             piHandleConfirm(value);
@@ -155,7 +177,7 @@ const AlbumFormDialog = ({
       fullWidth
       maxWidth="lg"
       open={open}
-      title={Strings.addAlbum()}
+      title={value.get("name") ?? Strings.untitledAlbum()}
       message=""
       handleConfirm={handleConfirm}
       handleCancel={handleCancel}
@@ -169,7 +191,7 @@ const AlbumFormDialog = ({
               autoComplete="none"
               fullWidth
               value={value.get("name")}
-              onChange={(e) => value.set({ name: e.target.value })}
+              onChange={(e) => value.set("name", e.target.value)}
               label={Strings.name()}
               id="name"
               type="text"
@@ -234,27 +256,65 @@ const AlbumFormDialog = ({
           <Grid item xs={12}>
             <Tooltip title={Strings.coOwnersTooltip()}>
               <UserField
-                value={value.get("coOwners")}
+                value={coOwners!}
                 label={Strings.coOwners()}
-                onChange={(coOwners) => value.set({ coOwners })}
+                onChange={async (newCoOwners) => {
+                  const relation = value.get("coOwners");
+                  relation.add(
+                    newCoOwners.filter(
+                      (newCoOwner) =>
+                        !!coOwners?.find(
+                          (coOwner) =>
+                            coOwner.get("objectId") ===
+                            newCoOwner.get("objectId")
+                        )
+                    )
+                  );
+                  value.set("coOwners", relation);
+                }}
               />
             </Tooltip>
           </Grid>
           <Grid item xs={12}>
             <Tooltip title={Strings.collaboratorsTooltip()}>
               <UserField
-                value={value.get("collaborators")}
+                value={collaborators!}
                 label={Strings.collaborators()}
-                onChange={(collaborators) => value.set({ collaborators })}
+                onChange={(newCollaborators) => {
+                  const relation = value.get("collaborators");
+                  relation.add(
+                    newCollaborators.filter(
+                      (newCollaborator) =>
+                        !!collaborators?.find(
+                          (collaborator) =>
+                            collaborator.get("objectId") ===
+                            newCollaborator.get("objectId")
+                        )
+                    )
+                  );
+                  value.set("collaborators", relation);
+                }}
               />
             </Tooltip>
           </Grid>
           <Grid item xs={12}>
             <Tooltip title={Strings.viewersTooltip()}>
               <UserField
-                value={value.get("viewers")}
+                value={viewers!}
                 label={Strings.viewers()}
-                onChange={(viewers) => value.set({ viewers })}
+                onChange={(newViewers) => {
+                  const relation = value.get("viewers");
+                  relation.add(
+                    newViewers.filter(
+                      (newViewer) =>
+                        !!viewers?.find(
+                          (viewer) =>
+                            viewer.get("objectId") === newViewer.get("objectId")
+                        )
+                    )
+                  );
+                  value.set("viewers", relation);
+                }}
               />
             </Tooltip>
           </Grid>
@@ -262,8 +322,20 @@ const AlbumFormDialog = ({
             <ImageField
               label={Strings.images()}
               multiple
-              value={value.get("images")}
-              onChange={(images) => value.set({ images })}
+              value={images!}
+              onChange={(newImages) => {
+                const relation = value.get("images");
+                relation.add(
+                  newImages.filter(
+                    (newImage) =>
+                      !!images?.find(
+                        (image) =>
+                          image.get("objectId") === newImage.get("objectId")
+                      )
+                  )
+                );
+                value.set("images", relation);
+              }}
             />
           </Grid>
         </Grid>

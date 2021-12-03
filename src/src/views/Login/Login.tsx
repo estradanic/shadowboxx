@@ -7,9 +7,9 @@ import {
   Link,
   PageContainer,
   TextField,
+  useSnackbar,
 } from "../../components";
 import { ErrorState, validateEmail } from "../../utils/formUtils";
-import { useUserContext } from "../../app/UserContext";
 import { useNavigationContext } from "../../app/NavigationContext";
 import { useHistory } from "react-router-dom";
 import { useRoutes } from "../../app/routes";
@@ -55,10 +55,10 @@ const Login = () => {
   const [errors, setErrors] = useState<ErrorState<"email" | "password">>(
     DefaultErrorState
   );
-  const { loginSucceed, loginFail } = useUserContext();
   const { redirectRoute, setGlobalLoading } = useNavigationContext();
   const history = useHistory();
   const { routes } = useRoutes();
+  const { enqueueErrorSnackbar } = useSnackbar();
 
   const validate = (): boolean => {
     const newErrors = { ...DefaultErrorState };
@@ -81,19 +81,18 @@ const Login = () => {
       user.set("password", password);
       user
         .logIn()
-        .then((response) => {
-          if (response.get("emailVerified")) {
-            loginSucceed(response);
-            if (redirectRoute?.viewId) {
-              history.push(redirectRoute.path);
-            } else {
-              history.push(routes["Home"].path);
-            }
+        .then(() => {
+          setGlobalLoading(false);
+          if (redirectRoute?.viewId) {
+            history.push(redirectRoute.path);
           } else {
-            history.push(routes["VerifyEmail"].path);
+            history.push(routes["Home"].path);
           }
         })
-        .catch(loginFail);
+        .catch((error) => {
+          enqueueErrorSnackbar(error?.message ?? Strings.loginError());
+          setGlobalLoading(false);
+        });
     }
   };
 

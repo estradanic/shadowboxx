@@ -6,19 +6,11 @@ import {
   AlbumFormDialog,
   useSnackbar,
 } from "../../components";
-import { useUserContext } from "../../app/UserContext";
-import {
-  Fab,
-  Typography,
-  Grid,
-  CircularProgress,
-  Button,
-} from "@material-ui/core";
+import { Fab, Typography, Grid, Button } from "@material-ui/core";
 import { Add } from "@material-ui/icons";
 import { makeStyles, Theme } from "@material-ui/core/styles";
 import Strings from "../../resources/Strings";
 import Album from "../../types/Album";
-import { useNotificationsContext } from "../../app/NotificationsContext";
 import BlankCanvas from "../../components/Svgs/BlankCanvas";
 import { useNavigationContext } from "../../app/NavigationContext";
 import Parse from "parse";
@@ -55,7 +47,6 @@ const HomePage = memo(() => {
   const [addAlbumDialogOpen, setAddAlbumDialogOpen] = useState(false);
   const { enqueueErrorSnackbar, enqueueSuccessSnackbar } = useSnackbar();
   const { setGlobalLoading, globalLoading } = useNavigationContext();
-  const { addNotification } = useNotificationsContext();
   const [albums, setAlbums] = useState<Parse.Object<Album>[]>([]);
   const gotAlbums = useRef(false);
 
@@ -134,12 +125,20 @@ const HomePage = memo(() => {
       </Fab>
       <AlbumFormDialog
         resetOnConfirm
-        value={new Parse.Object("Album")}
+        value={
+          new Parse.Object<Album>("Album", {
+            owner: Parse.User.current()!.toPointer(),
+            images: new Parse.Relation(),
+            name: "Untitled Album",
+            collaborators: new Parse.Relation(),
+            viewers: new Parse.Relation(),
+            coOwners: new Parse.Relation(),
+          })
+        }
         open={addAlbumDialogOpen}
         handleCancel={() => setAddAlbumDialogOpen(false)}
         handleConfirm={(value) => {
           setAddAlbumDialogOpen(false);
-          value.set({ owner: Parse.User.current()?.toPointer() });
           value
             .save()
             .then((response) => {
@@ -206,9 +205,10 @@ const LandingPage = () => {
 const Home = () => {
   useView("Home");
 
-  const { loggedIn } = useUserContext();
   return (
-    <PageContainer>{loggedIn ? <HomePage /> : <LandingPage />}</PageContainer>
+    <PageContainer>
+      {Parse.User.current() ? <HomePage /> : <LandingPage />}
+    </PageContainer>
   );
 };
 

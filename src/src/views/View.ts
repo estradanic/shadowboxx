@@ -1,5 +1,4 @@
 import { match } from "react-router-dom";
-import { useUserContext } from "../app/UserContext";
 import { useRoutes } from "../app/routes";
 import { useNavigationContext } from "../app/NavigationContext";
 import { useHistory } from "react-router-dom";
@@ -26,7 +25,6 @@ export const useView = (currentViewId: string) => {
     routeParams,
     setGlobalLoading,
   } = useNavigationContext();
-  const { loggedIn, loginSucceed } = useUserContext();
   const { getRoutePath, routes } = useRoutes();
   const history = useHistory();
   const currentRoute = routes[currentViewId];
@@ -44,7 +42,7 @@ export const useView = (currentViewId: string) => {
   };
 
   useEffect(() => {
-    if (loggedIn) {
+    if (Parse.User.current()) {
       if (!currentRoute.redirectOnAuthFail) {
         if (redirectRoute?.viewId) {
           const redirectPath = getRoutePath(redirectRoute?.viewId, routeParams);
@@ -59,18 +57,20 @@ export const useView = (currentViewId: string) => {
       }
     } else if (currentRoute.tryAuthenticate) {
       setGlobalLoading(true);
-      Parse.User.currentAsync()
-        .then((user) => {
-          if (user) {
-            loginSucceed(user);
-          } else {
-            redirectToLogin();
-          }
-        })
-        .catch(redirectToLogin);
+      redirectToLogin();
     }
-    // Only rerun when loggedIn or routeParams changes.
-    // Eslint is being over-protective here.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [loggedIn, routeParams]);
+  }, [
+    routeParams,
+    currentRoute.redirectOnAuthFail,
+    currentRoute.tryAuthenticate,
+    currentViewId,
+    getRoutePath,
+    history,
+    redirectRoute?.viewId,
+    redirectToLogin,
+    routeHistory,
+    setGlobalLoading,
+    setRedirectRoute,
+    setRouteHistory,
+  ]);
 };

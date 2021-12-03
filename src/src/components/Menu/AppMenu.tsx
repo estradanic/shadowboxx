@@ -11,7 +11,7 @@ import { Home, ExitToApp, Settings, Menu } from "@material-ui/icons";
 import ListItemLink from "../Link/ListItemLink";
 import { makeStyles, Theme, useTheme } from "@material-ui/core/styles";
 import Strings from "../../resources/Strings";
-import { useUserContext } from "../../app/UserContext";
+import Parse from "parse";
 
 const useStyles = makeStyles((theme: Theme) => ({
   drawer: {
@@ -46,7 +46,6 @@ export interface AppMenuListProps {
 /** Component to display a list of actions or pages for the app */
 const AppMenuList = ({ xs = false }: AppMenuListProps) => {
   const classes = useStyles();
-  const { logout } = useUserContext();
 
   return (
     <List className={xs ? "" : classes.horizontalList}>
@@ -62,7 +61,7 @@ const AppMenuList = ({ xs = false }: AppMenuListProps) => {
         </ListItemIcon>
         <ListItemText primary={Strings.settings()} />
       </ListItemLink>
-      <ListItemLink onClick={logout} to="/login">
+      <ListItemLink onClick={Parse.User.logOut} to="/login">
         <ListItemIcon className={classes.listItemIcon}>
           <ExitToApp />
         </ListItemIcon>

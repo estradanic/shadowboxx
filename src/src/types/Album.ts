@@ -4,7 +4,7 @@ import Image from "./Image";
 /** Interface defining an Album */
 export default interface Album {
   /** Unique Id of the album in the database */
-  objectId?: string,
+  objectId?: string;
   /** User that owns this album */
   owner: Parse.Pointer;
   /** Images in the album */
@@ -18,13 +18,13 @@ export default interface Album {
   /** Whether the album is publicly viewable or not */
   isPublic?: boolean;
   /** Collaborators with "put" access */
-  collaborators?: Parse.Relation<Parse.Object<Album>, Parse.User>;
+  collaborators: Parse.Relation<Parse.Object<Album>, Parse.User>;
   /** Collaborators with "view" access */
-  viewers?: Parse.Relation<Parse.Object<Album>, Parse.User>;
+  viewers: Parse.Relation<Parse.Object<Album>, Parse.User>;
   /** Collaborators with "edit" access */
-  coOwners?: Parse.Relation<Parse.Object<Album>, Parse.User>;
+  coOwners: Parse.Relation<Parse.Object<Album>, Parse.User>;
   /** Last edited date */
-  updatedAt: Date;
+  updatedAt?: Date;
   /** Created date */
-  createdAt: Date;
+  createdAt?: Date;
 }

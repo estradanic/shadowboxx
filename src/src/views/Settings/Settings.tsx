@@ -1,10 +1,8 @@
-import React, { useEffect, useState } from "react";
+import React, { useMemo, useState } from "react";
 import { useView } from "../View";
 import {
   PageContainer,
-  PasswordField,
   ImageField,
-  ActionDialog,
   TextField,
   useSnackbar,
 } from "../../components";
@@ -16,20 +14,17 @@ import {
   FormControlLabel,
   Switch,
   FormControl,
-  ClickAwayListener,
 } from "@material-ui/core";
-import { Brightness7, Brightness2, Lock, LockOpen } from "@material-ui/icons";
-import { ParseFile, useUserContext } from "../../app/UserContext";
+import { Brightness7, Brightness2 } from "@material-ui/icons";
 import Strings from "../../resources/Strings";
 import { makeStyles, Theme } from "@material-ui/core/styles";
-import { isEqual } from "lodash";
-import {
-  ErrorState,
-  validateEmail,
-  validatePassword,
-} from "../../utils/formUtils";
+import { ErrorState, validateEmail } from "../../utils/formUtils";
 import { isNullOrWhitespace } from "../../utils/stringUtils";
 import Parse from "parse";
+import User from "../../types/User";
+import { useParseQuery } from "@parse/react";
+import Image from "../../types/Image";
+import { useParseQueryOptions } from "../../constants/useParseQueryOptions";
 
 const useStyles = makeStyles((theme: Theme) => ({
   cardTitle: {
@@ -114,34 +109,20 @@ const DefaultErrorState = {
 const Settings = () => {
   useView("Settings");
 
+  const user: Parse.User<User> | undefined = Parse.User.current();
+  const { results: profilePictureResult } = useParseQuery(
+    new Parse.Query<Parse.Object<Image>>("Image").equalTo(
+      "objectId",
+      user!.get("profilePicture")?.objectId
+    ),
+    useParseQueryOptions
+  );
+  const profilePicture = useMemo(() => profilePictureResult?.[0], [
+    profilePictureResult,
+  ]);
+
   const classes = useStyles();
-  const {
-    firstName: globalFirstName,
-    lastName: globalLastName,
-    email: globalEmail,
-    profilePicture: globalProfilePicture,
-    setFirstName: setGlobalFirstName,
-    setLastName: setGlobalLastName,
-    setEmail: setGlobalEmail,
-    setProfilePicture: setGlobalProfilePicture,
-    isDarkThemeEnabled: globalDarkThemeEnabled,
-    setDarkThemeEnabled: setGlobalDarkThemeEnabled,
-  } = useUserContext();
   const [loading, setLoading] = useState<boolean>(false);
-  const [password, setPassword] = useState<string>("");
-  const [firstName, setFirstName] = useState<string>(globalFirstName);
-  const [lastName, setLastName] = useState<string>(globalLastName);
-  const [email, setEmail] = useState<string>(globalEmail);
-  const [profilePicture, setProfilePicture] = useState<ParseFile>(
-    globalProfilePicture
-  );
-  const [isDarkThemeEnabled, setIsDarkThemeEnabled] = useState<boolean>(
-    globalDarkThemeEnabled
-  );
-  const [passwordUnlocked, setPasswordUnlocked] = useState<boolean>(false);
-  const [hoveringUnlockPassword, setHoveringUnlockPassword] = useState<boolean>(
-    false
-  );
   const [errors, setErrors] = useState<
     ErrorState<
       "email" | "firstName" | "lastName" | "password" | "profilePicture"
@@ -149,45 +130,22 @@ const Settings = () => {
   >(DefaultErrorState);
   const { enqueueErrorSnackbar, enqueueSuccessSnackbar } = useSnackbar();
 
-  useEffect(() => {
-    setFirstName(globalFirstName);
-    setLastName(globalLastName);
-    setEmail(globalEmail);
-    setProfilePicture(globalProfilePicture);
-    setIsDarkThemeEnabled(globalDarkThemeEnabled);
-    // Only rerun when global values change.
-    // Eslint is being over-protective here.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [
-    globalFirstName,
-    globalLastName,
-    globalEmail,
-    globalProfilePicture,
-    globalDarkThemeEnabled,
-  ]);
-
   const validate = (): boolean => {
     const newErrors = { ...DefaultErrorState };
 
-    if (!validateEmail(email)) {
+    if (!validateEmail(user!.get("email"))) {
       newErrors.email = {
         isError: true,
-        errorMessage: Strings.invalidEmail(email),
+        errorMessage: Strings.invalidEmail(user!.get("email")),
       };
     }
-    if (password && !validatePassword(password)) {
-      newErrors.password = {
-        isError: true,
-        errorMessage: Strings.invalidPassword(password),
-      };
-    }
-    if (isNullOrWhitespace(firstName)) {
+    if (isNullOrWhitespace(user!.get("firstName"))) {
       newErrors.firstName = {
         isError: true,
         errorMessage: Strings.pleaseEnterA(Strings.firstName()),
       };
     }
-    if (isNullOrWhitespace(lastName)) {
+    if (isNullOrWhitespace(user!.get("lastName"))) {
       newErrors.lastName = {
         isError: true,
         errorMessage: Strings.pleaseEnterA(Strings.firstName()),
@@ -206,41 +164,10 @@ const Settings = () => {
 
   const changeUserInfo = () => {
     if (validate()) {
-      const newInfo: Parse.Attributes = {
-        firstName,
-        lastName,
-        password: password ?? "",
-        isDarkThemeEnabled,
-      };
-      if (
-        // compare images without parseFile being
-        !isEqual(
-          { ...profilePicture, parseFile: null },
-          { ...globalProfilePicture, parseFile: null }
-        )
-      ) {
-        newInfo.profilePicture = profilePicture;
-      }
-      if (email !== globalEmail) {
-        newInfo.email = email;
-      }
       setLoading(true);
-      Parse.User.current()?.set(newInfo);
-      Parse.User.current()
-        ?.save()
-        .then((response) => {
-          setGlobalEmail(response.getEmail() ?? "");
-          setGlobalFirstName(response.get("firstName"));
-          setGlobalLastName(response.get("lastName"));
-          if (response.get("profilePicture")) {
-            setGlobalProfilePicture(
-              response.get("profilePicture") ?? { src: "", name: "" }
-            );
-          }
-          setGlobalDarkThemeEnabled(
-            response.get("isDarkThemeEnabled") ?? false
-          );
-          setPasswordUnlocked(false);
+      user!
+        .save()
+        .then(() => {
           enqueueSuccessSnackbar(Strings.settingsSaved());
           setLoading(false);
         })
@@ -248,24 +175,6 @@ const Settings = () => {
           setLoading(false);
           enqueueErrorSnackbar(error?.message ?? Strings.settingsNotSaved());
         });
-    }
-  };
-
-  const [deleteAccountDialogOpen, setDeleteAccountDialogOpen] = useState(false);
-  const [promptPassword, setPromptPassword] = useState("");
-  const deleteAccount = () => {
-    if (promptPassword) {
-      Parse.User.current()
-        ?.destroy()
-        .then(() => {
-          window.location.reload();
-        })
-        .catch((error) => {
-          setLoading(false);
-          enqueueErrorSnackbar(error?.message ?? Strings.commonError());
-        });
-    } else {
-      enqueueErrorSnackbar(Strings.invalidPassword());
     }
   };
 
@@ -290,9 +199,9 @@ const Settings = () => {
                           checked: classes.switchChecked,
                         }}
                         color="primary"
-                        checked={isDarkThemeEnabled}
+                        checked={user!.get("isDarkThemeEnabled")}
                         onChange={(_, checked) =>
-                          setIsDarkThemeEnabled(checked)
+                          user!.set("isDarkThemeEnabled", checked)
                         }
                         icon={<Brightness7 />}
                         checkedIcon={<Brightness2 />}
@@ -308,9 +217,9 @@ const Settings = () => {
                 <ImageField
                   thumbnailOnly
                   autoComplete="none"
-                  value={[profilePicture]}
-                  onChange={([profilePicture]) => {
-                    setProfilePicture(profilePicture);
+                  value={profilePicture ? [profilePicture] : []}
+                  onChange={([newProfilePicture]) => {
+                    user!.set("profilePicture", newProfilePicture.toPointer());
                   }}
                   label={Strings.profilePicture()}
                 />
@@ -321,8 +230,8 @@ const Settings = () => {
                   error={errors.firstName.isError}
                   helperText={errors.firstName.errorMessage}
                   fullWidth
-                  value={firstName}
-                  onChange={(e) => setFirstName(e.target.value)}
+                  value={user!.get("firstName")}
+                  onChange={(e) => user!.set("firstName", e.target.value)}
                   label={Strings.firstName()}
                   id="firstName"
                   type="text"
@@ -334,8 +243,8 @@ const Settings = () => {
                   error={errors.lastName.isError}
                   helperText={errors.lastName.errorMessage}
                   fullWidth
-                  value={lastName}
-                  onChange={(e) => setLastName(e.target.value)}
+                  value={user!.get("lastName")}
+                  onChange={(e) => user!.set("lastName", e.target.value)}
                   label={Strings.lastName()}
                   id="lastName"
                   type="text"
@@ -347,76 +256,11 @@ const Settings = () => {
                   error={errors.email.isError}
                   helperText={errors.email.errorMessage}
                   fullWidth
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
+                  value={user!.get("email")}
+                  onChange={(e) => user!.set("email", e.target.value)}
                   label={Strings.email()}
                   id="email"
                   type="email"
-                />
-              </Grid>
-              <ClickAwayListener
-                onClickAway={() => {
-                  if (!password) {
-                    setPasswordUnlocked(false);
-                  }
-                }}
-              >
-                <Grid item xs={12}>
-                  <Button
-                    fullWidth
-                    className={classes.unlockPassword}
-                    size="small"
-                    onClick={() => setPasswordUnlocked(true)}
-                    style={{ display: passwordUnlocked ? "none" : "inherit" }}
-                    onMouseEnter={() => setHoveringUnlockPassword(true)}
-                    onMouseLeave={() => setHoveringUnlockPassword(false)}
-                    startIcon={hoveringUnlockPassword ? <LockOpen /> : <Lock />}
-                  >
-                    {Strings.unlockPassword()}
-                  </Button>
-                  <PasswordField
-                    style={{ display: passwordUnlocked ? "inherit" : "none" }}
-                    autoComplete="new-password"
-                    error={errors.password.isError}
-                    helperText={errors.password.errorMessage}
-                    fullWidth
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    label={Strings.newPassword()}
-                    id="password"
-                  />
-                </Grid>
-              </ClickAwayListener>
-              <Grid item xs={12}>
-                <Button
-                  fullWidth
-                  className={classes.deleteAccountButton}
-                  size="large"
-                  onClick={() => setDeleteAccountDialogOpen(true)}
-                >
-                  {Strings.deleteAccount()}
-                </Button>
-                <ActionDialog
-                  open={deleteAccountDialogOpen}
-                  title={Strings.deleteAccount()}
-                  message={Strings.deleteAccountConfirmation()}
-                  handleCancel={() => {
-                    setPromptPassword("");
-                    setDeleteAccountDialogOpen(false);
-                  }}
-                  handleConfirm={deleteAccount}
-                  confirmButtonColor="error"
-                  promptField={
-                    <PasswordField
-                      fullWidth
-                      label={Strings.password()}
-                      onChange={(event) =>
-                        setPromptPassword(event.target.value)
-                      }
-                      value={promptPassword}
-                    />
-                  }
-                  type="prompt"
                 />
               </Grid>
               <Grid item xs={12}>

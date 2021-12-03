@@ -108,6 +108,7 @@ const Strings: { [key: string]: (params?: any) => string } = {
   submit: () => "Submit",
   tryAddingAlbum: () => "Try adding one below",
   unlockPassword: () => "Change Password",
+  untitledAlbum: () => "Untitled Album",
   updateImageError: (fileName) => `Error updating image ${fileName}.`,
   uploadImageError: (fileName) => `Error uploading image ${fileName}.`,
   uploadingImage: (fileName) => `Uploading image (${fileName})`,

@@ -1,4 +1,4 @@
-import React, {useState, createContext, useContext, ReactNode, useCallback} from "react";
+import React, { useState, createContext, useContext, useCallback } from "react";
 import Parse from "parse";
 import { useNotificationsContext } from "./NotificationsContext";
 import Strings from "../resources/Strings";
@@ -14,23 +14,23 @@ export enum ImageActionCommand {
 /** Interface defining an action being done to an image */
 export interface ImageAction {
   /** The image being worked on */
-  image: Image,
+  image: Image;
   /** The command being performed on the image */
-  command: ImageActionCommand,
+  command: ImageActionCommand;
   /** Whether action is completed or not */
-  completed?: boolean,
+  completed?: boolean;
 }
 
 /** Interface defining the value of ImageContextProvider */
 interface ImageContextValue {
-  /** An array of ImageActions currently being taken or which have already completed */
-  actions: ImageAction[],
+  /** Whether there are actions currently in progress or not */
+  loading: boolean;
   /** A completion value for Progress components */
-  progress: number,
+  progress: number;
   /** Function to upload an image */
-  uploadImage: (image: Image) => Promise<Parse.Object<Image>>,
+  uploadImage: (image: Image) => Promise<Parse.Object<Image>>;
   /** Function to delete image */
-  deleteImage: (parseImage: Parse.Object<Image>) => Promise<void>,
+  deleteImage: (parseImage: Parse.Object<Image>) => Promise<void>;
 }
 
 /** Context to manage Images */
@@ -46,19 +46,25 @@ export const ImageContextProvider = ({
   children,
 }: ImageContextProviderProps) => {
   const [actions, setActions] = useState<ImageAction[]>([]);
-  const {addNotification} = useNotificationsContext();
+  const { addNotification } = useNotificationsContext();
   const [progress, setProgress] = useState<number>(0);
-  const {enqueueErrorSnackbar} = useSnackbar();
+  const [loading, setLoading] = useState<boolean>(false);
+  const { enqueueErrorSnackbar } = useSnackbar();
 
   const recalculateProgress = useCallback(() => {
     const completedActions = actions.filter((action) => action.completed);
-    setProgress(completedActions.length / actions.length * 100);
-  }, [actions])
+    const newProgress = (completedActions.length / actions.length) * 100;
+    if (newProgress === 100) {
+      setLoading(false);
+    }
+    setProgress(newProgress);
+  }, [actions]);
 
   const uploadImage = async (image: Image) => {
+    setLoading(true);
     let parseImage: Parse.Object<Image> = new Parse.Object("Image", image);
 
-    const action: ImageAction = {image, command: ImageActionCommand.UPLOAD};
+    const action: ImageAction = { image, command: ImageActionCommand.UPLOAD };
     setActions((prev) => [...prev, action]);
 
     const notification = addNotification({
@@ -69,7 +75,9 @@ export const ImageContextProvider = ({
     try {
       parseImage = await parseImage.save();
     } catch (e: any) {
-      enqueueErrorSnackbar(e?.message ?? Strings.uploadImageError(image.file.name()));
+      enqueueErrorSnackbar(
+        e?.message ?? Strings.uploadImageError(image.file.name())
+      );
     }
 
     action.completed = true;
@@ -80,7 +88,11 @@ export const ImageContextProvider = ({
   };
 
   const deleteImage = async (parseImage: Parse.Object<Image>) => {
-    const action: ImageAction = {image: parseImage.attributes, command: ImageActionCommand.DELETE};
+    setLoading(true);
+    const action: ImageAction = {
+      image: parseImage.attributes,
+      command: ImageActionCommand.DELETE,
+    };
     setActions((prev) => [...prev, action]);
 
     try {
@@ -97,21 +109,19 @@ export const ImageContextProvider = ({
     uploadImage,
     deleteImage,
     progress,
-    actions,
-  }
+    loading,
+  };
 
   return (
-    <ImageContext.Provider value={value}>
-      {children}
-    </ImageContext.Provider>
-  )
+    <ImageContext.Provider value={value}>{children}</ImageContext.Provider>
+  );
 };
 
 /** Alias to useContext(ImageContext) */
 export const useImageContext = () => {
   const context = useContext(ImageContext);
   if (!context) {
-    throw new Error('No ImageContextProvider!');
+    throw new Error("No ImageContextProvider!");
   }
   return context;
-}
+};

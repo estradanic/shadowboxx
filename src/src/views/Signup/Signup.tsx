@@ -7,6 +7,7 @@ import {
   Link,
   PageContainer,
   TextField,
+  useSnackbar,
 } from "../../components";
 import {
   ErrorState,
@@ -14,7 +15,6 @@ import {
   validatePassword,
 } from "../../utils/formUtils";
 import { isNullOrWhitespace } from "../../utils/stringUtils";
-import { useUserContext } from "../../app/UserContext";
 import { useNavigationContext } from "../../app/NavigationContext";
 import { useHistory } from "react-router-dom";
 import { useRoutes } from "../../app/routes";
@@ -71,7 +71,7 @@ const Signup = () => {
   const { setGlobalLoading } = useNavigationContext();
   const { routes } = useRoutes();
   const history = useHistory();
-  const { signupSucceed, loginFail } = useUserContext();
+  const { enqueueErrorSnackbar } = useSnackbar();
 
   const validate = (): boolean => {
     const newErrors = { ...DefaultErrorState };
@@ -119,11 +119,14 @@ const Signup = () => {
       user.set({ firstName, lastName, email });
       user
         .signUp()
-        .then((response) => {
-          signupSucceed(response);
-          history.push(routes["VerifyEmail"].path);
+        .then(() => {
+          setGlobalLoading(false);
+          history.push(routes["Home"].path);
         })
-        .catch(loginFail);
+        .catch((error) => {
+          setGlobalLoading(false);
+          enqueueErrorSnackbar(error?.message ?? Strings.signupError());
+        });
     }
   };
 
