@@ -4,7 +4,8 @@ import { useNotificationsContext } from "./NotificationsContext";
 import Strings from "../resources/Strings";
 import { CircularProgress } from "@material-ui/core";
 import { useSnackbar } from "../components";
-import Image from "../types/Image";
+import { ParseImage, Image } from "../types/Image";
+import { v4 as uuid } from "uuid";
 
 export enum ImageActionCommand {
   DELETE,
@@ -28,9 +29,9 @@ interface ImageContextValue {
   /** A completion value for Progress components */
   progress: number;
   /** Function to upload an image */
-  uploadImage: (image: Image) => Promise<Parse.Object<Image>>;
+  uploadImage: (image: Image) => Promise<ParseImage>;
   /** Function to delete image */
-  deleteImage: (parseImage: Parse.Object<Image>) => Promise<void>;
+  deleteImage: (parseImage: ParseImage) => Promise<void>;
 }
 
 /** Context to manage Images */
@@ -62,7 +63,8 @@ export const ImageContextProvider = ({
 
   const uploadImage = async (image: Image) => {
     setLoading(true);
-    let parseImage: Parse.Object<Image> = new Parse.Object("Image", image);
+    let parseImage: ParseImage = new ParseImage("Image", image);
+    // parseImage.set("objectId", `image-${uuid()}`);
 
     const action: ImageAction = { image, command: ImageActionCommand.UPLOAD };
     setActions((prev) => [...prev, action]);
@@ -87,7 +89,7 @@ export const ImageContextProvider = ({
     return parseImage;
   };
 
-  const deleteImage = async (parseImage: Parse.Object<Image>) => {
+  const deleteImage = async (parseImage: ParseImage) => {
     setLoading(true);
     const action: ImageAction = {
       image: parseImage.attributes,

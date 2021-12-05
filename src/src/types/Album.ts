@@ -1,14 +1,14 @@
 import Parse from "parse";
-import Image from "./Image";
+import { ParseImage } from "./Image";
+import Object, { Attributes } from "./ParseObject";
+import { ParseUser } from "./User";
 
 /** Interface defining an Album */
-export default interface Album {
-  /** Unique Id of the album in the database */
-  objectId?: string;
+export interface Album extends Attributes {
   /** User that owns this album */
   owner: Parse.Pointer;
   /** Images in the album */
-  images: Parse.Relation<Parse.Object<Album>, Parse.Object<Image>>;
+  images: Parse.Relation<ParseAlbum, ParseImage>;
   /** Name of the album */
   name: string;
   /** Description of the album */
@@ -18,13 +18,16 @@ export default interface Album {
   /** Whether the album is publicly viewable or not */
   isPublic?: boolean;
   /** Collaborators with "put" access */
-  collaborators: Parse.Relation<Parse.Object<Album>, Parse.User>;
+  collaborators: Parse.Relation<ParseAlbum, ParseUser>;
   /** Collaborators with "view" access */
-  viewers: Parse.Relation<Parse.Object<Album>, Parse.User>;
+  viewers: Parse.Relation<ParseAlbum, ParseUser>;
   /** Collaborators with "edit" access */
-  coOwners: Parse.Relation<Parse.Object<Album>, Parse.User>;
+  coOwners: Parse.Relation<ParseAlbum, ParseUser>;
   /** Last edited date */
   updatedAt?: Date;
   /** Created date */
   createdAt?: Date;
 }
+
+// TODO ADD GETTERS AND SETTERS
+export class ParseAlbum extends Object<Album> {}

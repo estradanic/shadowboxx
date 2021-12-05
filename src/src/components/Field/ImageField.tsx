@@ -21,7 +21,7 @@ import Strings from "../../resources/Strings";
 import { uniqueId } from "lodash";
 import TextField, { TextFieldProps } from "../Field/TextField";
 import Parse from "parse";
-import Image from "../../types/Image";
+import { ParseImage } from "../../types/Image";
 import { useSnackbar } from "../Snackbar/Snackbar";
 import { useImageContext } from "../../app/ImageContext";
 
@@ -93,9 +93,9 @@ const useStyles = makeStyles((theme: Theme) => ({
 export interface ImageFieldProps
   extends Omit<TextFieldProps, "value" | "onChange"> {
   /** Value of the field, array of Images */
-  value: Parse.Object<Image>[];
+  value: ParseImage[];
   /** Function to run when the value changes */
-  onChange: (value: Parse.Object<Image>[]) => void;
+  onChange: (value: ParseImage[]) => void;
   /** Whether to only save the thumbnail or not */
   thumbnailOnly?: boolean;
   /** Whether multiple images can be selected or not */
@@ -125,7 +125,7 @@ const ImageField = ({
   const addFromFile = (event: any) => {
     if (event.target.files?.[0]) {
       const max = multiple ? event.target.files.length : 1;
-      const newImages: Parse.Object<Image>[] = [];
+      const newImages: ParseImage[] = [];
       for (let i = 0; i < max; i++) {
         const file: any = event.target.files[i];
         const parseFile = new Parse.File(file.name, file);
@@ -147,10 +147,12 @@ const ImageField = ({
   const addImageFromUrl = () => {
     const fileName = imageUrl.substring(imageUrl.lastIndexOf("/") + 1);
     const parseFile = new Parse.File(fileName, { uri: imageUrl });
-    const newImage = new Parse.Object<Image>("Image", {
+    const newImage = new ParseImage("Image", {
       file: parseFile,
       isCoverImage: false,
     });
+    // newImage.set("objectId", `image-${uuid()}`);
+
     setShowUrlInput(false);
     if (multiple) {
       onChange([...value, newImage]);
@@ -251,7 +253,7 @@ const ImageField = ({
       {multiple && !!value.length && (
         <div className={classes.multiImageContainer}>
           {loading && <LinearProgress value={progress} />}
-          {value.map((image: Parse.Object<Image>) => {
+          {value.map((image: ParseImage) => {
             const file = image.get("file");
             return (
               <div

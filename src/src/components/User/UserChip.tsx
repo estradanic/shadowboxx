@@ -1,9 +1,20 @@
-import React, { memo, useCallback, useEffect, useRef, useState } from "react";
+import React, {
+  memo,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import UserLabel from "./UserLabel";
 import UserAvatar from "./UserAvatar";
 import { Chip, ChipProps } from "@material-ui/core";
 import { makeStyles, Theme } from "@material-ui/core/styles";
 import Parse from "parse";
+import { ParseUser } from "../../types/User";
+import { useParseQuery } from "@parse/react";
+import { useParseQueryOptions } from "../../constants/useParseQueryOptions";
+import { ParseImage } from "../../types/Image";
 
 const useStyles = makeStyles((theme: Theme) => ({
   root: {
@@ -31,11 +42,11 @@ const useStyles = makeStyles((theme: Theme) => ({
 export interface UserChipProps
   extends Omit<ChipProps, "label" | "icon" | "component" | "classes"> {
   /** User to display */
-  user?: Parse.User;
+  user?: ParseUser;
   /** Email of the user to display */
   email?: string;
   /** Function to run when the user is resolved */
-  onResolve?: (user: Parse.User) => void;
+  onResolve?: (user: ParseUser) => void;
 }
 
 /** Component to display the name and profile picture of a user */
@@ -43,11 +54,22 @@ const UserChip = memo(
   ({ user: piUser, email, onResolve, ...rest }: UserChipProps) => {
     const classes = useStyles();
     const mountedRef = useRef(true);
-    const [user, setUser] = useState<Parse.User>();
-    const currentUser = Parse.User.current();
+    const [user, setUser] = useState<ParseUser>();
+    const currentUser: ParseUser | undefined = ParseUser.current();
+
+    const { results: profilePictureResult } = useParseQuery(
+      new Parse.Query<ParseImage>("Image").equalTo(
+        "objectId",
+        user!.get("profilePicture")?.objectId
+      ),
+      useParseQueryOptions
+    );
+    const profilePicture = useMemo(() => profilePictureResult?.[0], [
+      profilePictureResult,
+    ]);
 
     const resolveUser = useCallback(
-      (resolvedUser: Parse.User) => {
+      (resolvedUser: ParseUser) => {
         setUser(resolvedUser);
         onResolve?.(resolvedUser);
       },
@@ -64,25 +86,46 @@ const UserChip = memo(
         ) {
           resolveUser(currentUser);
         } else if (
-          !piUser ||
-          !piUser.get("firstName") ||
-          !piUser.get("lastName") ||
-          !piUser.get("profilePicture")?.url()
+          (!piUser ||
+            !piUser.get("firstName") ||
+            !piUser.get("lastName") ||
+            !profilePicture?.get("file")?.url()) &&
+          email
         ) {
-          new Parse.Query<Parse.User>("User")
+          new Parse.Query<ParseUser>("User")
             .equalTo("email", piUser?.getEmail() ?? email)
             .first()
             .then((response) => {
               if (!response) {
-                resolveUser(piUser ?? new Parse.User());
+                resolveUser(
+                  piUser ??
+                    new ParseUser({
+                      email,
+                      username: email,
+                      password: "",
+                      lastName: "",
+                      firstName: email,
+                      isDarkThemeEnabled: false,
+                    })
+                );
               } else {
                 resolveUser(response);
               }
             })
             .catch((error) => {
-              resolveUser(piUser ?? new Parse.User());
+              resolveUser(
+                piUser ??
+                  new ParseUser({
+                    email,
+                    username: email,
+                    password: "",
+                    lastName: "",
+                    firstName: email,
+                    isDarkThemeEnabled: false,
+                  })
+              );
             });
-        } else {
+        } else if (piUser) {
           resolveUser(piUser);
         }
       }

@@ -19,6 +19,7 @@ import { UserAvatar } from "..";
 import { useRoutes } from "../../app/routes";
 import Notifications from "../Notifications/Notifications";
 import Parse from "parse";
+import { ParseUser } from "../../types/User";
 
 const useStyles = makeStyles((theme: Theme) => ({
   backButton: {
@@ -87,7 +88,7 @@ const Header = ({ viewId, ...rest }: HeaderProps) => {
           <Link className={classes.logo} to="/" color="inherit">
             {Strings.appName()}
           </Link>
-          {Parse.User.current() ? (
+          {ParseUser.current() ? (
             <AppMenu />
           ) : (
             <Button
@@ -111,15 +112,15 @@ const Header = ({ viewId, ...rest }: HeaderProps) => {
             />
           )}
           <Breadcrumbs viewId={viewId} />
-          {Parse.User.current() && (
+          {ParseUser.current() && (
             <>
               <Notifications className={classes.notifications} />
-              {Parse.User.current()?.get("profilePicture")?.url() ? (
+              {ParseUser.current()?.get("profilePicture")?.url() ? (
                 <UserAvatar className={classes.profile} />
               ) : (
-                <Typography variant="overline">{`${Parse.User.current()?.get(
+                <Typography variant="overline">{`${ParseUser.current()?.get(
                   "firstName"
-                )} ${Parse.User.current()?.get("lastName")}`}</Typography>
+                )} ${ParseUser.current()?.get("lastName")}`}</Typography>
               )}
             </>
           )}

@@ -21,10 +21,11 @@ import { makeStyles, Theme } from "@material-ui/core/styles";
 import { ErrorState, validateEmail } from "../../utils/formUtils";
 import { isNullOrWhitespace } from "../../utils/stringUtils";
 import Parse from "parse";
-import User from "../../types/User";
+import { ParseUser } from "../../types/User";
 import { useParseQuery } from "@parse/react";
-import Image from "../../types/Image";
+import { ParseImage } from "../../types/Image";
 import { useParseQueryOptions } from "../../constants/useParseQueryOptions";
+import { ImageContextProvider } from "../../app/ImageContext";
 
 const useStyles = makeStyles((theme: Theme) => ({
   cardTitle: {
@@ -109,9 +110,9 @@ const DefaultErrorState = {
 const Settings = () => {
   useView("Settings");
 
-  const user: Parse.User<User> | undefined = Parse.User.current();
+  const user: ParseUser | undefined = ParseUser.current();
   const { results: profilePictureResult } = useParseQuery(
-    new Parse.Query<Parse.Object<Image>>("Image").equalTo(
+    new Parse.Query<ParseImage>("Image").equalTo(
       "objectId",
       user!.get("profilePicture")?.objectId
     ),
@@ -214,15 +215,20 @@ const Settings = () => {
                 </FormControl>
               </Grid>
               <Grid item xs={12}>
-                <ImageField
-                  thumbnailOnly
-                  autoComplete="none"
-                  value={profilePicture ? [profilePicture] : []}
-                  onChange={([newProfilePicture]) => {
-                    user!.set("profilePicture", newProfilePicture.toPointer());
-                  }}
-                  label={Strings.profilePicture()}
-                />
+                <ImageContextProvider>
+                  <ImageField
+                    thumbnailOnly
+                    autoComplete="none"
+                    value={profilePicture ? [profilePicture] : []}
+                    onChange={([newProfilePicture]) => {
+                      user!.set(
+                        "profilePicture",
+                        newProfilePicture.toPointer()
+                      );
+                    }}
+                    label={Strings.profilePicture()}
+                  />
+                </ImageContextProvider>
               </Grid>
               <Grid item xs={12}>
                 <TextField

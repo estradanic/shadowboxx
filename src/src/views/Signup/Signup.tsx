@@ -19,7 +19,7 @@ import { useNavigationContext } from "../../app/NavigationContext";
 import { useHistory } from "react-router-dom";
 import { useRoutes } from "../../app/routes";
 import { useView } from "../View";
-import Parse from "parse";
+import { ParseUser } from "../../types/User";
 
 const useStyles = makeStyles((theme: Theme) => ({
   card: {
@@ -113,10 +113,14 @@ const Signup = () => {
   const signup = () => {
     if (validate()) {
       setGlobalLoading(true);
-      const user = new Parse.User();
-      user.setUsername(email);
-      user.setPassword(password);
-      user.set({ firstName, lastName, email });
+      const user = new ParseUser({
+        username: email,
+        email,
+        password,
+        firstName,
+        lastName,
+        isDarkThemeEnabled: false,
+      });
       user
         .signUp()
         .then(() => {

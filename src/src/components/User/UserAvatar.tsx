@@ -3,12 +3,17 @@ import React, {
   forwardRef,
   memo,
   useEffect,
+  useMemo,
   useState,
 } from "react";
 import { Avatar, AvatarProps } from "@material-ui/core";
 import { makeStyles, Theme } from "@material-ui/core/styles";
 import cx from "classnames";
 import Parse from "parse";
+import { ParseUser } from "../../types/User";
+import { useParseQuery } from "@parse/react";
+import { ParseImage } from "../../types/Image";
+import { useParseQueryOptions } from "../../constants/useParseQueryOptions";
 
 const useStyles = makeStyles((theme: Theme) => ({
   avatar: {
@@ -21,7 +26,7 @@ const useStyles = makeStyles((theme: Theme) => ({
 /** Interface defining props for UserAvatar */
 export interface UserAvatarProps extends AvatarProps {
   /** User to display */
-  user?: Parse.User;
+  user?: ParseUser;
   /** Email of the user to display */
   email?: string;
   /** Do not try to fetch user info from the server */
@@ -42,10 +47,21 @@ const UserAvatar = memo(
       ref: ForwardedRef<any>
     ) => {
       const classes = useStyles();
-      const globalUser = Parse.User.current();
+      const globalUser = ParseUser.current();
       const [src, setSrc] = useState("");
       const [firstName, setFirstName] = useState("");
       const [lastName, setLastName] = useState("");
+
+      const { results: profilePictureResult } = useParseQuery(
+        new Parse.Query<ParseImage>("Image").equalTo(
+          "objectId",
+          user!.get("profilePicture")?.objectId
+        ),
+        useParseQueryOptions
+      );
+      const profilePicture = useMemo(() => profilePictureResult?.[0], [
+        profilePictureResult,
+      ]);
 
       useEffect(() => {
         if (
@@ -60,7 +76,7 @@ const UserAvatar = memo(
           (!user ||
             !user?.get("firstName") ||
             !user?.get("lastName") ||
-            !user?.get("profilePicture")?.url()) &&
+            !profilePicture?.get("file")?.url()) &&
           !noFetch
         ) {
           new Parse.Query("User")
@@ -69,7 +85,7 @@ const UserAvatar = memo(
             .then((response) => {
               setSrc(
                 response?.get("profilePicture")?.url() ??
-                  user?.get("profilePicture")?.url() ??
+                  profilePicture?.get("file")?.url() ??
                   ""
               );
               setFirstName(
@@ -83,7 +99,7 @@ const UserAvatar = memo(
               );
             });
         } else {
-          setSrc(user?.get("profilePicture")?.url() ?? "");
+          setSrc(profilePicture?.get("file")?.url() ?? "");
           setFirstName(
             user?.get("firstName") ?? user?.getEmail() ?? email ?? ""
           );

@@ -3,8 +3,7 @@ import { useRoutes } from "../app/routes";
 import { useNavigationContext } from "../app/NavigationContext";
 import { useHistory } from "react-router-dom";
 import { useEffect } from "react";
-import Parse from "parse";
-
+import { ParseUser } from "../types/User";
 /**
  * Interface to define access to React Router path parameters.
  */
@@ -42,7 +41,7 @@ export const useView = (currentViewId: string) => {
   };
 
   useEffect(() => {
-    if (Parse.User.current()) {
+    if (ParseUser.current()) {
       if (!currentRoute.redirectOnAuthFail) {
         if (redirectRoute?.viewId) {
           const redirectPath = getRoutePath(redirectRoute?.viewId, routeParams);

@@ -1,12 +1,7 @@
 import Parse from "parse";
+import { Attributes } from "./ParseObject";
 
-export default interface User {
-  /** Unique id of the object in the database */
-  objectId?: string;
-  /** Date created */
-  createdAt?: Date;
-  /** Date last updated */
-  updatedAt?: Date;
+export interface User extends Attributes {
   /** Whether email has been verified or not */
   emailVerified?: boolean;
   /** Username (email) for login */
@@ -24,3 +19,6 @@ export default interface User {
   /** Pointer to Image record for profile picture */
   profilePicture?: Parse.Pointer;
 }
+
+// TODO ADD GETTERS AND SETTERS
+export class ParseUser extends Parse.User<User> {}

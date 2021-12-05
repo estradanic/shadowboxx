@@ -17,7 +17,7 @@ import { MoreVert, Public, Star } from "@material-ui/icons";
 import { useHistory } from "react-router-dom";
 import Strings from "../../resources/Strings";
 import UserAvatar from "../User/UserAvatar";
-import Album from "../../types/Album";
+import { ParseAlbum } from "../../types/Album";
 import Empty from "../Svgs/Empty";
 import { useSnackbar } from "../Snackbar/Snackbar";
 import { AlbumFormDialog } from "..";
@@ -27,6 +27,7 @@ import { useRoutes } from "../../app/routes";
 import Parse from "parse";
 import { useParseQuery } from "@parse/react";
 import { useParseQueryOptions } from "../../constants/useParseQueryOptions";
+import { ParseUser } from "../../types/User";
 
 const useStyles = makeStyles((theme: Theme) => ({
   card: {
@@ -85,14 +86,14 @@ const useStyles = makeStyles((theme: Theme) => ({
 
 /** Interface defining props for AlbumCard */
 export interface AlbumCardProps {
-  value: Parse.Object<Album>;
+  value: ParseAlbum;
   /** Function that signals to the parent component that something has changed and album should be refetched */
   onChange: () => void;
 }
 
 /** Component for displaying basic information about an album */
 const AlbumCard = ({ value: initialValue, onChange }: AlbumCardProps) => {
-  const [value, setValue] = useState<Parse.Object<Album>>(initialValue);
+  const [value, setValue] = useState<ParseAlbum>(initialValue);
 
   useEffect(() => {
     setValue(initialValue);
@@ -115,7 +116,7 @@ const AlbumCard = ({ value: initialValue, onChange }: AlbumCardProps) => {
     useParseQueryOptions
   );
   const { results: ownerResult } = useParseQuery(
-    new Parse.Query<Parse.User>("User").equalTo(
+    new Parse.Query<ParseUser>("User").equalTo(
       "objectId",
       value.get("owner").objectId
     ),

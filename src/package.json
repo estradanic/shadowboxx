@@ -95,7 +95,7 @@
     "build": "yarn install && node scripts/build.js",
     "build:dev": "yarn format && BUILD_PATH=dist node scripts/build-dev.js",
     "format": "prettier --write 'src/**/*.{ts,tsx,js,json,jsx}'",
-    "start": "http-server -p 8080 ./dist",
+    "start": "serve -p 8080 ./dist",
     "start:prod": "http-server -p 8080 ./build",
     "deploy": "yarn build && rm -rf ../public/* && cp -r ./build/* ../public && b4a deploy"
   },

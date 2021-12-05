@@ -6,7 +6,8 @@ import { debounce } from "lodash";
 import { isNullOrWhitespace } from "../../utils/stringUtils";
 import { makeStyles, Theme } from "@material-ui/core/styles";
 import Parse from "parse";
-import Album from "../../types/Album";
+import { ParseAlbum } from "../../types/Album";
+import { ParseUser } from "../../types/User";
 
 const useStyles = makeStyles((theme: Theme) => ({
   endAdornment: {
@@ -22,7 +23,7 @@ const useStyles = makeStyles((theme: Theme) => ({
 /** Interface defining props for UserField */
 export interface UserFieldProps
   extends Omit<
-    AutocompleteProps<Parse.User, true, false, true>,
+    AutocompleteProps<ParseUser, true, false, true>,
     | "multiple"
     | "freeSolo"
     | "renderTags"
@@ -32,12 +33,12 @@ export interface UserFieldProps
     | "onChange"
     | "value"
   > {
-  /** Value of the field, array of Parse.User */
-  value: Parse.User[];
+  /** Value of the field, array of ParseUser */
+  value: ParseUser[];
   /** Label to show on the field */
   label?: string;
   /** Function to call when the value changes */
-  onChange: (value: Parse.User[]) => void;
+  onChange: (value: ParseUser[]) => void;
 }
 
 /** Component to search/filter and input users by email */
@@ -47,18 +48,21 @@ const UserField = forwardRef(
     ref: ForwardedRef<any>
   ) => {
     const classes = useStyles();
-    const [options, setOptions] = useState<Parse.User[]>([]);
-    const onChange = async (_: any, value: (Parse.User | string)[]) => {
+    const [options, setOptions] = useState<ParseUser[]>([]);
+    const onChange = async (_: any, value: (ParseUser | string)[]) => {
       const newUsers = [];
       for (let i = 0; i < value.length; i++) {
         const option = value[i];
         if (typeof option === "string") {
           // Will this work or do I need to use signup?
           newUsers.push(
-            await new Parse.User({
+            await new ParseUser({
               email: option,
               username: option,
               password: "",
+              lastName: "",
+              firstName: option,
+              isDarkThemeEnabled: false,
             })
           );
         } else {
@@ -70,11 +74,11 @@ const UserField = forwardRef(
 
     const getOptions = debounce((value) => {
       if (!isNullOrWhitespace(value)) {
-        const currentUser = Parse.User.current();
+        const currentUser = ParseUser.current();
         if (!currentUser) {
           throw new Error("Not Logged In!");
         }
-        new Parse.Query<Parse.Object<Album>>("Album")
+        new Parse.Query<ParseAlbum>("Album")
           .equalTo("owner", currentUser.toPointer())
           .findAll()
           .then((response) => {
@@ -111,7 +115,7 @@ const UserField = forwardRef(
       }
     }, 500);
 
-    const resolveUserInfo = (resolvedUser: Parse.User) => {
+    const resolveUserInfo = (resolvedUser: ParseUser) => {
       if (
         value.find(
           (user) =>
@@ -134,7 +138,7 @@ const UserField = forwardRef(
     };
 
     return (
-      <Autocomplete<Parse.User, true, false, true>
+      <Autocomplete<ParseUser, true, false, true>
         ref={ref}
         classes={classes}
         options={options}

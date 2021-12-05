@@ -1,10 +1,11 @@
 import React, { memo, useEffect, useState } from "react";
 import { Typography, TypographyProps } from "@material-ui/core";
+import { ParseUser } from "../../types/User";
 
 /** Interface defining props for UserLabel */
 export interface UserLabelProps extends TypographyProps {
-  /** User to displayu */
-  user?: Parse.User;
+  /** User to display */
+  user?: ParseUser;
   /** Email of the user to display */
   email?: string;
   /** Do not try to fetch user information from the server */
@@ -16,7 +17,7 @@ const UserLabel = memo(
   ({ user, email, noFetch = false, ...rest }: UserLabelProps) => {
     const [firstName, setFirstName] = useState("");
     const [lastName, setLastName] = useState("");
-    const currentUser = Parse.User.current();
+    const currentUser = ParseUser.current();
 
     useEffect(() => {
       if (
@@ -29,9 +30,10 @@ const UserLabel = memo(
         setLastName(currentUser.get("lastName"));
       } else if (
         (!user || !user.get("firstName") || !user.get("lastName")) &&
-        !noFetch
+        !noFetch &&
+        email
       ) {
-        new Parse.Query<Parse.User>("User")
+        new Parse.Query<ParseUser>("User")
           .equalTo("email", user?.getEmail() ?? email)
           .first()
           .then((response) => {

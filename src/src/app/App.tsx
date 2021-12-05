@@ -7,12 +7,12 @@ import {
   unstable_createMuiStrictModeTheme as createMuiTheme,
 } from "@material-ui/core";
 import { Theme } from "@material-ui/core/styles";
-import Parse from "parse";
 import { initializeParse } from "@parse/react";
+import { ParseUser } from "../types/User";
 
 const PARSE_APPLICATION_ID = "aX17fiOL3N1Lklz83UnWMP6oympHLszezxXAXokH";
 const PARSE_JAVASCRIPT_KEY = "otMMK0SVH7LEIL1TbqlIbemXf0jpfEurJ9FQ7gri";
-const PARSE_HOST_URL = "shadowbox.b4a.io";
+const PARSE_HOST_URL = "http://shadowbox.b4a.io";
 initializeParse(PARSE_HOST_URL, PARSE_APPLICATION_ID, PARSE_JAVASCRIPT_KEY);
 
 const App = () => {
@@ -20,7 +20,7 @@ const App = () => {
 
   const darkTheme = (lightTheme: Theme) =>
     createMuiTheme(
-      Parse.User.current()?.get("isDarkThemeEnabled")
+      ParseUser.current()?.get("isDarkThemeEnabled")
         ? {
             palette: {
               primary: {

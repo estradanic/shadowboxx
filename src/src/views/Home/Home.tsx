@@ -10,10 +10,11 @@ import { Fab, Typography, Grid, Button } from "@material-ui/core";
 import { Add } from "@material-ui/icons";
 import { makeStyles, Theme } from "@material-ui/core/styles";
 import Strings from "../../resources/Strings";
-import Album from "../../types/Album";
+import { ParseAlbum } from "../../types/Album";
 import BlankCanvas from "../../components/Svgs/BlankCanvas";
 import { useNavigationContext } from "../../app/NavigationContext";
 import Parse from "parse";
+import { ParseUser } from "../../types/User";
 
 const useStyles = makeStyles((theme: Theme) => ({
   fab: {
@@ -47,17 +48,17 @@ const HomePage = memo(() => {
   const [addAlbumDialogOpen, setAddAlbumDialogOpen] = useState(false);
   const { enqueueErrorSnackbar, enqueueSuccessSnackbar } = useSnackbar();
   const { setGlobalLoading, globalLoading } = useNavigationContext();
-  const [albums, setAlbums] = useState<Parse.Object<Album>[]>([]);
+  const [albums, setAlbums] = useState<ParseAlbum[]>([]);
   const gotAlbums = useRef(false);
 
   const getAlbums = useCallback(() => {
     if (!gotAlbums.current && !globalLoading) {
       setGlobalLoading(true);
-      const currentUser = Parse.User.current();
+      const currentUser = ParseUser.current();
       if (!currentUser) {
         throw new Error("Not Logged In!");
       }
-      new Parse.Query<Parse.Object<Album>>("Album")
+      new Parse.Query<ParseAlbum>("Album")
         .equalTo("owner", currentUser.toPointer())
         .findAll()
         .then((response) => {
@@ -126,8 +127,8 @@ const HomePage = memo(() => {
       <AlbumFormDialog
         resetOnConfirm
         value={
-          new Parse.Object<Album>("Album", {
-            owner: Parse.User.current()!.toPointer(),
+          new ParseAlbum("Album", {
+            owner: ParseUser.current()!.toPointer(),
             images: new Parse.Relation(),
             name: "Untitled Album",
             collaborators: new Parse.Relation(),
@@ -156,43 +157,9 @@ const HomePage = memo(() => {
 });
 
 const LandingPage = () => {
-  const [person, setPerson] = useState<any>();
-
-  const addPerson = async () => {
-    try {
-      const Person = new Parse.Object("Person");
-      Person.set("name", "John");
-      Person.set("email", "john@back4app.com");
-      await Person.save();
-      alert("person saved!");
-    } catch (error) {
-      console.log("Error saving new person: ", error);
-    }
-  };
-
-  const fetchPerson = async () => {
-    const query = new Parse.Query("Person");
-    query.equalTo("name", "John");
-    const Person = await query.first();
-    setPerson(Person);
-    alert(
-      `Person: {name: ${Person?.get("name")}, email: ${Person?.get(
-        "email"
-      )}, id: ${Person?.id}}`
-    );
-  };
-
   return (
     <>
       <h2>Testing Parse</h2>
-      <Button onClick={addPerson}>Add Person</Button>
-      <Button onClick={fetchPerson}>Fetch Person</Button>
-      {!!person && (
-        <div>
-          <p>{`Name ${person.get("name")}`}</p>
-          <p>{`Email ${person.get("email")}`}</p>
-        </div>
-      )}
     </>
   );
 };
@@ -207,7 +174,7 @@ const Home = () => {
 
   return (
     <PageContainer>
-      {Parse.User.current() ? <HomePage /> : <LandingPage />}
+      {ParseUser.current() ? <HomePage /> : <LandingPage />}
     </PageContainer>
   );
 };

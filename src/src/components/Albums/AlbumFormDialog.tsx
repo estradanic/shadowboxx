@@ -3,7 +3,7 @@ import ActionDialog, {
   ActionDialogProps,
   useActionDialogContext,
 } from "../Dialog/ActionDialog";
-import Album from "../../types/Album";
+import { ParseAlbum } from "../../types/Album";
 import { makeStyles, Theme, useTheme } from "@material-ui/core/styles";
 import Strings from "../../resources/Strings";
 import {
@@ -24,6 +24,7 @@ import Tooltip from "../Tooltip/Tooltip";
 import Parse from "parse";
 import { useParseQuery } from "@parse/react";
 import { useParseQueryOptions } from "../../constants/useParseQueryOptions";
+import { ImageContextProvider } from "../../app/ImageContext";
 
 const useStyles = makeStyles((theme: Theme) => ({
   checkboxLabel: {
@@ -63,9 +64,9 @@ const useStyles = makeStyles((theme: Theme) => ({
 export interface AlbumFormDialogProps
   extends Pick<ActionDialogProps, "open" | "handleCancel"> {
   /** Value for the component */
-  value: Parse.Object<Album>;
+  value: ParseAlbum;
   /** Function to run when the confirm button is clicked */
-  handleConfirm: (value: Parse.Object<Album>) => void;
+  handleConfirm: (value: ParseAlbum) => void;
   /** Whether to reset dialog state when confirm button is clicked */
   resetOnConfirm?: boolean;
 }
@@ -78,7 +79,7 @@ const AlbumFormDialog = ({
   handleConfirm: piHandleConfirm,
   resetOnConfirm,
 }: AlbumFormDialogProps) => {
-  const [value, setValue] = useState<Parse.Object<Album>>(initialValue);
+  const [value, setValue] = useState<ParseAlbum>(initialValue);
   const { results: collaborators } = useParseQuery(
     value.get("collaborators").query(),
     useParseQueryOptions
@@ -319,24 +320,26 @@ const AlbumFormDialog = ({
             </Tooltip>
           </Grid>
           <Grid item xs={12}>
-            <ImageField
-              label={Strings.images()}
-              multiple
-              value={images!}
-              onChange={(newImages) => {
-                const relation = value.get("images");
-                relation.add(
-                  newImages.filter(
-                    (newImage) =>
-                      !!images?.find(
-                        (image) =>
-                          image.get("objectId") === newImage.get("objectId")
-                      )
-                  )
-                );
-                value.set("images", relation);
-              }}
-            />
+            <ImageContextProvider>
+              <ImageField
+                label={Strings.images()}
+                multiple
+                value={images!}
+                onChange={(newImages) => {
+                  const relation = value.get("images");
+                  relation.add(
+                    newImages.filter(
+                      (newImage) =>
+                        !!images?.find(
+                          (image) =>
+                            image.get("objectId") === newImage.get("objectId")
+                        )
+                    )
+                  );
+                  value.set("images", relation);
+                }}
+              />
+            </ImageContextProvider>
           </Grid>
         </Grid>
       }

@@ -60,6 +60,7 @@ export const useSnackbar = () => {
     });
   };
   const enqueueErrorSnackbar = (message: string) => {
+    console.error(message);
     enqueueSnackbar(<Typography>{message}</Typography>, {
       variant: "error",
       className: classes.variantError,
