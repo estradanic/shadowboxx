@@ -63,8 +63,16 @@ export const ImageContextProvider = ({
 
   const uploadImage = async (image: Image) => {
     setLoading(true);
+
+    try {
+      image.file = await image.file.save();
+    } catch (e: any) {
+      enqueueErrorSnackbar(
+        e?.message ?? Strings.uploadImageError(image.file.name())
+      );
+    }
+
     let parseImage: ParseImage = new ParseImage("Image", image);
-    // parseImage.set("objectId", `image-${uuid()}`);
 
     const action: ImageAction = { image, command: ImageActionCommand.UPLOAD };
     setActions((prev) => [...prev, action]);
