@@ -29,5 +29,76 @@ export interface Album extends Attributes {
   createdAt?: Date;
 }
 
-// TODO ADD GETTERS AND SETTERS
-export class ParseAlbum extends Object<Album> {}
+export class ParseAlbum extends Object<Album> {
+  get owner(): Parse.Pointer {
+    return this.get("owner");
+  }
+
+  set owner(owner) {
+    this.set("owner", owner);
+  }
+
+  get images(): Parse.Relation<ParseAlbum, ParseImage> {
+    return this.get("images");
+  }
+
+  set images(images) {
+    this.set("images", images);
+  }
+
+  get name(): string {
+    return this.get("name");
+  }
+
+  set name(name) {
+    this.set("name", name);
+  }
+
+  get description(): string | undefined {
+    return this.get("description");
+  }
+
+  set description(description) {
+    this.set("description", description);
+  }
+
+  get isFavorite(): boolean | undefined {
+    return this.get("isFavorite");
+  }
+
+  set isFavorite(isFavorite) {
+    this.set("isFavorite", isFavorite);
+  }
+
+  get isPublic(): boolean | undefined {
+    return this.get("isPublic");
+  }
+
+  set isPublic(isPublic) {
+    this.set("isPublic", isPublic);
+  }
+
+  get collaborators(): Parse.Relation<ParseAlbum, ParseUser> {
+    return this.get("collaborators");
+  }
+
+  set collaborators(collaborators) {
+    this.set("collaborators", collaborators);
+  }
+
+  get viewers(): Parse.Relation<ParseAlbum, ParseUser> {
+    return this.get("collaborators");
+  }
+
+  set viewers(collaborators) {
+    this.set("collaborators", collaborators);
+  }
+
+  get coOwners(): Parse.Relation<ParseAlbum, ParseUser> {
+    return this.get("collaborators");
+  }
+
+  set coOwners(collaborators) {
+    this.set("collaborators", collaborators);
+  }
+}

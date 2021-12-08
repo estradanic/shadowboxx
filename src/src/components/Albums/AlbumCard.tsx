@@ -100,25 +100,25 @@ const AlbumCard = ({ value: initialValue, onChange }: AlbumCardProps) => {
   }, [initialValue]);
 
   const { results: collaborators } = useParseQuery(
-    value.get("collaborators").query(),
+    value.collaborators.query(),
     useParseQueryOptions
   );
   const { results: coOwners } = useParseQuery(
-    value.get("coOwners").query(),
+    value.coOwners.query(),
     useParseQueryOptions
   );
   const { results: viewers } = useParseQuery(
-    value.get("viewers").query(),
+    value.viewers.query(),
     useParseQueryOptions
   );
   const { results: images } = useParseQuery(
-    value.get("images").query(),
+    value.images.query(),
     useParseQueryOptions
   );
   const { results: ownerResult } = useParseQuery(
     new Parse.Query<ParseUser>("User").equalTo(
       "objectId",
-      value.get("owner").objectId
+      value.owner.objectId
     ),
     useParseQueryOptions
   );
@@ -126,10 +126,10 @@ const AlbumCard = ({ value: initialValue, onChange }: AlbumCardProps) => {
   const owner = useMemo(() => ownerResult?.[0], [ownerResult]);
 
   const [isFavorite, setIsFavorite] = useState<boolean>(
-    value?.get("isFavorite") ?? false
+    value?.isFavorite ?? false
   );
   const [isPublic, setIsPublic] = useState<boolean>(
-    value?.get("isPublic") ?? false
+    value?.isPublic ?? false
   );
 
   const { enqueueErrorSnackbar, enqueueSuccessSnackbar } = useSnackbar();
@@ -180,7 +180,7 @@ const AlbumCard = ({ value: initialValue, onChange }: AlbumCardProps) => {
   const closeMenu = () => setAnchorEl(undefined);
 
   const navigateToAlbum = () => {
-    const params = new URLSearchParams({ name: value?.get("name") });
+    const params = new URLSearchParams({ name: value?.name });
     history.push(`${routes["Album"].path}?${params.toString()}`);
   };
 
@@ -203,9 +203,9 @@ const AlbumCard = ({ value: initialValue, onChange }: AlbumCardProps) => {
               </Menu>
             </>
           }
-          title={value?.get("name")}
+          title={value?.name}
           subheader={`${Strings.numOfPhotos(images?.length ?? 0)} ${
-            value?.get("description") ?? ""
+            value?.description ?? ""
           }`}
         />
         {coverImageSrc ? (
@@ -227,7 +227,7 @@ const AlbumCard = ({ value: initialValue, onChange }: AlbumCardProps) => {
                 color="textSecondary"
                 component="p"
               >
-                {Strings.createdAt(value?.get("createdAt"))}
+                {Strings.createdAt(value?.createdAt)}
               </Typography>
             </Grid>
             <Grid item xs={6}>
@@ -237,7 +237,7 @@ const AlbumCard = ({ value: initialValue, onChange }: AlbumCardProps) => {
                 color="textSecondary"
                 component="p"
               >
-                {Strings.updatedAt(value?.get("updatedAt"))}
+                {Strings.updatedAt(value?.updatedAt)}
               </Typography>
             </Grid>
             {(!!coOwners?.length ||
@@ -305,12 +305,12 @@ const AlbumCard = ({ value: initialValue, onChange }: AlbumCardProps) => {
         <CardActions disableSpacing>
           <IconButton
             onClick={() => {
-              const oldIsFavorite = value?.get("isFavorite");
+              const oldIsFavorite = value?.isFavorite;
               value?.set("isFavorite", !oldIsFavorite);
               value
                 ?.save()
                 .then((response) => {
-                  setIsFavorite(!!response?.get("isFavorite"));
+                  setIsFavorite(!!response?.isFavorite);
                 })
                 .catch((error) => {
                   value?.set("isFavorite", oldIsFavorite);
@@ -325,12 +325,12 @@ const AlbumCard = ({ value: initialValue, onChange }: AlbumCardProps) => {
           <IconButton
             className={classes.public}
             onClick={() => {
-              const oldIsPublic = value?.get("isPublic");
+              const oldIsPublic = value?.isPublic;
               value?.set("isPublic", !oldIsPublic);
               value
                 ?.save()
                 .then((response) => {
-                  setIsPublic(!!response?.get("isPublic"));
+                  setIsPublic(!!response?.isPublic);
                 })
                 .catch((error) => {
                   value?.set("isPublic", oldIsPublic);

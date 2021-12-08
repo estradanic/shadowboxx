@@ -114,7 +114,7 @@ const Settings = () => {
   const { results: profilePictureResult } = useParseQuery(
     new Parse.Query<ParseImage>("Image").equalTo(
       "objectId",
-      user!.get("profilePicture")?.objectId
+      user!.profilePicture?.objectId
     ),
     useParseQueryOptions
   );
@@ -134,19 +134,19 @@ const Settings = () => {
   const validate = (): boolean => {
     const newErrors = { ...DefaultErrorState };
 
-    if (!validateEmail(user!.get("email"))) {
+    if (!validateEmail(user!.email)) {
       newErrors.email = {
         isError: true,
-        errorMessage: Strings.invalidEmail(user!.get("email")),
+        errorMessage: Strings.invalidEmail(user!.email),
       };
     }
-    if (isNullOrWhitespace(user!.get("firstName"))) {
+    if (isNullOrWhitespace(user!.firstName)) {
       newErrors.firstName = {
         isError: true,
         errorMessage: Strings.pleaseEnterA(Strings.firstName()),
       };
     }
-    if (isNullOrWhitespace(user!.get("lastName"))) {
+    if (isNullOrWhitespace(user!.lastName)) {
       newErrors.lastName = {
         isError: true,
         errorMessage: Strings.pleaseEnterA(Strings.firstName()),
@@ -200,9 +200,9 @@ const Settings = () => {
                           checked: classes.switchChecked,
                         }}
                         color="primary"
-                        checked={user!.get("isDarkThemeEnabled")}
+                        checked={user!.isDarkThemeEnabled}
                         onChange={(_, checked) =>
-                          user!.set("isDarkThemeEnabled", checked)
+                          user!.isDarkThemeEnabled = checked
                         }
                         icon={<Brightness7 />}
                         checkedIcon={<Brightness2 />}
@@ -236,8 +236,8 @@ const Settings = () => {
                   error={errors.firstName.isError}
                   helperText={errors.firstName.errorMessage}
                   fullWidth
-                  value={user!.get("firstName")}
-                  onChange={(e) => user!.set("firstName", e.target.value)}
+                  value={user!.firstName}
+                  onChange={(e) => user!.firstName = e.target.value}
                   label={Strings.firstName()}
                   id="firstName"
                   type="text"
@@ -249,8 +249,8 @@ const Settings = () => {
                   error={errors.lastName.isError}
                   helperText={errors.lastName.errorMessage}
                   fullWidth
-                  value={user!.get("lastName")}
-                  onChange={(e) => user!.set("lastName", e.target.value)}
+                  value={user!.lastName}
+                  onChange={(e) => user!.lastName = e.target.value}
                   label={Strings.lastName()}
                   id="lastName"
                   type="text"
@@ -262,8 +262,8 @@ const Settings = () => {
                   error={errors.email.isError}
                   helperText={errors.email.errorMessage}
                   fullWidth
-                  value={user!.get("email")}
-                  onChange={(e) => user!.set("email", e.target.value)}
+                  value={user!.email}
+                  onChange={(e) => user!.email = e.target.value}
                   label={Strings.email()}
                   id="email"
                   type="email"

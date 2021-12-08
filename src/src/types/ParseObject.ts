@@ -9,4 +9,8 @@ export interface Attributes {
   updatedAt?: Date;
 }
 
-export default class Object<T> extends Parse.Object<Attributes & T> {}
+export default class Object<T> extends Parse.Object<Attributes & T> {
+  get objectId(): string | undefined {
+    return this.get("objectId");
+  }
+}

@@ -81,19 +81,19 @@ const AlbumFormDialog = ({
 }: AlbumFormDialogProps) => {
   const [value, setValue] = useState<ParseAlbum>(initialValue);
   const { results: collaborators } = useParseQuery(
-    value.get("collaborators").query(),
+    value.collaborators.query(),
     useParseQueryOptions
   );
   const { results: coOwners } = useParseQuery(
-    value.get("coOwners").query(),
+    value.coOwners.query(),
     useParseQueryOptions
   );
   const { results: viewers } = useParseQuery(
-    value.get("viewers").query(),
+    value.viewers.query(),
     useParseQueryOptions
   );
   const { results: images } = useParseQuery(
-    value.get("images").query(),
+    value.images.query(),
     useParseQueryOptions
   );
 
@@ -119,7 +119,7 @@ const AlbumFormDialog = ({
   const validate = () => {
     const errors = defaultErrors;
     let valid = true;
-    if (isNullOrWhitespace(value.get("name"))) {
+    if (isNullOrWhitespace(value.name)) {
       errors.name = {
         isError: true,
         errorMessage: Strings.pleaseEnterA("name"),
@@ -178,7 +178,7 @@ const AlbumFormDialog = ({
       fullWidth
       maxWidth="lg"
       open={open}
-      title={value.get("name") ?? Strings.untitledAlbum()}
+      title={value.name ?? Strings.untitledAlbum()}
       message=""
       handleConfirm={handleConfirm}
       handleCancel={handleCancel}
@@ -191,7 +191,7 @@ const AlbumFormDialog = ({
               helperText={errors.name.errorMessage}
               autoComplete="none"
               fullWidth
-              value={value.get("name")}
+              value={value.name}
               onChange={(e) => value.set("name", e.target.value)}
               label={Strings.name()}
               id="name"
@@ -202,7 +202,7 @@ const AlbumFormDialog = ({
             <TextField
               autoComplete="none"
               fullWidth
-              value={value.get("description")}
+              value={value.description}
               onChange={(e) => value.set({ description: e.target.value })}
               label={Strings.description()}
               id="description"
@@ -217,7 +217,7 @@ const AlbumFormDialog = ({
                   control={
                     <Checkbox
                       icon={<StarBorder className={classes.favoriteIcon} />}
-                      checked={value.get("isFavorite")}
+                      checked={value.isFavorite}
                       onChange={(_, checked) =>
                         value.set({ isFavorite: checked })
                       }
@@ -238,7 +238,7 @@ const AlbumFormDialog = ({
                   control={
                     <Checkbox
                       icon={<Public className={classes.publicIcon} />}
-                      checked={value.get("isPublic")}
+                      checked={value.isPublic}
                       onChange={(_, checked) =>
                         value.set({ isPublic: checked })
                       }
@@ -260,7 +260,7 @@ const AlbumFormDialog = ({
                 value={coOwners!}
                 label={Strings.coOwners()}
                 onChange={async (newCoOwners) => {
-                  const relation = value.get("coOwners");
+                  const relation = value.coOwners;
                   relation.add(
                     newCoOwners.filter(
                       (newCoOwner) =>
@@ -282,7 +282,7 @@ const AlbumFormDialog = ({
                 value={collaborators!}
                 label={Strings.collaborators()}
                 onChange={(newCollaborators) => {
-                  const relation = value.get("collaborators");
+                  const relation = value.collaborators;
                   relation.add(
                     newCollaborators.filter(
                       (newCollaborator) =>
@@ -304,7 +304,7 @@ const AlbumFormDialog = ({
                 value={viewers!}
                 label={Strings.viewers()}
                 onChange={(newViewers) => {
-                  const relation = value.get("viewers");
+                  const relation = value.viewers;
                   relation.add(
                     newViewers.filter(
                       (newViewer) =>
@@ -326,7 +326,7 @@ const AlbumFormDialog = ({
                 multiple
                 value={images!}
                 onChange={(newImages) => {
-                  const relation = value.get("images");
+                  const relation = value.images;
                   relation.add(
                     newImages.filter(
                       (newImage) =>
