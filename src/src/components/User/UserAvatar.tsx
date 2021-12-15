@@ -3,7 +3,6 @@ import React, {
   forwardRef,
   memo,
   useEffect,
-  useMemo,
   useState,
 } from "react";
 import { Avatar, AvatarProps } from "@material-ui/core";
@@ -11,9 +10,8 @@ import { makeStyles, Theme } from "@material-ui/core/styles";
 import cx from "classnames";
 import Parse from "parse";
 import { ParseUser } from "../../types/User";
-import { useParseQuery } from "@parse/react";
 import { ParseImage } from "../../types/Image";
-import { useParseQueryOptions } from "../../constants/useParseQueryOptions";
+import { useUserContext } from "../../app/UserContext";
 
 const useStyles = makeStyles((theme: Theme) => ({
   avatar: {
@@ -47,65 +45,56 @@ const UserAvatar = memo(
       ref: ForwardedRef<any>
     ) => {
       const classes = useStyles();
-      const globalUser = ParseUser.current();
+      const { loggedInUser, profilePicture } = useUserContext();
       const [src, setSrc] = useState("");
       const [firstName, setFirstName] = useState("");
       const [lastName, setLastName] = useState("");
 
-      const { results: profilePictureResult } = useParseQuery(
-        new Parse.Query<ParseImage>("Image").equalTo(
-          "objectId",
-          user!.get("profilePicture")?.objectId
-        ),
-        useParseQueryOptions
-      );
-      const profilePicture = useMemo(() => profilePictureResult?.[0], [
-        profilePictureResult,
-      ]);
-
       useEffect(() => {
         if (
           (!user && !email) ||
-          (user && user?.getEmail() === globalUser?.getEmail()) ||
-          (email && email === globalUser?.getEmail())
+          (user && user?.getEmail() === loggedInUser?.getEmail()) ||
+          (email && email === loggedInUser?.getEmail())
         ) {
-          setSrc(globalUser?.get("profilePicture")?.url() ?? "");
-          setFirstName(globalUser?.get("firstName"));
-          setLastName(globalUser?.get("lastName"));
+          setSrc(profilePicture?.file.url() ?? "");
+          setFirstName(loggedInUser?.firstName ?? "");
+          setLastName(loggedInUser?.lastName ?? "");
         } else if (
           (!user ||
-            !user?.get("firstName") ||
-            !user?.get("lastName") ||
-            !profilePicture?.get("file")?.url()) &&
+            !user?.firstName ||
+            !user?.lastName ||
+            !profilePicture?.file?.url()) &&
           !noFetch
         ) {
-          new Parse.Query("User")
-            .equalTo("email", user?.getEmail() ?? email)
+          new Parse.Query<ParseUser>("User")
+            .equalTo("email", user?.getEmail() ?? email ?? "")
             .first()
             .then((response) => {
-              setSrc(
-                response?.get("profilePicture")?.url() ??
-                  profilePicture?.get("file")?.url() ??
+              new Parse.Query<ParseImage>("Image")
+                .equalTo("objectId", response?.profilePicture?.objectId)
+                .first()
+                .then((profilePictureResponse) => {
+                  setSrc(
+                    profilePictureResponse?.file.url() ??
+                      profilePicture?.file?.url() ??
+                      ""
+                  );
+                });
+              setFirstName(
+                response?.firstName ??
+                  user?.firstName ??
+                  user?.getEmail() ??
+                  email ??
                   ""
               );
-              setFirstName(
-                response?.get("firstName") ??
-                  user?.get("firstName") ??
-                  user?.getEmail() ??
-                  email
-              );
-              setLastName(
-                response?.get("lastName") ?? user?.get("lastName") ?? ""
-              );
+              setLastName(response?.lastName ?? user?.lastName ?? "");
             });
         } else {
-          setSrc(profilePicture?.get("file")?.url() ?? "");
-          setFirstName(
-            user?.get("firstName") ?? user?.getEmail() ?? email ?? ""
-          );
-          setLastName(user?.get("lastName") ?? "");
+          setSrc(profilePicture?.file?.url() ?? "");
+          setFirstName(user?.firstName ?? user?.getEmail() ?? email ?? "");
+          setLastName(user?.lastName ?? "");
         }
-      }, [user, email, globalUser, noFetch]);
+      }, [user, email, loggedInUser, noFetch, profilePicture?.file]);
 
       return (
         <Avatar

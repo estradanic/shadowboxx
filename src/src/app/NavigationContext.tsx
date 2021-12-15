@@ -107,7 +107,13 @@ export const NavigationContextProvider = ({
 /**
  * Alias to useContext(NavigationContext)
  */
-export const useNavigationContext = () => useContext(NavigationContext);
+export const useNavigationContext = (): NavigationContextValue => {
+  const context = useContext(NavigationContext);
+  if (context === undefined) {
+    throw new Error("NavigationContextProvider not found!");
+  }
+  return context;
+};
 
 /**
  * Hook causing a useEffect by which routeParams can be set and observable

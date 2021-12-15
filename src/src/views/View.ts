@@ -3,7 +3,7 @@ import { useRoutes } from "../app/routes";
 import { useNavigationContext } from "../app/NavigationContext";
 import { useHistory } from "react-router-dom";
 import { useEffect } from "react";
-import { ParseUser } from "../types/User";
+import { useUserContext } from "../app/UserContext";
 /**
  * Interface to define access to React Router path parameters.
  */
@@ -27,6 +27,7 @@ export const useView = (currentViewId: string) => {
   const { getRoutePath, routes } = useRoutes();
   const history = useHistory();
   const currentRoute = routes[currentViewId];
+  const { loggedInUser } = useUserContext();
 
   const redirectToLogin = () => {
     setGlobalLoading(false);
@@ -41,7 +42,7 @@ export const useView = (currentViewId: string) => {
   };
 
   useEffect(() => {
-    if (ParseUser.current()) {
+    if (loggedInUser) {
       if (!currentRoute.redirectOnAuthFail) {
         if (redirectRoute?.viewId) {
           const redirectPath = getRoutePath(redirectRoute?.viewId, routeParams);
@@ -71,5 +72,6 @@ export const useView = (currentViewId: string) => {
     setGlobalLoading,
     setRedirectRoute,
     setRouteHistory,
+    loggedInUser,
   ]);
 };

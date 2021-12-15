@@ -15,6 +15,7 @@ import { ParseUser } from "../../types/User";
 import { useParseQuery } from "@parse/react";
 import { useParseQueryOptions } from "../../constants/useParseQueryOptions";
 import { ParseImage } from "../../types/Image";
+import { useUserContext } from "../../app/UserContext";
 
 const useStyles = makeStyles((theme: Theme) => ({
   root: {
@@ -55,12 +56,12 @@ const UserChip = memo(
     const classes = useStyles();
     const mountedRef = useRef(true);
     const [user, setUser] = useState<ParseUser>();
-    const currentUser: ParseUser | undefined = ParseUser.current();
+    const { loggedInUser } = useUserContext();
 
     const { results: profilePictureResult } = useParseQuery(
       new Parse.Query<ParseImage>("Image").equalTo(
         "objectId",
-        user!.get("profilePicture")?.objectId
+        user!.profilePicture?.objectId
       ),
       useParseQueryOptions
     );
@@ -79,17 +80,17 @@ const UserChip = memo(
     useEffect(() => {
       if (mountedRef.current) {
         if (
-          currentUser &&
+          loggedInUser &&
           ((!piUser && !email) ||
-            (piUser && piUser?.getEmail() === currentUser?.getEmail()) ||
-            (email && email === currentUser?.getEmail()))
+            (piUser && piUser?.getEmail() === loggedInUser.getEmail()) ||
+            (email && email === loggedInUser.getEmail()))
         ) {
-          resolveUser(currentUser);
+          resolveUser(loggedInUser);
         } else if (
           (!piUser ||
-            !piUser.get("firstName") ||
-            !piUser.get("lastName") ||
-            !profilePicture?.get("file")?.url()) &&
+            !piUser.firstName ||
+            !piUser.lastName ||
+            !profilePicture?.file?.url()) &&
           email
         ) {
           new Parse.Query<ParseUser>("User")
@@ -133,7 +134,7 @@ const UserChip = memo(
       return () => {
         mountedRef.current = false;
       };
-    }, [email, currentUser, piUser, resolveUser]);
+    }, [email, loggedInUser, piUser, resolveUser, profilePicture?.file]);
 
     return (
       <Chip

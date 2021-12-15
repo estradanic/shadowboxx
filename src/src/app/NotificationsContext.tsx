@@ -84,8 +84,8 @@ export const NotificationsContextProvider = ({
 /** Alias to useContext(NotificationsContext) */
 export const useNotificationsContext = () => {
   const context = useContext(NotificationsContext);
-  if (!context) {
-    throw new Error("No NotificationsContextProvider!");
+  if (context === undefined) {
+    throw new Error("No NotificationsContextProvider found!");
   }
   return context;
 };

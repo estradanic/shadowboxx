@@ -6,7 +6,7 @@ import {
   AlbumFormDialog,
   useSnackbar,
 } from "../../components";
-import { Fab, Typography, Grid, Button } from "@material-ui/core";
+import { Fab, Typography, Grid } from "@material-ui/core";
 import { Add } from "@material-ui/icons";
 import { makeStyles, Theme } from "@material-ui/core/styles";
 import Strings from "../../resources/Strings";
@@ -14,7 +14,7 @@ import { ParseAlbum } from "../../types/Album";
 import BlankCanvas from "../../components/Svgs/BlankCanvas";
 import { useNavigationContext } from "../../app/NavigationContext";
 import Parse from "parse";
-import { ParseUser } from "../../types/User";
+import { useUserContext } from "../../app/UserContext";
 
 const useStyles = makeStyles((theme: Theme) => ({
   fab: {
@@ -50,16 +50,13 @@ const HomePage = memo(() => {
   const { setGlobalLoading, globalLoading } = useNavigationContext();
   const [albums, setAlbums] = useState<ParseAlbum[]>([]);
   const gotAlbums = useRef(false);
+  const { loggedInUser } = useUserContext();
 
   const getAlbums = useCallback(() => {
     if (!gotAlbums.current && !globalLoading) {
       setGlobalLoading(true);
-      const currentUser = ParseUser.current();
-      if (!currentUser) {
-        throw new Error("Not Logged In!");
-      }
       new Parse.Query<ParseAlbum>("Album")
-        .equalTo("owner", currentUser.toPointer())
+        .equalTo("owner", loggedInUser!.toPointer())
         .findAll()
         .then((response) => {
           setAlbums(response);
@@ -72,7 +69,13 @@ const HomePage = memo(() => {
           gotAlbums.current = true;
         });
     }
-  }, [setAlbums, enqueueErrorSnackbar, globalLoading, setGlobalLoading]);
+  }, [
+    setAlbums,
+    enqueueErrorSnackbar,
+    globalLoading,
+    setGlobalLoading,
+    loggedInUser,
+  ]);
 
   useEffect(() => {
     getAlbums();
@@ -85,9 +88,9 @@ const HomePage = memo(() => {
           <Grid item className={classes.albumsContainer}>
             {albums
               .sort((a, b) =>
-                a.get("isFavorite") && b.get("isFavorite")
-                  ? a.get("name").localeCompare(b.get("name"))
-                  : a.get("isFavorite") && !b.get("isFavorite")
+                a.isFavorite && b.isFavorite
+                  ? a.name.localeCompare(b.name)
+                  : a.isFavorite && !b.isFavorite
                   ? -1
                   : 1
               )
@@ -98,7 +101,7 @@ const HomePage = memo(() => {
                     getAlbums();
                   }}
                   value={album}
-                  key={album?.get("name")}
+                  key={album?.name}
                 />
               ))}
           </Grid>
@@ -128,7 +131,7 @@ const HomePage = memo(() => {
         resetOnConfirm
         value={
           new ParseAlbum("Album", {
-            owner: ParseUser.current()!.toPointer(),
+            owner: loggedInUser!.toPointer(),
             images: new Parse.Relation(),
             name: "Untitled Album",
             collaborators: new Parse.Relation(),
@@ -143,9 +146,7 @@ const HomePage = memo(() => {
           value
             .save()
             .then((response) => {
-              enqueueSuccessSnackbar(
-                Strings.addAlbumSuccess(response?.get("name"))
-              );
+              enqueueSuccessSnackbar(Strings.addAlbumSuccess(response?.name));
             })
             .catch((error) => {
               enqueueErrorSnackbar(error?.message ?? Strings.addAlbumError());
@@ -171,10 +172,11 @@ const LandingPage = () => {
  */
 const Home = () => {
   useView("Home");
+  const { loggedInUser } = useUserContext();
 
   return (
     <PageContainer>
-      {ParseUser.current() ? <HomePage /> : <LandingPage />}
+      {loggedInUser ? <HomePage /> : <LandingPage />}
     </PageContainer>
   );
 };

@@ -21,6 +21,10 @@ export interface User extends Attributes {
 }
 
 export class ParseUser extends Parse.User<User> {
+  get objectId(): string | undefined {
+    return this.get("objectId");
+  }
+
   get emailVerified(): boolean | undefined {
     return this.get("emailVerified");
   }

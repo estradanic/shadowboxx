@@ -128,9 +128,7 @@ const AlbumCard = ({ value: initialValue, onChange }: AlbumCardProps) => {
   const [isFavorite, setIsFavorite] = useState<boolean>(
     value?.isFavorite ?? false
   );
-  const [isPublic, setIsPublic] = useState<boolean>(
-    value?.isPublic ?? false
-  );
+  const [isPublic, setIsPublic] = useState<boolean>(value?.isPublic ?? false);
 
   const { enqueueErrorSnackbar, enqueueSuccessSnackbar } = useSnackbar();
   const [anchorEl, setAnchorEl] = useState<Element>();
@@ -140,12 +138,10 @@ const AlbumCard = ({ value: initialValue, onChange }: AlbumCardProps) => {
   const history = useHistory();
   const { routes } = useRoutes();
   const coverImage = useMemo(
-    () => images?.find((image) => image.get("isCoverImage")) ?? images?.[0],
+    () => images?.find((image) => image.isCoverImage) ?? images?.[0],
     [images]
   );
-  const coverImageSrc = useMemo(() => coverImage?.get("file")?.url(), [
-    coverImage,
-  ]);
+  const coverImageSrc = useMemo(() => coverImage?.file.url(), [coverImage]);
 
   const classes = useStyles();
   const theme = useTheme();
@@ -212,7 +208,7 @@ const AlbumCard = ({ value: initialValue, onChange }: AlbumCardProps) => {
           <CardMedia
             className={classes.media}
             image={coverImageSrc}
-            title={coverImage?.get("file").name()}
+            title={coverImage?.file.name()}
             onClick={navigateToAlbum}
           />
         ) : (
@@ -248,10 +244,8 @@ const AlbumCard = ({ value: initialValue, onChange }: AlbumCardProps) => {
                   <Grid item key={coOwner?.getEmail()}>
                     <Tooltip
                       title={
-                        coOwner?.get("firstName")
-                          ? `${coOwner?.get("firstName")} ${coOwner?.get(
-                              "lastName"
-                            )}`
+                        coOwner?.firstName
+                          ? `${coOwner?.firstName} ${coOwner?.get("lastName")}`
                           : coOwner?.getEmail() ?? ""
                       }
                     >
@@ -266,10 +260,10 @@ const AlbumCard = ({ value: initialValue, onChange }: AlbumCardProps) => {
                   <Grid item key={collaborator?.getEmail()}>
                     <Tooltip
                       title={
-                        collaborator?.get("firstName")
-                          ? `${collaborator?.get(
-                              "firstName"
-                            )} ${collaborator?.get("lastName")}`
+                        collaborator?.firstName
+                          ? `${collaborator?.get("firstName")} ${
+                              collaborator?.lastName
+                            }`
                           : collaborator?.getEmail() ?? ""
                       }
                     >
@@ -284,10 +278,8 @@ const AlbumCard = ({ value: initialValue, onChange }: AlbumCardProps) => {
                   <Grid item key={viewer?.getEmail()}>
                     <Tooltip
                       title={
-                        viewer?.get("firstName")
-                          ? `${viewer?.get("firstName")} ${viewer?.get(
-                              "lastName"
-                            )}`
+                        viewer?.firstName
+                          ? `${viewer?.firstName} ${viewer?.get("lastName")}`
                           : viewer?.getEmail() ?? ""
                       }
                     >

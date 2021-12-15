@@ -21,7 +21,6 @@ import { useSnackbar } from "../Snackbar/Snackbar";
 import UserField from "../Field/UserField";
 import TextField from "../Field/TextField";
 import Tooltip from "../Tooltip/Tooltip";
-import Parse from "parse";
 import { useParseQuery } from "@parse/react";
 import { useParseQueryOptions } from "../../constants/useParseQueryOptions";
 import { ImageContextProvider } from "../../app/ImageContext";
@@ -146,8 +145,7 @@ const AlbumFormDialog = ({
         ...(collaborators ?? []),
         ...(coOwners ?? []),
       ].filter(
-        (collaborator) =>
-          collaborator.getEmail() === collaborator.get("firstName")
+        (collaborator) => collaborator.getEmail() === collaborator.firstName
       );
       if (!!nonExistentCollaborators.length) {
         openConfirm(
@@ -265,9 +263,7 @@ const AlbumFormDialog = ({
                     newCoOwners.filter(
                       (newCoOwner) =>
                         !!coOwners?.find(
-                          (coOwner) =>
-                            coOwner.get("objectId") ===
-                            newCoOwner.get("objectId")
+                          (coOwner) => coOwner.objectId === newCoOwner.objectId
                         )
                     )
                   );
@@ -288,8 +284,7 @@ const AlbumFormDialog = ({
                       (newCollaborator) =>
                         !!collaborators?.find(
                           (collaborator) =>
-                            collaborator.get("objectId") ===
-                            newCollaborator.get("objectId")
+                            collaborator.objectId === newCollaborator.objectId
                         )
                     )
                   );
@@ -309,8 +304,7 @@ const AlbumFormDialog = ({
                     newViewers.filter(
                       (newViewer) =>
                         !!viewers?.find(
-                          (viewer) =>
-                            viewer.get("objectId") === newViewer.get("objectId")
+                          (viewer) => viewer.objectId === newViewer.objectId
                         )
                     )
                   );
@@ -331,8 +325,7 @@ const AlbumFormDialog = ({
                     newImages.filter(
                       (newImage) =>
                         !!images?.find(
-                          (image) =>
-                            image.get("objectId") === newImage.get("objectId")
+                          (image) => image.objectId === newImage.objectId
                         )
                     )
                   );

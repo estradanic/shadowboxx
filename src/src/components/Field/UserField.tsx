@@ -8,6 +8,7 @@ import { makeStyles, Theme } from "@material-ui/core/styles";
 import Parse from "parse";
 import { ParseAlbum } from "../../types/Album";
 import { ParseUser } from "../../types/User";
+import { useUserContext } from "../../app/UserContext";
 
 const useStyles = makeStyles((theme: Theme) => ({
   endAdornment: {
@@ -47,6 +48,7 @@ const UserField = forwardRef(
     { label, onChange: piOnChange, value, ...rest }: UserFieldProps,
     ref: ForwardedRef<any>
   ) => {
+    const { loggedInUser } = useUserContext();
     const classes = useStyles();
     const [options, setOptions] = useState<ParseUser[]>([]);
     const onChange = async (_: any, value: (ParseUser | string)[]) => {
@@ -74,17 +76,12 @@ const UserField = forwardRef(
 
     const getOptions = debounce((value) => {
       if (!isNullOrWhitespace(value)) {
-        const currentUser = ParseUser.current();
-        if (!currentUser) {
-          throw new Error("Not Logged In!");
-        }
         new Parse.Query<ParseAlbum>("Album")
-          .equalTo("owner", currentUser.toPointer())
+          .equalTo("owner", loggedInUser!.toPointer())
           .findAll()
           .then((response) => {
             response.forEach((album) => {
-              album
-                .get("collaborators")
+              album.collaborators
                 ?.query()
                 .findAll()
                 .then((response) => {
@@ -92,8 +89,7 @@ const UserField = forwardRef(
                     Array.from(new Set([...prev, ...response]))
                   );
                 });
-              album
-                .get("viewers")
+              album.viewers
                 ?.query()
                 .findAll()
                 .then((response) => {
@@ -101,8 +97,7 @@ const UserField = forwardRef(
                     Array.from(new Set([...prev, ...response]))
                   );
                 });
-              album
-                .get("coOwners")
+              album.coOwners
                 ?.query()
                 .findAll()
                 .then((response) => {
@@ -120,9 +115,9 @@ const UserField = forwardRef(
         value.find(
           (user) =>
             user?.getEmail() === resolvedUser?.getEmail() &&
-            user?.getEmail() === user?.get("firstName") &&
-            resolvedUser?.getEmail() !== resolvedUser?.get("firstName") &&
-            user?.get("firstName") !== resolvedUser?.get("firstName")
+            user?.getEmail() === user?.firstName &&
+            resolvedUser?.getEmail() !== resolvedUser?.firstName &&
+            user?.firstName !== resolvedUser?.firstName
         )
       ) {
         onChange(
@@ -159,14 +154,12 @@ const UserField = forwardRef(
                 ?.getEmail()
                 ?.toLocaleLowerCase()
                 ?.includes(inputValue.toLocaleLowerCase()) ||
-                `${option?.get("firstName")} ${option?.get("lastName")}`
+                `${option?.firstName} ${option?.lastName}`
                   .toLocaleLowerCase()
                   .includes(inputValue.toLocaleLowerCase()))
           )
         }
-        getOptionLabel={(option) =>
-          `${option?.get("firstName")} ${option.get("lastName")}`
-        }
+        getOptionLabel={(option) => `${option?.firstName} ${option.lastName}`}
         renderTags={(value, getTagProps) =>
           value.map((user, index) => (
             <UserChip

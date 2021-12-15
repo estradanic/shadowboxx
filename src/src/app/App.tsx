@@ -8,7 +8,7 @@ import {
 } from "@material-ui/core";
 import { Theme } from "@material-ui/core/styles";
 import { initializeParse } from "@parse/react";
-import { ParseUser } from "../types/User";
+import { useUserContext } from "./UserContext";
 
 const PARSE_APPLICATION_ID = "aX17fiOL3N1Lklz83UnWMP6oympHLszezxXAXokH";
 const PARSE_JAVASCRIPT_KEY = "otMMK0SVH7LEIL1TbqlIbemXf0jpfEurJ9FQ7gri";
@@ -17,10 +17,11 @@ initializeParse(PARSE_HOST_URL, PARSE_APPLICATION_ID, PARSE_JAVASCRIPT_KEY);
 
 const App = () => {
   const { routes } = useRoutes();
+  const { loggedInUser } = useUserContext();
 
   const darkTheme = (lightTheme: Theme) =>
     createMuiTheme(
-      ParseUser.current()?.get("isDarkThemeEnabled")
+      loggedInUser?.isDarkThemeEnabled
         ? {
             palette: {
               primary: {

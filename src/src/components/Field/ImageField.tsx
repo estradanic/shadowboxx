@@ -230,8 +230,8 @@ const ImageField = ({
                 <InputAdornment position="end">
                   <Avatar
                     className={classes.endAdornmentAvatar}
-                    src={value[0].get("file").url()}
-                    alt={value[0].get("file").name()}
+                    src={value[0].file.url()}
+                    alt={value[0].file.name()}
                   />
                 </InputAdornment>
               )}
@@ -242,7 +242,7 @@ const ImageField = ({
               <Typography variant="body1">
                 {value.length > 1 && multiple
                   ? Strings.multipleImages(value.length)
-                  : elide(value[0].get("file").name(), 20, 3)}
+                  : elide(value[0].file.name(), 20, 3)}
               </Typography>
             </InputAdornment>
           ),
@@ -254,25 +254,24 @@ const ImageField = ({
         <div className={classes.multiImageContainer}>
           {loading && <LinearProgress value={progress} />}
           {value.map((image: ParseImage) => {
-            const file = image.get("file");
+            const file = image.file;
             return (
               <div
                 className={classes.imageWrapper}
-                key={uniqueId(image.get("objectId"))}
+                key={uniqueId(image.objectId)}
               >
                 <Remove
                   fontSize="large"
                   className={classes.removeImage}
                   onClick={async () => {
                     const newValue = value.filter(
-                      (valueImage) =>
-                        image.get("objectId") !== valueImage.get("objectId")
+                      (valueImage) => image.objectId !== valueImage.objectId
                     );
                     onChange(newValue);
                     await deleteImage(image);
                   }}
                 />
-                {image.get("isCoverImage") ? (
+                {image.isCoverImage ? (
                   <Star
                     fontSize="large"
                     className={classes.coverImage}

@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from "react";
+import React, { useState } from "react";
 import { useView } from "../View";
 import {
   PageContainer,
@@ -20,12 +20,8 @@ import Strings from "../../resources/Strings";
 import { makeStyles, Theme } from "@material-ui/core/styles";
 import { ErrorState, validateEmail } from "../../utils/formUtils";
 import { isNullOrWhitespace } from "../../utils/stringUtils";
-import Parse from "parse";
-import { ParseUser } from "../../types/User";
-import { useParseQuery } from "@parse/react";
-import { ParseImage } from "../../types/Image";
-import { useParseQueryOptions } from "../../constants/useParseQueryOptions";
 import { ImageContextProvider } from "../../app/ImageContext";
+import { useUserContext } from "../../app/UserContext";
 
 const useStyles = makeStyles((theme: Theme) => ({
   cardTitle: {
@@ -109,18 +105,7 @@ const DefaultErrorState = {
  */
 const Settings = () => {
   useView("Settings");
-
-  const user: ParseUser | undefined = ParseUser.current();
-  const { results: profilePictureResult } = useParseQuery(
-    new Parse.Query<ParseImage>("Image").equalTo(
-      "objectId",
-      user!.profilePicture?.objectId
-    ),
-    useParseQueryOptions
-  );
-  const profilePicture = useMemo(() => profilePictureResult?.[0], [
-    profilePictureResult,
-  ]);
+  const { loggedInUser, profilePicture } = useUserContext();
 
   const classes = useStyles();
   const [loading, setLoading] = useState<boolean>(false);
@@ -134,19 +119,19 @@ const Settings = () => {
   const validate = (): boolean => {
     const newErrors = { ...DefaultErrorState };
 
-    if (!validateEmail(user!.email)) {
+    if (!validateEmail(loggedInUser!.email)) {
       newErrors.email = {
         isError: true,
-        errorMessage: Strings.invalidEmail(user!.email),
+        errorMessage: Strings.invalidEmail(loggedInUser!.email),
       };
     }
-    if (isNullOrWhitespace(user!.firstName)) {
+    if (isNullOrWhitespace(loggedInUser!.firstName)) {
       newErrors.firstName = {
         isError: true,
         errorMessage: Strings.pleaseEnterA(Strings.firstName()),
       };
     }
-    if (isNullOrWhitespace(user!.lastName)) {
+    if (isNullOrWhitespace(loggedInUser!.lastName)) {
       newErrors.lastName = {
         isError: true,
         errorMessage: Strings.pleaseEnterA(Strings.firstName()),
@@ -166,7 +151,7 @@ const Settings = () => {
   const changeUserInfo = () => {
     if (validate()) {
       setLoading(true);
-      user!
+      loggedInUser!
         .save()
         .then(() => {
           enqueueSuccessSnackbar(Strings.settingsSaved());
@@ -200,9 +185,9 @@ const Settings = () => {
                           checked: classes.switchChecked,
                         }}
                         color="primary"
-                        checked={user!.isDarkThemeEnabled}
+                        checked={loggedInUser!.isDarkThemeEnabled}
                         onChange={(_, checked) =>
-                          user!.isDarkThemeEnabled = checked
+                          (loggedInUser!.isDarkThemeEnabled = checked)
                         }
                         icon={<Brightness7 />}
                         checkedIcon={<Brightness2 />}
@@ -221,7 +206,7 @@ const Settings = () => {
                     autoComplete="none"
                     value={profilePicture ? [profilePicture] : []}
                     onChange={([newProfilePicture]) => {
-                      user!.set(
+                      loggedInUser!.set(
                         "profilePicture",
                         newProfilePicture.toPointer()
                       );
@@ -236,8 +221,8 @@ const Settings = () => {
                   error={errors.firstName.isError}
                   helperText={errors.firstName.errorMessage}
                   fullWidth
-                  value={user!.firstName}
-                  onChange={(e) => user!.firstName = e.target.value}
+                  value={loggedInUser!.firstName}
+                  onChange={(e) => (loggedInUser!.firstName = e.target.value)}
                   label={Strings.firstName()}
                   id="firstName"
                   type="text"
@@ -249,8 +234,8 @@ const Settings = () => {
                   error={errors.lastName.isError}
                   helperText={errors.lastName.errorMessage}
                   fullWidth
-                  value={user!.lastName}
-                  onChange={(e) => user!.lastName = e.target.value}
+                  value={loggedInUser!.lastName}
+                  onChange={(e) => (loggedInUser!.lastName = e.target.value)}
                   label={Strings.lastName()}
                   id="lastName"
                   type="text"
@@ -262,8 +247,8 @@ const Settings = () => {
                   error={errors.email.isError}
                   helperText={errors.email.errorMessage}
                   fullWidth
-                  value={user!.email}
-                  onChange={(e) => user!.email = e.target.value}
+                  value={loggedInUser!.email}
+                  onChange={(e) => (loggedInUser!.email = e.target.value)}
                   label={Strings.email()}
                   id="email"
                   type="email"

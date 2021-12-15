@@ -9,5 +9,20 @@ export interface Image {
   isCoverImage: boolean;
 }
 
-// TODO ADD GETTERS AND SETTERS
-export class ParseImage extends Object<Image> {}
+export class ParseImage extends Object<Image> {
+  get file(): Parse.File {
+    return this.get("file");
+  }
+
+  set file(file) {
+    this.set("file", file);
+  }
+
+  get isCoverImage(): boolean {
+    return this.get("isCoverImage");
+  }
+
+  set isCoverImage(isCoverImage) {
+    this.set("isCoverImage", isCoverImage);
+  }
+}

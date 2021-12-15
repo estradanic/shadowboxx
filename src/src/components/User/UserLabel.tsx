@@ -1,6 +1,7 @@
 import React, { memo, useEffect, useState } from "react";
 import { Typography, TypographyProps } from "@material-ui/core";
 import { ParseUser } from "../../types/User";
+import { useUserContext } from "../../app/UserContext";
 
 /** Interface defining props for UserLabel */
 export interface UserLabelProps extends TypographyProps {
@@ -17,19 +18,19 @@ const UserLabel = memo(
   ({ user, email, noFetch = false, ...rest }: UserLabelProps) => {
     const [firstName, setFirstName] = useState("");
     const [lastName, setLastName] = useState("");
-    const currentUser = ParseUser.current();
+    const { loggedInUser } = useUserContext();
 
     useEffect(() => {
       if (
-        currentUser &&
+        loggedInUser &&
         ((!user && !email) ||
-          (user && user?.getEmail() === currentUser?.getEmail()) ||
-          (email && email === currentUser?.getEmail()))
+          (user && user?.getEmail() === loggedInUser?.getEmail()) ||
+          (email && email === loggedInUser?.getEmail()))
       ) {
-        setFirstName(currentUser.get("firstName"));
-        setLastName(currentUser.get("lastName"));
+        setFirstName(loggedInUser.firstName);
+        setLastName(loggedInUser.lastName);
       } else if (
-        (!user || !user.get("firstName") || !user.get("lastName")) &&
+        (!user || !user.firstName || !user.lastName) &&
         !noFetch &&
         email
       ) {
@@ -38,19 +39,19 @@ const UserLabel = memo(
           .first()
           .then((response) => {
             setFirstName(
-              response?.get("firstName") ??
-                user?.get("firstName") ??
+              response?.firstName ??
+                user?.firstName ??
                 user?.getEmail() ??
                 email ??
                 ""
             );
-            setLastName(response?.get("lastName") ?? "");
+            setLastName(response?.lastName ?? "");
           });
       } else {
-        setFirstName(user?.get("firstName") ?? user?.getEmail() ?? email ?? "");
-        setLastName(user?.get("lastName") ?? "");
+        setFirstName(user?.firstName ?? user?.getEmail() ?? email ?? "");
+        setLastName(user?.lastName ?? "");
       }
-    }, [user, email, currentUser, noFetch]);
+    }, [user, email, loggedInUser, noFetch]);
 
     return (
       <Typography variant="overline" {...rest}>

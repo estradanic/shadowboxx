@@ -2,26 +2,3 @@
 # yarn lockfile v1
 
 
-"@parse/react-base@^0.0.1-alpha.16":
-  version "0.0.1-alpha.16"
-  resolved "https://registry.yarnpkg.com/@parse/react-base/-/react-base-0.0.1-alpha.16.tgz#ee8209ae8a610a2acc386d5a6d7e7f146bc80ed3"
-  integrity sha512-Ul7paiTWaAyl12i5lpF10sCrl+a+spIKlLgRWcsGpF1ZI2w1X7veS5g+TLh2mcidv1fg7552Bqp9gIhdlxX3ow==
-  dependencies:
-    tslib "2.3.1"
-
-"@parse/react@^0.0.1-alpha.17":
-  version "0.0.1-alpha.17"
-  resolved "https://registry.yarnpkg.com/@parse/react/-/react-0.0.1-alpha.17.tgz#1c7330c6e043db7a40875cb4cf0420d47bee0e47"
-  integrity sha512-y3EUCQI8+92RjGW1F/53Ova+VevLYFkbuU2jrtzBOSFttLm+GKPzE6/NPjT6ppHT3Bi5jqCPpmLxhAtz8PexMQ==
-  dependencies:
-    "@parse/react-base" "^0.0.1-alpha.16"
-
-tslib@2.3.1:
-  version "2.3.1"
-  resolved "https://registry.yarnpkg.com/tslib/-/tslib-2.3.1.tgz#e8a335add5ceae51aa261d32a490158ef042ef01"
-  integrity sha512-77EbyPPpMz+FRFRuAFlWMtmgUWGe9UOG2Z25NqCwiIjRhOf5iKGuzSe5P2w1laq+FkRy4p+PCuVkJSGkzTEKVw==
-
-use-debounce@^7.0.1:
-  version "7.0.1"
-  resolved "https://registry.yarnpkg.com/use-debounce/-/use-debounce-7.0.1.tgz#380e6191cc13ad29f8e2149a12b5c37cc2891190"
-  integrity sha512-fOrzIw2wstbAJuv8PC9Vg4XgwyTLEOdq4y/Z3IhVl8DAE4svRcgyEUvrEXu+BMNgMoc3YND6qLT61kkgEKXh7Q==

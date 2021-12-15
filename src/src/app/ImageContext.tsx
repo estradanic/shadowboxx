@@ -1,11 +1,9 @@
 import React, { useState, createContext, useContext, useCallback } from "react";
-import Parse from "parse";
 import { useNotificationsContext } from "./NotificationsContext";
 import Strings from "../resources/Strings";
 import { CircularProgress } from "@material-ui/core";
 import { useSnackbar } from "../components";
 import { ParseImage, Image } from "../types/Image";
-import { v4 as uuid } from "uuid";
 
 export enum ImageActionCommand {
   DELETE,
@@ -130,8 +128,8 @@ export const ImageContextProvider = ({
 /** Alias to useContext(ImageContext) */
 export const useImageContext = () => {
   const context = useContext(ImageContext);
-  if (!context) {
-    throw new Error("No ImageContextProvider!");
+  if (context === undefined) {
+    throw new Error("No ImageContextProvider found!");
   }
   return context;
 };

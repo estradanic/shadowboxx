@@ -19,7 +19,10 @@ import { UserAvatar } from "..";
 import { useRoutes } from "../../app/routes";
 import Notifications from "../Notifications/Notifications";
 import Parse from "parse";
-import { ParseUser } from "../../types/User";
+import { useUserContext } from "../../app/UserContext";
+import { useParseQuery } from "@parse/react";
+import { ParseImage } from "../../types/Image";
+import { useParseQueryOptions } from "../../constants/useParseQueryOptions";
 
 const useStyles = makeStyles((theme: Theme) => ({
   backButton: {
@@ -68,6 +71,14 @@ const Header = ({ viewId, ...rest }: HeaderProps) => {
   const history = useHistory();
   const [showBackButton, setShowBackButton] = useState(false);
   const { routes } = useRoutes();
+  const { loggedInUser } = useUserContext();
+  const { results: profilePictureResults } = useParseQuery(
+    new Parse.Query<ParseImage>("Image").equalTo(
+      "objectId",
+      loggedInUser?.profilePicture?.objectId
+    ),
+    useParseQueryOptions
+  );
 
   useEffect(() => {
     if (routeHistory.length === 1) {
@@ -88,7 +99,7 @@ const Header = ({ viewId, ...rest }: HeaderProps) => {
           <Link className={classes.logo} to="/" color="inherit">
             {Strings.appName()}
           </Link>
-          {ParseUser.current() ? (
+          {loggedInUser ? (
             <AppMenu />
           ) : (
             <Button
@@ -112,15 +123,13 @@ const Header = ({ viewId, ...rest }: HeaderProps) => {
             />
           )}
           <Breadcrumbs viewId={viewId} />
-          {ParseUser.current() && (
+          {loggedInUser && (
             <>
               <Notifications className={classes.notifications} />
-              {ParseUser.current()?.get("profilePicture")?.url() ? (
+              {profilePictureResults?.[0]?.file.url() ? (
                 <UserAvatar className={classes.profile} />
               ) : (
-                <Typography variant="overline">{`${ParseUser.current()?.get(
-                  "firstName"
-                )} ${ParseUser.current()?.get("lastName")}`}</Typography>
+                <Typography variant="overline">{`${loggedInUser.firstName} ${loggedInUser.lastName}`}</Typography>
               )}
             </>
           )}
