@@ -98,33 +98,13 @@ const UserChip = memo(
             .first()
             .then((response) => {
               if (!response) {
-                resolveUser(
-                  piUser ??
-                    new ParseUser({
-                      email,
-                      username: email,
-                      password: "",
-                      lastName: "",
-                      firstName: email,
-                      isDarkThemeEnabled: false,
-                    })
-                );
+                resolveUser(piUser ?? new ParseUser(email, "", email));
               } else {
                 resolveUser(response);
               }
             })
-            .catch((error) => {
-              resolveUser(
-                piUser ??
-                  new ParseUser({
-                    email,
-                    username: email,
-                    password: "",
-                    lastName: "",
-                    firstName: email,
-                    isDarkThemeEnabled: false,
-                  })
-              );
+            .catch(() => {
+              resolveUser(piUser ?? new ParseUser(email, "", email));
             });
         } else if (piUser) {
           resolveUser(piUser);

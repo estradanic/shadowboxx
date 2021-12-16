@@ -14,7 +14,8 @@ import { useNavigationContext } from "../../app/NavigationContext";
 import { useHistory } from "react-router-dom";
 import { useRoutes } from "../../app/routes";
 import { useView } from "../View";
-import Parse from "parse";
+import { ParseUser } from "../../types/User";
+import { useUserContext } from "../../app/UserContext";
 
 const useStyles = makeStyles((theme: Theme) => ({
   cardTitle: {
@@ -59,6 +60,7 @@ const Login = () => {
   const history = useHistory();
   const { routes } = useRoutes();
   const { enqueueErrorSnackbar } = useSnackbar();
+  const { updateLoggedInUser } = useUserContext();
 
   const validate = (): boolean => {
     const newErrors = { ...DefaultErrorState };
@@ -76,11 +78,9 @@ const Login = () => {
   const login = () => {
     if (validate()) {
       setGlobalLoading(true);
-      const user = new Parse.User();
-      user.set("username", email);
-      user.set("password", password);
+      const user = new ParseUser(email, password);
       user
-        .logIn()
+        .login(updateLoggedInUser)
         .then(() => {
           setGlobalLoading(false);
           if (redirectRoute?.viewId) {

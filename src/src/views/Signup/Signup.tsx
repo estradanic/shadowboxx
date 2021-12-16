@@ -20,6 +20,7 @@ import { useHistory } from "react-router-dom";
 import { useRoutes } from "../../app/routes";
 import { useView } from "../View";
 import { ParseUser } from "../../types/User";
+import { useUserContext } from "../../app/UserContext";
 
 const useStyles = makeStyles((theme: Theme) => ({
   card: {
@@ -72,6 +73,7 @@ const Signup = () => {
   const { routes } = useRoutes();
   const history = useHistory();
   const { enqueueErrorSnackbar } = useSnackbar();
+  const { updateLoggedInUser } = useUserContext();
 
   const validate = (): boolean => {
     const newErrors = { ...DefaultErrorState };
@@ -113,16 +115,9 @@ const Signup = () => {
   const signup = () => {
     if (validate()) {
       setGlobalLoading(true);
-      const user = new ParseUser({
-        username: email,
-        email,
-        password,
-        firstName,
-        lastName,
-        isDarkThemeEnabled: false,
-      });
+      const user = new ParseUser(email, password, firstName, lastName);
       user
-        .signUp()
+        .signup(updateLoggedInUser)
         .then(() => {
           setGlobalLoading(false);
           history.push(routes["Home"].path);

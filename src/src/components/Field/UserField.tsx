@@ -56,17 +56,8 @@ const UserField = forwardRef(
       for (let i = 0; i < value.length; i++) {
         const option = value[i];
         if (typeof option === "string") {
-          // Will this work or do I need to use signup?
-          newUsers.push(
-            await new ParseUser({
-              email: option,
-              username: option,
-              password: "",
-              lastName: "",
-              firstName: option,
-              isDarkThemeEnabled: false,
-            })
-          );
+          // TODO VERIFY: Will this work or do I need to use signup?
+          newUsers.push(await new ParseUser(option, "", option));
         } else {
           newUsers.push(option);
         }

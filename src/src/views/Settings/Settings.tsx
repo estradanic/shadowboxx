@@ -105,7 +105,7 @@ const DefaultErrorState = {
  */
 const Settings = () => {
   useView("Settings");
-  const { loggedInUser, profilePicture } = useUserContext();
+  const { loggedInUser, profilePicture, updateLoggedInUser } = useUserContext();
 
   const classes = useStyles();
   const [loading, setLoading] = useState<boolean>(false);
@@ -152,7 +152,7 @@ const Settings = () => {
     if (validate()) {
       setLoading(true);
       loggedInUser!
-        .save()
+        .update(updateLoggedInUser)
         .then(() => {
           enqueueSuccessSnackbar(Strings.settingsSaved());
           setLoading(false);

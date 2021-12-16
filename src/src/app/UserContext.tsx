@@ -1,8 +1,7 @@
-import React, { createContext, useContext, useMemo } from "react";
-import { ParseUser } from "../types/User";
-import { useParseQuery } from "@parse/react";
-import { useParseQueryOptions } from "../constants/useParseQueryOptions";
+import React, { createContext, useContext, useState } from "react";
+import { ParseUser, UpdateLoggedInUser, UpdateReason } from "../types/User";
 import { ParseImage } from "../types/Image";
+import Parse from "parse";
 
 /**
  * Interface defining the return value of the UserContext
@@ -12,6 +11,8 @@ interface UserContextValue {
   loggedInUser?: ParseUser;
   /** Profile picture of the currently logged in user */
   profilePicture?: ParseImage;
+  /** Function to set the user on login, signup, or save */
+  updateLoggedInUser: UpdateLoggedInUser;
 }
 
 /**
@@ -29,33 +30,46 @@ interface UserContextProviderProps {
 
 /** Custom context provider for UserContext */
 export const UserContextProvider = ({ children }: UserContextProviderProps) => {
-  const { results: loggedInUserResults } = useParseQuery(
-    new Parse.Query<ParseUser>("User").equalTo(
-      "objectId",
-      Parse.User.current()?.get("objectId")
-    ),
-    useParseQueryOptions
+  const [loggedInUser, setLoggedInUser] = useState<ParseUser | undefined>(
+    Parse.User.current() as ParseUser
   );
+  const [profilePicture, setProfilePicture] = useState<
+    ParseImage | undefined
+  >();
 
-  const loggedInUser = useMemo(() => loggedInUserResults?.[0], [
-    loggedInUserResults,
-  ]);
-
-  const { results: profilePictureResults } = useParseQuery(
-    new Parse.Query<ParseImage>("Image").equalTo(
-      "objectId",
-      loggedInUser?.profilePicture?.objectId
-    ),
-    useParseQueryOptions
-  );
-
-  const profilePicture = useMemo(() => profilePictureResults?.[0], [
-    profilePictureResults,
-  ]);
+  const updateLoggedInUser = (
+    newLoggedInUser: ParseUser,
+    reason: UpdateReason
+  ) => {
+    if (reason === UpdateReason.LOG_OUT) {
+      setLoggedInUser(undefined);
+      setProfilePicture(undefined);
+    } else if (
+      !loggedInUser ||
+      newLoggedInUser.objectId === loggedInUser.objectId
+    ) {
+      if (reason !== UpdateReason.UPDATE) {
+        setLoggedInUser(newLoggedInUser);
+      }
+      if (
+        reason !== UpdateReason.UPDATE ||
+        newLoggedInUser.profilePicture?.objectId !==
+          loggedInUser?.profilePicture?.objectId
+      ) {
+        new Parse.Query<ParseImage>("Image")
+          .equalTo("objectId", newLoggedInUser.profilePicture?.objectId)
+          .first()
+          .then((profilePictureResponse) => {
+            setProfilePicture(profilePictureResponse);
+          });
+      }
+    }
+  };
 
   const value = {
     loggedInUser,
     profilePicture,
+    updateLoggedInUser,
   };
 
   return <UserContext.Provider value={value}>{children}</UserContext.Provider>;

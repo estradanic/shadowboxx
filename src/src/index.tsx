@@ -10,6 +10,7 @@ import { NavigationContextProvider } from "./app/NavigationContext";
 import { SnackbarProvider } from "./components";
 import { NotificationsContextProvider } from "./app/NotificationsContext";
 import { ActionDialogContextProvider } from "./components/Dialog/ActionDialog";
+import { UserContextProvider } from "./app/UserContext";
 
 const theme = createMuiTheme({
   palette: {
@@ -57,7 +58,9 @@ ReactDOM.render(
         <NavigationContextProvider>
           <NotificationsContextProvider>
             <ActionDialogContextProvider>
-              <App />
+              <UserContextProvider>
+                <App />
+              </UserContextProvider>
             </ActionDialogContextProvider>
           </NotificationsContextProvider>
         </NavigationContextProvider>

@@ -71,14 +71,7 @@ const Header = ({ viewId, ...rest }: HeaderProps) => {
   const history = useHistory();
   const [showBackButton, setShowBackButton] = useState(false);
   const { routes } = useRoutes();
-  const { loggedInUser } = useUserContext();
-  const { results: profilePictureResults } = useParseQuery(
-    new Parse.Query<ParseImage>("Image").equalTo(
-      "objectId",
-      loggedInUser?.profilePicture?.objectId
-    ),
-    useParseQueryOptions
-  );
+  const { loggedInUser, profilePicture } = useUserContext();
 
   useEffect(() => {
     if (routeHistory.length === 1) {
@@ -126,7 +119,7 @@ const Header = ({ viewId, ...rest }: HeaderProps) => {
           {loggedInUser && (
             <>
               <Notifications className={classes.notifications} />
-              {profilePictureResults?.[0]?.file.url() ? (
+              {profilePicture?.file.url() ? (
                 <UserAvatar className={classes.profile} />
               ) : (
                 <Typography variant="overline">{`${loggedInUser.firstName} ${loggedInUser.lastName}`}</Typography>

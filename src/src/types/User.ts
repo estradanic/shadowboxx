@@ -1,4 +1,4 @@
-import Parse from "parse";
+import Parse, { FullOptions } from "parse";
 import { Attributes } from "./ParseObject";
 
 export interface User extends Attributes {
@@ -20,7 +20,66 @@ export interface User extends Attributes {
   profilePicture?: Parse.Pointer;
 }
 
+export type UpdateLoggedInUser = (
+  loggedInUser: ParseUser,
+  reason: UpdateReason
+) => void;
+
+export enum UpdateReason {
+  LOG_IN,
+  SIGN_UP,
+  UPDATE,
+  LOG_OUT,
+}
+
 export class ParseUser extends Parse.User<User> {
+  constructor(
+    username: string,
+    password: string,
+    firstName?: string,
+    lastName?: string
+  ) {
+    super({
+      username,
+      email: username,
+      password,
+      firstName: firstName ?? "",
+      lastName: lastName ?? "",
+      isDarkThemeEnabled: false,
+    });
+  }
+
+  async login(updateLoggedInUser: UpdateLoggedInUser, options?: FullOptions) {
+    return super.logIn(options).then((loggedInUser) => {
+      updateLoggedInUser(loggedInUser, UpdateReason.LOG_IN);
+      return loggedInUser;
+    });
+  }
+
+  async signup(updateLoggedInUser: UpdateLoggedInUser, options?: FullOptions) {
+    return super.signUp(undefined, options).then((loggedInUser) => {
+      updateLoggedInUser(loggedInUser, UpdateReason.SIGN_UP);
+      return loggedInUser;
+    });
+  }
+
+  async update(
+    updateLoggedInUser: UpdateLoggedInUser,
+    options?: Parse.Object.SaveOptions
+  ) {
+    return super.save(undefined, options).then((loggedInUser) => {
+      updateLoggedInUser(loggedInUser, UpdateReason.UPDATE);
+      return loggedInUser;
+    });
+  }
+
+  async logout(updateLoggedInUser: UpdateLoggedInUser) {
+    return ParseUser.logOut().then((loggedOutUser) => {
+      updateLoggedInUser(loggedOutUser as ParseUser, UpdateReason.LOG_OUT);
+      return loggedOutUser;
+    });
+  }
+
   get objectId(): string | undefined {
     return this.get("objectId");
   }
