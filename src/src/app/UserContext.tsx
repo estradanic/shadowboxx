@@ -1,7 +1,14 @@
-import React, { createContext, useContext, useState } from "react";
+import React, {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useState,
+} from "react";
 import { ParseUser, UpdateLoggedInUser, UpdateReason } from "../types/User";
 import { ParseImage } from "../types/Image";
 import Parse from "parse";
+import Strings from "../resources/Strings";
 
 /**
  * Interface defining the return value of the UserContext
@@ -30,41 +37,66 @@ interface UserContextProviderProps {
 
 /** Custom context provider for UserContext */
 export const UserContextProvider = ({ children }: UserContextProviderProps) => {
+  const [initialized, setInitialized] = useState<boolean>(false);
+
   const [loggedInUser, setLoggedInUser] = useState<ParseUser | undefined>(
-    Parse.User.current() as ParseUser
+    Parse.User.current() ? new ParseUser(Parse.User.current()!) : undefined
   );
   const [profilePicture, setProfilePicture] = useState<
     ParseImage | undefined
   >();
 
-  const updateLoggedInUser = (
-    newLoggedInUser: ParseUser,
-    reason: UpdateReason
-  ) => {
-    if (reason === UpdateReason.LOG_OUT) {
-      setLoggedInUser(undefined);
-      setProfilePicture(undefined);
-    } else if (
-      !loggedInUser ||
-      newLoggedInUser.objectId === loggedInUser.objectId
-    ) {
-      if (reason !== UpdateReason.UPDATE) {
-        setLoggedInUser(newLoggedInUser);
-      }
-      if (
-        reason !== UpdateReason.UPDATE ||
-        newLoggedInUser.profilePicture?.objectId !==
-          loggedInUser?.profilePicture?.objectId
+  const updateLoggedInUser = useCallback(
+    (newLoggedInUser: ParseUser, reason: UpdateReason) => {
+      if (reason === UpdateReason.LOG_OUT) {
+        setLoggedInUser(undefined);
+        setProfilePicture(undefined);
+      } else if (
+        !loggedInUser ||
+        newLoggedInUser.username === loggedInUser.username
       ) {
-        new Parse.Query<ParseImage>("Image")
-          .equalTo("objectId", newLoggedInUser.profilePicture?.objectId)
-          .first()
-          .then((profilePictureResponse) => {
-            setProfilePicture(profilePictureResponse);
+        if (reason === UpdateReason.LOG_IN) {
+          console.log("Querying for user: ", newLoggedInUser.username);
+          newLoggedInUser.user.fetch().then((userResponse) => {
+            if (userResponse) {
+              setLoggedInUser(new ParseUser(userResponse));
+              console.log(
+                "Set user: ",
+                userResponse,
+                new ParseUser(userResponse)
+              );
+            } else {
+              console.error(Strings.couldNotGetUserInfo());
+            }
           });
+        }
+        if (
+          reason === UpdateReason.LOG_IN ||
+          newLoggedInUser.profilePicture?.objectId !==
+            loggedInUser?.profilePicture?.objectId
+        ) {
+          new Parse.Query<ParseImage>("Image")
+            .equalTo("objectId", newLoggedInUser.profilePicture?.objectId)
+            .first()
+            .then((profilePictureResponse) => {
+              setProfilePicture(profilePictureResponse);
+            });
+        }
       }
+    },
+    [setLoggedInUser, setProfilePicture, loggedInUser]
+  );
+
+  useEffect(() => {
+    if (initialized) {
+      return;
     }
-  };
+    setInitialized(true);
+    if (loggedInUser) {
+      console.log("initializing: ", loggedInUser);
+      updateLoggedInUser(loggedInUser, UpdateReason.LOG_IN);
+    }
+  }, [loggedInUser, updateLoggedInUser, initialized, setInitialized]);
 
   const value = {
     loggedInUser,

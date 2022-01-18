@@ -9,7 +9,7 @@ import { Avatar, AvatarProps } from "@material-ui/core";
 import { makeStyles, Theme } from "@material-ui/core/styles";
 import cx from "classnames";
 import Parse from "parse";
-import { ParseUser } from "../../types/User";
+import { ParseUser, User } from "../../types/User";
 import { ParseImage } from "../../types/Image";
 import { useUserContext } from "../../app/UserContext";
 
@@ -53,8 +53,8 @@ const UserAvatar = memo(
       useEffect(() => {
         if (
           (!user && !email) ||
-          (user && user?.getEmail() === loggedInUser?.getEmail()) ||
-          (email && email === loggedInUser?.getEmail())
+          (user && user?.email === loggedInUser?.email) ||
+          (email && email === loggedInUser?.email)
         ) {
           setSrc(profilePicture?.file.url() ?? "");
           setFirstName(loggedInUser?.firstName ?? "");
@@ -66,32 +66,35 @@ const UserAvatar = memo(
             !profilePicture?.file?.url()) &&
           !noFetch
         ) {
-          new Parse.Query<ParseUser>("User")
-            .equalTo("email", user?.getEmail() ?? email ?? "")
+          new Parse.Query<Parse.User<User>>("User")
+            .equalTo("email", user?.email ?? email ?? "")
             .first()
             .then((response) => {
-              new Parse.Query<ParseImage>("Image")
-                .equalTo("objectId", response?.profilePicture?.objectId)
-                .first()
-                .then((profilePictureResponse) => {
-                  setSrc(
-                    profilePictureResponse?.file.url() ??
-                      profilePicture?.file?.url() ??
-                      ""
-                  );
-                });
-              setFirstName(
-                response?.firstName ??
-                  user?.firstName ??
-                  user?.getEmail() ??
-                  email ??
-                  ""
-              );
-              setLastName(response?.lastName ?? user?.lastName ?? "");
+              if (response) {
+                const fetchedUser = new ParseUser(response);
+                new Parse.Query<ParseImage>("Image")
+                  .equalTo("objectId", fetchedUser?.profilePicture?.objectId)
+                  .first()
+                  .then((profilePictureResponse) => {
+                    setSrc(
+                      profilePictureResponse?.file.url() ??
+                        profilePicture?.file?.url() ??
+                        ""
+                    );
+                  });
+                setFirstName(
+                  fetchedUser?.firstName ??
+                    user?.firstName ??
+                    user?.email ??
+                    email ??
+                    ""
+                );
+                setLastName(fetchedUser?.lastName ?? user?.lastName ?? "");
+              }
             });
         } else {
           setSrc(profilePicture?.file?.url() ?? "");
-          setFirstName(user?.firstName ?? user?.getEmail() ?? email ?? "");
+          setFirstName(user?.firstName ?? user?.email ?? email ?? "");
           setLastName(user?.lastName ?? "");
         }
       }, [user, email, loggedInUser, noFetch, profilePicture?.file]);

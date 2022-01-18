@@ -206,10 +206,7 @@ const Settings = () => {
                     autoComplete="none"
                     value={profilePicture ? [profilePicture] : []}
                     onChange={([newProfilePicture]) => {
-                      loggedInUser!.set(
-                        "profilePicture",
-                        newProfilePicture.toPointer()
-                      );
+                      loggedInUser!.profilePicture = newProfilePicture.toPointer();
                     }}
                     label={Strings.profilePicture()}
                   />

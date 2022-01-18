@@ -78,7 +78,7 @@ const Login = () => {
   const login = () => {
     if (validate()) {
       setGlobalLoading(true);
-      const user = new ParseUser(email, password);
+      const user = ParseUser.fromAttributes({ username: email, password });
       user
         .login(updateLoggedInUser)
         .then(() => {

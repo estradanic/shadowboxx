@@ -56,7 +56,7 @@ const HomePage = memo(() => {
     if (!gotAlbums.current && !globalLoading) {
       setGlobalLoading(true);
       new Parse.Query<ParseAlbum>("Album")
-        .equalTo("owner", loggedInUser!.toPointer())
+        .equalTo("owner", loggedInUser!.user.toPointer())
         .findAll()
         .then((response) => {
           setAlbums(response);
@@ -131,7 +131,7 @@ const HomePage = memo(() => {
         resetOnConfirm
         value={
           new ParseAlbum("Album", {
-            owner: loggedInUser!.toPointer(),
+            owner: loggedInUser!.user.toPointer(),
             images: new Parse.Relation(),
             name: "Untitled Album",
             collaborators: new Parse.Relation(),

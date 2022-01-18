@@ -2,7 +2,7 @@ import { match } from "react-router-dom";
 import { useRoutes } from "../app/routes";
 import { useNavigationContext } from "../app/NavigationContext";
 import { useHistory } from "react-router-dom";
-import { useEffect } from "react";
+import { useCallback, useEffect } from "react";
 import { useUserContext } from "../app/UserContext";
 /**
  * Interface to define access to React Router path parameters.
@@ -29,7 +29,7 @@ export const useView = (currentViewId: string) => {
   const currentRoute = routes[currentViewId];
   const { loggedInUser } = useUserContext();
 
-  const redirectToLogin = () => {
+  const redirectToLogin = useCallback(() => {
     setGlobalLoading(false);
     if (currentRoute.redirectOnAuthFail) {
       const loginRoute = routes["Login"];
@@ -39,7 +39,16 @@ export const useView = (currentViewId: string) => {
       });
       history.push(loginRoute.path);
     }
-  };
+  }, [
+    setGlobalLoading,
+    setRedirectRoute,
+    getRoutePath,
+    routes,
+    history,
+    currentRoute.redirectOnAuthFail,
+    currentViewId,
+    routeParams,
+  ]);
 
   useEffect(() => {
     if (loggedInUser) {

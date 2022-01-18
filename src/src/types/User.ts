@@ -32,33 +32,36 @@ export enum UpdateReason {
   LOG_OUT,
 }
 
-export class ParseUser extends Parse.User<User> {
-  constructor(
-    username: string,
-    password: string,
-    firstName?: string,
-    lastName?: string
-  ) {
-    super({
-      username,
-      email: username,
-      password,
-      firstName: firstName ?? "",
-      lastName: lastName ?? "",
-      isDarkThemeEnabled: false,
-    });
+export class ParseUser {
+  static fromAttributes = (attributes: Partial<User>): ParseUser => {
+    const fullAttributes: User = {
+      username: attributes.username ?? attributes.email ?? "",
+      password: attributes.password ?? "",
+      email: attributes.email ?? attributes.username ?? "",
+      isDarkThemeEnabled: attributes.isDarkThemeEnabled ?? false,
+      firstName:
+        attributes.firstName ?? attributes.email ?? attributes.username ?? "",
+      lastName: attributes.lastName ?? "",
+    };
+    return new ParseUser(new Parse.User(fullAttributes));
+  };
+
+  user: Parse.User<User>;
+
+  constructor(user: Parse.User<User>) {
+    this.user = user;
   }
 
   async login(updateLoggedInUser: UpdateLoggedInUser, options?: FullOptions) {
-    return super.logIn(options).then((loggedInUser) => {
-      updateLoggedInUser(loggedInUser, UpdateReason.LOG_IN);
+    return this.user.logIn(options).then((loggedInUser) => {
+      updateLoggedInUser(new ParseUser(loggedInUser), UpdateReason.LOG_IN);
       return loggedInUser;
     });
   }
 
   async signup(updateLoggedInUser: UpdateLoggedInUser, options?: FullOptions) {
-    return super.signUp(undefined, options).then((loggedInUser) => {
-      updateLoggedInUser(loggedInUser, UpdateReason.SIGN_UP);
+    return this.user.signUp(undefined, options).then((loggedInUser) => {
+      updateLoggedInUser(new ParseUser(loggedInUser), UpdateReason.SIGN_UP);
       return loggedInUser;
     });
   }
@@ -67,80 +70,80 @@ export class ParseUser extends Parse.User<User> {
     updateLoggedInUser: UpdateLoggedInUser,
     options?: Parse.Object.SaveOptions
   ) {
-    return super.save(undefined, options).then((loggedInUser) => {
-      updateLoggedInUser(loggedInUser, UpdateReason.UPDATE);
+    return this.user.save(undefined, options).then((loggedInUser) => {
+      updateLoggedInUser(new ParseUser(loggedInUser), UpdateReason.UPDATE);
       return loggedInUser;
     });
   }
 
   async logout(updateLoggedInUser: UpdateLoggedInUser) {
-    return ParseUser.logOut().then((loggedOutUser) => {
-      updateLoggedInUser(loggedOutUser as ParseUser, UpdateReason.LOG_OUT);
+    return Parse.User.logOut<Parse.User<User>>().then((loggedOutUser) => {
+      updateLoggedInUser(new ParseUser(loggedOutUser), UpdateReason.LOG_OUT);
       return loggedOutUser;
     });
   }
 
   get objectId(): string | undefined {
-    return this.get("objectId");
+    return this.user.get("objectId") ?? this.user.id;
   }
 
   get emailVerified(): boolean | undefined {
-    return this.get("emailVerified");
+    return this.user.get("emailVerified");
   }
 
   set emailVerified(emailVerified) {
-    this.set("emailVerified", emailVerified);
+    this.user.set("emailVerified", emailVerified);
   }
 
   get username(): string {
-    return this.get("username");
+    return this.user.get("username");
   }
 
   set username(username) {
-    this.setUsername(username);
+    this.user.setUsername(username);
   }
 
   set password(password: string) {
-    this.setPassword(password);
+    this.user.setPassword(password);
   }
 
   get email(): string {
-    return this.get("email");
+    return this.user.get("email");
   }
 
   set email(email) {
-    this.setEmail(email);
+    this.user.setEmail(email);
   }
 
   get lastName(): string {
-    return this.get("lastName");
+    return this.user.get("lastName");
   }
 
   set lastName(lastName) {
-    this.set("lastName", lastName);
+    this.user.set("lastName", lastName);
   }
 
   get firstName(): string {
-    return this.get("firstName");
+    return this.user.get("firstName");
   }
 
   set firstName(firstName) {
-    this.set("firstName", firstName);
+    this.user.set("firstName", firstName);
   }
 
   get isDarkThemeEnabled(): boolean {
-    return this.get("isDarkThemeEnabled");
+    return this.user.get("isDarkThemeEnabled");
   }
 
   set isDarkThemeEnabled(isDarkThemeEnabled) {
-    this.set("isDarkThemeEnabled", isDarkThemeEnabled);
+    this.user.set("isDarkThemeEnabled", isDarkThemeEnabled);
   }
 
   get profilePicture(): Parse.Pointer | undefined {
-    return this.get("profilePicture");
+    return this.user.get("profilePicture");
   }
 
   set profilePicture(profilePicture) {
-    this.set("profilePicture", profilePicture);
+    this.user.set("profilePicture", profilePicture);
   }
 }

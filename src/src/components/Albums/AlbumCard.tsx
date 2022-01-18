@@ -27,7 +27,7 @@ import { useRoutes } from "../../app/routes";
 import Parse from "parse";
 import { useParseQuery } from "@parse/react";
 import { useParseQueryOptions } from "../../constants/useParseQueryOptions";
-import { ParseUser } from "../../types/User";
+import { ParseUser, User } from "../../types/User";
 
 const useStyles = makeStyles((theme: Theme) => ({
   card: {
@@ -99,15 +99,15 @@ const AlbumCard = ({ value: initialValue, onChange }: AlbumCardProps) => {
     setValue(initialValue);
   }, [initialValue]);
 
-  const { results: collaborators } = useParseQuery(
+  const { results: collaboratorsResults } = useParseQuery(
     value.collaborators.query(),
     useParseQueryOptions
   );
-  const { results: coOwners } = useParseQuery(
+  const { results: coOwnersResults } = useParseQuery(
     value.coOwners.query(),
     useParseQueryOptions
   );
-  const { results: viewers } = useParseQuery(
+  const { results: viewersResults } = useParseQuery(
     value.viewers.query(),
     useParseQueryOptions
   );
@@ -116,14 +116,31 @@ const AlbumCard = ({ value: initialValue, onChange }: AlbumCardProps) => {
     useParseQueryOptions
   );
   const { results: ownerResult } = useParseQuery(
-    new Parse.Query<ParseUser>("User").equalTo(
+    new Parse.Query<Parse.User<User>>("User").equalTo(
       "objectId",
       value.owner.objectId
     ),
     useParseQueryOptions
   );
 
-  const owner = useMemo(() => ownerResult?.[0], [ownerResult]);
+  const owner = useMemo(
+    () =>
+      ownerResult && ownerResult[0] ? new ParseUser(ownerResult[0]) : undefined,
+    [ownerResult]
+  );
+  const collaborators = useMemo(
+    () =>
+      collaboratorsResults?.map((collaborator) => new ParseUser(collaborator)),
+    [collaboratorsResults]
+  );
+  const coOwners = useMemo(
+    () => coOwnersResults?.map((coOwner) => new ParseUser(coOwner)),
+    [coOwnersResults]
+  );
+  const viewers = useMemo(
+    () => viewersResults?.map((viewer) => new ParseUser(viewer)),
+    [viewersResults]
+  );
 
   const [isFavorite, setIsFavorite] = useState<boolean>(
     value?.isFavorite ?? false
@@ -241,12 +258,12 @@ const AlbumCard = ({ value: initialValue, onChange }: AlbumCardProps) => {
               !!viewers?.length) && (
               <Grid className={classes.collaborators} item container xs={12}>
                 {coOwners?.map((coOwner) => (
-                  <Grid item key={coOwner?.getEmail()}>
+                  <Grid item key={coOwner?.email}>
                     <Tooltip
                       title={
                         coOwner?.firstName
-                          ? `${coOwner?.firstName} ${coOwner?.get("lastName")}`
-                          : coOwner?.getEmail() ?? ""
+                          ? `${coOwner?.firstName} ${coOwner?.lastName}`
+                          : coOwner?.email ?? ""
                       }
                     >
                       <UserAvatar
@@ -257,14 +274,12 @@ const AlbumCard = ({ value: initialValue, onChange }: AlbumCardProps) => {
                   </Grid>
                 ))}
                 {collaborators?.map((collaborator) => (
-                  <Grid item key={collaborator?.getEmail()}>
+                  <Grid item key={collaborator?.email}>
                     <Tooltip
                       title={
                         collaborator?.firstName
-                          ? `${collaborator?.get("firstName")} ${
-                              collaborator?.lastName
-                            }`
-                          : collaborator?.getEmail() ?? ""
+                          ? `${collaborator?.firstName} ${collaborator?.lastName}`
+                          : collaborator?.email ?? ""
                       }
                     >
                       <UserAvatar
@@ -275,12 +290,12 @@ const AlbumCard = ({ value: initialValue, onChange }: AlbumCardProps) => {
                   </Grid>
                 ))}
                 {viewers?.map((viewer) => (
-                  <Grid item key={viewer?.getEmail()}>
+                  <Grid item key={viewer?.email}>
                     <Tooltip
                       title={
                         viewer?.firstName
-                          ? `${viewer?.firstName} ${viewer?.get("lastName")}`
-                          : viewer?.getEmail() ?? ""
+                          ? `${viewer?.firstName} ${viewer?.lastName}`
+                          : viewer?.email ?? ""
                       }
                     >
                       <UserAvatar

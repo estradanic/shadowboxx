@@ -18,11 +18,7 @@ import { useHistory } from "react-router-dom";
 import { UserAvatar } from "..";
 import { useRoutes } from "../../app/routes";
 import Notifications from "../Notifications/Notifications";
-import Parse from "parse";
 import { useUserContext } from "../../app/UserContext";
-import { useParseQuery } from "@parse/react";
-import { ParseImage } from "../../types/Image";
-import { useParseQueryOptions } from "../../constants/useParseQueryOptions";
 
 const useStyles = makeStyles((theme: Theme) => ({
   backButton: {

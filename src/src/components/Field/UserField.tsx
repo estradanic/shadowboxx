@@ -57,7 +57,12 @@ const UserField = forwardRef(
         const option = value[i];
         if (typeof option === "string") {
           // TODO VERIFY: Will this work or do I need to use signup?
-          newUsers.push(await new ParseUser(option, "", option));
+          newUsers.push(
+            await ParseUser.fromAttributes({
+              username: option,
+              firstName: option,
+            })
+          );
         } else {
           newUsers.push(option);
         }
@@ -68,7 +73,7 @@ const UserField = forwardRef(
     const getOptions = debounce((value) => {
       if (!isNullOrWhitespace(value)) {
         new Parse.Query<ParseAlbum>("Album")
-          .equalTo("owner", loggedInUser!.toPointer())
+          .equalTo("owner", loggedInUser!.user.toPointer())
           .findAll()
           .then((response) => {
             response.forEach((album) => {
@@ -77,7 +82,14 @@ const UserField = forwardRef(
                 .findAll()
                 .then((response) => {
                   setOptions((prev) =>
-                    Array.from(new Set([...prev, ...response]))
+                    Array.from(
+                      new Set([
+                        ...prev,
+                        ...response.map(
+                          (collaborator) => new ParseUser(collaborator)
+                        ),
+                      ])
+                    )
                   );
                 });
               album.viewers
@@ -85,7 +97,12 @@ const UserField = forwardRef(
                 .findAll()
                 .then((response) => {
                   setOptions((prev) =>
-                    Array.from(new Set([...prev, ...response]))
+                    Array.from(
+                      new Set([
+                        ...prev,
+                        ...response.map((viewer) => new ParseUser(viewer)),
+                      ])
+                    )
                   );
                 });
               album.coOwners
@@ -93,7 +110,12 @@ const UserField = forwardRef(
                 .findAll()
                 .then((response) => {
                   setOptions((prev) =>
-                    Array.from(new Set([...prev, ...response]))
+                    Array.from(
+                      new Set([
+                        ...prev,
+                        ...response.map((coOwner) => new ParseUser(coOwner)),
+                      ])
+                    )
                   );
                 });
             });
@@ -105,16 +127,16 @@ const UserField = forwardRef(
       if (
         value.find(
           (user) =>
-            user?.getEmail() === resolvedUser?.getEmail() &&
-            user?.getEmail() === user?.firstName &&
-            resolvedUser?.getEmail() !== resolvedUser?.firstName &&
+            user?.email === resolvedUser?.email &&
+            user?.email === user?.firstName &&
+            resolvedUser?.email !== resolvedUser?.firstName &&
             user?.firstName !== resolvedUser?.firstName
         )
       ) {
         onChange(
           null,
           value.map((user) => {
-            if (resolvedUser?.getEmail() === user?.getEmail()) {
+            if (resolvedUser?.email === user?.email) {
               return resolvedUser;
             }
             return user;
@@ -139,10 +161,8 @@ const UserField = forwardRef(
         filterOptions={(options, { inputValue }) =>
           options.filter(
             (option) =>
-              !value.filter((val) => val?.getEmail() === option?.getEmail())
-                .length &&
-              (option
-                ?.getEmail()
+              !value.filter((val) => val?.email === option?.email).length &&
+              (option?.email
                 ?.toLocaleLowerCase()
                 ?.includes(inputValue.toLocaleLowerCase()) ||
                 `${option?.firstName} ${option?.lastName}`

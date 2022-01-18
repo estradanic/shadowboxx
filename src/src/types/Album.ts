@@ -1,7 +1,7 @@
 import Parse from "parse";
 import { ParseImage } from "./Image";
 import Object, { Attributes } from "./ParseObject";
-import { ParseUser } from "./User";
+import { User } from "./User";
 
 /** Interface defining an Album */
 export interface Album extends Attributes {
@@ -18,11 +18,11 @@ export interface Album extends Attributes {
   /** Whether the album is publicly viewable or not */
   isPublic?: boolean;
   /** Collaborators with "put" access */
-  collaborators: Parse.Relation<ParseAlbum, ParseUser>;
+  collaborators: Parse.Relation<ParseAlbum, Parse.User<User>>;
   /** Collaborators with "view" access */
-  viewers: Parse.Relation<ParseAlbum, ParseUser>;
+  viewers: Parse.Relation<ParseAlbum, Parse.User<User>>;
   /** Collaborators with "edit" access */
-  coOwners: Parse.Relation<ParseAlbum, ParseUser>;
+  coOwners: Parse.Relation<ParseAlbum, Parse.User<User>>;
   /** Last edited date */
   updatedAt?: Date;
   /** Created date */
@@ -78,7 +78,7 @@ export class ParseAlbum extends Object<Album> {
     this.set("isPublic", isPublic);
   }
 
-  get collaborators(): Parse.Relation<ParseAlbum, ParseUser> {
+  get collaborators(): Parse.Relation<ParseAlbum, Parse.User<User>> {
     return this.get("collaborators");
   }
 
@@ -86,7 +86,7 @@ export class ParseAlbum extends Object<Album> {
     this.set("collaborators", collaborators);
   }
 
-  get viewers(): Parse.Relation<ParseAlbum, ParseUser> {
+  get viewers(): Parse.Relation<ParseAlbum, Parse.User<User>> {
     return this.get("collaborators");
   }
 
@@ -94,7 +94,7 @@ export class ParseAlbum extends Object<Album> {
     this.set("collaborators", collaborators);
   }
 
-  get coOwners(): Parse.Relation<ParseAlbum, ParseUser> {
+  get coOwners(): Parse.Relation<ParseAlbum, Parse.User<User>> {
     return this.get("collaborators");
   }
 

@@ -1,6 +1,6 @@
 import React, { memo, useEffect, useState } from "react";
 import { Typography, TypographyProps } from "@material-ui/core";
-import { ParseUser } from "../../types/User";
+import { ParseUser, User } from "../../types/User";
 import { useUserContext } from "../../app/UserContext";
 
 /** Interface defining props for UserLabel */
@@ -24,8 +24,8 @@ const UserLabel = memo(
       if (
         loggedInUser &&
         ((!user && !email) ||
-          (user && user?.getEmail() === loggedInUser?.getEmail()) ||
-          (email && email === loggedInUser?.getEmail()))
+          (user && user?.email === loggedInUser?.email) ||
+          (email && email === loggedInUser?.email))
       ) {
         setFirstName(loggedInUser.firstName);
         setLastName(loggedInUser.lastName);
@@ -34,21 +34,24 @@ const UserLabel = memo(
         !noFetch &&
         email
       ) {
-        new Parse.Query<ParseUser>("User")
-          .equalTo("email", user?.getEmail() ?? email)
+        new Parse.Query<Parse.User<User>>("User")
+          .equalTo("email", user?.email ?? email)
           .first()
           .then((response) => {
-            setFirstName(
-              response?.firstName ??
-                user?.firstName ??
-                user?.getEmail() ??
-                email ??
-                ""
-            );
-            setLastName(response?.lastName ?? "");
+            if (response) {
+              const fetchedUser = new ParseUser(response);
+              setFirstName(
+                fetchedUser?.firstName ??
+                  user?.firstName ??
+                  user?.email ??
+                  email ??
+                  ""
+              );
+              setLastName(fetchedUser?.lastName ?? "");
+            }
           });
       } else {
-        setFirstName(user?.firstName ?? user?.getEmail() ?? email ?? "");
+        setFirstName(user?.firstName ?? user?.email ?? email ?? "");
         setLastName(user?.lastName ?? "");
       }
     }, [user, email, loggedInUser, noFetch]);

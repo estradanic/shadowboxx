@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useMemo, useState } from "react";
 import ActionDialog, {
   ActionDialogProps,
   useActionDialogContext,
@@ -24,6 +24,7 @@ import Tooltip from "../Tooltip/Tooltip";
 import { useParseQuery } from "@parse/react";
 import { useParseQueryOptions } from "../../constants/useParseQueryOptions";
 import { ImageContextProvider } from "../../app/ImageContext";
+import { ParseUser } from "../../types/User";
 
 const useStyles = makeStyles((theme: Theme) => ({
   checkboxLabel: {
@@ -79,21 +80,35 @@ const AlbumFormDialog = ({
   resetOnConfirm,
 }: AlbumFormDialogProps) => {
   const [value, setValue] = useState<ParseAlbum>(initialValue);
-  const { results: collaborators } = useParseQuery(
+  const { results: collaboratorsResults } = useParseQuery(
     value.collaborators.query(),
     useParseQueryOptions
   );
-  const { results: coOwners } = useParseQuery(
+  const { results: coOwnersResults } = useParseQuery(
     value.coOwners.query(),
     useParseQueryOptions
   );
-  const { results: viewers } = useParseQuery(
+  const { results: viewersResults } = useParseQuery(
     value.viewers.query(),
     useParseQueryOptions
   );
   const { results: images } = useParseQuery(
     value.images.query(),
     useParseQueryOptions
+  );
+
+  const collaborators = useMemo(
+    () =>
+      collaboratorsResults?.map((collaborator) => new ParseUser(collaborator)),
+    [collaboratorsResults]
+  );
+  const coOwners = useMemo(
+    () => coOwnersResults?.map((coOwner) => new ParseUser(coOwner)),
+    [coOwnersResults]
+  );
+  const viewers = useMemo(
+    () => viewersResults?.map((viewer) => new ParseUser(viewer)),
+    [viewersResults]
   );
 
   const classes = useStyles();
@@ -144,13 +159,11 @@ const AlbumFormDialog = ({
         ...(viewers ?? []),
         ...(collaborators ?? []),
         ...(coOwners ?? []),
-      ].filter(
-        (collaborator) => collaborator.getEmail() === collaborator.firstName
-      );
+      ].filter((collaborator) => collaborator.email === collaborator.firstName);
       if (!!nonExistentCollaborators.length) {
         openConfirm(
           Strings.nonExistentCollaboratorWarning(
-            nonExistentCollaborators[0].getEmail()
+            nonExistentCollaborators[0].email
           ),
           () => {
             piHandleConfirm(value);
@@ -260,12 +273,15 @@ const AlbumFormDialog = ({
                 onChange={async (newCoOwners) => {
                   const relation = value.coOwners;
                   relation.add(
-                    newCoOwners.filter(
-                      (newCoOwner) =>
-                        !!coOwners?.find(
-                          (coOwner) => coOwner.objectId === newCoOwner.objectId
-                        )
-                    )
+                    newCoOwners
+                      .filter(
+                        (newCoOwner) =>
+                          !!coOwners?.find(
+                            (coOwner) =>
+                              coOwner.objectId === newCoOwner.objectId
+                          )
+                      )
+                      .map((newCoOwner) => newCoOwner.user)
                   );
                   value.set("coOwners", relation);
                 }}
@@ -280,13 +296,15 @@ const AlbumFormDialog = ({
                 onChange={(newCollaborators) => {
                   const relation = value.collaborators;
                   relation.add(
-                    newCollaborators.filter(
-                      (newCollaborator) =>
-                        !!collaborators?.find(
-                          (collaborator) =>
-                            collaborator.objectId === newCollaborator.objectId
-                        )
-                    )
+                    newCollaborators
+                      .filter(
+                        (newCollaborator) =>
+                          !!collaborators?.find(
+                            (collaborator) =>
+                              collaborator.objectId === newCollaborator.objectId
+                          )
+                      )
+                      .map((newCollaborator) => newCollaborator.user)
                   );
                   value.set("collaborators", relation);
                 }}
@@ -301,12 +319,14 @@ const AlbumFormDialog = ({
                 onChange={(newViewers) => {
                   const relation = value.viewers;
                   relation.add(
-                    newViewers.filter(
-                      (newViewer) =>
-                        !!viewers?.find(
-                          (viewer) => viewer.objectId === newViewer.objectId
-                        )
-                    )
+                    newViewers
+                      .filter(
+                        (newViewer) =>
+                          !!viewers?.find(
+                            (viewer) => viewer.objectId === newViewer.objectId
+                          )
+                      )
+                      .map((newViewer) => newViewer.user)
                   );
                   value.set("viewers", relation);
                 }}

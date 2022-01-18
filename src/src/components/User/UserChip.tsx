@@ -11,7 +11,7 @@ import UserAvatar from "./UserAvatar";
 import { Chip, ChipProps } from "@material-ui/core";
 import { makeStyles, Theme } from "@material-ui/core/styles";
 import Parse from "parse";
-import { ParseUser } from "../../types/User";
+import { ParseUser, User } from "../../types/User";
 import { useParseQuery } from "@parse/react";
 import { useParseQueryOptions } from "../../constants/useParseQueryOptions";
 import { ParseImage } from "../../types/Image";
@@ -82,8 +82,8 @@ const UserChip = memo(
         if (
           loggedInUser &&
           ((!piUser && !email) ||
-            (piUser && piUser?.getEmail() === loggedInUser.getEmail()) ||
-            (email && email === loggedInUser.getEmail()))
+            (piUser && piUser?.email === loggedInUser.email) ||
+            (email && email === loggedInUser.email))
         ) {
           resolveUser(loggedInUser);
         } else if (
@@ -93,18 +93,32 @@ const UserChip = memo(
             !profilePicture?.file?.url()) &&
           email
         ) {
-          new Parse.Query<ParseUser>("User")
-            .equalTo("email", piUser?.getEmail() ?? email)
+          new Parse.Query<Parse.User<User>>("User")
+            .equalTo("email", piUser?.email ?? email)
             .first()
             .then((response) => {
               if (!response) {
-                resolveUser(piUser ?? new ParseUser(email, "", email));
+                resolveUser(
+                  piUser ??
+                    ParseUser.fromAttributes({
+                      username: email,
+                      password: "",
+                      firstName: email,
+                    })
+                );
               } else {
-                resolveUser(response);
+                resolveUser(new ParseUser(response));
               }
             })
             .catch(() => {
-              resolveUser(piUser ?? new ParseUser(email, "", email));
+              resolveUser(
+                piUser ??
+                  ParseUser.fromAttributes({
+                    username: email,
+                    password: "",
+                    firstName: email,
+                  })
+              );
             });
         } else if (piUser) {
           resolveUser(piUser);
