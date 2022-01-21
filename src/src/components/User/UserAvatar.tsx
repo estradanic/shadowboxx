@@ -10,7 +10,7 @@ import { makeStyles, Theme } from "@material-ui/core/styles";
 import cx from "classnames";
 import Parse from "parse";
 import { ParseUser, User } from "../../types/User";
-import { ParseImage } from "../../types/Image";
+import { ParseImage, Image } from "../../types/Image";
 import { useUserContext } from "../../app/UserContext";
 
 const useStyles = makeStyles((theme: Theme) => ({
@@ -72,15 +72,20 @@ const UserAvatar = memo(
             .then((response) => {
               if (response) {
                 const fetchedUser = new ParseUser(response);
-                new Parse.Query<ParseImage>("Image")
-                  .equalTo("objectId", fetchedUser?.profilePicture?.objectId)
+                new Parse.Query<Parse.Object<Image>>("Image")
+                  .equalTo("objectId", fetchedUser?.profilePicture?.id)
                   .first()
                   .then((profilePictureResponse) => {
-                    setSrc(
-                      profilePictureResponse?.file.url() ??
-                        profilePicture?.file?.url() ??
-                        ""
-                    );
+                    if (profilePictureResponse) {
+                      const newProfilePicture = new ParseImage(
+                        profilePictureResponse
+                      );
+                      setSrc(
+                        newProfilePicture?.file.url() ??
+                          profilePicture?.file?.url() ??
+                          ""
+                      );
+                    }
                   });
                 setFirstName(
                   fetchedUser?.firstName ??

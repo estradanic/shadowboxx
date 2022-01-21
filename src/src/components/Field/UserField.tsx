@@ -6,7 +6,7 @@ import { debounce } from "lodash";
 import { isNullOrWhitespace } from "../../utils/stringUtils";
 import { makeStyles, Theme } from "@material-ui/core/styles";
 import Parse from "parse";
-import { ParseAlbum } from "../../types/Album";
+import { ParseAlbum, Album } from "../../types/Album";
 import { ParseUser } from "../../types/User";
 import { useUserContext } from "../../app/UserContext";
 
@@ -72,11 +72,12 @@ const UserField = forwardRef(
 
     const getOptions = debounce((value) => {
       if (!isNullOrWhitespace(value)) {
-        new Parse.Query<ParseAlbum>("Album")
+        new Parse.Query<Parse.Object<Album>>("Album")
           .equalTo("owner", loggedInUser!.user.toPointer())
           .findAll()
           .then((response) => {
-            response.forEach((album) => {
+            response.forEach((albumResponse) => {
+              const album = new ParseAlbum(albumResponse);
               album.collaborators
                 ?.query()
                 .findAll()

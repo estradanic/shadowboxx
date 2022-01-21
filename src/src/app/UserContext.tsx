@@ -6,7 +6,7 @@ import React, {
   useState,
 } from "react";
 import { ParseUser, UpdateLoggedInUser, UpdateReason } from "../types/User";
-import { ParseImage } from "../types/Image";
+import { ParseImage, Image } from "../types/Image";
 import Parse from "parse";
 import Strings from "../resources/Strings";
 
@@ -56,15 +56,10 @@ export const UserContextProvider = ({ children }: UserContextProviderProps) => {
         newLoggedInUser.username === loggedInUser.username
       ) {
         if (reason === UpdateReason.LOG_IN) {
-          console.log("Querying for user: ", newLoggedInUser.username);
           newLoggedInUser.user.fetch().then((userResponse) => {
             if (userResponse) {
               setLoggedInUser(new ParseUser(userResponse));
-              console.log(
-                "Set user: ",
-                userResponse,
-                new ParseUser(userResponse)
-              );
+              newLoggedInUser = new ParseUser(userResponse);
             } else {
               console.error(Strings.couldNotGetUserInfo());
             }
@@ -72,14 +67,21 @@ export const UserContextProvider = ({ children }: UserContextProviderProps) => {
         }
         if (
           reason === UpdateReason.LOG_IN ||
-          newLoggedInUser.profilePicture?.objectId !==
-            loggedInUser?.profilePicture?.objectId
+          newLoggedInUser.profilePicture?.id !==
+            loggedInUser?.profilePicture?.id
         ) {
-          new Parse.Query<ParseImage>("Image")
-            .equalTo("objectId", newLoggedInUser.profilePicture?.objectId)
+          console.log(
+            "Querying profile picture: ",
+            newLoggedInUser.profilePicture
+          );
+          new Parse.Query<Parse.Object<Image>>("Image")
+            .equalTo("objectId", newLoggedInUser.profilePicture?.id)
             .first()
             .then((profilePictureResponse) => {
-              setProfilePicture(profilePictureResponse);
+              console.log("Setting profile picture: ", profilePictureResponse);
+              if (profilePictureResponse) {
+                setProfilePicture(new ParseImage(profilePictureResponse));
+              }
             });
         }
       }
@@ -93,7 +95,6 @@ export const UserContextProvider = ({ children }: UserContextProviderProps) => {
     }
     setInitialized(true);
     if (loggedInUser) {
-      console.log("initializing: ", loggedInUser);
       updateLoggedInUser(loggedInUser, UpdateReason.LOG_IN);
     }
   }, [loggedInUser, updateLoggedInUser, initialized, setInitialized]);

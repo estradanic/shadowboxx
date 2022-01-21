@@ -28,6 +28,7 @@ import Parse from "parse";
 import { useParseQuery } from "@parse/react";
 import { useParseQueryOptions } from "../../constants/useParseQueryOptions";
 import { ParseUser, User } from "../../types/User";
+import { ParseImage } from "../../types/Image";
 
 const useStyles = makeStyles((theme: Theme) => ({
   card: {
@@ -111,14 +112,14 @@ const AlbumCard = ({ value: initialValue, onChange }: AlbumCardProps) => {
     value.viewers.query(),
     useParseQueryOptions
   );
-  const { results: images } = useParseQuery(
+  const { results: imagesResults } = useParseQuery(
     value.images.query(),
     useParseQueryOptions
   );
   const { results: ownerResult } = useParseQuery(
     new Parse.Query<Parse.User<User>>("User").equalTo(
       "objectId",
-      value.owner.objectId
+      value.owner.id
     ),
     useParseQueryOptions
   );
@@ -140,6 +141,10 @@ const AlbumCard = ({ value: initialValue, onChange }: AlbumCardProps) => {
   const viewers = useMemo(
     () => viewersResults?.map((viewer) => new ParseUser(viewer)),
     [viewersResults]
+  );
+  const images = useMemo(
+    () => imagesResults?.map((image) => new ParseImage(image)),
+    [imagesResults]
   );
 
   const [isFavorite, setIsFavorite] = useState<boolean>(
@@ -170,7 +175,7 @@ const AlbumCard = ({ value: initialValue, onChange }: AlbumCardProps) => {
     openConfirm(
       Strings.deleteAlbumConfirmation(),
       () => {
-        value
+        value.album
           .destroy()
           .then(() => {
             onChange();
@@ -313,14 +318,15 @@ const AlbumCard = ({ value: initialValue, onChange }: AlbumCardProps) => {
           <IconButton
             onClick={() => {
               const oldIsFavorite = value?.isFavorite;
-              value?.set("isFavorite", !oldIsFavorite);
-              value
+              value.isFavorite = !oldIsFavorite;
+              value.album
                 ?.save()
                 .then((response) => {
-                  setIsFavorite(!!response?.isFavorite);
+                  const savedAlbum = new ParseAlbum(response);
+                  setIsFavorite(!!savedAlbum.isFavorite);
                 })
                 .catch((error) => {
-                  value?.set("isFavorite", oldIsFavorite);
+                  value.isFavorite = oldIsFavorite;
                   enqueueErrorSnackbar(
                     error?.message ?? Strings.editAlbumError()
                   );
@@ -333,14 +339,15 @@ const AlbumCard = ({ value: initialValue, onChange }: AlbumCardProps) => {
             className={classes.public}
             onClick={() => {
               const oldIsPublic = value?.isPublic;
-              value?.set("isPublic", !oldIsPublic);
-              value
+              value.isPublic = !oldIsPublic;
+              value.album
                 ?.save()
                 .then((response) => {
-                  setIsPublic(!!response?.isPublic);
+                  const savedAlbum = new ParseAlbum(response);
+                  setIsPublic(!!savedAlbum.isPublic);
                 })
                 .catch((error) => {
-                  value?.set("isPublic", oldIsPublic);
+                  value.isPublic = oldIsPublic;
                   enqueueErrorSnackbar(
                     error?.message ?? Strings.editAlbumError()
                   );
@@ -357,7 +364,7 @@ const AlbumCard = ({ value: initialValue, onChange }: AlbumCardProps) => {
         handleCancel={() => setEditAlbumDialogOpen(false)}
         handleConfirm={(value) => {
           setEditAlbumDialogOpen(false);
-          value
+          value.album
             ?.save()
             .then(() => {
               onChange();

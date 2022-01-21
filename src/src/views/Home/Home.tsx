@@ -10,7 +10,7 @@ import { Fab, Typography, Grid } from "@material-ui/core";
 import { Add } from "@material-ui/icons";
 import { makeStyles, Theme } from "@material-ui/core/styles";
 import Strings from "../../resources/Strings";
-import { ParseAlbum } from "../../types/Album";
+import { ParseAlbum, Album } from "../../types/Album";
 import BlankCanvas from "../../components/Svgs/BlankCanvas";
 import { useNavigationContext } from "../../app/NavigationContext";
 import Parse from "parse";
@@ -55,11 +55,11 @@ const HomePage = memo(() => {
   const getAlbums = useCallback(() => {
     if (!gotAlbums.current && !globalLoading) {
       setGlobalLoading(true);
-      new Parse.Query<ParseAlbum>("Album")
+      new Parse.Query<Parse.Object<Album>>("Album")
         .equalTo("owner", loggedInUser!.user.toPointer())
         .findAll()
         .then((response) => {
-          setAlbums(response);
+          setAlbums(response.map((album) => new ParseAlbum(album)));
           setGlobalLoading(false);
           gotAlbums.current = true;
         })
@@ -130,23 +130,28 @@ const HomePage = memo(() => {
       <AlbumFormDialog
         resetOnConfirm
         value={
-          new ParseAlbum("Album", {
-            owner: loggedInUser!.user.toPointer(),
-            images: new Parse.Relation(),
-            name: "Untitled Album",
-            collaborators: new Parse.Relation(),
-            viewers: new Parse.Relation(),
-            coOwners: new Parse.Relation(),
-          })
+          new ParseAlbum(
+            new Parse.Object<Album>("Album", {
+              owner: loggedInUser!.user.toPointer(),
+              images: new Parse.Relation(),
+              name: Strings.untitledAlbum(),
+              collaborators: new Parse.Relation(),
+              viewers: new Parse.Relation(),
+              coOwners: new Parse.Relation(),
+            })
+          )
         }
         open={addAlbumDialogOpen}
         handleCancel={() => setAddAlbumDialogOpen(false)}
         handleConfirm={(value) => {
           setAddAlbumDialogOpen(false);
-          value
+          value.album
             .save()
             .then((response) => {
-              enqueueSuccessSnackbar(Strings.addAlbumSuccess(response?.name));
+              const responseAlbum = new ParseAlbum(response);
+              enqueueSuccessSnackbar(
+                Strings.addAlbumSuccess(responseAlbum?.name)
+              );
             })
             .catch((error) => {
               enqueueErrorSnackbar(error?.message ?? Strings.addAlbumError());

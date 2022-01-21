@@ -14,7 +14,7 @@ import Parse from "parse";
 import { ParseUser, User } from "../../types/User";
 import { useParseQuery } from "@parse/react";
 import { useParseQueryOptions } from "../../constants/useParseQueryOptions";
-import { ParseImage } from "../../types/Image";
+import { Image, ParseImage } from "../../types/Image";
 import { useUserContext } from "../../app/UserContext";
 
 const useStyles = makeStyles((theme: Theme) => ({
@@ -59,15 +59,19 @@ const UserChip = memo(
     const { loggedInUser } = useUserContext();
 
     const { results: profilePictureResult } = useParseQuery(
-      new Parse.Query<ParseImage>("Image").equalTo(
+      new Parse.Query<Parse.Object<Image>>("Image").equalTo(
         "objectId",
-        user!.profilePicture?.objectId
+        user!.profilePicture?.id
       ),
       useParseQueryOptions
     );
-    const profilePicture = useMemo(() => profilePictureResult?.[0], [
-      profilePictureResult,
-    ]);
+    const profilePicture = useMemo(
+      () =>
+        profilePictureResult?.[0]
+          ? new ParseImage(profilePictureResult[0])
+          : undefined,
+      [profilePictureResult]
+    );
 
     const resolveUser = useCallback(
       (resolvedUser: ParseUser) => {

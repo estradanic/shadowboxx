@@ -21,7 +21,7 @@ import Strings from "../../resources/Strings";
 import { uniqueId } from "lodash";
 import TextField, { TextFieldProps } from "../Field/TextField";
 import Parse from "parse";
-import { ParseImage } from "../../types/Image";
+import { ParseImage, Image } from "../../types/Image";
 import { useSnackbar } from "../Snackbar/Snackbar";
 import { useImageContext } from "../../app/ImageContext";
 
@@ -147,10 +147,12 @@ const ImageField = ({
   const addImageFromUrl = () => {
     const fileName = imageUrl.substring(imageUrl.lastIndexOf("/") + 1);
     const parseFile = new Parse.File(fileName, { uri: imageUrl });
-    const newImage = new ParseImage("Image", {
-      file: parseFile,
-      isCoverImage: false,
-    });
+    const newImage = new ParseImage(
+      new Parse.Object<Image>("Image", {
+        file: parseFile,
+        isCoverImage: false,
+      })
+    );
     // newImage.set("objectId", `image-${uuid()}`);
 
     setShowUrlInput(false);
@@ -276,14 +278,14 @@ const ImageField = ({
                     fontSize="large"
                     className={classes.coverImage}
                     onClick={async () => {
-                      image.set("isCoverImage", false);
+                      image.isCoverImage = false;
                       try {
-                        await image.save();
+                        await image.image.save();
                       } catch (error: any) {
                         enqueueErrorSnackbar(
                           error?.message ?? Strings.commonError()
                         );
-                        image.set("isCoverImage", true);
+                        image.isCoverImage = true;
                       }
                     }}
                   />
@@ -292,14 +294,14 @@ const ImageField = ({
                     fontSize="large"
                     className={classes.coverImage}
                     onClick={async () => {
-                      image.set("isCoverImage", true);
+                      image.isCoverImage = true;
                       try {
-                        image.save();
+                        image.image.save();
                       } catch (error: any) {
                         enqueueErrorSnackbar(
                           error?.message ?? Strings.commonError()
                         );
-                        image.set("isCoverImage", false);
+                        image.isCoverImage = false;
                       }
                     }}
                   />

@@ -25,6 +25,7 @@ import { useParseQuery } from "@parse/react";
 import { useParseQueryOptions } from "../../constants/useParseQueryOptions";
 import { ImageContextProvider } from "../../app/ImageContext";
 import { ParseUser } from "../../types/User";
+import { ParseImage } from "../../types/Image";
 
 const useStyles = makeStyles((theme: Theme) => ({
   checkboxLabel: {
@@ -92,7 +93,7 @@ const AlbumFormDialog = ({
     value.viewers.query(),
     useParseQueryOptions
   );
-  const { results: images } = useParseQuery(
+  const { results: imagesResults } = useParseQuery(
     value.images.query(),
     useParseQueryOptions
   );
@@ -109,6 +110,10 @@ const AlbumFormDialog = ({
   const viewers = useMemo(
     () => viewersResults?.map((viewer) => new ParseUser(viewer)),
     [viewersResults]
+  );
+  const images = useMemo(
+    () => imagesResults?.map((image) => new ParseImage(image)),
+    [imagesResults]
   );
 
   const classes = useStyles();
@@ -203,7 +208,7 @@ const AlbumFormDialog = ({
               autoComplete="none"
               fullWidth
               value={value.name}
-              onChange={(e) => value.set("name", e.target.value)}
+              onChange={(e) => (value.name = e.target.value)}
               label={Strings.name()}
               id="name"
               type="text"
@@ -214,7 +219,7 @@ const AlbumFormDialog = ({
               autoComplete="none"
               fullWidth
               value={value.description}
-              onChange={(e) => value.set({ description: e.target.value })}
+              onChange={(e) => (value.description = e.target.value)}
               label={Strings.description()}
               id="description"
               type="text"
@@ -229,9 +234,7 @@ const AlbumFormDialog = ({
                     <Checkbox
                       icon={<StarBorder className={classes.favoriteIcon} />}
                       checked={value.isFavorite}
-                      onChange={(_, checked) =>
-                        value.set({ isFavorite: checked })
-                      }
+                      onChange={(_, checked) => (value.isFavorite = checked)}
                       checkedIcon={<Star className={classes.favoriteIcon} />}
                     />
                   }
@@ -250,9 +253,7 @@ const AlbumFormDialog = ({
                     <Checkbox
                       icon={<Public className={classes.publicIcon} />}
                       checked={value.isPublic}
-                      onChange={(_, checked) =>
-                        value.set({ isPublic: checked })
-                      }
+                      onChange={(_, checked) => (value.isPublic = checked)}
                       checkedIcon={
                         <Public className={classes.publicIconChecked} />
                       }
@@ -283,7 +284,7 @@ const AlbumFormDialog = ({
                       )
                       .map((newCoOwner) => newCoOwner.user)
                   );
-                  value.set("coOwners", relation);
+                  value.coOwners = relation;
                 }}
               />
             </Tooltip>
@@ -306,7 +307,7 @@ const AlbumFormDialog = ({
                       )
                       .map((newCollaborator) => newCollaborator.user)
                   );
-                  value.set("collaborators", relation);
+                  value.collaborators = relation;
                 }}
               />
             </Tooltip>
@@ -328,7 +329,7 @@ const AlbumFormDialog = ({
                       )
                       .map((newViewer) => newViewer.user)
                   );
-                  value.set("viewers", relation);
+                  value.viewers = relation;
                 }}
               />
             </Tooltip>
@@ -342,14 +343,16 @@ const AlbumFormDialog = ({
                 onChange={(newImages) => {
                   const relation = value.images;
                   relation.add(
-                    newImages.filter(
-                      (newImage) =>
-                        !!images?.find(
-                          (image) => image.objectId === newImage.objectId
-                        )
-                    )
+                    newImages
+                      .filter(
+                        (newImage) =>
+                          !!images?.find(
+                            (image) => image.objectId === newImage.objectId
+                          )
+                      )
+                      .map((newImage) => newImage.image)
                   );
-                  value.set("images", relation);
+                  value.images = relation;
                 }}
               />
             </ImageContextProvider>

@@ -7,10 +7,26 @@ export interface Attributes {
   createdAt?: Date;
   /** Date object has been last updated in the database */
   updatedAt?: Date;
+
+  [key: string]: any;
 }
 
-export default class Object<T> extends Parse.Object<Attributes & T> {
-  get objectId(): string | undefined {
-    return this.get("objectId");
+export default class Object<A extends Attributes = Attributes> {
+  object: Parse.Object<A>;
+
+  constructor(object: Parse.Object<A>) {
+    this.object = object;
+  }
+
+  get objectId(): A["objectId"] {
+    return this.object.get("objectId") ?? this.object.id;
+  }
+
+  get createdAt(): A["createdAt"] {
+    return this.object.get("createdAt");
+  }
+
+  get updatedAt(): A["updatedAt"] {
+    return this.object.get("updatedAt");
   }
 }

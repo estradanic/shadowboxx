@@ -1,8 +1,8 @@
 import Parse from "parse";
-import Object from "./ParseObject";
+import Object, { Attributes } from "./ParseObject";
 
 /** Interface defining an Image */
-export interface Image {
+export interface Image extends Attributes {
   /** The actual saved file */
   file: Parse.File;
   /** Whether the image is the selected cover image for the album */
@@ -10,19 +10,26 @@ export interface Image {
 }
 
 export class ParseImage extends Object<Image> {
+  image: Parse.Object<Image>;
+
+  constructor(image: Parse.Object<Image>) {
+    super(image);
+    this.image = image;
+  }
+
   get file(): Parse.File {
-    return this.get("file");
+    return this.image.get("file");
   }
 
   set file(file) {
-    this.set("file", file);
+    this.image.set("file", file);
   }
 
   get isCoverImage(): boolean {
-    return this.get("isCoverImage");
+    return this.image.get("isCoverImage");
   }
 
   set isCoverImage(isCoverImage) {
-    this.set("isCoverImage", isCoverImage);
+    this.image.set("isCoverImage", isCoverImage);
   }
 }
