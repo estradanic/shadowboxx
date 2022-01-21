@@ -18,6 +18,14 @@ export default class Object<A extends Attributes = Attributes> {
     this.object = object;
   }
 
+  toPointer(): Parse.Pointer {
+    return this.object.toPointer();
+  }
+
+  get attributes(): A {
+    return this.object.attributes;
+  }
+
   get objectId(): A["objectId"] {
     return this.object.get("objectId") ?? this.object.id;
   }

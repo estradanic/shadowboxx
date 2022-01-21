@@ -129,18 +129,14 @@ const HomePage = memo(() => {
       </Fab>
       <AlbumFormDialog
         resetOnConfirm
-        value={
-          new ParseAlbum(
-            new Parse.Object<Album>("Album", {
-              owner: loggedInUser!.user.toPointer(),
-              images: new Parse.Relation(),
-              name: Strings.untitledAlbum(),
-              collaborators: new Parse.Relation(),
-              viewers: new Parse.Relation(),
-              coOwners: new Parse.Relation(),
-            })
-          )
-        }
+        value={ParseAlbum.fromAttributes({
+          owner: loggedInUser!.user.toPointer(),
+          images: new Parse.Relation(),
+          name: Strings.untitledAlbum(),
+          collaborators: new Parse.Relation(),
+          viewers: new Parse.Relation(),
+          coOwners: new Parse.Relation(),
+        })}
         open={addAlbumDialogOpen}
         handleCancel={() => setAddAlbumDialogOpen(false)}
         handleConfirm={(value) => {

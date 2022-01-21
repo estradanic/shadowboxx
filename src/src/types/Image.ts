@@ -10,11 +10,23 @@ export interface Image extends Attributes {
 }
 
 export class ParseImage extends Object<Image> {
+  static fromAttributes(attributes: Image) {
+    return new ParseImage(new Parse.Object<Image>("Image", attributes));
+  }
+
   image: Parse.Object<Image>;
 
   constructor(image: Parse.Object<Image>) {
     super(image);
     this.image = image;
+  }
+
+  async save() {
+    return new ParseImage(await this.image.save());
+  }
+
+  async destroy() {
+    return await this.image.destroy();
   }
 
   get file(): Parse.File {

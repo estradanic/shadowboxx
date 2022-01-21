@@ -175,7 +175,7 @@ const AlbumCard = ({ value: initialValue, onChange }: AlbumCardProps) => {
     openConfirm(
       Strings.deleteAlbumConfirmation(),
       () => {
-        value.album
+        value
           .destroy()
           .then(() => {
             onChange();
@@ -319,11 +319,10 @@ const AlbumCard = ({ value: initialValue, onChange }: AlbumCardProps) => {
             onClick={() => {
               const oldIsFavorite = value?.isFavorite;
               value.isFavorite = !oldIsFavorite;
-              value.album
+              value
                 ?.save()
                 .then((response) => {
-                  const savedAlbum = new ParseAlbum(response);
-                  setIsFavorite(!!savedAlbum.isFavorite);
+                  setIsFavorite(!!response.isFavorite);
                 })
                 .catch((error) => {
                   value.isFavorite = oldIsFavorite;
@@ -340,11 +339,10 @@ const AlbumCard = ({ value: initialValue, onChange }: AlbumCardProps) => {
             onClick={() => {
               const oldIsPublic = value?.isPublic;
               value.isPublic = !oldIsPublic;
-              value.album
+              value
                 ?.save()
                 .then((response) => {
-                  const savedAlbum = new ParseAlbum(response);
-                  setIsPublic(!!savedAlbum.isPublic);
+                  setIsPublic(!!response.isPublic);
                 })
                 .catch((error) => {
                   value.isPublic = oldIsPublic;
@@ -364,7 +362,7 @@ const AlbumCard = ({ value: initialValue, onChange }: AlbumCardProps) => {
         handleCancel={() => setEditAlbumDialogOpen(false)}
         handleConfirm={(value) => {
           setEditAlbumDialogOpen(false);
-          value.album
+          value
             ?.save()
             .then(() => {
               onChange();

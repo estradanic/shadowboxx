@@ -21,7 +21,7 @@ import Strings from "../../resources/Strings";
 import { uniqueId } from "lodash";
 import TextField, { TextFieldProps } from "../Field/TextField";
 import Parse from "parse";
-import { ParseImage, Image } from "../../types/Image";
+import { ParseImage } from "../../types/Image";
 import { useSnackbar } from "../Snackbar/Snackbar";
 import { useImageContext } from "../../app/ImageContext";
 
@@ -147,13 +147,10 @@ const ImageField = ({
   const addImageFromUrl = () => {
     const fileName = imageUrl.substring(imageUrl.lastIndexOf("/") + 1);
     const parseFile = new Parse.File(fileName, { uri: imageUrl });
-    const newImage = new ParseImage(
-      new Parse.Object<Image>("Image", {
-        file: parseFile,
-        isCoverImage: false,
-      })
-    );
-    // newImage.set("objectId", `image-${uuid()}`);
+    const newImage = ParseImage.fromAttributes({
+      file: parseFile,
+      isCoverImage: false,
+    });
 
     setShowUrlInput(false);
     if (multiple) {
@@ -280,7 +277,7 @@ const ImageField = ({
                     onClick={async () => {
                       image.isCoverImage = false;
                       try {
-                        await image.image.save();
+                        await image.save();
                       } catch (error: any) {
                         enqueueErrorSnackbar(
                           error?.message ?? Strings.commonError()
@@ -296,7 +293,7 @@ const ImageField = ({
                     onClick={async () => {
                       image.isCoverImage = true;
                       try {
-                        image.image.save();
+                        await image.save();
                       } catch (error: any) {
                         enqueueErrorSnackbar(
                           error?.message ?? Strings.commonError()

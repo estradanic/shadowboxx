@@ -70,9 +70,7 @@ export const ImageContextProvider = ({
       );
     }
 
-    let parseImage: ParseImage = new ParseImage(
-      new Parse.Object<Image>("Image", image)
-    );
+    let parseImage: ParseImage = ParseImage.fromAttributes(image);
 
     const action: ImageAction = { image, command: ImageActionCommand.UPLOAD };
     setActions((prev) => [...prev, action]);
@@ -83,7 +81,7 @@ export const ImageContextProvider = ({
     });
 
     try {
-      parseImage = new ParseImage(await parseImage.image.save());
+      parseImage = await parseImage.save();
     } catch (e: any) {
       enqueueErrorSnackbar(
         e?.message ?? Strings.uploadImageError(image.file.name())
@@ -100,13 +98,13 @@ export const ImageContextProvider = ({
   const deleteImage = async (parseImage: ParseImage) => {
     setLoading(true);
     const action: ImageAction = {
-      image: parseImage.image.attributes,
+      image: parseImage.attributes,
       command: ImageActionCommand.DELETE,
     };
     setActions((prev) => [...prev, action]);
 
     try {
-      await parseImage.image.destroy();
+      await parseImage.destroy();
     } catch (e: any) {
       enqueueErrorSnackbar(e?.message ?? Strings.commonError());
     }

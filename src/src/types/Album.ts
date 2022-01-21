@@ -30,11 +30,23 @@ export interface Album extends Attributes {
 }
 
 export class ParseAlbum extends Object<Album> {
+  static fromAttributes(attributes: Album) {
+    return new ParseAlbum(new Parse.Object<Album>("Album", attributes));
+  }
+
   album: Parse.Object<Album>;
 
   constructor(album: Parse.Object<Album>) {
     super(album);
     this.album = album;
+  }
+
+  async save() {
+    return new ParseAlbum(await this.album.save());
+  }
+
+  async destroy() {
+    return await this.album.destroy();
   }
 
   get owner(): Parse.Pointer {
