@@ -34,90 +34,90 @@ export class ParseAlbum extends Object<Album> {
     return new ParseAlbum(new Parse.Object<Album>("Album", attributes));
   }
 
-  album: Parse.Object<Album>;
+  _album: Parse.Object<Album>;
 
   constructor(album: Parse.Object<Album>) {
     super(album);
-    this.album = album;
+    this._album = album;
   }
 
   async save() {
-    return new ParseAlbum(await this.album.save());
+    return new ParseAlbum(await this._album.save());
   }
 
   async destroy() {
-    return await this.album.destroy();
+    return await this._album.destroy();
   }
 
   get owner(): Parse.Pointer {
-    return this.album.get("owner");
+    return this._album.get("owner");
   }
 
   set owner(owner) {
-    this.album.set("owner", owner);
+    this._album.set("owner", owner);
   }
 
   get images(): Parse.Relation<Parse.Object<Album>, Parse.Object<Image>> {
-    return this.album.get("images");
+    return this._album.get("images");
   }
 
   set images(images) {
-    this.album.set("images", images);
+    this._album.set("images", images);
   }
 
   get name(): string {
-    return this.album.get("name");
+    return this._album.get("name");
   }
 
   set name(name) {
-    this.album.set("name", name);
+    this._album.set("name", name);
   }
 
   get description(): string | undefined {
-    return this.album.get("description");
+    return this._album.get("description");
   }
 
   set description(description) {
-    this.album.set("description", description);
+    this._album.set("description", description);
   }
 
   get isFavorite(): boolean | undefined {
-    return this.album.get("isFavorite");
+    return this._album.get("isFavorite");
   }
 
   set isFavorite(isFavorite) {
-    this.album.set("isFavorite", isFavorite);
+    this._album.set("isFavorite", isFavorite);
   }
 
   get isPublic(): boolean | undefined {
-    return this.album.get("isPublic");
+    return this._album.get("isPublic");
   }
 
   set isPublic(isPublic) {
-    this.album.set("isPublic", isPublic);
+    this._album.set("isPublic", isPublic);
   }
 
   get collaborators(): Parse.Relation<Parse.Object<Album>, Parse.User<User>> {
-    return this.album.get("collaborators");
+    return this._album.get("collaborators");
   }
 
   set collaborators(collaborators) {
-    this.album.set("collaborators", collaborators);
+    this._album.set("collaborators", collaborators);
   }
 
   get viewers(): Parse.Relation<Parse.Object<Album>, Parse.User<User>> {
-    return this.album.get("collaborators");
+    return this._album.get("collaborators");
   }
 
   set viewers(collaborators) {
-    this.album.set("collaborators", collaborators);
+    this._album.set("collaborators", collaborators);
   }
 
   get coOwners(): Parse.Relation<Parse.Object<Album>, Parse.User<User>> {
-    return this.album.get("collaborators");
+    return this._album.get("collaborators");
   }
 
   set coOwners(collaborators) {
-    this.album.set("collaborators", collaborators);
+    this._album.set("collaborators", collaborators);
   }
 }

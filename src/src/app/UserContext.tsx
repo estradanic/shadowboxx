@@ -56,10 +56,10 @@ export const UserContextProvider = ({ children }: UserContextProviderProps) => {
         newLoggedInUser.username === loggedInUser.username
       ) {
         if (reason === UpdateReason.LOG_IN) {
-          newLoggedInUser.user.fetch().then((userResponse) => {
+          newLoggedInUser.fetch().then((userResponse) => {
             if (userResponse) {
-              setLoggedInUser(new ParseUser(userResponse));
-              newLoggedInUser = new ParseUser(userResponse);
+              setLoggedInUser(userResponse);
+              newLoggedInUser = userResponse;
             } else {
               console.error(Strings.couldNotGetUserInfo());
             }
@@ -70,15 +70,10 @@ export const UserContextProvider = ({ children }: UserContextProviderProps) => {
           newLoggedInUser.profilePicture?.id !==
             loggedInUser?.profilePicture?.id
         ) {
-          console.log(
-            "Querying profile picture: ",
-            newLoggedInUser.profilePicture
-          );
           new Parse.Query<Parse.Object<Image>>("Image")
             .equalTo("objectId", newLoggedInUser.profilePicture?.id)
             .first()
             .then((profilePictureResponse) => {
-              console.log("Setting profile picture: ", profilePictureResponse);
               if (profilePictureResponse) {
                 setProfilePicture(new ParseImage(profilePictureResponse));
               }

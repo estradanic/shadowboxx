@@ -73,7 +73,7 @@ const UserField = forwardRef(
     const getOptions = debounce((value) => {
       if (!isNullOrWhitespace(value)) {
         new Parse.Query<Parse.Object<Album>>("Album")
-          .equalTo("owner", loggedInUser!.user.toPointer())
+          .equalTo("owner", loggedInUser!.toPointer())
           .findAll()
           .then((response) => {
             response.forEach((albumResponse) => {

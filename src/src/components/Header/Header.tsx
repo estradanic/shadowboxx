@@ -37,6 +37,7 @@ const useStyles = makeStyles((theme: Theme) => ({
     },
   },
   profile: {
+    marginLeft: theme.spacing(1),
     marginRight: theme.spacing(-1.5),
     marginBottom: theme.spacing(1),
   },
@@ -115,10 +116,9 @@ const Header = ({ viewId, ...rest }: HeaderProps) => {
           {loggedInUser && (
             <>
               <Notifications className={classes.notifications} />
-              {profilePicture?.file?.url() ? (
+              <Typography variant="overline">{`${loggedInUser.firstName} ${loggedInUser.lastName}`}</Typography>
+              {!!profilePicture?.file?.url() && (
                 <UserAvatar className={classes.profile} />
-              ) : (
-                <Typography variant="overline">{`${loggedInUser.firstName} ${loggedInUser.lastName}`}</Typography>
               )}
             </>
           )}

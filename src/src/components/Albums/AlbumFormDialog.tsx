@@ -282,7 +282,7 @@ const AlbumFormDialog = ({
                               coOwner.objectId === newCoOwner.objectId
                           )
                       )
-                      .map((newCoOwner) => newCoOwner.user)
+                      .map((newCoOwner) => newCoOwner._user)
                   );
                   value.coOwners = relation;
                 }}
@@ -305,7 +305,7 @@ const AlbumFormDialog = ({
                               collaborator.objectId === newCollaborator.objectId
                           )
                       )
-                      .map((newCollaborator) => newCollaborator.user)
+                      .map((newCollaborator) => newCollaborator._user)
                   );
                   value.collaborators = relation;
                 }}
@@ -327,7 +327,7 @@ const AlbumFormDialog = ({
                             (viewer) => viewer.objectId === newViewer.objectId
                           )
                       )
-                      .map((newViewer) => newViewer.user)
+                      .map((newViewer) => newViewer._user)
                   );
                   value.viewers = relation;
                 }}
@@ -350,7 +350,7 @@ const AlbumFormDialog = ({
                             (image) => image.objectId === newImage.objectId
                           )
                       )
-                      .map((newImage) => newImage.image)
+                      .map((newImage) => newImage._image)
                   );
                   value.images = relation;
                 }}

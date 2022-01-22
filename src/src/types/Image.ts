@@ -14,34 +14,34 @@ export class ParseImage extends Object<Image> {
     return new ParseImage(new Parse.Object<Image>("Image", attributes));
   }
 
-  image: Parse.Object<Image>;
+  _image: Parse.Object<Image>;
 
   constructor(image: Parse.Object<Image>) {
     super(image);
-    this.image = image;
+    this._image = image;
   }
 
   async save() {
-    return new ParseImage(await this.image.save());
+    return new ParseImage(await this._image.save());
   }
 
   async destroy() {
-    return await this.image.destroy();
+    return await this._image.destroy();
   }
 
   get file(): Parse.File {
-    return this.image.get("file");
+    return this._image.get("file");
   }
 
   set file(file) {
-    this.image.set("file", file);
+    this._image.set("file", file);
   }
 
   get isCoverImage(): boolean {
-    return this.image.get("isCoverImage");
+    return this._image.get("isCoverImage");
   }
 
   set isCoverImage(isCoverImage) {
-    this.image.set("isCoverImage", isCoverImage);
+    this._image.set("isCoverImage", isCoverImage);
   }
 }
