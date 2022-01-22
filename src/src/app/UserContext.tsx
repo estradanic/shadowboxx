@@ -5,10 +5,11 @@ import React, {
   useEffect,
   useState,
 } from "react";
-import { ParseUser, UpdateLoggedInUser, UpdateReason } from "../types/User";
+import { ParseUser, UpdateLoggedInUser, UpdateReason, User } from "../types/User";
 import { ParseImage, Image } from "../types/Image";
 import Parse from "parse";
 import Strings from "../resources/Strings";
+import deepEqual from 'deep-equal';
 
 /**
  * Interface defining the return value of the UserContext
@@ -45,6 +46,17 @@ export const UserContextProvider = ({ children }: UserContextProviderProps) => {
   const [profilePicture, setProfilePicture] = useState<
     ParseImage | undefined
   >();
+  const [attributes, setAttributes] = useState<User | undefined>(loggedInUser?.attributes);
+
+  const saveUpdatesInterval = async () => {
+    if (initialized && loggedInUser?.attributes) {
+      if (!deepEqual(loggedInUser.attributes, attributes)) {
+        setLoggedInUser(await loggedInUser.update(updateLoggedInUser));
+        setAttributes(loggedInUser.attributes);
+      }
+      setTimeout(saveUpdatesInterval, 5000);
+    }
+  }
 
   const updateLoggedInUser = useCallback(
     (newLoggedInUser: ParseUser, reason: UpdateReason) => {

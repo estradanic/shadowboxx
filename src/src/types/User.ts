@@ -63,14 +63,14 @@ export class ParseUser {
   async login(updateLoggedInUser: UpdateLoggedInUser, options?: FullOptions) {
     return await this._user.logIn(options).then((loggedInUser) => {
       updateLoggedInUser(new ParseUser(loggedInUser), UpdateReason.LOG_IN);
-      return loggedInUser;
+      return new ParseUser(loggedInUser);
     });
   }
 
   async signup(updateLoggedInUser: UpdateLoggedInUser, options?: FullOptions) {
     return await this._user.signUp(undefined, options).then((loggedInUser) => {
       updateLoggedInUser(new ParseUser(loggedInUser), UpdateReason.SIGN_UP);
-      return loggedInUser;
+      return new ParseUser(loggedInUser);
     });
   }
 
@@ -80,15 +80,19 @@ export class ParseUser {
   ) {
     return await this._user.save(undefined, options).then((loggedInUser) => {
       updateLoggedInUser(new ParseUser(loggedInUser), UpdateReason.UPDATE);
-      return loggedInUser;
+      return new ParseUser(loggedInUser);
     });
   }
 
   async logout(updateLoggedInUser: UpdateLoggedInUser) {
     return await Parse.User.logOut<Parse.User<User>>().then((loggedOutUser) => {
       updateLoggedInUser(new ParseUser(loggedOutUser), UpdateReason.LOG_OUT);
-      return loggedOutUser;
+      return new ParseUser(loggedOutUser);
     });
+  }
+
+  get attributes(): User {
+    return this._user.attributes;
   }
 
   get objectId(): string | undefined {
