@@ -42,6 +42,7 @@ export class ParseUser {
       firstName:
         attributes.firstName ?? attributes.email ?? attributes.username ?? "",
       lastName: attributes.lastName ?? "",
+      profilePicture: attributes.profilePicture,
     };
     return new ParseUser(new Parse.User(fullAttributes));
   };
@@ -52,11 +53,21 @@ export class ParseUser {
     this._user = user;
   }
 
+  isEqual(pi: ParseUser): boolean {
+    return (
+      this.email === pi.email &&
+      this.isDarkThemeEnabled === pi.isDarkThemeEnabled &&
+      this.firstName === pi.firstName &&
+      this.lastName === pi.lastName &&
+      this.profilePicture?.id === pi.profilePicture?.id
+    );
+  }
+
   async fetch() {
     return new ParseUser(await this._user.fetch());
   }
 
-  toPointer() {
+  toPointer(): Parse.Pointer {
     return this._user.toPointer();
   }
 

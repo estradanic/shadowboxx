@@ -27,14 +27,14 @@ export default class Object<A extends Attributes = Attributes> {
   }
 
   get objectId(): A["objectId"] {
-    return this.object.get("objectId") ?? this.object.id;
+    return this.object.id;
   }
 
   get createdAt(): A["createdAt"] {
-    return this.object.get("createdAt");
+    return this.object.createdAt;
   }
 
   get updatedAt(): A["updatedAt"] {
-    return this.object.get("updatedAt");
+    return this.object.updatedAt;
   }
 }

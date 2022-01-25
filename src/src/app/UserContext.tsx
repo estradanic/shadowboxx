@@ -14,7 +14,7 @@ import {
 import { ParseImage, Image } from "../types/Image";
 import Parse from "parse";
 import Strings from "../resources/Strings";
-import deepEqual from "deep-equal";
+import useInterval from "use-interval";
 
 /**
  * Interface defining the return value of the UserContext
@@ -52,18 +52,8 @@ export const UserContextProvider = ({ children }: UserContextProviderProps) => {
     ParseImage | undefined
   >();
   const [attributes, setAttributes] = useState<User | undefined>(
-    loggedInUser?.attributes
+    loggedInUser ? { ...loggedInUser.attributes } : undefined
   );
-
-  const saveUpdatesInterval = async () => {
-    if (initialized && loggedInUser?.attributes) {
-      if (!deepEqual(loggedInUser.attributes, attributes)) {
-        setLoggedInUser(await loggedInUser.update(updateLoggedInUser));
-        setAttributes(loggedInUser.attributes);
-      }
-      setTimeout(saveUpdatesInterval, 5000);
-    }
-  };
 
   const updateLoggedInUser = useCallback(
     (newLoggedInUser: ParseUser, reason: UpdateReason) => {
@@ -102,6 +92,22 @@ export const UserContextProvider = ({ children }: UserContextProviderProps) => {
     },
     [setLoggedInUser, setProfilePicture, loggedInUser]
   );
+
+  const saveLoggedInUserUpdates = async () => {
+    console.log("running");
+    if (
+      initialized &&
+      loggedInUser?.attributes &&
+      attributes &&
+      !loggedInUser.isEqual(ParseUser.fromAttributes(attributes))
+    ) {
+      console.log("not equal");
+      setLoggedInUser(await loggedInUser.update(updateLoggedInUser));
+      setAttributes({ ...loggedInUser.attributes });
+    }
+  };
+
+  useInterval(saveLoggedInUserUpdates, 5000);
 
   useEffect(() => {
     if (initialized) {
