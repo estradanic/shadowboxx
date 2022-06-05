@@ -1,4 +1,5 @@
 import Parse from "parse";
+import Pointer from "./Pointer";
 
 export interface Attributes {
   /** Unique id of the object in the database */
@@ -11,30 +12,39 @@ export interface Attributes {
   [key: string]: any;
 }
 
+/**
+ * Class wrapping the Parse.Object class and providing convenience methods/properties
+ */
 export default class Object<A extends Attributes = Attributes> {
-  object: Parse.Object<A>;
+  static COLUMNS: { [key: string]: string } = {
+    id: "objectId",
+    createdAt: "createdAt",
+    updatedAt: "updatedAt",
+  };
+
+  _object: Parse.Object<A>;
 
   constructor(object: Parse.Object<A>) {
-    this.object = object;
+    this._object = object;
   }
 
-  toPointer(): Parse.Pointer {
-    return this.object.toPointer();
+  toPointer(): Pointer {
+    return new Pointer(this._object.toPointer());
   }
 
   get attributes(): A {
-    return this.object.attributes;
+    return this._object.attributes;
   }
 
-  get objectId(): A["objectId"] {
-    return this.object.id;
+  get id(): A["objectId"] {
+    return this._object.id;
   }
 
   get createdAt(): A["createdAt"] {
-    return this.object.createdAt;
+    return this._object.createdAt;
   }
 
   get updatedAt(): A["updatedAt"] {
-    return this.object.updatedAt;
+    return this._object.updatedAt;
   }
 }

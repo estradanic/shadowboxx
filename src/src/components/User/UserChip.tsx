@@ -60,7 +60,7 @@ const UserChip = memo(
 
     const { results: profilePictureResult } = useParseQuery(
       new Parse.Query<Parse.Object<Image>>("Image").equalTo(
-        "objectId",
+        ParseImage.COLUMNS.id,
         user!.profilePicture?.id
       ),
       useParseQueryOptions

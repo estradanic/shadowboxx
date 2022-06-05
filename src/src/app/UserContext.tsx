@@ -26,6 +26,8 @@ interface UserContextValue {
   profilePicture?: ParseImage;
   /** Function to set the user on login, signup, or save */
   updateLoggedInUser: UpdateLoggedInUser;
+  /** Function to immediately apply updates to the loggedInUser */
+  saveLoggedInUserUpdates: () => Promise<void>;
 }
 
 /**
@@ -68,7 +70,6 @@ export const UserContextProvider = ({ children }: UserContextProviderProps) => {
           newLoggedInUser.fetch().then((userResponse) => {
             if (userResponse) {
               setLoggedInUser(userResponse);
-              newLoggedInUser = userResponse;
             } else {
               console.error(Strings.couldNotGetUserInfo());
             }
@@ -76,11 +77,10 @@ export const UserContextProvider = ({ children }: UserContextProviderProps) => {
         }
         if (
           reason === UpdateReason.LOG_IN ||
-          newLoggedInUser.profilePicture?.id !==
-            loggedInUser?.profilePicture?.id
+          newLoggedInUser.profilePicture?.id !== profilePicture?.id
         ) {
           new Parse.Query<Parse.Object<Image>>("Image")
-            .equalTo("objectId", newLoggedInUser.profilePicture?.id)
+            .equalTo(ParseImage.COLUMNS.id, newLoggedInUser.profilePicture?.id)
             .first()
             .then((profilePictureResponse) => {
               if (profilePictureResponse) {
@@ -90,18 +90,16 @@ export const UserContextProvider = ({ children }: UserContextProviderProps) => {
         }
       }
     },
-    [setLoggedInUser, setProfilePicture, loggedInUser]
+    [setLoggedInUser, setProfilePicture, loggedInUser, profilePicture?.id]
   );
 
   const saveLoggedInUserUpdates = async () => {
-    console.log("running");
     if (
       initialized &&
       loggedInUser?.attributes &&
       attributes &&
       !loggedInUser.isEqual(ParseUser.fromAttributes(attributes))
     ) {
-      console.log("not equal");
       setLoggedInUser(await loggedInUser.update(updateLoggedInUser));
       setAttributes({ ...loggedInUser.attributes });
     }
@@ -123,6 +121,7 @@ export const UserContextProvider = ({ children }: UserContextProviderProps) => {
     loggedInUser,
     profilePicture,
     updateLoggedInUser,
+    saveLoggedInUserUpdates,
   };
 
   return <UserContext.Provider value={value}>{children}</UserContext.Provider>;

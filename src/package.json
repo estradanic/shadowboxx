@@ -60,7 +60,6 @@
     "optimize-css-assets-webpack-plugin": "5.0.4",
     "parse": "^3.4.0",
     "password-hash": "^1.2.2",
-    "patch-package": "^6.4.7",
     "pnp-webpack-plugin": "1.6.4",
     "postcss-flexbugs-fixes": "4.2.1",
     "postcss-loader": "3.0.0",

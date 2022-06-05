@@ -278,8 +278,7 @@ const AlbumFormDialog = ({
                       .filter(
                         (newCoOwner) =>
                           !!coOwners?.find(
-                            (coOwner) =>
-                              coOwner.objectId === newCoOwner.objectId
+                            (coOwner) => coOwner.id === newCoOwner.id
                           )
                       )
                       .map((newCoOwner) => newCoOwner._user)
@@ -302,7 +301,7 @@ const AlbumFormDialog = ({
                         (newCollaborator) =>
                           !!collaborators?.find(
                             (collaborator) =>
-                              collaborator.objectId === newCollaborator.objectId
+                              collaborator.id === newCollaborator.id
                           )
                       )
                       .map((newCollaborator) => newCollaborator._user)
@@ -324,7 +323,7 @@ const AlbumFormDialog = ({
                       .filter(
                         (newViewer) =>
                           !!viewers?.find(
-                            (viewer) => viewer.objectId === newViewer.objectId
+                            (viewer) => viewer.id === newViewer.id
                           )
                       )
                       .map((newViewer) => newViewer._user)
@@ -346,9 +345,7 @@ const AlbumFormDialog = ({
                     newImages
                       .filter(
                         (newImage) =>
-                          !!images?.find(
-                            (image) => image.objectId === newImage.objectId
-                          )
+                          !!images?.find((image) => image.id === newImage.id)
                       )
                       .map((newImage) => newImage._image)
                   );

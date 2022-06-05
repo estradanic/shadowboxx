@@ -118,7 +118,7 @@ const AlbumCard = ({ value: initialValue, onChange }: AlbumCardProps) => {
   );
   const { results: ownerResult } = useParseQuery(
     new Parse.Query<Parse.User<User>>("User").equalTo(
-      "objectId",
+      ParseAlbum.COLUMNS.id,
       value.owner.id
     ),
     useParseQueryOptions

@@ -9,10 +9,19 @@ export interface Image extends Attributes {
   isCoverImage: boolean;
 }
 
+/**
+ * Class wrapping the Parse.Image class and providing convenience methods/properties
+ */
 export class ParseImage extends Object<Image> {
   static fromAttributes(attributes: Image) {
     return new ParseImage(new Parse.Object<Image>("Image", attributes));
   }
+
+  static COLUMNS: { [key: string]: string } = {
+    ...Object.COLUMNS,
+    file: "file",
+    isCoverImage: "isCoverImage",
+  };
 
   _image: Parse.Object<Image>;
 
@@ -30,18 +39,18 @@ export class ParseImage extends Object<Image> {
   }
 
   get file(): Parse.File {
-    return this._image.get("file");
+    return this._image.get(ParseImage.COLUMNS.file);
   }
 
   set file(file) {
-    this._image.set("file", file);
+    this._image.set(ParseImage.COLUMNS.file, file);
   }
 
   get isCoverImage(): boolean {
-    return this._image.get("isCoverImage");
+    return this._image.get(ParseImage.COLUMNS.isCoverImage);
   }
 
   set isCoverImage(isCoverImage) {
-    this._image.set("isCoverImage", isCoverImage);
+    this._image.set(ParseImage.COLUMNS.isCoverImage, isCoverImage);
   }
 }

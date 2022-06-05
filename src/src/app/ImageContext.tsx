@@ -62,16 +62,6 @@ export const ImageContextProvider = ({
   const uploadImage = async (image: Image) => {
     setLoading(true);
 
-    try {
-      image.file = await image.file.save();
-    } catch (e: any) {
-      enqueueErrorSnackbar(
-        e?.message ?? Strings.uploadImageError(image.file.name())
-      );
-    }
-
-    let parseImage: ParseImage = ParseImage.fromAttributes(image);
-
     const action: ImageAction = { image, command: ImageActionCommand.UPLOAD };
     setActions((prev) => [...prev, action]);
 
@@ -80,12 +70,25 @@ export const ImageContextProvider = ({
       icon: <CircularProgress />,
     });
 
+    let failed = false;
     try {
-      parseImage = await parseImage.save();
+      image.file = await image.file.save();
     } catch (e: any) {
+      failed = true;
       enqueueErrorSnackbar(
         e?.message ?? Strings.uploadImageError(image.file.name())
       );
+    }
+
+    let parseImage: ParseImage = ParseImage.fromAttributes(image);
+    if (!failed) {
+      try {
+        parseImage = await parseImage.save();
+      } catch (e: any) {
+        enqueueErrorSnackbar(
+          e?.message ?? Strings.uploadImageError(image.file.name())
+        );
+      }
     }
 
     action.completed = true;

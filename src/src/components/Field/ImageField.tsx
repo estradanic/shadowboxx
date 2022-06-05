@@ -255,16 +255,13 @@ const ImageField = ({
           {value.map((image: ParseImage) => {
             const file = image.file;
             return (
-              <div
-                className={classes.imageWrapper}
-                key={uniqueId(image.objectId)}
-              >
+              <div className={classes.imageWrapper} key={uniqueId(image.id)}>
                 <Remove
                   fontSize="large"
                   className={classes.removeImage}
                   onClick={async () => {
                     const newValue = value.filter(
-                      (valueImage) => image.objectId !== valueImage.objectId
+                      (valueImage) => image.id !== valueImage.id
                     );
                     onChange(newValue);
                     await deleteImage(image);

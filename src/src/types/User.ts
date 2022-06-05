@@ -1,5 +1,6 @@
 import Parse, { FullOptions } from "parse";
 import { Attributes } from "./ParseObject";
+import Pointer from "./Pointer";
 
 export interface User extends Attributes {
   /** Whether email has been verified or not */
@@ -32,7 +33,22 @@ export enum UpdateReason {
   LOG_OUT,
 }
 
+/**
+ * Class wrapping the Parse.User class and providing convenience methods/properties
+ */
 export class ParseUser {
+  static COLUMNS: { [key: string]: string } = {
+    id: "objectId",
+    emailVerified: "emailVerified",
+    password: "password",
+    email: "email",
+    lastName: "lastName",
+    firstName: "firstName",
+    isDarkThemeEnabled: "isDarkThemeEnabled",
+    profilePicture: "profilePicture",
+    username: "username",
+  };
+
   static fromAttributes = (attributes: Partial<User>): ParseUser => {
     const fullAttributes: User = {
       username: attributes.username ?? attributes.email ?? "",
@@ -106,20 +122,20 @@ export class ParseUser {
     return this._user.attributes;
   }
 
-  get objectId(): string | undefined {
-    return this._user.get("objectId") ?? this._user.id;
+  get id(): string | undefined {
+    return this._user.get(ParseUser.COLUMNS.id) ?? this._user.id;
   }
 
   get emailVerified(): boolean | undefined {
-    return this._user.get("emailVerified");
+    return this._user.get(ParseUser.COLUMNS.emailVerified);
   }
 
   set emailVerified(emailVerified) {
-    this._user.set("emailVerified", emailVerified);
+    this._user.set(ParseUser.COLUMNS.emailVerified, emailVerified);
   }
 
   get username(): string {
-    return this._user.get("username");
+    return this._user.get(ParseUser.COLUMNS.username);
   }
 
   set username(username) {
@@ -131,7 +147,7 @@ export class ParseUser {
   }
 
   get email(): string {
-    return this._user.get("email");
+    return this._user.get(ParseUser.COLUMNS.email);
   }
 
   set email(email) {
@@ -139,34 +155,34 @@ export class ParseUser {
   }
 
   get lastName(): string {
-    return this._user.get("lastName");
+    return this._user.get(ParseUser.COLUMNS.lastName);
   }
 
   set lastName(lastName) {
-    this._user.set("lastName", lastName);
+    this._user.set(ParseUser.COLUMNS.lastName, lastName);
   }
 
   get firstName(): string {
-    return this._user.get("firstName");
+    return this._user.get(ParseUser.COLUMNS.firstName);
   }
 
   set firstName(firstName) {
-    this._user.set("firstName", firstName);
+    this._user.set(ParseUser.COLUMNS.firstName, firstName);
   }
 
   get isDarkThemeEnabled(): boolean {
-    return this._user.get("isDarkThemeEnabled");
+    return this._user.get(ParseUser.COLUMNS.isDarkThemeEnabled);
   }
 
   set isDarkThemeEnabled(isDarkThemeEnabled) {
-    this._user.set("isDarkThemeEnabled", isDarkThemeEnabled);
+    this._user.set(ParseUser.COLUMNS.isDarkThemeEnabled, isDarkThemeEnabled);
   }
 
-  get profilePicture(): Parse.Pointer | undefined {
-    return this._user.get("profilePicture");
+  get profilePicture(): Pointer | undefined {
+    return new Pointer(this._user.get(ParseUser.COLUMNS.profilePicture));
   }
 
   set profilePicture(profilePicture) {
-    this._user.set("profilePicture", profilePicture);
+    this._user.set(ParseUser.COLUMNS.profilePicture, profilePicture?._pointer);
   }
 }

@@ -105,7 +105,11 @@ const DefaultErrorState = {
  */
 const Settings = () => {
   useView("Settings");
-  const { loggedInUser, profilePicture, updateLoggedInUser } = useUserContext();
+  const {
+    loggedInUser,
+    profilePicture,
+    saveLoggedInUserUpdates,
+  } = useUserContext();
 
   const classes = useStyles();
   const [loading, setLoading] = useState<boolean>(false);
@@ -114,24 +118,32 @@ const Settings = () => {
       "email" | "firstName" | "lastName" | "password" | "profilePicture"
     >
   >(DefaultErrorState);
+  const [settings, setSettings] = useState({
+    isDarkThemeEnabled: !!loggedInUser?.isDarkThemeEnabled,
+    profilePicture,
+    firstName: loggedInUser?.firstName ?? "",
+    lastName: loggedInUser?.lastName ?? "",
+    email: loggedInUser?.email ?? "",
+  });
+
   const { enqueueErrorSnackbar, enqueueSuccessSnackbar } = useSnackbar();
 
   const validate = (): boolean => {
     const newErrors = { ...DefaultErrorState };
 
-    if (!validateEmail(loggedInUser!.email)) {
+    if (!validateEmail(settings.email)) {
       newErrors.email = {
         isError: true,
-        errorMessage: Strings.invalidEmail(loggedInUser!.email),
+        errorMessage: Strings.invalidEmail(settings.email),
       };
     }
-    if (isNullOrWhitespace(loggedInUser!.firstName)) {
+    if (isNullOrWhitespace(settings.firstName)) {
       newErrors.firstName = {
         isError: true,
         errorMessage: Strings.pleaseEnterA(Strings.firstName()),
       };
     }
-    if (isNullOrWhitespace(loggedInUser!.lastName)) {
+    if (isNullOrWhitespace(settings.lastName)) {
       newErrors.lastName = {
         isError: true,
         errorMessage: Strings.pleaseEnterA(Strings.firstName()),
@@ -151,8 +163,12 @@ const Settings = () => {
   const changeUserInfo = () => {
     if (validate()) {
       setLoading(true);
-      loggedInUser!
-        .update(updateLoggedInUser)
+      loggedInUser!.email = settings.email;
+      loggedInUser!.firstName = settings.firstName;
+      loggedInUser!.lastName = settings.lastName;
+      loggedInUser!.profilePicture = settings.profilePicture?.toPointer();
+      loggedInUser!.isDarkThemeEnabled = settings.isDarkThemeEnabled;
+      saveLoggedInUserUpdates()
         .then(() => {
           enqueueSuccessSnackbar(Strings.settingsSaved());
           setLoading(false);
@@ -185,9 +201,12 @@ const Settings = () => {
                           checked: classes.switchChecked,
                         }}
                         color="primary"
-                        checked={loggedInUser!.isDarkThemeEnabled}
+                        checked={settings.isDarkThemeEnabled}
                         onChange={(_, checked) =>
-                          (loggedInUser!.isDarkThemeEnabled = checked)
+                          setSettings((prev) => ({
+                            ...prev,
+                            isDarkThemeEnabled: checked,
+                          }))
                         }
                         icon={<Brightness7 />}
                         checkedIcon={<Brightness2 />}
@@ -204,10 +223,15 @@ const Settings = () => {
                   <ImageField
                     thumbnailOnly
                     autoComplete="none"
-                    value={profilePicture ? [profilePicture] : []}
-                    onChange={([newProfilePicture]) => {
-                      loggedInUser!.profilePicture = newProfilePicture.toPointer();
-                    }}
+                    value={
+                      settings.profilePicture ? [settings.profilePicture] : []
+                    }
+                    onChange={([newProfilePicture]) =>
+                      setSettings((prev) => ({
+                        ...prev,
+                        profilePicture: newProfilePicture,
+                      }))
+                    }
                     label={Strings.profilePicture()}
                   />
                 </ImageContextProvider>
@@ -218,8 +242,13 @@ const Settings = () => {
                   error={errors.firstName.isError}
                   helperText={errors.firstName.errorMessage}
                   fullWidth
-                  value={loggedInUser!.firstName}
-                  onChange={(e) => (loggedInUser!.firstName = e.target.value)}
+                  value={settings.firstName}
+                  onChange={(e) =>
+                    setSettings((prev) => ({
+                      ...prev,
+                      firstName: e.target.value,
+                    }))
+                  }
                   label={Strings.firstName()}
                   id="firstName"
                   type="text"
@@ -231,8 +260,13 @@ const Settings = () => {
                   error={errors.lastName.isError}
                   helperText={errors.lastName.errorMessage}
                   fullWidth
-                  value={loggedInUser!.lastName}
-                  onChange={(e) => (loggedInUser!.lastName = e.target.value)}
+                  value={settings.lastName}
+                  onChange={(e) =>
+                    setSettings((prev) => ({
+                      ...prev,
+                      lastName: e.target.value,
+                    }))
+                  }
                   label={Strings.lastName()}
                   id="lastName"
                   type="text"
@@ -244,8 +278,10 @@ const Settings = () => {
                   error={errors.email.isError}
                   helperText={errors.email.errorMessage}
                   fullWidth
-                  value={loggedInUser!.email}
-                  onChange={(e) => (loggedInUser!.email = e.target.value)}
+                  value={settings.email}
+                  onChange={(e) =>
+                    setSettings((prev) => ({ ...prev, email: e.target.value }))
+                  }
                   label={Strings.email()}
                   id="email"
                   type="email"
