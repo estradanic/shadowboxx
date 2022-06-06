@@ -5,13 +5,12 @@ import React, {
   useEffect,
   useState,
 } from "react";
-import {
-  ParseUser,
+import ParseUser, {
   UpdateLoggedInUser,
   UpdateReason,
   User,
 } from "../types/User";
-import { ParseImage, Image } from "../types/Image";
+import ParseImage, { Image } from "../types/Image";
 import Parse from "parse";
 import Strings from "../resources/Strings";
 import useInterval from "use-interval";

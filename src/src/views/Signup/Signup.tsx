@@ -19,7 +19,7 @@ import { useNavigationContext } from "../../app/NavigationContext";
 import { useHistory } from "react-router-dom";
 import { useRoutes } from "../../app/routes";
 import { useView } from "../View";
-import { ParseUser } from "../../types/User";
+import ParseUser from "../../types/User";
 import { useUserContext } from "../../app/UserContext";
 
 const useStyles = makeStyles((theme: Theme) => ({

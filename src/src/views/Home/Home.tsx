@@ -10,10 +10,9 @@ import { Fab, Typography, Grid } from "@material-ui/core";
 import { Add } from "@material-ui/icons";
 import { makeStyles, Theme } from "@material-ui/core/styles";
 import Strings from "../../resources/Strings";
-import { ParseAlbum, Album } from "../../types/Album";
+import ParseAlbum from "../../types/Album";
 import BlankCanvas from "../../components/Svgs/BlankCanvas";
 import { useNavigationContext } from "../../app/NavigationContext";
-import Parse from "parse";
 import { useUserContext } from "../../app/UserContext";
 
 const useStyles = makeStyles((theme: Theme) => ({
@@ -55,8 +54,8 @@ const HomePage = memo(() => {
   const getAlbums = useCallback(() => {
     if (!gotAlbums.current && !globalLoading) {
       setGlobalLoading(true);
-      new Parse.Query<Parse.Object<Album>>("Album")
-        .equalTo("owner", loggedInUser!.toPointer())
+      ParseAlbum.query()
+        .equalTo(ParseAlbum.COLUMNS.owner, loggedInUser!.email)
         .findAll()
         .then((response) => {
           setAlbums(response.map((album) => new ParseAlbum(album)));
@@ -130,12 +129,12 @@ const HomePage = memo(() => {
       <AlbumFormDialog
         resetOnConfirm
         value={ParseAlbum.fromAttributes({
-          owner: loggedInUser!.toPointer(),
-          images: new Parse.Relation(),
+          owner: loggedInUser!.email,
+          images: [],
           name: Strings.untitledAlbum(),
-          collaborators: new Parse.Relation(),
-          viewers: new Parse.Relation(),
-          coOwners: new Parse.Relation(),
+          collaborators: [],
+          viewers: [],
+          coOwners: [],
         })}
         open={addAlbumDialogOpen}
         handleCancel={() => setAddAlbumDialogOpen(false)}

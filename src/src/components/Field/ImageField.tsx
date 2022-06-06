@@ -21,7 +21,7 @@ import Strings from "../../resources/Strings";
 import { uniqueId } from "lodash";
 import TextField, { TextFieldProps } from "../Field/TextField";
 import Parse from "parse";
-import { ParseImage } from "../../types/Image";
+import ParseImage from "../../types/Image";
 import { useSnackbar } from "../Snackbar/Snackbar";
 import { useImageContext } from "../../app/ImageContext";
 

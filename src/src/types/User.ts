@@ -1,5 +1,5 @@
 import Parse, { FullOptions } from "parse";
-import { Attributes } from "./ParseObject";
+import { Attributes } from "./Object";
 import Pointer from "./Pointer";
 
 export interface User extends Attributes {
@@ -36,7 +36,7 @@ export enum UpdateReason {
 /**
  * Class wrapping the Parse.User class and providing convenience methods/properties
  */
-export class ParseUser {
+export default class ParseUser {
   static COLUMNS: { [key: string]: string } = {
     id: "objectId",
     emailVerified: "emailVerified",
@@ -48,6 +48,10 @@ export class ParseUser {
     profilePicture: "profilePicture",
     username: "username",
   };
+
+  static query() {
+    return new Parse.Query<Parse.User<User>>("User");
+  }
 
   static fromAttributes = (attributes: Partial<User>): ParseUser => {
     const fullAttributes: User = {
@@ -116,6 +120,10 @@ export class ParseUser {
       updateLoggedInUser(new ParseUser(loggedOutUser), UpdateReason.LOG_OUT);
       return new ParseUser(loggedOutUser);
     });
+  }
+
+  get exists(): boolean {
+    return !!this._user;
   }
 
   get attributes(): User {

@@ -17,18 +17,15 @@ import { MoreVert, Public, Star } from "@material-ui/icons";
 import { useHistory } from "react-router-dom";
 import Strings from "../../resources/Strings";
 import UserAvatar from "../User/UserAvatar";
-import { ParseAlbum } from "../../types/Album";
+import ParseAlbum from "../../types/Album";
 import Empty from "../Svgs/Empty";
 import { useSnackbar } from "../Snackbar/Snackbar";
 import { AlbumFormDialog } from "..";
 import Tooltip from "../Tooltip/Tooltip";
 import { useActionDialogContext } from "../Dialog/ActionDialog";
 import { useRoutes } from "../../app/routes";
-import Parse from "parse";
-import { useParseQuery } from "@parse/react";
-import { useParseQueryOptions } from "../../constants/useParseQueryOptions";
-import { ParseUser, User } from "../../types/User";
-import { ParseImage } from "../../types/Image";
+import ParseUser from "../../types/User";
+import ParseImage from "../../types/Image";
 
 const useStyles = makeStyles((theme: Theme) => ({
   card: {
@@ -96,56 +93,60 @@ export interface AlbumCardProps {
 const AlbumCard = ({ value: initialValue, onChange }: AlbumCardProps) => {
   const [value, setValue] = useState<ParseAlbum>(initialValue);
 
+  const [images, setImages] = useState<ParseImage[]>([]);
+  const [coOwners, setCoOwners] = useState<ParseUser[]>([]);
+  const [collaborators, setCollaborators] = useState<ParseUser[]>([]);
+  const [viewers, setViewers] = useState<ParseUser[]>([]);
+  const [owner, setOwner] = useState<ParseUser>();
+
+  useEffect(() => {
+    ParseUser.query()
+      .equalTo(ParseUser.COLUMNS.email, value.owner)
+      .first()
+      .then((response) => {
+        setOwner(new ParseUser(response!));
+      });
+  }, [value.owner]);
+
+  useEffect(() => {
+    ParseImage.query()
+      .containedIn(ParseImage.COLUMNS.id, value.images)
+      .findAll()
+      .then((response) => {
+        setImages(response.map((image) => new ParseImage(image)));
+      });
+  }, [value.images]);
+
+  useEffect(() => {
+    ParseUser.query()
+      .containedIn(ParseUser.COLUMNS.email, value.coOwners)
+      .findAll()
+      .then((response) => {
+        setCoOwners(response.map((coOwner) => new ParseUser(coOwner)));
+      });
+  }, [value.coOwners]);
+
+  useEffect(() => {
+    ParseUser.query()
+      .containedIn(ParseUser.COLUMNS.email, value.collaborators)
+      .findAll()
+      .then((response) => {
+        setCollaborators(response.map((coOwner) => new ParseUser(coOwner)));
+      });
+  }, [value.collaborators]);
+
+  useEffect(() => {
+    ParseUser.query()
+      .containedIn(ParseUser.COLUMNS.email, value.viewers)
+      .findAll()
+      .then((response) => {
+        setViewers(response.map((coOwner) => new ParseUser(coOwner)));
+      });
+  }, [value.viewers]);
+
   useEffect(() => {
     setValue(initialValue);
   }, [initialValue]);
-
-  const { results: collaboratorsResults } = useParseQuery(
-    value.collaborators.query(),
-    useParseQueryOptions
-  );
-  const { results: coOwnersResults } = useParseQuery(
-    value.coOwners.query(),
-    useParseQueryOptions
-  );
-  const { results: viewersResults } = useParseQuery(
-    value.viewers.query(),
-    useParseQueryOptions
-  );
-  const { results: imagesResults } = useParseQuery(
-    value.images.query(),
-    useParseQueryOptions
-  );
-  const { results: ownerResult } = useParseQuery(
-    new Parse.Query<Parse.User<User>>("User").equalTo(
-      ParseAlbum.COLUMNS.id,
-      value.owner.id
-    ),
-    useParseQueryOptions
-  );
-
-  const owner = useMemo(
-    () =>
-      ownerResult && ownerResult[0] ? new ParseUser(ownerResult[0]) : undefined,
-    [ownerResult]
-  );
-  const collaborators = useMemo(
-    () =>
-      collaboratorsResults?.map((collaborator) => new ParseUser(collaborator)),
-    [collaboratorsResults]
-  );
-  const coOwners = useMemo(
-    () => coOwnersResults?.map((coOwner) => new ParseUser(coOwner)),
-    [coOwnersResults]
-  );
-  const viewers = useMemo(
-    () => viewersResults?.map((viewer) => new ParseUser(viewer)),
-    [viewersResults]
-  );
-  const images = useMemo(
-    () => imagesResults?.map((image) => new ParseImage(image)),
-    [imagesResults]
-  );
 
   const [isFavorite, setIsFavorite] = useState<boolean>(
     value?.isFavorite ?? false
@@ -207,7 +208,7 @@ const AlbumCard = ({ value: initialValue, onChange }: AlbumCardProps) => {
       <Card className={xs ? classes.cardMobile : classes.card}>
         <CardHeader
           classes={{ title: classes.title }}
-          avatar={<UserAvatar user={owner} />}
+          avatar={<UserAvatar email={owner?.email!} fetchUser={() => owner!} />}
           action={
             <>
               <IconButton onClick={(e) => setAnchorEl(e.currentTarget)}>
@@ -273,7 +274,8 @@ const AlbumCard = ({ value: initialValue, onChange }: AlbumCardProps) => {
                     >
                       <UserAvatar
                         className={classes.collaboratorAvatar}
-                        user={coOwner}
+                        email={coOwner.email}
+                        fetchUser={() => coOwner}
                       />
                     </Tooltip>
                   </Grid>
@@ -289,7 +291,8 @@ const AlbumCard = ({ value: initialValue, onChange }: AlbumCardProps) => {
                     >
                       <UserAvatar
                         className={classes.collaboratorAvatar}
-                        user={collaborator}
+                        email={collaborator.email}
+                        fetchUser={() => collaborator}
                       />
                     </Tooltip>
                   </Grid>
@@ -305,7 +308,8 @@ const AlbumCard = ({ value: initialValue, onChange }: AlbumCardProps) => {
                     >
                       <UserAvatar
                         className={classes.collaboratorAvatar}
-                        user={viewer}
+                        email={viewer.email}
+                        fetchUser={() => viewer}
                       />
                     </Tooltip>
                   </Grid>

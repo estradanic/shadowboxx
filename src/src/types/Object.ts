@@ -32,6 +32,10 @@ export default class Object<A extends Attributes = Attributes> {
     return new Pointer(this._object.toPointer());
   }
 
+  get exists(): boolean {
+    return !!this._object;
+  }
+
   get attributes(): A {
     return this._object.attributes;
   }

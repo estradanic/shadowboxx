@@ -1,20 +1,9 @@
-import React, {
-  memo,
-  useCallback,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from "react";
+import React, { memo, useEffect, useRef, useState } from "react";
 import UserLabel from "./UserLabel";
 import UserAvatar from "./UserAvatar";
 import { Chip, ChipProps } from "@material-ui/core";
 import { makeStyles, Theme } from "@material-ui/core/styles";
-import Parse from "parse";
-import { ParseUser, User } from "../../types/User";
-import { useParseQuery } from "@parse/react";
-import { useParseQueryOptions } from "../../constants/useParseQueryOptions";
-import { Image, ParseImage } from "../../types/Image";
+import ParseUser from "../../types/User";
 import { useUserContext } from "../../app/UserContext";
 
 const useStyles = makeStyles((theme: Theme) => ({
@@ -42,107 +31,68 @@ const useStyles = makeStyles((theme: Theme) => ({
 /** Interface defining props for UserChip */
 export interface UserChipProps
   extends Omit<ChipProps, "label" | "icon" | "component" | "classes"> {
-  /** User to display */
-  user?: ParseUser;
   /** Email of the user to display */
-  email?: string;
-  /** Function to run when the user is resolved */
-  onResolve?: (user: ParseUser) => void;
+  email: string;
+  /** Function to get user. If provided, this component does not request data from the server */
+  fetchUser?: () => ParseUser;
 }
 
 /** Component to display the name and profile picture of a user */
-const UserChip = memo(
-  ({ user: piUser, email, onResolve, ...rest }: UserChipProps) => {
-    const classes = useStyles();
-    const mountedRef = useRef(true);
-    const [user, setUser] = useState<ParseUser>();
-    const { loggedInUser } = useUserContext();
+const UserChip = memo(({ email, fetchUser, ...rest }: UserChipProps) => {
+  const classes = useStyles();
+  const mountedRef = useRef(true);
+  const [user, setUser] = useState<ParseUser>();
+  const { loggedInUser } = useUserContext();
 
-    const { results: profilePictureResult } = useParseQuery(
-      new Parse.Query<Parse.Object<Image>>("Image").equalTo(
-        ParseImage.COLUMNS.id,
-        user!.profilePicture?.id
-      ),
-      useParseQueryOptions
-    );
-    const profilePicture = useMemo(
-      () =>
-        profilePictureResult?.[0]
-          ? new ParseImage(profilePictureResult[0])
-          : undefined,
-      [profilePictureResult]
-    );
-
-    const resolveUser = useCallback(
-      (resolvedUser: ParseUser) => {
-        setUser(resolvedUser);
-        onResolve?.(resolvedUser);
-      },
-      [setUser, onResolve]
-    );
-
-    useEffect(() => {
-      if (mountedRef.current) {
-        if (
-          loggedInUser &&
-          ((!piUser && !email) ||
-            (piUser && piUser?.email === loggedInUser.email) ||
-            (email && email === loggedInUser.email))
-        ) {
-          resolveUser(loggedInUser);
-        } else if (
-          (!piUser ||
-            !piUser.firstName ||
-            !piUser.lastName ||
-            !profilePicture?.file?.url()) &&
-          email
-        ) {
-          new Parse.Query<Parse.User<User>>("User")
-            .equalTo("email", piUser?.email ?? email)
-            .first()
-            .then((response) => {
-              if (!response) {
-                resolveUser(
-                  piUser ??
-                    ParseUser.fromAttributes({
-                      username: email,
-                      password: "",
-                      firstName: email,
-                    })
-                );
-              } else {
-                resolveUser(new ParseUser(response));
-              }
-            })
-            .catch(() => {
-              resolveUser(
-                piUser ??
-                  ParseUser.fromAttributes({
-                    username: email,
-                    password: "",
-                    firstName: email,
-                  })
-              );
-            });
-        } else if (piUser) {
-          resolveUser(piUser);
-        }
+  useEffect(() => {
+    if (mountedRef.current) {
+      if (fetchUser) {
+        setUser(fetchUser());
       }
-      mountedRef.current = true;
-      return () => {
-        mountedRef.current = false;
-      };
-    }, [email, loggedInUser, piUser, resolveUser, profilePicture?.file]);
+      if (loggedInUser && email === loggedInUser.email) {
+        setUser(loggedInUser);
+      } else {
+        ParseUser.query()
+          .equalTo(ParseUser.COLUMNS.email, email)
+          .first()
+          .then((response) => {
+            if (!response) {
+              setUser(
+                ParseUser.fromAttributes({
+                  username: email,
+                  password: "",
+                  firstName: email,
+                })
+              );
+            } else {
+              setUser(new ParseUser(response));
+            }
+          })
+          .catch(() => {
+            setUser(
+              ParseUser.fromAttributes({
+                username: email,
+                password: "",
+                firstName: email,
+              })
+            );
+          });
+      }
+    }
+    mountedRef.current = true;
+    return () => {
+      mountedRef.current = false;
+    };
+  }, [email, loggedInUser, setUser, fetchUser]);
 
-    return (
-      <Chip
-        {...rest}
-        classes={classes}
-        icon={<UserAvatar noFetch user={user} />}
-        label={<UserLabel noFetch user={user} />}
-      />
-    );
-  }
-);
+  return (
+    <Chip
+      {...rest}
+      classes={classes}
+      icon={<UserAvatar fetchUser={() => user!} email={user?.email!} />}
+      label={<UserLabel fetchUser={() => user!} email={user?.email!} />}
+    />
+  );
+});
 
 export default UserChip;

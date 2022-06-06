@@ -10,6 +10,10 @@ export default class Pointer {
     this._pointer = pointer;
   }
 
+  get exists(): boolean {
+    return !!this._pointer;
+  }
+
   get id(): string {
     // The type for Pointer in the parse npm module isn't reliable.
     // Check for either objectId or id here.

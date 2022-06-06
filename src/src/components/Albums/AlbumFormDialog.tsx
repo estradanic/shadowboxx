@@ -1,9 +1,9 @@
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useState } from "react";
 import ActionDialog, {
   ActionDialogProps,
   useActionDialogContext,
 } from "../Dialog/ActionDialog";
-import { ParseAlbum } from "../../types/Album";
+import ParseAlbum, { Album } from "../../types/Album";
 import { makeStyles, Theme, useTheme } from "@material-ui/core/styles";
 import Strings from "../../resources/Strings";
 import {
@@ -21,11 +21,9 @@ import { useSnackbar } from "../Snackbar/Snackbar";
 import UserField from "../Field/UserField";
 import TextField from "../Field/TextField";
 import Tooltip from "../Tooltip/Tooltip";
-import { useParseQuery } from "@parse/react";
-import { useParseQueryOptions } from "../../constants/useParseQueryOptions";
 import { ImageContextProvider } from "../../app/ImageContext";
-import { ParseUser } from "../../types/User";
-import { ParseImage } from "../../types/Image";
+import ParseUser from "../../types/User";
+import ParseImage from "../../types/Image";
 
 const useStyles = makeStyles((theme: Theme) => ({
   checkboxLabel: {
@@ -80,41 +78,17 @@ const AlbumFormDialog = ({
   handleConfirm: piHandleConfirm,
   resetOnConfirm,
 }: AlbumFormDialogProps) => {
-  const [value, setValue] = useState<ParseAlbum>(initialValue);
-  const { results: collaboratorsResults } = useParseQuery(
-    value.collaborators.query(),
-    useParseQueryOptions
-  );
-  const { results: coOwnersResults } = useParseQuery(
-    value.coOwners.query(),
-    useParseQueryOptions
-  );
-  const { results: viewersResults } = useParseQuery(
-    value.viewers.query(),
-    useParseQueryOptions
-  );
-  const { results: imagesResults } = useParseQuery(
-    value.images.query(),
-    useParseQueryOptions
-  );
+  const [value, setValue] = useState<Album>(initialValue.attributes);
+  const [images, setImages] = useState<ParseImage[]>([]);
 
-  const collaborators = useMemo(
-    () =>
-      collaboratorsResults?.map((collaborator) => new ParseUser(collaborator)),
-    [collaboratorsResults]
-  );
-  const coOwners = useMemo(
-    () => coOwnersResults?.map((coOwner) => new ParseUser(coOwner)),
-    [coOwnersResults]
-  );
-  const viewers = useMemo(
-    () => viewersResults?.map((viewer) => new ParseUser(viewer)),
-    [viewersResults]
-  );
-  const images = useMemo(
-    () => imagesResults?.map((image) => new ParseImage(image)),
-    [imagesResults]
-  );
+  useEffect(() => {
+    ParseImage.query()
+      .containedIn(ParseImage.COLUMNS.id, value.images)
+      .findAll()
+      .then((response) => {
+        setImages(response.map((image) => new ParseImage(image)));
+      });
+  }, [value.images]);
 
   const classes = useStyles();
   const theme = useTheme();
@@ -131,7 +105,7 @@ const AlbumFormDialog = ({
   const [errors, setErrors] = useState<ErrorState<"name">>(defaultErrors);
 
   const resetState = () => {
-    setValue(initialValue);
+    setValue(initialValue.attributes);
     setErrors(defaultErrors);
   };
 
@@ -158,24 +132,26 @@ const AlbumFormDialog = ({
     return valid;
   };
 
-  const handleConfirm = () => {
+  const handleConfirm = async () => {
     if (validate()) {
-      const nonExistentCollaborators = [
-        ...(viewers ?? []),
-        ...(collaborators ?? []),
-        ...(coOwners ?? []),
-      ].filter((collaborator) => collaborator.email === collaborator.firstName);
-      if (!!nonExistentCollaborators.length) {
-        openConfirm(
-          Strings.nonExistentCollaboratorWarning(
-            nonExistentCollaborators[0].email
-          ),
-          () => {
-            piHandleConfirm(value);
-          }
-        );
+      const valueUsers = new Set([
+        ...value.viewers,
+        ...value.collaborators,
+        ...value.coOwners,
+      ]);
+      const existingUserCount = await new Parse.Query("User")
+        .containedIn(ParseUser.COLUMNS.email, [
+          ...value.viewers,
+          ...value.collaborators,
+          ...value.coOwners,
+        ])
+        .count();
+      if (existingUserCount < valueUsers.size) {
+        openConfirm(Strings.nonExistentUserWarning(), () => {
+          piHandleConfirm(ParseAlbum.fromAttributes(value));
+        });
       } else {
-        piHandleConfirm(value);
+        piHandleConfirm(ParseAlbum.fromAttributes(value));
       }
       if (resetOnConfirm) {
         resetState();
@@ -208,7 +184,9 @@ const AlbumFormDialog = ({
               autoComplete="none"
               fullWidth
               value={value.name}
-              onChange={(e) => (value.name = e.target.value)}
+              onChange={(e) =>
+                setValue((prev) => ({ ...prev, name: e.target.value }))
+              }
               label={Strings.name()}
               id="name"
               type="text"
@@ -219,7 +197,9 @@ const AlbumFormDialog = ({
               autoComplete="none"
               fullWidth
               value={value.description}
-              onChange={(e) => (value.description = e.target.value)}
+              onChange={(e) =>
+                setValue((prev) => ({ ...prev, description: e.target.value }))
+              }
               label={Strings.description()}
               id="description"
               type="text"
@@ -233,8 +213,10 @@ const AlbumFormDialog = ({
                   control={
                     <Checkbox
                       icon={<StarBorder className={classes.favoriteIcon} />}
-                      checked={value.isFavorite}
-                      onChange={(_, checked) => (value.isFavorite = checked)}
+                      checked={!!value.isFavorite}
+                      onChange={(_, checked) =>
+                        setValue((prev) => ({ ...prev, isFavorite: checked }))
+                      }
                       checkedIcon={<Star className={classes.favoriteIcon} />}
                     />
                   }
@@ -252,8 +234,10 @@ const AlbumFormDialog = ({
                   control={
                     <Checkbox
                       icon={<Public className={classes.publicIcon} />}
-                      checked={value.isPublic}
-                      onChange={(_, checked) => (value.isPublic = checked)}
+                      checked={!!value.isPublic}
+                      onChange={(_, checked) =>
+                        setValue((prev) => ({ ...prev, isPublic: checked }))
+                      }
                       checkedIcon={
                         <Public className={classes.publicIconChecked} />
                       }
@@ -269,67 +253,42 @@ const AlbumFormDialog = ({
           <Grid item xs={12}>
             <Tooltip title={Strings.coOwnersTooltip()}>
               <UserField
-                value={coOwners!}
+                value={value.coOwners}
                 label={Strings.coOwners()}
-                onChange={async (newCoOwners) => {
-                  const relation = value.coOwners;
-                  relation.add(
-                    newCoOwners
-                      .filter(
-                        (newCoOwner) =>
-                          !!coOwners?.find(
-                            (coOwner) => coOwner.id === newCoOwner.id
-                          )
-                      )
-                      .map((newCoOwner) => newCoOwner._user)
-                  );
-                  value.coOwners = relation;
-                }}
+                onChange={(coOwners) =>
+                  setValue((prev) => ({
+                    ...prev,
+                    coOwners,
+                  }))
+                }
               />
             </Tooltip>
           </Grid>
           <Grid item xs={12}>
             <Tooltip title={Strings.collaboratorsTooltip()}>
               <UserField
-                value={collaborators!}
+                value={value.collaborators}
                 label={Strings.collaborators()}
-                onChange={(newCollaborators) => {
-                  const relation = value.collaborators;
-                  relation.add(
-                    newCollaborators
-                      .filter(
-                        (newCollaborator) =>
-                          !!collaborators?.find(
-                            (collaborator) =>
-                              collaborator.id === newCollaborator.id
-                          )
-                      )
-                      .map((newCollaborator) => newCollaborator._user)
-                  );
-                  value.collaborators = relation;
-                }}
+                onChange={(collaborators) =>
+                  setValue((prev) => ({
+                    ...prev,
+                    collaborators,
+                  }))
+                }
               />
             </Tooltip>
           </Grid>
           <Grid item xs={12}>
             <Tooltip title={Strings.viewersTooltip()}>
               <UserField
-                value={viewers!}
+                value={value.viewers}
                 label={Strings.viewers()}
-                onChange={(newViewers) => {
-                  const relation = value.viewers;
-                  relation.add(
-                    newViewers
-                      .filter(
-                        (newViewer) =>
-                          !!viewers?.find(
-                            (viewer) => viewer.id === newViewer.id
-                          )
-                      )
-                      .map((newViewer) => newViewer._user)
-                  );
-                  value.viewers = relation;
-                }}
+                onChange={(viewers) =>
+                  setValue((prev) => ({
+                    ...prev,
+                    viewers,
+                  }))
+                }
               />
             </Tooltip>
           </Grid>
@@ -338,19 +297,13 @@ const AlbumFormDialog = ({
               <ImageField
                 label={Strings.images()}
                 multiple
-                value={images!}
-                onChange={(newImages) => {
-                  const relation = value.images;
-                  relation.add(
-                    newImages
-                      .filter(
-                        (newImage) =>
-                          !!images?.find((image) => image.id === newImage.id)
-                      )
-                      .map((newImage) => newImage._image)
-                  );
-                  value.images = relation;
-                }}
+                value={images}
+                onChange={(images) =>
+                  setValue((prev) => ({
+                    ...prev,
+                    images: images.map((image) => image.id!),
+                  }))
+                }
               />
             </ImageContextProvider>
           </Grid>

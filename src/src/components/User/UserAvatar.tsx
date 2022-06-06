@@ -1,10 +1,15 @@
-import React, { ForwardedRef, forwardRef, useEffect, useState } from "react";
+import React, {
+  ForwardedRef,
+  forwardRef,
+  useCallback,
+  useEffect,
+  useState,
+} from "react";
 import { Avatar, AvatarProps } from "@material-ui/core";
 import { makeStyles, Theme } from "@material-ui/core/styles";
 import cx from "classnames";
-import Parse from "parse";
-import { ParseUser, User } from "../../types/User";
-import { ParseImage, Image } from "../../types/Image";
+import ParseUser from "../../types/User";
+import ParseImage from "../../types/Image";
 import { useUserContext } from "../../app/UserContext";
 
 const useStyles = makeStyles((theme: Theme) => ({
@@ -17,24 +22,16 @@ const useStyles = makeStyles((theme: Theme) => ({
 
 /** Interface defining props for UserAvatar */
 export interface UserAvatarProps extends AvatarProps {
-  /** User to display */
-  user?: ParseUser;
   /** Email of the user to display */
-  email?: string;
-  /** Do not try to fetch user info from the server */
-  noFetch?: boolean;
+  email: string;
+  /** Function to get user. If provided, this component does not request data from the server */
+  fetchUser?: () => ParseUser;
 }
 
 /** Component to display the profile picture of a user */
 const UserAvatar = forwardRef(
   (
-    {
-      user,
-      email,
-      noFetch = false,
-      className: piClassName = "",
-      ...rest
-    }: UserAvatarProps,
+    { email, fetchUser, className: piClassName = "", ...rest }: UserAvatarProps,
     ref: ForwardedRef<any>
   ) => {
     const classes = useStyles();
@@ -43,59 +40,58 @@ const UserAvatar = forwardRef(
     const [firstName, setFirstName] = useState("");
     const [lastName, setLastName] = useState("");
 
+    const setProfilePicture = useCallback(
+      (user: ParseUser) => {
+        if (user && user.profilePicture?.exists) {
+          ParseImage.query()
+            .equalTo(ParseImage.COLUMNS.id, user.profilePicture.id)
+            .first()
+            .then((profilePictureResponse) => {
+              if (profilePictureResponse) {
+                const newProfilePicture = new ParseImage(
+                  profilePictureResponse
+                );
+                setSrc(newProfilePicture?.file.url() ?? "");
+              }
+            });
+        }
+      },
+      [setSrc]
+    );
+
     useEffect(() => {
-      if (
-        (!user && !email) ||
-        (user && user?.email === loggedInUser?.email) ||
-        (email && email === loggedInUser?.email)
-      ) {
+      if (fetchUser) {
+        const user = fetchUser();
+        setFirstName(user?.firstName ?? user?.email ?? email);
+        setLastName(user?.lastName ?? "");
+        setProfilePicture(user);
+      } else if (email === loggedInUser?.email) {
         setSrc(profilePicture?.file.url() ?? "");
         setFirstName(loggedInUser?.firstName ?? "");
         setLastName(loggedInUser?.lastName ?? "");
-      } else if (
-        (!user ||
-          !user?.firstName ||
-          !user?.lastName ||
-          !profilePicture?.file?.url()) &&
-        !noFetch
-      ) {
-        new Parse.Query<Parse.User<User>>("User")
-          .equalTo("email", user?.email ?? email ?? "")
+      } else {
+        ParseUser.query()
+          .equalTo(ParseUser.COLUMNS.email, email)
           .first()
           .then((response) => {
             if (response) {
               const fetchedUser = new ParseUser(response);
-              new Parse.Query<Parse.Object<Image>>("Image")
-                .equalTo(ParseImage.COLUMNS.id, fetchedUser?.profilePicture?.id)
-                .first()
-                .then((profilePictureResponse) => {
-                  if (profilePictureResponse) {
-                    const newProfilePicture = new ParseImage(
-                      profilePictureResponse
-                    );
-                    setSrc(
-                      newProfilePicture?.file.url() ??
-                        profilePicture?.file?.url() ??
-                        ""
-                    );
-                  }
-                });
-              setFirstName(
-                fetchedUser?.firstName ??
-                  user?.firstName ??
-                  user?.email ??
-                  email ??
-                  ""
-              );
-              setLastName(fetchedUser?.lastName ?? user?.lastName ?? "");
+              setProfilePicture(fetchedUser);
+              setFirstName(fetchedUser?.firstName ?? email);
+              setLastName(fetchedUser?.lastName ?? "");
+            } else {
+              setFirstName(email);
+              setLastName("");
             }
           });
-      } else {
-        setSrc(profilePicture?.file?.url() ?? "");
-        setFirstName(user?.firstName ?? user?.email ?? email ?? "");
-        setLastName(user?.lastName ?? "");
       }
-    }, [user, email, loggedInUser, noFetch, profilePicture?.file]);
+    }, [
+      email,
+      loggedInUser,
+      fetchUser,
+      profilePicture?.file,
+      setProfilePicture,
+    ]);
 
     return (
       <Avatar

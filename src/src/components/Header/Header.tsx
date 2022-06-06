@@ -118,7 +118,10 @@ const Header = ({ viewId, ...rest }: HeaderProps) => {
               <Notifications className={classes.notifications} />
               <Typography variant="overline">{`${loggedInUser.firstName} ${loggedInUser.lastName}`}</Typography>
               {!!profilePicture?.file?.url() && (
-                <UserAvatar className={classes.profile} />
+                <UserAvatar
+                  email={loggedInUser.email}
+                  className={classes.profile}
+                />
               )}
             </>
           )}

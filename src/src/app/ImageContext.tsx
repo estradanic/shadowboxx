@@ -3,7 +3,7 @@ import { useNotificationsContext } from "./NotificationsContext";
 import Strings from "../resources/Strings";
 import { CircularProgress } from "@material-ui/core";
 import { useSnackbar } from "../components";
-import { ParseImage, Image } from "../types/Image";
+import ParseImage, { Image } from "../types/Image";
 
 export enum ImageActionCommand {
   DELETE,

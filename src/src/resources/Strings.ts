@@ -85,8 +85,8 @@ const Strings: { [key: string]: (params?: any) => string } = {
   noAlbums: () => "No Albums",
   noEmailExists: (email: string) => `Email doesn't exist (${email})`,
   noImageExists: (fileName: string) => `Image doesn't exist (${fileName})`,
-  nonExistentCollaboratorWarning: (collaborator: string) =>
-    `You are adding a collaborator that does not currently have a Shadowbox account (${collaborator}). This will open up access to your album to the first person who creates an account with that email. This may pose a privacy/security risk. Do you wish to continue?`,
+  nonExistentUserWarning: () =>
+    `You are adding at least one user that does not currently have a Shadowbox account. This will open up access to your album to the first person who creates an account with that email. This may pose a privacy/security risk. Do you wish to continue?`,
   noNotifications: () => "You're all caught up! :)",
   noNotificationsDetail: () => "No Notifications",
   noSessionId: () => "No session id provided",

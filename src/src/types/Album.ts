@@ -1,15 +1,12 @@
 import Parse from "parse";
-import { Image } from "./Image";
-import Object, { Attributes } from "./ParseObject";
-import { User } from "./User";
-import Pointer from "./Pointer";
+import Object, { Attributes } from "./Object";
 
 /** Interface defining an Album */
 export interface Album extends Attributes {
   /** User that owns this album */
-  owner: Parse.Pointer;
+  owner: string;
   /** Images in the album */
-  images: Parse.Relation<Parse.Object<Album>, Parse.Object<Image>>;
+  images: string[];
   /** Name of the album */
   name: string;
   /** Description of the album */
@@ -19,11 +16,11 @@ export interface Album extends Attributes {
   /** Whether the album is publicly viewable or not */
   isPublic?: boolean;
   /** Collaborators with "put" access */
-  collaborators: Parse.Relation<Parse.Object<Album>, Parse.User<User>>;
+  collaborators: string[];
   /** Collaborators with "view" access */
-  viewers: Parse.Relation<Parse.Object<Album>, Parse.User<User>>;
+  viewers: string[];
   /** Collaborators with "edit" access */
-  coOwners: Parse.Relation<Parse.Object<Album>, Parse.User<User>>;
+  coOwners: string[];
   /** Last edited date */
   updatedAt?: Date;
   /** Created date */
@@ -33,7 +30,7 @@ export interface Album extends Attributes {
 /**
  * Class wrapping the Parse.Album class and providing convenience methods/properties
  */
-export class ParseAlbum extends Object<Album> {
+export default class ParseAlbum extends Object<Album> {
   static COLUMNS: { [key: string]: string } = {
     ...Object.COLUMNS,
     owner: "owner",
@@ -46,6 +43,10 @@ export class ParseAlbum extends Object<Album> {
     coOwners: "coOwners",
     viewers: "viewers",
   };
+
+  static query() {
+    return new Parse.Query<Parse.Object<Album>>("Album");
+  }
 
   static fromAttributes(attributes: Album) {
     return new ParseAlbum(new Parse.Object<Album>("Album", attributes));
@@ -66,15 +67,15 @@ export class ParseAlbum extends Object<Album> {
     return await this._album.destroy();
   }
 
-  get owner(): Pointer {
-    return new Pointer(this._album.get(ParseAlbum.COLUMNS.owner));
+  get owner(): Album["owner"] {
+    return this._album.get(ParseAlbum.COLUMNS.owner);
   }
 
   set owner(owner) {
-    this._album.set(ParseAlbum.COLUMNS.owner, owner._pointer);
+    this._album.set(ParseAlbum.COLUMNS.owner, owner);
   }
 
-  get images(): Parse.Relation<Parse.Object<Album>, Parse.Object<Image>> {
+  get images(): Album["images"] {
     return this._album.get(ParseAlbum.COLUMNS.images);
   }
 
@@ -82,7 +83,7 @@ export class ParseAlbum extends Object<Album> {
     this._album.set(ParseAlbum.COLUMNS.images, images);
   }
 
-  get name(): string {
+  get name(): Album["name"] {
     return this._album.get(ParseAlbum.COLUMNS.name);
   }
 
@@ -90,7 +91,7 @@ export class ParseAlbum extends Object<Album> {
     this._album.set(ParseAlbum.COLUMNS.name, name);
   }
 
-  get description(): string | undefined {
+  get description(): Album["description"] {
     return this._album.get(ParseAlbum.COLUMNS.description);
   }
 
@@ -98,7 +99,7 @@ export class ParseAlbum extends Object<Album> {
     this._album.set(ParseAlbum.COLUMNS.description, description);
   }
 
-  get isFavorite(): boolean | undefined {
+  get isFavorite(): Album["isFavorite"] {
     return this._album.get(ParseAlbum.COLUMNS.isFavorite);
   }
 
@@ -106,7 +107,7 @@ export class ParseAlbum extends Object<Album> {
     this._album.set(ParseAlbum.COLUMNS.isFavorite, isFavorite);
   }
 
-  get isPublic(): boolean | undefined {
+  get isPublic(): Album["isPublic"] {
     return this._album.get(ParseAlbum.COLUMNS.isPublic);
   }
 
@@ -114,7 +115,7 @@ export class ParseAlbum extends Object<Album> {
     this._album.set(ParseAlbum.COLUMNS.isPublic, isPublic);
   }
 
-  get collaborators(): Parse.Relation<Parse.Object<Album>, Parse.User<User>> {
+  get collaborators(): Album["collaborators"] {
     return this._album.get(ParseAlbum.COLUMNS.collaborators);
   }
 
@@ -122,19 +123,19 @@ export class ParseAlbum extends Object<Album> {
     this._album.set(ParseAlbum.COLUMNS.collaborators, collaborators);
   }
 
-  get viewers(): Parse.Relation<Parse.Object<Album>, Parse.User<User>> {
+  get viewers(): Album["viewers"] {
     return this._album.get(ParseAlbum.COLUMNS.viewers);
   }
 
-  set viewers(collaborators) {
-    this._album.set(ParseAlbum.COLUMNS.viewers, collaborators);
+  set viewers(viewers) {
+    this._album.set(ParseAlbum.COLUMNS.viewers, viewers);
   }
 
-  get coOwners(): Parse.Relation<Parse.Object<Album>, Parse.User<User>> {
+  get coOwners(): Album["coOwners"] {
     return this._album.get(ParseAlbum.COLUMNS.coOwners);
   }
 
-  set coOwners(collaborators) {
-    this._album.set(ParseAlbum.COLUMNS.coOwners, collaborators);
+  set coOwners(coOwners) {
+    this._album.set(ParseAlbum.COLUMNS.coOwners, coOwners);
   }
 }

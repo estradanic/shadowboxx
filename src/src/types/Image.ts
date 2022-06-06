@@ -1,5 +1,5 @@
 import Parse from "parse";
-import Object, { Attributes } from "./ParseObject";
+import Object, { Attributes } from "./Object";
 
 /** Interface defining an Image */
 export interface Image extends Attributes {
@@ -12,9 +12,13 @@ export interface Image extends Attributes {
 /**
  * Class wrapping the Parse.Image class and providing convenience methods/properties
  */
-export class ParseImage extends Object<Image> {
+export default class ParseImage extends Object<Image> {
   static fromAttributes(attributes: Image) {
     return new ParseImage(new Parse.Object<Image>("Image", attributes));
+  }
+
+  static query() {
+    return new Parse.Query<Parse.Object<Image>>("Image");
   }
 
   static COLUMNS: { [key: string]: string } = {
