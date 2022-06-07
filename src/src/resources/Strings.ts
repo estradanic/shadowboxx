@@ -86,7 +86,9 @@ const Strings: { [key: string]: (params?: any) => string } = {
   noEmailExists: (email: string) => `Email doesn't exist (${email})`,
   noImageExists: (fileName: string) => `Image doesn't exist (${fileName})`,
   nonExistentUserWarning: () =>
-    `You are adding at least one user that does not currently have a Shadowbox account. This will open up access to your album to the first person who creates an account with that email. This may pose a privacy/security risk. Do you wish to continue?`,
+    `You are saving this album with at least one user that does not currently have a Shadowbox account.
+    This will open up access to your album to the first person who creates an account with that email.
+    This may pose a privacy/security risk. Do you wish to continue?`,
   noNotifications: () => "You're all caught up! :)",
   noNotificationsDetail: () => "No Notifications",
   noSessionId: () => "No session id provided",
@@ -98,8 +100,10 @@ const Strings: { [key: string]: (params?: any) => string } = {
   public: () => "Public",
   publicTooltip: () =>
     "Should this album be viewable by anyone with a link? (Overrides Viewers)",
+  removeImage: () => "Remove image from album",
   removeImageError: (fileName) =>
     `Could not remove image ${fileName} from album.`,
+  setImageAsCover: () => "Set this image as the album cover",
   settings: () => "Settings",
   settingsNotSaved: () => `${Strings.commonError()} Settings not saved.`,
   settingsSaved: () => "Settings saved successfully",
@@ -108,6 +112,7 @@ const Strings: { [key: string]: (params?: any) => string } = {
   submit: () => "Submit",
   tryAddingAlbum: () => "Try adding one below",
   unlockPassword: () => "Change Password",
+  unsetCoverImage: () => "Unset this image as the album cover",
   untitledAlbum: () => "Untitled Album",
   updateImageError: (fileName) => `Error updating image ${fileName}.`,
   uploadImageError: (fileName) => `Error uploading image ${fileName}.`,

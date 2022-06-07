@@ -1,7 +1,6 @@
 import React, { useState, memo } from "react";
 import {
   InputAdornment,
-  Tooltip,
   Avatar,
   Typography,
   LinearProgress,
@@ -20,6 +19,7 @@ import { elide } from "../../utils/stringUtils";
 import Strings from "../../resources/Strings";
 import { uniqueId } from "lodash";
 import TextField, { TextFieldProps } from "../Field/TextField";
+import Tooltip from "../Tooltip/Tooltip";
 import Parse from "parse";
 import ParseImage from "../../types/Image";
 import { useSnackbar } from "../Snackbar/Snackbar";
@@ -223,7 +223,7 @@ const ImageField = memo(
             endAdornment: (
               <>
                 <InputAdornment onClick={openUrlInput} position="end">
-                  <Tooltip arrow title={Strings.addFromUrl()}>
+                  <Tooltip title={Strings.addFromUrl()}>
                     <Link className={classes.endAdornment} />
                   </Tooltip>
                 </InputAdornment>
@@ -231,7 +231,7 @@ const ImageField = memo(
                   position="end"
                   onClick={() => document.getElementById(inputId)?.click()}
                 >
-                  <Tooltip arrow title={Strings.addFromFile()}>
+                  <Tooltip title={Strings.addFromFile()}>
                     <AddAPhoto className={classes.endAdornment} />
                   </Tooltip>
                 </InputAdornment>
@@ -268,65 +268,73 @@ const ImageField = memo(
               const file = image.file;
               return (
                 <div className={classes.imageWrapper} key={uniqueId(image.id)}>
-                  <Remove
-                    fontSize="large"
-                    className={classes.removeImage}
-                    onClick={async () => {
-                      const newValue = value.filter(
-                        (valueImage) => image.id !== valueImage.id
-                      );
-                      onChange(newValue);
-                      await deleteImage(image);
-                    }}
-                  />
-                  {image.isCoverImage ? (
-                    <Star
+                  <Tooltip title={Strings.removeImage()}>
+                    <Remove
                       fontSize="large"
-                      className={classes.coverImage}
+                      className={classes.removeImage}
                       onClick={async () => {
-                        const newValue = [...value];
-                        image.isCoverImage = false;
-                        try {
-                          newValue[index] = await image.save();
-                          onChange(newValue);
-                        } catch (error: any) {
-                          enqueueErrorSnackbar(
-                            error?.message ?? Strings.commonError()
+                        const newValue = value.filter(
+                          (valueImage) => image.id !== valueImage.id
+                        );
+                        onChange(newValue);
+                        await deleteImage(image);
+                      }}
+                    />
+                  </Tooltip>
+                  {image.isCoverImage ? (
+                    <Tooltip title={Strings.unsetCoverImage()}>
+                      <Star
+                        fontSize="large"
+                        className={classes.coverImage}
+                        onClick={async () => {
+                          const newValue = [...value];
+                          image.isCoverImage = false;
+                          try {
+                            newValue[index] = await image.save();
+                            onChange(newValue);
+                          } catch (error: any) {
+                            enqueueErrorSnackbar(
+                              error?.message ?? Strings.commonError()
+                            );
+                            image.isCoverImage = true;
+                          }
+                        }}
+                      />
+                    </Tooltip>
+                  ) : (
+                    <Tooltip title={Strings.setImageAsCover()}>
+                      <StarBorder
+                        fontSize="large"
+                        className={classes.coverImage}
+                        onClick={async () => {
+                          const newValue = [...value];
+                          const currentCoverImageIndex = value.findIndex(
+                            (i) => i.isCoverImage
                           );
                           image.isCoverImage = true;
-                        }
-                      }}
-                    />
-                  ) : (
-                    <StarBorder
-                      fontSize="large"
-                      className={classes.coverImage}
-                      onClick={async () => {
-                        const newValue = [...value];
-                        const currentCoverImageIndex = value.findIndex(
-                          (i) => i.isCoverImage
-                        );
-                        image.isCoverImage = true;
-                        try {
-                          if (currentCoverImageIndex !== -1) {
-                            value[currentCoverImageIndex].isCoverImage = false;
-                            newValue[currentCoverImageIndex] = await value[
-                              currentCoverImageIndex
-                            ].save();
+                          try {
+                            if (currentCoverImageIndex !== -1) {
+                              value[
+                                currentCoverImageIndex
+                              ].isCoverImage = false;
+                              newValue[currentCoverImageIndex] = await value[
+                                currentCoverImageIndex
+                              ].save();
+                            }
+                            newValue[index] = await image.save();
+                            onChange(newValue);
+                          } catch (error: any) {
+                            enqueueErrorSnackbar(
+                              error?.message ?? Strings.commonError()
+                            );
+                            image.isCoverImage = false;
+                            if (currentCoverImageIndex !== -1) {
+                              value[currentCoverImageIndex].isCoverImage = true;
+                            }
                           }
-                          newValue[index] = await image.save();
-                          onChange(newValue);
-                        } catch (error: any) {
-                          enqueueErrorSnackbar(
-                            error?.message ?? Strings.commonError()
-                          );
-                          image.isCoverImage = false;
-                          if (currentCoverImageIndex !== -1) {
-                            value[currentCoverImageIndex].isCoverImage = true;
-                          }
-                        }
-                      }}
-                    />
+                        }}
+                      />
+                    </Tooltip>
                   )}
                   <img
                     className={classes.multiImage}
