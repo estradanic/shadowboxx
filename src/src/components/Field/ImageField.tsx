@@ -42,10 +42,13 @@ const useStyles = makeStyles((theme: Theme) => ({
     maxWidth: "100%",
     width: theme.spacing(35),
     display: "block",
+    borderRadius: theme.spacing(0.5),
+    overflow: "hidden",
   },
   multiImageContainer: {
     textAlign: "center",
-    backgroundColor: theme.palette.text.disabled,
+    backgroundColor: theme.palette.grey[50],
+    border: `1px solid ${theme.palette.divider}`,
     margin: theme.spacing(2),
     borderRadius: theme.spacing(0.5),
     padding: theme.spacing(2),
@@ -61,9 +64,10 @@ const useStyles = makeStyles((theme: Theme) => ({
     zIndex: 99,
     marginLeft: theme.spacing(-1),
     marginTop: theme.spacing(-1),
+    border: `2px solid ${theme.palette.error.contrastText}`,
   },
   coverImage: {
-    backgroundColor: theme.palette.background.paper,
+    backgroundColor: theme.palette.warning.contrastText,
     borderRadius: "100%",
     color: theme.palette.warning.main,
     position: "absolute",
@@ -80,7 +84,7 @@ const useStyles = makeStyles((theme: Theme) => ({
     width: "fit-content",
     height: "fit-content",
     margin: theme.spacing(1),
-    backgroundColor: theme.palette.background.paper,
+    backgroundColor: "transparent",
   },
   main: {
     "& > div": {

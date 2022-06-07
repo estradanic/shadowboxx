@@ -3,7 +3,7 @@ import ActionDialog, {
   ActionDialogProps,
   useActionDialogContext,
 } from "../Dialog/ActionDialog";
-import ParseAlbum, { Album } from "../../types/Album";
+import { Album } from "../../types/Album";
 import { makeStyles, Theme, useTheme } from "@material-ui/core/styles";
 import Strings from "../../resources/Strings";
 import {

@@ -44,9 +44,13 @@ const theme = createMuiTheme({
       contrastText: "#FFFFFF",
       light: "#E79732",
     },
+    divider: "#111111",
     background: {
       default: "#1B71B5",
       paper: "#FFFFFF",
+    },
+    grey: {
+      50: "#EEEEEE",
     },
   },
 });

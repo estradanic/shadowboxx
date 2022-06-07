@@ -54,6 +54,7 @@ const App = () => {
                 contrastText: "#FFFFFF",
                 light: "#FB8C00",
               },
+              divider: "#EEEEEE",
               background: {
                 default: "#00182B",
                 paper: "#0F1111",
@@ -63,6 +64,9 @@ const App = () => {
                 secondary: "#DDDDDD",
                 disabled: "#DDDDDD",
                 hint: "#DDDDDD",
+              },
+              grey: {
+                50: "#111111",
               },
             },
           }
