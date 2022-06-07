@@ -63,9 +63,9 @@ const useStyles = makeStyles((theme: Theme) => ({
 export interface AlbumFormDialogProps
   extends Pick<ActionDialogProps, "open" | "handleCancel"> {
   /** Value for the component */
-  value: ParseAlbum;
+  value: Album;
   /** Function to run when the confirm button is clicked */
-  handleConfirm: (value: ParseAlbum) => void;
+  handleConfirm: (value: Album) => void;
   /** Whether to reset dialog state when confirm button is clicked */
   resetOnConfirm?: boolean;
 }
@@ -78,7 +78,7 @@ const AlbumFormDialog = ({
   handleConfirm: piHandleConfirm,
   resetOnConfirm,
 }: AlbumFormDialogProps) => {
-  const [value, setValue] = useState<Album>(initialValue.attributes);
+  const [value, setValue] = useState<Album>(initialValue);
   const [images, setImages] = useState<ParseImage[]>([]);
 
   useEffect(() => {
@@ -105,7 +105,7 @@ const AlbumFormDialog = ({
   const [errors, setErrors] = useState<ErrorState<"name">>(defaultErrors);
 
   const resetState = () => {
-    setValue(initialValue.attributes);
+    setValue(initialValue);
     setErrors(defaultErrors);
   };
 

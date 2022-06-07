@@ -361,13 +361,13 @@ const AlbumCard = ({ value: initialValue, onChange }: AlbumCardProps) => {
         </CardActions>
       </Card>
       <AlbumFormDialog
-        value={value}
+        value={value.attributes}
         open={editAlbumDialogOpen}
         handleCancel={() => setEditAlbumDialogOpen(false)}
-        handleConfirm={(value) => {
+        handleConfirm={(attributes) => {
           setEditAlbumDialogOpen(false);
           value
-            ?.save()
+            ?.update(attributes)
             .then(() => {
               onChange();
             })

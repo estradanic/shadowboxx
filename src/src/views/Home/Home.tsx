@@ -128,25 +128,22 @@ const HomePage = memo(() => {
       </Fab>
       <AlbumFormDialog
         resetOnConfirm
-        value={ParseAlbum.fromAttributes({
+        value={{
           owner: loggedInUser!.email,
           images: [],
           name: Strings.untitledAlbum(),
           collaborators: [],
           viewers: [],
           coOwners: [],
-        })}
+        }}
         open={addAlbumDialogOpen}
         handleCancel={() => setAddAlbumDialogOpen(false)}
-        handleConfirm={(value) => {
+        handleConfirm={(attributes) => {
           setAddAlbumDialogOpen(false);
-          value._album
+          ParseAlbum.fromAttributes(attributes)
             .save()
             .then((response) => {
-              const responseAlbum = new ParseAlbum(response);
-              enqueueSuccessSnackbar(
-                Strings.addAlbumSuccess(responseAlbum?.name)
-              );
+              enqueueSuccessSnackbar(Strings.addAlbumSuccess(response?.name));
             })
             .catch((error) => {
               enqueueErrorSnackbar(error?.message ?? Strings.addAlbumError());

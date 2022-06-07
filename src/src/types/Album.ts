@@ -59,6 +59,11 @@ export default class ParseAlbum extends Object<Album> {
     this._album = album;
   }
 
+  async update(attributes: Album) {
+    this._album.set(attributes);
+    return this.save();
+  }
+
   async save() {
     return new ParseAlbum(await this._album.save());
   }

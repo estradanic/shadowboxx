@@ -1,4 +1,10 @@
-import React, { useState, createContext, useContext, useCallback } from "react";
+import React, {
+  useState,
+  createContext,
+  useContext,
+  useCallback,
+  useRef,
+} from "react";
 import { useNotificationsContext } from "./NotificationsContext";
 import Strings from "../resources/Strings";
 import { CircularProgress } from "@material-ui/core";
@@ -44,26 +50,29 @@ interface ImageContextProviderProps {
 export const ImageContextProvider = ({
   children,
 }: ImageContextProviderProps) => {
-  const [actions, setActions] = useState<ImageAction[]>([]);
+  const actions = useRef<ImageAction[]>([]);
   const { addNotification } = useNotificationsContext();
   const [progress, setProgress] = useState<number>(0);
   const [loading, setLoading] = useState<boolean>(false);
   const { enqueueErrorSnackbar } = useSnackbar();
 
-  const recalculateProgress = useCallback(() => {
-    const completedActions = actions.filter((action) => action.completed);
-    const newProgress = (completedActions.length / actions.length) * 100;
+  const recalculateProgress = () => {
+    const completedActions = actions.current.filter(
+      (action) => action.completed
+    );
+    const newProgress =
+      (completedActions.length / actions.current.length) * 100;
     if (newProgress === 100) {
       setLoading(false);
     }
     setProgress(newProgress);
-  }, [actions]);
+  };
 
   const uploadImage = async (image: Image) => {
     setLoading(true);
 
     const action: ImageAction = { image, command: ImageActionCommand.UPLOAD };
-    setActions((prev) => [...prev, action]);
+    actions.current.push(action);
 
     const notification = addNotification({
       title: Strings.uploadingImage(image.file.name()),
@@ -104,7 +113,7 @@ export const ImageContextProvider = ({
       image: parseImage.attributes,
       command: ImageActionCommand.DELETE,
     };
-    setActions((prev) => [...prev, action]);
+    actions.current.push(action);
 
     try {
       await parseImage.destroy();

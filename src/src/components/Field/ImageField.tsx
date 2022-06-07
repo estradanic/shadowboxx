@@ -45,7 +45,7 @@ const useStyles = makeStyles((theme: Theme) => ({
   },
   multiImageContainer: {
     textAlign: "center",
-    backgroundColor: theme.palette.background.default,
+    backgroundColor: theme.palette.text.disabled,
     margin: theme.spacing(2),
     borderRadius: theme.spacing(0.5),
     padding: theme.spacing(2),
@@ -86,6 +86,11 @@ const useStyles = makeStyles((theme: Theme) => ({
     "& > div": {
       cursor: "default",
     },
+  },
+  progress: {
+    marginTop: "50%",
+    marginLeft: "25%",
+    marginRight: "25%",
   },
 }));
 
@@ -251,8 +256,10 @@ const ImageField = ({
       />
       {multiple && !!value.length && (
         <div className={classes.multiImageContainer}>
-          {loading && <LinearProgress value={progress} />}
-          {value.map((image: ParseImage) => {
+          {loading && (
+            <LinearProgress className={classes.progress} value={progress} />
+          )}
+          {value.map((image: ParseImage, index) => {
             const file = image.file;
             return (
               <div className={classes.imageWrapper} key={uniqueId(image.id)}>
@@ -272,9 +279,11 @@ const ImageField = ({
                     fontSize="large"
                     className={classes.coverImage}
                     onClick={async () => {
+                      const newValue = [...value];
                       image.isCoverImage = false;
                       try {
-                        await image.save();
+                        newValue[index] = await image.save();
+                        onChange(newValue);
                       } catch (error: any) {
                         enqueueErrorSnackbar(
                           error?.message ?? Strings.commonError()
@@ -288,14 +297,28 @@ const ImageField = ({
                     fontSize="large"
                     className={classes.coverImage}
                     onClick={async () => {
+                      const newValue = [...value];
+                      const currentCoverImageIndex = value.findIndex(
+                        (i) => i.isCoverImage
+                      );
                       image.isCoverImage = true;
                       try {
-                        await image.save();
+                        if (currentCoverImageIndex !== -1) {
+                          value[currentCoverImageIndex].isCoverImage = false;
+                          newValue[currentCoverImageIndex] = await value[
+                            currentCoverImageIndex
+                          ].save();
+                        }
+                        newValue[index] = await image.save();
+                        onChange(newValue);
                       } catch (error: any) {
                         enqueueErrorSnackbar(
                           error?.message ?? Strings.commonError()
                         );
                         image.isCoverImage = false;
+                        if (currentCoverImageIndex !== -1) {
+                          value[currentCoverImageIndex].isCoverImage = true;
+                        }
                       }
                     }}
                   />
