@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, memo } from "react";
 import {
   InputAdornment,
   Tooltip,
@@ -112,233 +112,235 @@ export interface ImageFieldProps
 }
 
 /** Component to input images from the filesystem or online */
-const ImageField = ({
-  onChange,
-  label,
-  thumbnailOnly = false,
-  value = [],
-  multiple = false,
-  ...rest
-}: ImageFieldProps) => {
-  const classes = useStyles();
+const ImageField = memo(
+  ({
+    onChange,
+    label,
+    thumbnailOnly = false,
+    value = [],
+    multiple = false,
+    ...rest
+  }: ImageFieldProps) => {
+    const classes = useStyles();
 
-  const { uploadImage, progress, loading, deleteImage } = useImageContext();
-  const [showUrlInput, setShowUrlInput] = useState<boolean>(false);
-  const [imageUrl, setImageUrl] = useState<string>("");
+    const { uploadImage, progress, loading, deleteImage } = useImageContext();
+    const [showUrlInput, setShowUrlInput] = useState<boolean>(false);
+    const [imageUrl, setImageUrl] = useState<string>("");
 
-  const inputId = uniqueId("profile-pic-input");
-  const urlInputId = uniqueId("image-url-input");
+    const inputId = uniqueId("profile-pic-input");
+    const urlInputId = uniqueId("image-url-input");
 
-  const { enqueueErrorSnackbar } = useSnackbar();
+    const { enqueueErrorSnackbar } = useSnackbar();
 
-  const addFromFile = (event: any) => {
-    if (event.target.files?.[0]) {
-      const max = multiple ? event.target.files.length : 1;
-      const newImages: ParseImage[] = [];
-      for (let i = 0; i < max; i++) {
-        const file: any = event.target.files[i];
-        const parseFile = new Parse.File(file.name, file);
-        uploadImage({ file: parseFile, isCoverImage: false })
-          .then((newImage) => {
-            newImages.push(newImage);
-            const newValue = multiple ? [...value, ...newImages] : newImages;
-            onChange(newValue);
-          })
-          .catch((error) => {
-            enqueueErrorSnackbar(
-              error?.message ?? Strings.uploadImageError(file.name)
-            );
-          });
+    const addFromFile = (event: any) => {
+      if (event.target.files?.[0]) {
+        const max = multiple ? event.target.files.length : 1;
+        const newImages: ParseImage[] = [];
+        for (let i = 0; i < max; i++) {
+          const file: any = event.target.files[i];
+          const parseFile = new Parse.File(file.name, file);
+          uploadImage({ file: parseFile, isCoverImage: false })
+            .then((newImage) => {
+              newImages.push(newImage);
+              const newValue = multiple ? [...value, ...newImages] : newImages;
+              onChange(newValue);
+            })
+            .catch((error) => {
+              enqueueErrorSnackbar(
+                error?.message ?? Strings.uploadImageError(file.name)
+              );
+            });
+        }
       }
-    }
-  };
+    };
 
-  const addImageFromUrl = () => {
-    const fileName = imageUrl.substring(imageUrl.lastIndexOf("/") + 1);
-    const parseFile = new Parse.File(fileName, { uri: imageUrl });
-    const newImage = ParseImage.fromAttributes({
-      file: parseFile,
-      isCoverImage: false,
-    });
+    const addImageFromUrl = () => {
+      const fileName = imageUrl.substring(imageUrl.lastIndexOf("/") + 1);
+      const parseFile = new Parse.File(fileName, { uri: imageUrl });
+      const newImage = ParseImage.fromAttributes({
+        file: parseFile,
+        isCoverImage: false,
+      });
 
-    setShowUrlInput(false);
-    if (multiple) {
-      onChange([...value, newImage]);
-    } else {
-      onChange([newImage]);
-    }
-  };
+      setShowUrlInput(false);
+      if (multiple) {
+        onChange([...value, newImage]);
+      } else {
+        onChange([newImage]);
+      }
+    };
 
-  const openUrlInput = () => {
-    setShowUrlInput(true);
-    document.getElementById(urlInputId)?.focus();
-  };
+    const openUrlInput = () => {
+      setShowUrlInput(true);
+      document.getElementById(urlInputId)?.focus();
+    };
 
-  return (
-    <>
-      <TextField // Url src input
-        style={{ display: showUrlInput ? "inherit" : "none" }}
-        id={urlInputId}
-        inputRef={(input) => input && input.focus()}
-        fullWidth
-        onChange={(event) => setImageUrl(event.target.value)}
-        onKeyPress={(event) => {
-          if (event.key === "Enter") {
-            addImageFromUrl();
-          }
-        }}
-        value={imageUrl}
-        label={Strings.imageUrl()}
-        InputProps={{
-          endAdornment: (
-            <>
-              <InputAdornment position="end" onClick={addImageFromUrl}>
-                <Check className={classes.endAdornment} />
-              </InputAdornment>
-              <InputAdornment
-                position="end"
-                onClick={() => setShowUrlInput(false)}
-              >
-                <Close className={classes.endAdornment} />
-              </InputAdornment>
-            </>
-          ),
-        }}
-      />
-      <TextField // Main input
-        className={classes.main}
-        id={inputId}
-        style={{ display: showUrlInput ? "none" : "inherit" }}
-        onChange={addFromFile}
-        fullWidth
-        inputProps={{
-          accept: "image/*",
-          multiple,
-          className: classes.input,
-        }}
-        type="file"
-        label={label}
-        InputProps={{
-          endAdornment: (
-            <>
-              <InputAdornment onClick={openUrlInput} position="end">
-                <Tooltip arrow title={Strings.addFromUrl()}>
-                  <Link className={classes.endAdornment} />
-                </Tooltip>
-              </InputAdornment>
-              <InputAdornment
-                position="end"
-                onClick={() => document.getElementById(inputId)?.click()}
-              >
-                <Tooltip arrow title={Strings.addFromFile()}>
-                  <AddAPhoto className={classes.endAdornment} />
-                </Tooltip>
-              </InputAdornment>
-              {!!value.length && !multiple && (
-                <InputAdornment position="end">
-                  <Avatar
-                    className={classes.endAdornmentAvatar}
-                    src={value[0].file.url()}
-                    alt={value[0].file.name()}
-                  />
+    return (
+      <>
+        <TextField // Url src input
+          style={{ display: showUrlInput ? "inherit" : "none" }}
+          id={urlInputId}
+          inputRef={(input) => input && input.focus()}
+          fullWidth
+          onChange={(event) => setImageUrl(event.target.value)}
+          onKeyPress={(event) => {
+            if (event.key === "Enter") {
+              addImageFromUrl();
+            }
+          }}
+          value={imageUrl}
+          label={Strings.imageUrl()}
+          InputProps={{
+            endAdornment: (
+              <>
+                <InputAdornment position="end" onClick={addImageFromUrl}>
+                  <Check className={classes.endAdornment} />
                 </InputAdornment>
-              )}
-            </>
-          ),
-          startAdornment: !!value.length && (
-            <InputAdornment position="start">
-              <Typography variant="body1">
-                {value.length > 1 && multiple
-                  ? Strings.multipleImages(value.length)
-                  : elide(value[0].file.name(), 20, 3)}
-              </Typography>
-            </InputAdornment>
-          ),
-          readOnly: true,
-        }}
-        {...rest}
-      />
-      {multiple && !!value.length && (
-        <div className={classes.multiImageContainer}>
-          {loading && (
-            <LinearProgress className={classes.progress} value={progress} />
-          )}
-          {value.map((image: ParseImage, index) => {
-            const file = image.file;
-            return (
-              <div className={classes.imageWrapper} key={uniqueId(image.id)}>
-                <Remove
-                  fontSize="large"
-                  className={classes.removeImage}
-                  onClick={async () => {
-                    const newValue = value.filter(
-                      (valueImage) => image.id !== valueImage.id
-                    );
-                    onChange(newValue);
-                    await deleteImage(image);
-                  }}
-                />
-                {image.isCoverImage ? (
-                  <Star
+                <InputAdornment
+                  position="end"
+                  onClick={() => setShowUrlInput(false)}
+                >
+                  <Close className={classes.endAdornment} />
+                </InputAdornment>
+              </>
+            ),
+          }}
+        />
+        <TextField // Main input
+          className={classes.main}
+          id={inputId}
+          style={{ display: showUrlInput ? "none" : "inherit" }}
+          onChange={addFromFile}
+          fullWidth
+          inputProps={{
+            accept: "image/*",
+            multiple,
+            className: classes.input,
+          }}
+          type="file"
+          label={label}
+          InputProps={{
+            endAdornment: (
+              <>
+                <InputAdornment onClick={openUrlInput} position="end">
+                  <Tooltip arrow title={Strings.addFromUrl()}>
+                    <Link className={classes.endAdornment} />
+                  </Tooltip>
+                </InputAdornment>
+                <InputAdornment
+                  position="end"
+                  onClick={() => document.getElementById(inputId)?.click()}
+                >
+                  <Tooltip arrow title={Strings.addFromFile()}>
+                    <AddAPhoto className={classes.endAdornment} />
+                  </Tooltip>
+                </InputAdornment>
+                {!!value.length && !multiple && (
+                  <InputAdornment position="end">
+                    <Avatar
+                      className={classes.endAdornmentAvatar}
+                      src={value[0].file.url()}
+                      alt={value[0].file.name()}
+                    />
+                  </InputAdornment>
+                )}
+              </>
+            ),
+            startAdornment: !!value.length && (
+              <InputAdornment position="start">
+                <Typography variant="body1">
+                  {value.length > 1 && multiple
+                    ? Strings.multipleImages(value.length)
+                    : elide(value[0].file.name(), 20, 3)}
+                </Typography>
+              </InputAdornment>
+            ),
+            readOnly: true,
+          }}
+          {...rest}
+        />
+        {multiple && !!value.length && (
+          <div className={classes.multiImageContainer}>
+            {loading && (
+              <LinearProgress className={classes.progress} value={progress} />
+            )}
+            {value.map((image: ParseImage, index) => {
+              const file = image.file;
+              return (
+                <div className={classes.imageWrapper} key={uniqueId(image.id)}>
+                  <Remove
                     fontSize="large"
-                    className={classes.coverImage}
+                    className={classes.removeImage}
                     onClick={async () => {
-                      const newValue = [...value];
-                      image.isCoverImage = false;
-                      try {
-                        newValue[index] = await image.save();
-                        onChange(newValue);
-                      } catch (error: any) {
-                        enqueueErrorSnackbar(
-                          error?.message ?? Strings.commonError()
+                      const newValue = value.filter(
+                        (valueImage) => image.id !== valueImage.id
+                      );
+                      onChange(newValue);
+                      await deleteImage(image);
+                    }}
+                  />
+                  {image.isCoverImage ? (
+                    <Star
+                      fontSize="large"
+                      className={classes.coverImage}
+                      onClick={async () => {
+                        const newValue = [...value];
+                        image.isCoverImage = false;
+                        try {
+                          newValue[index] = await image.save();
+                          onChange(newValue);
+                        } catch (error: any) {
+                          enqueueErrorSnackbar(
+                            error?.message ?? Strings.commonError()
+                          );
+                          image.isCoverImage = true;
+                        }
+                      }}
+                    />
+                  ) : (
+                    <StarBorder
+                      fontSize="large"
+                      className={classes.coverImage}
+                      onClick={async () => {
+                        const newValue = [...value];
+                        const currentCoverImageIndex = value.findIndex(
+                          (i) => i.isCoverImage
                         );
                         image.isCoverImage = true;
-                      }
-                    }}
-                  />
-                ) : (
-                  <StarBorder
-                    fontSize="large"
-                    className={classes.coverImage}
-                    onClick={async () => {
-                      const newValue = [...value];
-                      const currentCoverImageIndex = value.findIndex(
-                        (i) => i.isCoverImage
-                      );
-                      image.isCoverImage = true;
-                      try {
-                        if (currentCoverImageIndex !== -1) {
-                          value[currentCoverImageIndex].isCoverImage = false;
-                          newValue[currentCoverImageIndex] = await value[
-                            currentCoverImageIndex
-                          ].save();
+                        try {
+                          if (currentCoverImageIndex !== -1) {
+                            value[currentCoverImageIndex].isCoverImage = false;
+                            newValue[currentCoverImageIndex] = await value[
+                              currentCoverImageIndex
+                            ].save();
+                          }
+                          newValue[index] = await image.save();
+                          onChange(newValue);
+                        } catch (error: any) {
+                          enqueueErrorSnackbar(
+                            error?.message ?? Strings.commonError()
+                          );
+                          image.isCoverImage = false;
+                          if (currentCoverImageIndex !== -1) {
+                            value[currentCoverImageIndex].isCoverImage = true;
+                          }
                         }
-                        newValue[index] = await image.save();
-                        onChange(newValue);
-                      } catch (error: any) {
-                        enqueueErrorSnackbar(
-                          error?.message ?? Strings.commonError()
-                        );
-                        image.isCoverImage = false;
-                        if (currentCoverImageIndex !== -1) {
-                          value[currentCoverImageIndex].isCoverImage = true;
-                        }
-                      }
-                    }}
+                      }}
+                    />
+                  )}
+                  <img
+                    className={classes.multiImage}
+                    src={file.url()}
+                    alt={file.name()}
                   />
-                )}
-                <img
-                  className={classes.multiImage}
-                  src={file.url()}
-                  alt={file.name()}
-                />
-              </div>
-            );
-          })}
-        </div>
-      )}
-    </>
-  );
-};
+                </div>
+              );
+            })}
+          </div>
+        )}
+      </>
+    );
+  }
+);
 
 export default ImageField;

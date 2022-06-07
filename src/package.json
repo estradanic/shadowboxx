@@ -99,8 +99,7 @@
     "format": "prettier --write 'src/**/*.{ts,tsx,js,json,jsx}'",
     "start": "serve -p 8080 ./dist",
     "start:prod": "http-server -p 8080 ./build",
-    "deploy": "yarn build && rm -rf ../public/* && cp -r ./build/* ../public && b4a deploy",
-    "postinstall": "patch-package"
+    "deploy": "yarn build && rm -rf ../public/* && cp -r ./build/* ../public && b4a deploy"
   },
   "eslintConfig": {
     "extends": [

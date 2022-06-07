@@ -7,9 +7,9 @@ import {
 
 const useStyles = makeStyles((theme: Theme) => ({
   tooltip: {
-    backgroundColor: theme.palette.background.paper,
+    backgroundColor: theme.palette.grey[50],
     color: theme.palette.text.primary,
-    border: `1px solid ${theme.palette.text.primary}`,
+    border: `1px solid ${theme.palette.divider}`,
     fontSize: "small",
   },
   arrow: {

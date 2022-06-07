@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import ActionDialog, {
   ActionDialogProps,
   useActionDialogContext,
@@ -78,17 +78,76 @@ const AlbumFormDialog = ({
   handleConfirm: piHandleConfirm,
   resetOnConfirm,
 }: AlbumFormDialogProps) => {
-  const [value, setValue] = useState<Album>(initialValue);
+  const [imageIds, setImageIds] = useState<Album["images"]>(
+    initialValue.images
+  );
+  const [name, setName] = useState<Album["name"]>(initialValue.name);
+  const [description, setDescription] = useState<Album["description"]>(
+    initialValue.description
+  );
+  const [isFavorite, setIsFavorite] = useState<Album["isFavorite"]>(
+    initialValue.isFavorite
+  );
+  const [isPublic, setIsPublic] = useState<Album["isPublic"]>(
+    initialValue.isPublic
+  );
+  const [collaborators, setCollaborators] = useState<Album["collaborators"]>(
+    initialValue.collaborators
+  );
+  const [viewers, setViewers] = useState<Album["viewers"]>(
+    initialValue.viewers
+  );
+  const [coOwners, setCoOwners] = useState<Album["coOwners"]>(
+    initialValue.coOwners
+  );
+
   const [images, setImages] = useState<ParseImage[]>([]);
+
+  const defaultErrors = useMemo(
+    () => ({
+      name: {
+        isError: false,
+        errorMessage: "",
+      },
+    }),
+    []
+  );
+  const [errors, setErrors] = useState<ErrorState<"name">>(defaultErrors);
+
+  const reinitialize = useCallback(() => {
+    setName(initialValue.name);
+    setDescription(initialValue.description);
+    setIsFavorite(initialValue.isFavorite);
+    setIsPublic(initialValue.isPublic);
+    setCollaborators(initialValue.collaborators);
+    setViewers(initialValue.viewers);
+    setCoOwners(initialValue.coOwners);
+    setErrors(defaultErrors);
+  }, [
+    setName,
+    setDescription,
+    setIsFavorite,
+    setIsPublic,
+    setCollaborators,
+    setViewers,
+    setCoOwners,
+    setErrors,
+    initialValue,
+    defaultErrors,
+  ]);
 
   useEffect(() => {
     ParseImage.query()
-      .containedIn(ParseImage.COLUMNS.id, value.images)
+      .containedIn(ParseImage.COLUMNS.id, imageIds)
       .findAll()
       .then((response) => {
         setImages(response.map((image) => new ParseImage(image)));
       });
-  }, [value.images]);
+  }, [imageIds]);
+
+  useEffect(() => {
+    reinitialize();
+  }, [initialValue, reinitialize]);
 
   const classes = useStyles();
   const theme = useTheme();
@@ -96,23 +155,10 @@ const AlbumFormDialog = ({
   const { enqueueErrorSnackbar } = useSnackbar();
   const { openConfirm } = useActionDialogContext();
 
-  const defaultErrors = {
-    name: {
-      isError: false,
-      errorMessage: "",
-    },
-  };
-  const [errors, setErrors] = useState<ErrorState<"name">>(defaultErrors);
-
-  const resetState = () => {
-    setValue(initialValue);
-    setErrors(defaultErrors);
-  };
-
   const validate = () => {
     const errors = defaultErrors;
     let valid = true;
-    if (isNullOrWhitespace(value.name)) {
+    if (isNullOrWhitespace(name)) {
       errors.name = {
         isError: true,
         errorMessage: Strings.pleaseEnterA("name"),
@@ -134,33 +180,49 @@ const AlbumFormDialog = ({
 
   const handleConfirm = async () => {
     if (validate()) {
-      const valueUsers = new Set([
-        ...value.viewers,
-        ...value.collaborators,
-        ...value.coOwners,
-      ]);
-      const existingUserCount = await new Parse.Query("User")
+      const userEmails = new Set([...viewers, ...collaborators, ...coOwners]);
+      const signedUpUserCount = await new Parse.Query("User")
         .containedIn(ParseUser.COLUMNS.email, [
-          ...value.viewers,
-          ...value.collaborators,
-          ...value.coOwners,
+          ...viewers,
+          ...collaborators,
+          ...coOwners,
         ])
         .count();
-      if (existingUserCount < valueUsers.size) {
+      if (signedUpUserCount < userEmails.size) {
         openConfirm(Strings.nonExistentUserWarning(), () => {
-          piHandleConfirm(value);
+          piHandleConfirm({
+            ...initialValue,
+            images: imageIds,
+            name,
+            description,
+            isFavorite,
+            isPublic,
+            collaborators,
+            viewers,
+            coOwners,
+          });
         });
       } else {
-        piHandleConfirm(value);
+        piHandleConfirm({
+          ...initialValue,
+          images: imageIds,
+          name,
+          description,
+          isFavorite,
+          isPublic,
+          collaborators,
+          viewers,
+          coOwners,
+        });
       }
       if (resetOnConfirm) {
-        resetState();
+        reinitialize();
       }
     }
   };
 
   const handleCancel = () => {
-    resetState();
+    reinitialize();
     piHandleCancel?.();
   };
 
@@ -170,147 +232,120 @@ const AlbumFormDialog = ({
       fullWidth
       maxWidth="lg"
       open={open}
-      title={value.name ?? Strings.untitledAlbum()}
+      title={name ?? Strings.untitledAlbum()}
       message=""
       handleConfirm={handleConfirm}
       handleCancel={handleCancel}
       type="prompt"
-      promptField={
-        <Grid container direction="row">
-          <Grid item xs={12}>
-            <TextField
-              error={errors.name.isError}
-              helperText={errors.name.errorMessage}
-              autoComplete="none"
-              fullWidth
-              value={value.name}
-              onChange={(e) =>
-                setValue((prev) => ({ ...prev, name: e.target.value }))
-              }
-              label={Strings.name()}
-              id="name"
-              type="text"
-            />
-          </Grid>
-          <Grid item xs={12}>
-            <TextField
-              autoComplete="none"
-              fullWidth
-              value={value.description}
-              onChange={(e) =>
-                setValue((prev) => ({ ...prev, description: e.target.value }))
-              }
-              label={Strings.description()}
-              id="description"
-              type="text"
-              multiline
-            />
-          </Grid>
-          <Grid item xs={12}>
-            <Tooltip title={Strings.favoriteTooltip()}>
-              <FormControl fullWidth className={classes.checkbox}>
-                <FormControlLabel
-                  control={
-                    <Checkbox
-                      icon={<StarBorder className={classes.favoriteIcon} />}
-                      checked={!!value.isFavorite}
-                      onChange={(_, checked) =>
-                        setValue((prev) => ({ ...prev, isFavorite: checked }))
-                      }
-                      checkedIcon={<Star className={classes.favoriteIcon} />}
-                    />
-                  }
-                  label={Strings.favorite()}
-                  labelPlacement="start"
-                  className={classes.checkboxLabel}
-                />
-              </FormControl>
-            </Tooltip>
-          </Grid>
-          <Grid item xs={12}>
-            <Tooltip title={Strings.publicTooltip()}>
-              <FormControl fullWidth className={classes.checkbox}>
-                <FormControlLabel
-                  control={
-                    <Checkbox
-                      icon={<Public className={classes.publicIcon} />}
-                      checked={!!value.isPublic}
-                      onChange={(_, checked) =>
-                        setValue((prev) => ({ ...prev, isPublic: checked }))
-                      }
-                      checkedIcon={
-                        <Public className={classes.publicIconChecked} />
-                      }
-                    />
-                  }
-                  label={Strings.public()}
-                  labelPlacement="start"
-                  className={classes.checkboxLabel}
-                />
-              </FormControl>
-            </Tooltip>
-          </Grid>
-          <Grid item xs={12}>
-            <Tooltip title={Strings.coOwnersTooltip()}>
-              <UserField
-                value={value.coOwners}
-                label={Strings.coOwners()}
-                onChange={(coOwners) =>
-                  setValue((prev) => ({
-                    ...prev,
-                    coOwners,
-                  }))
-                }
-              />
-            </Tooltip>
-          </Grid>
-          <Grid item xs={12}>
-            <Tooltip title={Strings.collaboratorsTooltip()}>
-              <UserField
-                value={value.collaborators}
-                label={Strings.collaborators()}
-                onChange={(collaborators) =>
-                  setValue((prev) => ({
-                    ...prev,
-                    collaborators,
-                  }))
-                }
-              />
-            </Tooltip>
-          </Grid>
-          <Grid item xs={12}>
-            <Tooltip title={Strings.viewersTooltip()}>
-              <UserField
-                value={value.viewers}
-                label={Strings.viewers()}
-                onChange={(viewers) =>
-                  setValue((prev) => ({
-                    ...prev,
-                    viewers,
-                  }))
-                }
-              />
-            </Tooltip>
-          </Grid>
-          <Grid item xs={12}>
-            <ImageContextProvider>
-              <ImageField
-                label={Strings.images()}
-                multiple
-                value={images}
-                onChange={(images) =>
-                  setValue((prev) => ({
-                    ...prev,
-                    images: images.map((image) => image.id!),
-                  }))
-                }
-              />
-            </ImageContextProvider>
-          </Grid>
-        </Grid>
-      }
       confirmButtonColor="success"
-    />
+    >
+      <Grid container direction="row">
+        <Grid item xs={12}>
+          <TextField
+            error={errors.name.isError}
+            helperText={errors.name.errorMessage}
+            autoComplete="none"
+            fullWidth
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            label={Strings.name()}
+            id="name"
+            type="text"
+          />
+        </Grid>
+        <Grid item xs={12}>
+          <TextField
+            autoComplete="none"
+            fullWidth
+            value={description}
+            onChange={(e) => setDescription(e.target.value)}
+            label={Strings.description()}
+            id="description"
+            type="text"
+            multiline
+          />
+        </Grid>
+        <Grid item xs={12}>
+          <Tooltip title={Strings.favoriteTooltip()}>
+            <FormControl fullWidth className={classes.checkbox}>
+              <FormControlLabel
+                control={
+                  <Checkbox
+                    icon={<StarBorder className={classes.favoriteIcon} />}
+                    checked={!!isFavorite}
+                    onChange={(_, checked) => setIsFavorite(checked)}
+                    checkedIcon={<Star className={classes.favoriteIcon} />}
+                  />
+                }
+                label={Strings.favorite()}
+                labelPlacement="start"
+                className={classes.checkboxLabel}
+              />
+            </FormControl>
+          </Tooltip>
+        </Grid>
+        <Grid item xs={12}>
+          <Tooltip title={Strings.publicTooltip()}>
+            <FormControl fullWidth className={classes.checkbox}>
+              <FormControlLabel
+                control={
+                  <Checkbox
+                    icon={<Public className={classes.publicIcon} />}
+                    checked={!!isPublic}
+                    onChange={(_, checked) => setIsPublic(checked)}
+                    checkedIcon={
+                      <Public className={classes.publicIconChecked} />
+                    }
+                  />
+                }
+                label={Strings.public()}
+                labelPlacement="start"
+                className={classes.checkboxLabel}
+              />
+            </FormControl>
+          </Tooltip>
+        </Grid>
+        <Grid item xs={12}>
+          <Tooltip title={Strings.coOwnersTooltip()}>
+            <UserField
+              value={coOwners}
+              label={Strings.coOwners()}
+              onChange={(coOwners) => setCoOwners(coOwners)}
+            />
+          </Tooltip>
+        </Grid>
+        <Grid item xs={12}>
+          <Tooltip title={Strings.collaboratorsTooltip()}>
+            <UserField
+              value={collaborators}
+              label={Strings.collaborators()}
+              onChange={(collaborators) => setCollaborators(collaborators)}
+            />
+          </Tooltip>
+        </Grid>
+        <Grid item xs={12}>
+          <Tooltip title={Strings.viewersTooltip()}>
+            <UserField
+              value={viewers}
+              label={Strings.viewers()}
+              onChange={(viewers) => setViewers(viewers)}
+            />
+          </Tooltip>
+        </Grid>
+        <Grid item xs={12}>
+          <ImageContextProvider>
+            <ImageField
+              label={Strings.images()}
+              multiple
+              value={images}
+              onChange={(images) =>
+                setImageIds(images.map((image) => image.id!))
+              }
+            />
+          </ImageContextProvider>
+        </Grid>
+      </Grid>
+    </ActionDialog>
   );
 };
 

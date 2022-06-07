@@ -1,4 +1,10 @@
-import React, { createContext, ReactNode, useContext, useState } from "react";
+import React, {
+  createContext,
+  memo,
+  ReactNode,
+  useContext,
+  useState,
+} from "react";
 import {
   Button,
   Dialog,
@@ -54,8 +60,6 @@ export interface ActionDialogProps extends DialogProps {
   handleClose?: () => void;
   /** What type of dialog this is, similar to builtin javascript alert, confirm, and prompt */
   type: "alert" | "confirm" | "prompt";
-  /** Field or fields to be returned as the prompt value */
-  promptField?: React.ReactNode;
   /** Color of the confirm button */
   confirmButtonColor?: "error" | "warning" | "success" | "default";
 }
@@ -186,10 +190,11 @@ export const ActionDialogContextProvider = ({
           handleCancel={handleCancel}
           handleConfirm={handleConfirm}
           handleClose={handleClose}
-          promptField={fields}
           type={type}
           {...actionDialogProps}
-        />
+        >
+          {fields}
+        </ActionDialog>
         {children}
       </>
     </ActionDialogContext.Provider>
@@ -199,6 +204,22 @@ export const ActionDialogContextProvider = ({
 /** Alias to useContext(ActionDialogContext) */
 export const useActionDialogContext = () => useContext(ActionDialogContext);
 
+interface ActionDialogContentProps
+  extends Pick<ActionDialogProps, "message" | "type" | "children"> {}
+
+// This is broken into a separate component and memoized to prevent rerenders
+// when handleCancel, handleConfirm, and handleClose change.
+const ActionDialogContent = memo(
+  ({ message, type, children }: ActionDialogContentProps) => {
+    return (
+      <DialogContent>
+        <DialogContentText>{message}</DialogContentText>
+        {type === "prompt" && children}
+      </DialogContent>
+    );
+  }
+);
+
 /** Component to replace the builtin javascript alert, confirm, and prompt functionality */
 const ActionDialog = ({
   title,
@@ -207,8 +228,8 @@ const ActionDialog = ({
   handleConfirm,
   handleClose,
   type,
-  promptField,
   confirmButtonColor = "default",
+  children,
   ...rest
 }: ActionDialogProps) => {
   const classes = useStyles();
@@ -220,10 +241,9 @@ const ActionDialog = ({
           {title}
         </Typography>
       </DialogTitle>
-      <DialogContent>
-        <DialogContentText>{message}</DialogContentText>
-        {promptField}
-      </DialogContent>
+      <ActionDialogContent message={message} type={type}>
+        {children}
+      </ActionDialogContent>
       <DialogActions>
         {type === "alert" ? (
           <Button onClick={handleClose}>{Strings.okay()}</Button>
