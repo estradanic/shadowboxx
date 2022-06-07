@@ -1,10 +1,4 @@
-import React, {
-  useState,
-  createContext,
-  useContext,
-  useCallback,
-  useRef,
-} from "react";
+import React, { useState, createContext, useContext, useRef } from "react";
 import { useNotificationsContext } from "./NotificationsContext";
 import Strings from "../resources/Strings";
 import { CircularProgress } from "@material-ui/core";

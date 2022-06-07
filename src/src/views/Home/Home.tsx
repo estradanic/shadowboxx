@@ -1,4 +1,4 @@
-import React, { memo, useCallback, useEffect, useRef, useState } from "react";
+import React, { memo, useEffect, useRef, useState } from "react";
 import { useView } from "../View";
 import {
   PageContainer,
@@ -51,7 +51,7 @@ const HomePage = memo(() => {
   const gotAlbums = useRef(false);
   const { loggedInUser } = useUserContext();
 
-  const getAlbums = useCallback(() => {
+  useEffect(() => {
     if (!gotAlbums.current && !globalLoading) {
       setGlobalLoading(true);
       ParseAlbum.query()
@@ -76,10 +76,6 @@ const HomePage = memo(() => {
     loggedInUser,
   ]);
 
-  useEffect(() => {
-    getAlbums();
-  }, [getAlbums]);
-
   return (
     <>
       <Grid container direction="column">
@@ -93,11 +89,16 @@ const HomePage = memo(() => {
                   ? -1
                   : 1
               )
-              .map((album) => (
+              .map((album, index) => (
                 <AlbumCard
-                  onChange={() => {
-                    gotAlbums.current = false;
-                    getAlbums();
+                  onChange={(changedAlbum) => {
+                    const newAlbums = [...albums];
+                    if (changedAlbum !== null) {
+                      newAlbums[index] = changedAlbum;
+                    } else {
+                      newAlbums.splice(index, 1);
+                    }
+                    setAlbums(newAlbums);
                   }}
                   value={album}
                   key={album?.name}

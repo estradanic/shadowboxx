@@ -84,15 +84,17 @@ const useStyles = makeStyles((theme: Theme) => ({
 
 /** Interface defining props for AlbumCard */
 export interface AlbumCardProps {
+  /** The album value to display */
   value: ParseAlbum;
-  /** Function that signals to the parent component that something has changed and album should be refetched */
-  onChange: () => void;
+  /**
+   * Function to be run when the value changes.
+   * Returns null if album was deleted.
+   */
+  onChange: (value: ParseAlbum | null) => void;
 }
 
 /** Component for displaying basic information about an album */
-const AlbumCard = ({ value: initialValue, onChange }: AlbumCardProps) => {
-  const [value, setValue] = useState<ParseAlbum>(initialValue);
-
+const AlbumCard = ({ value, onChange }: AlbumCardProps) => {
   const [images, setImages] = useState<ParseImage[]>([]);
   const [coOwners, setCoOwners] = useState<ParseUser[]>([]);
   const [collaborators, setCollaborators] = useState<ParseUser[]>([]);
@@ -144,10 +146,6 @@ const AlbumCard = ({ value: initialValue, onChange }: AlbumCardProps) => {
       });
   }, [value.viewers]);
 
-  useEffect(() => {
-    setValue(initialValue);
-  }, [initialValue]);
-
   const [isFavorite, setIsFavorite] = useState<boolean>(
     value?.isFavorite ?? false
   );
@@ -179,7 +177,7 @@ const AlbumCard = ({ value: initialValue, onChange }: AlbumCardProps) => {
         value
           .destroy()
           .then(() => {
-            onChange();
+            onChange(null);
             enqueueSuccessSnackbar(Strings.deleteAlbumSuccess());
           })
           .catch((error) => {
@@ -367,9 +365,9 @@ const AlbumCard = ({ value: initialValue, onChange }: AlbumCardProps) => {
         handleConfirm={(attributes) => {
           setEditAlbumDialogOpen(false);
           value
-            ?.update(attributes)
-            .then(() => {
-              onChange();
+            .update(attributes)
+            .then((response) => {
+              onChange(response);
             })
             .catch((error) => {
               enqueueErrorSnackbar(error?.message ?? Strings.editAlbumError());

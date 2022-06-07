@@ -148,10 +148,10 @@ const AlbumFormDialog = ({
         .count();
       if (existingUserCount < valueUsers.size) {
         openConfirm(Strings.nonExistentUserWarning(), () => {
-          piHandleConfirm(ParseAlbum.fromAttributes(value));
+          piHandleConfirm(value);
         });
       } else {
-        piHandleConfirm(ParseAlbum.fromAttributes(value));
+        piHandleConfirm(value);
       }
       if (resetOnConfirm) {
         resetState();
