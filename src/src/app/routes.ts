@@ -1,6 +1,6 @@
 import { ComponentType } from "react";
-import { Home, Login, Settings, Signup } from "../views";
-import { RouteParams } from "./NavigationContext";
+import { Album, Home, Login, Settings, Signup } from "../views";
+import { RouteHistory, RouteParams } from "./NavigationContext";
 import { isEmpty } from "lodash";
 
 /**
@@ -33,6 +33,14 @@ export interface RouteProps {
  * Universal routes map containing all pages for the site
  */
 const routes: { [key: string]: RouteProps } = {
+  Album: {
+    viewId: "Album",
+    viewName: "Album",
+    view: Album,
+    path: "/album/:id",
+    tryAuthenticate: true,
+    redirectOnAuthFail: true,
+  },
   Home: {
     viewId: "Home",
     viewName: "Home",
@@ -71,8 +79,13 @@ const routes: { [key: string]: RouteProps } = {
 /**
  * Helper function to get the path for a route including parameters
  */
-const getRoutePath = (viewId: string, routeParams: RouteParams): string => {
-  const templatePath = routes[viewId]?.path;
+const getRoutePath = (
+  routeHistoryEntry: RouteHistory,
+  routeParams: RouteParams
+): string => {
+  const templatePath = `${routes[routeHistoryEntry.viewId]?.path}${
+    routeHistoryEntry.search
+  }`;
   if (!templatePath) {
     return "";
   }

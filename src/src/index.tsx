@@ -52,6 +52,12 @@ const theme = createMuiTheme({
     grey: {
       50: "#EEEEEE",
     },
+    text: {
+      primary: "#000000",
+      secondary: "#FFFFFF",
+      disabled: "#222222",
+      hint: "#222222",
+    },
   },
 });
 

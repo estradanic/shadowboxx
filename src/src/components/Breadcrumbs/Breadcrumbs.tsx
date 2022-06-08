@@ -84,7 +84,10 @@ const Breadcrumbs = ({ viewId, ...rest }: BreadcrumbsProps) => {
             variant="overline"
             key={`breadcrumb${breadcrumb.viewId}`}
             color="inherit"
-            to={getRoutePath(breadcrumb.viewId, routeParams)}
+            to={getRoutePath(
+              { viewId: breadcrumb.viewId, search: "" },
+              routeParams
+            )}
           >
             {breadcrumb.viewName}
           </Link>

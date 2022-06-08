@@ -2,6 +2,7 @@ import React from "react";
 import Svg, { SvgProps } from "./Svg";
 import { useTheme } from "@material-ui/core";
 
+/** Svg to use when an album has no images */
 const Empty = ({ height }: Omit<SvgProps, "children">) => {
   const theme = useTheme();
 
@@ -30,7 +31,6 @@ const Empty = ({ height }: Omit<SvgProps, "children">) => {
             <stop offset="1" stopColor="gray" stopOpacity="0.1" />
           </linearGradient>
         </defs>
-        <title>empty</title>
         <ellipse
           cx="354.13"
           cy="741.27"

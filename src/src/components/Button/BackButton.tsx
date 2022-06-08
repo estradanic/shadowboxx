@@ -8,10 +8,12 @@ import { useNavigationContext } from "../../app/NavigationContext";
 
 /** Interface defining props for BackButton */
 interface BackButtonProps
-  extends Omit<ButtonProps, "onClick" | "children" | "startIcon"> {}
+  extends Omit<ButtonProps, "onClick" | "children" | "startIcon"> {
+  placement?: "header" | "body";
+}
 
 /** Component to move backwards one route in history */
-const BackButton = (props: BackButtonProps) => {
+const BackButton = ({ placement = "header", ...rest }: BackButtonProps) => {
   const history = useHistory();
   const { getRoutePath } = useRoutes();
   const { routeHistory, routeParams, setRouteHistory } = useNavigationContext();
@@ -23,9 +25,12 @@ const BackButton = (props: BackButtonProps) => {
     history.push(getRoutePath(newRouteHistory[0], routeParams));
   };
 
+  const startIcon = placement === "header" ? <ArrowBack /> : undefined;
+  const text = placement === "header" ? Strings.back() : Strings.goBack();
+
   return (
-    <Button startIcon={<ArrowBack />} onClick={onClick} {...props}>
-      {Strings.back()}
+    <Button startIcon={startIcon} onClick={onClick} {...rest}>
+      {text}
     </Button>
   );
 };

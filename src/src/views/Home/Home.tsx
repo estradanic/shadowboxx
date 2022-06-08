@@ -59,11 +59,11 @@ const HomePage = memo(() => {
         .findAll()
         .then((response) => {
           setAlbums(response.map((album) => new ParseAlbum(album)));
-          setGlobalLoading(false);
-          gotAlbums.current = true;
         })
         .catch((error) => {
           enqueueErrorSnackbar(error?.message);
+        })
+        .finally(() => {
           setGlobalLoading(false);
           gotAlbums.current = true;
         });

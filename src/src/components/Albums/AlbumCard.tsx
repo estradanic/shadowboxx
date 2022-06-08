@@ -60,13 +60,18 @@ const useStyles = makeStyles((theme: Theme) => ({
   },
   updatedAt: {
     float: "right",
+    color: theme.palette.text.hint,
   },
   createdAt: {
     textAlign: "left",
+    color: theme.palette.text.hint,
   },
   title: {
     fontWeight: "bold",
     textAlign: "center",
+  },
+  subheader: {
+    color: theme.palette.text.hint,
   },
   icon: {
     color: theme.palette.text.primary,
@@ -197,15 +202,16 @@ const AlbumCard = ({ value, onChange }: AlbumCardProps) => {
   const closeMenu = () => setAnchorEl(undefined);
 
   const navigateToAlbum = () => {
-    const params = new URLSearchParams({ name: value?.name });
-    history.push(`${routes["Album"].path}?${params.toString()}`);
+    if (value?.id) {
+      history.push(routes["Album"].path.replace(":id", value.id));
+    }
   };
 
   return (
     <>
       <Card className={xs ? classes.cardMobile : classes.card}>
         <CardHeader
-          classes={{ title: classes.title }}
+          classes={{ title: classes.title, subheader: classes.subheader }}
           avatar={<UserAvatar email={owner?.email!} fetchUser={() => owner!} />}
           action={
             <>
@@ -241,7 +247,6 @@ const AlbumCard = ({ value, onChange }: AlbumCardProps) => {
               <Typography
                 className={classes.createdAt}
                 variant="body2"
-                color="textSecondary"
                 component="p"
               >
                 {Strings.createdAt(value?.createdAt)}
@@ -251,7 +256,6 @@ const AlbumCard = ({ value, onChange }: AlbumCardProps) => {
               <Typography
                 className={classes.updatedAt}
                 variant="body2"
-                color="textSecondary"
                 component="p"
               >
                 {Strings.updatedAt(value?.updatedAt)}

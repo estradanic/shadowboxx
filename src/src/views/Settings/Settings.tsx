@@ -10,7 +10,6 @@ import {
   Grid,
   Card,
   Button,
-  Typography,
   FormControlLabel,
   Switch,
   FormControl,
@@ -22,11 +21,11 @@ import { ErrorState, validateEmail } from "../../utils/formUtils";
 import { isNullOrWhitespace } from "../../utils/stringUtils";
 import { ImageContextProvider } from "../../app/ImageContext";
 import { useUserContext } from "../../app/UserContext";
+import FancyTypography from "../../components/Typography/FancyTypography";
 
 const useStyles = makeStyles((theme: Theme) => ({
   cardTitle: {
     "& *": {
-      fontFamily: "Alex Brush",
       color: theme.palette.primary.contrastText,
       width: "fit-content",
       margin: "auto",
@@ -182,12 +181,14 @@ const Settings = () => {
 
   return (
     <PageContainer loading={loading}>
-      <Grid item sm={8}>
+      <Grid item lg={6} sm={8}>
         <Card>
           <form autoComplete="off">
             <Grid container direction="row">
               <Grid className={classes.cardTitle} item xs={12}>
-                <Typography variant="h4">{Strings.settings()}</Typography>
+                <FancyTypography variant="h4">
+                  {Strings.settings()}
+                </FancyTypography>
               </Grid>
               <Grid item xs={12}>
                 <FormControl fullWidth className={classes.darkTheme}>

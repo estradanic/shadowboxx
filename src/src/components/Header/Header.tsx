@@ -73,11 +73,13 @@ const Header = ({ viewId, ...rest }: HeaderProps) => {
   useEffect(() => {
     if (routeHistory.length === 1) {
       setShowBackButton(
-        routeHistory[0] !== viewId && !!routes[routeHistory[0]]?.tryAuthenticate
+        routeHistory[0].viewId !== viewId &&
+          !!routes[routeHistory[0].viewId]?.tryAuthenticate
       );
     } else if (routeHistory.length > 1) {
       setShowBackButton(
-        routeHistory[1] !== viewId && !!routes[routeHistory[1]]?.tryAuthenticate
+        routeHistory[1].viewId !== viewId &&
+          !!routes[routeHistory[1].viewId]?.tryAuthenticate
       );
     }
   }, [routeHistory.length, routeHistory, viewId, routes]);

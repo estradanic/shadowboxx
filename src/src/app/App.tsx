@@ -61,7 +61,7 @@ const App = () => {
               },
               text: {
                 primary: "#FFFFFF",
-                secondary: "#DDDDDD",
+                secondary: "#000000",
                 disabled: "#DDDDDD",
                 hint: "#DDDDDD",
               },

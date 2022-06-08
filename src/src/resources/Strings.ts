@@ -10,7 +10,8 @@ const Strings: { [key: string]: (params?: any) => string } = {
   addAlbumSuccess: (album: string) => `Successfully added album ${album}`,
   addFromFile: () => "Add from file",
   addFromUrl: () => "Add from URL",
-  albumNotFound: (album: string) => `Album not found (${album})`,
+  albumNotFound: (album: string) =>
+    `Album not found${album ? ` (${album})` : ""}`,
   alreadyHaveAccount: () => "Already have an account?",
   appName: () => "Shadowbox",
   back: () => "Back",
@@ -59,6 +60,7 @@ const Strings: { [key: string]: (params?: any) => string } = {
   getAlbumsError: () => `${Strings.commonError()} Could not get albums.`,
   getImageError: () => `${Strings.commonError()} Could not get image.`,
   getImagesError: () => `${Strings.commonError()} Could not get images.`,
+  goBack: () => "Go Back",
   home: () => "Home",
   imageNotDeleted: (image) => `Image not deleted ${JSON.stringify(image)}`,
   imageNotSaved: () => `${Strings.commonError()} Image not saved`,

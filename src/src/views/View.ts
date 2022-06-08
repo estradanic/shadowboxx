@@ -1,4 +1,4 @@
-import { match } from "react-router-dom";
+import { match, useLocation } from "react-router-dom";
 import { useRoutes } from "../app/routes";
 import { useNavigationContext } from "../app/NavigationContext";
 import { useHistory } from "react-router-dom";
@@ -28,6 +28,7 @@ export const useView = (currentViewId: string) => {
   const history = useHistory();
   const currentRoute = routes[currentViewId];
   const { loggedInUser } = useUserContext();
+  const { search } = useLocation();
 
   const redirectToLogin = useCallback(() => {
     setGlobalLoading(false);
@@ -35,7 +36,7 @@ export const useView = (currentViewId: string) => {
       const loginRoute = routes["Login"];
       setRedirectRoute({
         viewId: currentViewId,
-        path: getRoutePath(currentViewId, routeParams),
+        path: getRoutePath({ viewId: currentViewId, search }, routeParams),
       });
       history.push(loginRoute.path);
     }
@@ -48,20 +49,20 @@ export const useView = (currentViewId: string) => {
     currentRoute.redirectOnAuthFail,
     currentViewId,
     routeParams,
+    search,
   ]);
 
   useEffect(() => {
     if (loggedInUser) {
       if (!currentRoute.redirectOnAuthFail) {
-        if (redirectRoute?.viewId) {
-          const redirectPath = getRoutePath(redirectRoute?.viewId, routeParams);
+        if (redirectRoute?.path) {
           setRedirectRoute({ viewId: "", path: "" });
-          history.push(redirectPath);
+          history.push(redirectRoute.path);
         }
       }
       const newRouteHistory = [...routeHistory];
-      if (currentViewId !== routeHistory[0]) {
-        newRouteHistory.unshift(currentViewId);
+      if (currentViewId !== routeHistory[0]?.viewId) {
+        newRouteHistory.unshift({ viewId: currentViewId, search });
         setRouteHistory(newRouteHistory);
       }
     } else if (currentRoute.tryAuthenticate) {
@@ -82,5 +83,7 @@ export const useView = (currentViewId: string) => {
     setRedirectRoute,
     setRouteHistory,
     loggedInUser,
+    redirectRoute.path,
+    search,
   ]);
 };

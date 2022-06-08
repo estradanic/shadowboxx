@@ -9,7 +9,10 @@ export type RouteParams = { [viewId: string]: { [param: string]: string } };
 /**
  * Array of previously visited routes by viewId
  */
-export type RouteHistory = string[];
+export type RouteHistory = {
+  viewId: string;
+  search: string;
+};
 
 /**
  * Where to redirect back to after login
@@ -25,9 +28,9 @@ interface NavigationContextValue {
   /** React state setter for routeParams */
   setRouteParams: React.Dispatch<React.SetStateAction<RouteParams>>;
   /** Array of previously visited routes by viewId */
-  routeHistory: RouteHistory;
+  routeHistory: RouteHistory[];
   /** React state setter for routeHistory */
-  setRouteHistory: React.Dispatch<React.SetStateAction<RouteHistory>>;
+  setRouteHistory: React.Dispatch<React.SetStateAction<RouteHistory[]>>;
   /** Where to redirect back to after login */
   redirectRoute: RedirectRouteInfo;
   /** React state setter for redirectRoute */
@@ -44,9 +47,9 @@ interface NavigationContextValue {
 const NavigationContext = createContext<NavigationContextValue>({
   routeParams: {},
   setRouteParams: (_: RouteParams | ((_: RouteParams) => RouteParams)) => {},
-  routeHistory: [""],
+  routeHistory: [{ viewId: "", search: "" }],
   setRouteHistory: (
-    _: RouteHistory | ((_: RouteHistory) => RouteHistory)
+    _: RouteHistory[] | ((_: RouteHistory[]) => RouteHistory[])
   ) => {},
   redirectRoute: { viewId: "", path: "" },
   setRedirectRoute: (
@@ -78,7 +81,7 @@ interface NavigationContextProviderProps {
 export const NavigationContextProvider = ({
   children,
 }: NavigationContextProviderProps) => {
-  const [routeHistory, setRouteHistory] = useState<RouteHistory>([]);
+  const [routeHistory, setRouteHistory] = useState<RouteHistory[]>([]);
   const [routeParams, setRouteParams] = useState<RouteParams>({});
   const [globalLoading, setGlobalLoading] = useState<boolean>(false);
   const [redirectRoute, setRedirectRoute] = useState<RedirectRouteInfo>({
