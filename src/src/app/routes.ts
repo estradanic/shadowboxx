@@ -1,7 +1,13 @@
 import { ComponentType } from "react";
-import { Album, Home, Login, Settings, Signup } from "../views";
 import { RouteHistory, RouteParams } from "./NavigationContext";
-import { isEmpty } from "lodash";
+import isEmpty from "lodash/isEmpty";
+import { lazy } from "react";
+
+const Home = lazy(() => import("../views/Home/Home"));
+const Login = lazy(() => import("../views/Login/Login"));
+const Settings = lazy(() => import("../views/Settings/Settings"));
+const Signup = lazy(() => import("../views/Signup/Signup"));
+const Album = lazy(() => import("../views/Album/Album"));
 
 /**
  * Interface defining a route object

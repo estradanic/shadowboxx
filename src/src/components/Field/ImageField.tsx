@@ -17,7 +17,7 @@ import {
 import { makeStyles, Theme } from "@material-ui/core/styles";
 import { elide } from "../../utils/stringUtils";
 import Strings from "../../resources/Strings";
-import { uniqueId } from "lodash";
+import uniqueId from "lodash/uniqueId";
 import TextField, { TextFieldProps } from "../Field/TextField";
 import Tooltip from "../Tooltip/Tooltip";
 import Parse from "parse";

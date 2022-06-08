@@ -1,8 +1,9 @@
-import React from "react";
+import React, { Suspense } from "react";
 import { BrowserRouter as Router, Switch } from "react-router-dom";
 import ViewWrapper from "./RouteWrapper";
 import { useRoutes } from "./routes";
 import {
+  CircularProgress,
   ThemeProvider,
   unstable_createMuiStrictModeTheme as createMuiTheme,
 } from "@material-ui/core";
@@ -80,11 +81,27 @@ const App = () => {
   return (
     <ThemeProvider theme={darkTheme}>
       <Router>
-        <Switch>
-          {Object.keys(routes).map((routeKey) => (
-            <ViewWrapper key={routeKey} {...routes[routeKey]} />
-          ))}
-        </Switch>
+        <Suspense
+          fallback={
+            <div
+              style={{
+                width: "100vw",
+                height: "100vh",
+                backgroundColor: "#1B71B5",
+              }}
+            >
+              <CircularProgress
+                style={{ margin: "auto", top: "40%", color: "#C14E4E" }}
+              />
+            </div>
+          }
+        >
+          <Switch>
+            {Object.keys(routes).map((routeKey) => (
+              <ViewWrapper key={routeKey} {...routes[routeKey]} />
+            ))}
+          </Switch>
+        </Suspense>
       </Router>
     </ThemeProvider>
   );

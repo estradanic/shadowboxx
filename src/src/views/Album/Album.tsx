@@ -10,6 +10,7 @@ import Void from "../../components/Svgs/Void";
 import { makeStyles, Theme } from "@material-ui/core/styles";
 import ParseImage from "../../types/Image";
 import FancyTitleTypography from "../../components/Typography/FancyTitleTypography";
+import { useRoutes } from "../../app/routes";
 
 const useStyles = makeStyles((theme: Theme) => ({
   albumNotFoundContainer: {
@@ -53,6 +54,24 @@ const Album = () => {
   const classes = useStyles();
   const [images, setImages] = useState<ParseImage[]>();
 
+  const { routeHistory } = useNavigationContext();
+  const { routes } = useRoutes();
+  const [showBackButton, setShowBackButton] = useState(false);
+
+  useEffect(() => {
+    if (routeHistory.length === 1) {
+      setShowBackButton(
+        routeHistory[0].viewId !== "Album" &&
+          !!routes[routeHistory[0].viewId]?.tryAuthenticate
+      );
+    } else if (routeHistory.length > 1) {
+      setShowBackButton(
+        routeHistory[1].viewId !== "Album" &&
+          !!routes[routeHistory[1].viewId]?.tryAuthenticate
+      );
+    }
+  }, [routeHistory.length, routeHistory, routes]);
+
   useEffect(() => {
     if (!gotAlbum.current && !globalLoading) {
       if (id) {
@@ -79,16 +98,18 @@ const Album = () => {
                   gotImages.current = true;
                   setGlobalLoading(!gotAlbum.current);
                 });
+              setGlobalLoading(!gotImages.current);
             } else {
               enqueueErrorSnackbar(Strings.albumNotFound(id));
+              setGlobalLoading(false);
             }
           })
           .catch((e) => {
             enqueueErrorSnackbar(e.message ?? Strings.getAlbumError());
+            setGlobalLoading(false);
           })
           .finally(() => {
             gotAlbum.current = true;
-            setGlobalLoading(!gotImages.current);
           });
       } else {
         enqueueErrorSnackbar(Strings.noAlbumId());
@@ -123,7 +144,9 @@ const Album = () => {
             {Strings.albumNotFound()}
           </Typography>
           <br />
-          <BackButton color="inherit" placement="body" variant="text" />
+          {showBackButton && (
+            <BackButton color="inherit" placement="body" variant="text" />
+          )}
         </Grid>
       )}
     </PageContainer>

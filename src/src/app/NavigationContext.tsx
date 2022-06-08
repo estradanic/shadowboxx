@@ -1,5 +1,6 @@
 import React, { useState, useEffect, createContext, useContext } from "react";
-import { isEmpty, isMatch } from "lodash";
+import isEmpty from "lodash/isEmpty";
+import isMatch from "lodash/isMatch";
 
 /**
  * Historical React Router url parameters mapped to route viewId
