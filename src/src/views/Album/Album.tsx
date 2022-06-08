@@ -18,21 +18,23 @@ const useStyles = makeStyles((theme: Theme) => ({
   albumNotFound: {
     fontSize: "medium",
   },
+  imageWrapper: {
+    minWidth: theme.spacing(40),
+    padding: theme.spacing(2),
+  },
   image: {
-    width: theme.spacing(35),
     display: "block",
     borderRadius: theme.spacing(0.5),
     overflow: "hidden",
-    minWidth: theme.spacing(50),
-    flexBasis: "20%",
-    margin: theme.spacing(2),
-    flexGrow: 1,
-    flexShrink: 1,
+    marginTop: "auto",
+    marginBottom: "auto",
+    width: "100%",
+    border: `2px solid ${theme.palette.primary.dark}`,
   },
   imageContainer: {
     display: "flex",
     flexDirection: "row",
-    paddingTop: theme.spacing(10),
+    marginTop: theme.spacing(7),
   },
 }));
 
@@ -103,12 +105,13 @@ const Album = () => {
           </Grid>
           <Grid item container className={classes.imageContainer} xs={12}>
             {images?.map((image) => (
-              <img
-                key={image.id}
-                className={classes.image}
-                src={image.file.url()}
-                alt={image.file.name()}
-              />
+              <Grid key={image.id} item xs={4} className={classes.imageWrapper}>
+                <img
+                  className={classes.image}
+                  src={image.file.url()}
+                  alt={image.file.name()}
+                />
+              </Grid>
             ))}
           </Grid>
         </>
