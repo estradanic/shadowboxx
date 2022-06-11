@@ -1,19 +1,6 @@
 import React, { useState, memo } from "react";
-import {
-  InputAdornment,
-  Avatar,
-  Typography,
-  LinearProgress,
-} from "@material-ui/core";
-import {
-  Close,
-  AddAPhoto,
-  Link,
-  Check,
-  Remove,
-  Star,
-  StarBorder,
-} from "@material-ui/icons";
+import { InputAdornment, Avatar, Typography, Grid } from "@material-ui/core";
+import { Close, AddAPhoto, Link, Check } from "@material-ui/icons";
 import { makeStyles, Theme } from "@material-ui/core/styles";
 import { elide } from "../../utils/stringUtils";
 import Strings from "../../resources/Strings";
@@ -24,6 +11,11 @@ import Parse from "parse";
 import ParseImage from "../../types/Image";
 import { useSnackbar } from "../Snackbar/Snackbar";
 import { useImageContext } from "../../app/ImageContext";
+import LoadingWrapper from "../Loader/LoadingWrapper";
+import Image from "../Image/Image";
+import RemoveImageDecoration from "../Image/Decoration/RemoveImageDecoration";
+import CoverImageDecoration from "../Image/Decoration/CoverImageDecoration";
+import useRandomColor from "../../hooks/useRandomColor";
 
 const useStyles = makeStyles((theme: Theme) => ({
   endAdornment: {
@@ -38,33 +30,12 @@ const useStyles = makeStyles((theme: Theme) => ({
     cursor: "text",
     visibility: "hidden",
   },
-  multiImage: {
-    maxWidth: "100%",
-    width: theme.spacing(35),
-    display: "block",
-    borderRadius: theme.spacing(0.5),
-    overflow: "hidden",
-  },
   multiImageContainer: {
     textAlign: "center",
-    backgroundColor: theme.palette.grey[50],
     border: `1px solid ${theme.palette.divider}`,
-    margin: theme.spacing(2),
+    margin: theme.spacing(2, 0),
     borderRadius: theme.spacing(0.5),
     padding: theme.spacing(2),
-  },
-  removeImage: {
-    backgroundColor: theme.palette.error.main,
-    color: theme.palette.error.contrastText,
-    borderRadius: "100%",
-    position: "absolute",
-    top: 0,
-    left: 0,
-    cursor: "pointer",
-    zIndex: 99,
-    marginLeft: theme.spacing(-1),
-    marginTop: theme.spacing(-1),
-    border: `2px solid ${theme.palette.error.contrastText}`,
   },
   coverImage: {
     backgroundColor: theme.palette.warning.contrastText,
@@ -78,23 +49,25 @@ const useStyles = makeStyles((theme: Theme) => ({
     marginRight: theme.spacing(-1),
     marginBottom: theme.spacing(-1),
   },
+  notCoverImage: {
+    color: theme.palette.warning.contrastText,
+    borderRadius: "100%",
+    backgroundColor: theme.palette.warning.main,
+    position: "absolute",
+    bottom: 0,
+    right: 0,
+    cursor: "pointer",
+    zIndex: 99,
+    marginRight: theme.spacing(-1),
+    marginBottom: theme.spacing(-1),
+  },
   imageWrapper: {
-    position: "relative",
-    display: "inline-block",
-    width: "fit-content",
-    height: "fit-content",
-    margin: theme.spacing(1),
-    backgroundColor: "transparent",
+    marginBottom: theme.spacing(2),
   },
   main: {
     "& > div": {
       cursor: "default",
     },
-  },
-  progress: {
-    marginTop: "50%",
-    marginLeft: "25%",
-    marginRight: "25%",
   },
 }));
 
@@ -123,7 +96,7 @@ const ImageField = memo(
   }: ImageFieldProps) => {
     const classes = useStyles();
 
-    const { uploadImage, progress, loading, deleteImage } = useImageContext();
+    const { uploadImage, loading, deleteImage } = useImageContext();
     const [showUrlInput, setShowUrlInput] = useState<boolean>(false);
     const [imageUrl, setImageUrl] = useState<string>("");
 
@@ -131,6 +104,8 @@ const ImageField = memo(
     const urlInputId = uniqueId("image-url-input");
 
     const { enqueueErrorSnackbar } = useSnackbar();
+
+    const randomColor = useRandomColor();
 
     const addFromFile = (event: any) => {
       if (event.target.files?.[0]) {
@@ -173,6 +148,40 @@ const ImageField = memo(
     const openUrlInput = () => {
       setShowUrlInput(true);
       document.getElementById(urlInputId)?.focus();
+    };
+
+    const setCoverImage = async (image: ParseImage, index: number) => {
+      const newValue = [...value];
+      const currentCoverImageIndex = value.findIndex((i) => i.isCoverImage);
+      image.isCoverImage = true;
+      try {
+        if (currentCoverImageIndex !== -1) {
+          value[currentCoverImageIndex].isCoverImage = false;
+          newValue[currentCoverImageIndex] = await value[
+            currentCoverImageIndex
+          ].save();
+        }
+        newValue[index] = await image.save();
+        onChange(newValue);
+      } catch (error: any) {
+        enqueueErrorSnackbar(error?.message ?? Strings.commonError());
+        image.isCoverImage = false;
+        if (currentCoverImageIndex !== -1) {
+          value[currentCoverImageIndex].isCoverImage = true;
+        }
+      }
+    };
+
+    const unsetCoverImage = async (image: ParseImage, index: number) => {
+      const newValue = [...value];
+      image.isCoverImage = false;
+      try {
+        newValue[index] = await image.save();
+        onChange(newValue);
+      } catch (error: any) {
+        enqueueErrorSnackbar(error?.message ?? Strings.commonError());
+        image.isCoverImage = true;
+      }
     };
 
     return (
@@ -260,91 +269,50 @@ const ImageField = memo(
           {...rest}
         />
         {multiple && !!value.length && (
-          <div className={classes.multiImageContainer}>
-            {loading && (
-              <LinearProgress className={classes.progress} value={progress} />
-            )}
-            {value.map((image: ParseImage, index) => {
-              const file = image.file;
-              return (
-                <div className={classes.imageWrapper} key={uniqueId(image.id)}>
-                  <Tooltip title={Strings.removeImage()}>
-                    <Remove
-                      fontSize="large"
-                      className={classes.removeImage}
-                      onClick={async () => {
-                        const newValue = value.filter(
-                          (valueImage) => image.id !== valueImage.id
-                        );
-                        onChange(newValue);
-                        await deleteImage(image);
-                      }}
+          <LoadingWrapper loading={loading} backgroundColor="transparent">
+            <Grid container className={classes.multiImageContainer}>
+              {value.map((image: ParseImage, index) => {
+                const file = image.file;
+                return (
+                  <Grid
+                    xs={12}
+                    md={6}
+                    lg={4}
+                    item
+                    className={classes.imageWrapper}
+                    key={image.id}
+                  >
+                    <Image
+                      borderColor={randomColor}
+                      src={file.url()}
+                      alt={file.name()}
+                      decorations={[
+                        <RemoveImageDecoration
+                          onClick={async () => {
+                            const newValue = value.filter(
+                              (valueImage) => image.id !== valueImage.id
+                            );
+                            onChange(newValue);
+                            await deleteImage(image);
+                          }}
+                        />,
+                        <CoverImageDecoration
+                          checked={image.isCoverImage}
+                          onClick={async () => {
+                            if (image.isCoverImage) {
+                              await unsetCoverImage(image, index);
+                            } else {
+                              await setCoverImage(image, index);
+                            }
+                          }}
+                        />,
+                      ]}
                     />
-                  </Tooltip>
-                  {image.isCoverImage ? (
-                    <Tooltip title={Strings.unsetCoverImage()}>
-                      <Star
-                        fontSize="large"
-                        className={classes.coverImage}
-                        onClick={async () => {
-                          const newValue = [...value];
-                          image.isCoverImage = false;
-                          try {
-                            newValue[index] = await image.save();
-                            onChange(newValue);
-                          } catch (error: any) {
-                            enqueueErrorSnackbar(
-                              error?.message ?? Strings.commonError()
-                            );
-                            image.isCoverImage = true;
-                          }
-                        }}
-                      />
-                    </Tooltip>
-                  ) : (
-                    <Tooltip title={Strings.setImageAsCover()}>
-                      <StarBorder
-                        fontSize="large"
-                        className={classes.coverImage}
-                        onClick={async () => {
-                          const newValue = [...value];
-                          const currentCoverImageIndex = value.findIndex(
-                            (i) => i.isCoverImage
-                          );
-                          image.isCoverImage = true;
-                          try {
-                            if (currentCoverImageIndex !== -1) {
-                              value[
-                                currentCoverImageIndex
-                              ].isCoverImage = false;
-                              newValue[currentCoverImageIndex] = await value[
-                                currentCoverImageIndex
-                              ].save();
-                            }
-                            newValue[index] = await image.save();
-                            onChange(newValue);
-                          } catch (error: any) {
-                            enqueueErrorSnackbar(
-                              error?.message ?? Strings.commonError()
-                            );
-                            image.isCoverImage = false;
-                            if (currentCoverImageIndex !== -1) {
-                              value[currentCoverImageIndex].isCoverImage = true;
-                            }
-                          }
-                        }}
-                      />
-                    </Tooltip>
-                  )}
-                  <img
-                    className={classes.multiImage}
-                    src={file.url()}
-                    alt={file.name()}
-                  />
-                </div>
-              );
-            })}
-          </div>
+                  </Grid>
+                );
+              })}
+            </Grid>
+          </LoadingWrapper>
         )}
       </>
     );

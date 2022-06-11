@@ -34,6 +34,20 @@ export default class ParseImage extends Object<Image> {
     this._image = image;
   }
 
+  compareTo(that: ParseImage): number {
+    return !this.file?.name() && !that?.file?.name()
+      ? 0
+      : !this.file?.name()
+      ? 1
+      : !that?.file?.name()
+      ? -1
+      : this.isCoverImage
+      ? -1
+      : that.isCoverImage
+      ? 1
+      : this.file?.name().localeCompare(that.file?.name()!);
+  }
+
   async save() {
     return new ParseImage(await this._image.save());
   }

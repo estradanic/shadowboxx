@@ -31,6 +31,12 @@ const App = () => {
                 contrastText: "#FFFFFF",
                 light: "#01579B",
               },
+              secondary: {
+                main: "#A01E1E",
+                dark: "#601212",
+                light: "#B22222",
+                contrastText: "#FFFFFF",
+              },
               error: {
                 main: "#A01E1E",
                 dark: "#601212",
@@ -88,11 +94,11 @@ const App = () => {
                 width: "100vw",
                 height: "100vh",
                 backgroundColor: "#1B71B5",
+                paddingTop: "45vh",
+                paddingLeft: "45vh",
               }}
             >
-              <CircularProgress
-                style={{ margin: "auto", top: "40%", color: "#C14E4E" }}
-              />
+              <CircularProgress style={{ color: "#C14E4E" }} />
             </div>
           }
         >

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useView } from "../View";
 import {
   PageContainer,
@@ -124,6 +124,18 @@ const Settings = () => {
     lastName: loggedInUser?.lastName ?? "",
     email: loggedInUser?.email ?? "",
   });
+
+  useEffect(() => {
+    if (loggedInUser) {
+      setSettings({
+        isDarkThemeEnabled: loggedInUser.isDarkThemeEnabled,
+        firstName: loggedInUser.firstName,
+        lastName: loggedInUser.lastName,
+        email: loggedInUser.email,
+        profilePicture,
+      });
+    }
+  }, [loggedInUser, profilePicture]);
 
   const { enqueueErrorSnackbar, enqueueSuccessSnackbar } = useSnackbar();
 

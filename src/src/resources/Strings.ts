@@ -1,8 +1,119 @@
+export interface StringEntries {
+  accountNotDeleted: string;
+  actionUnauthorized: string;
+  addAlbum: string;
+  addAlbumError: string;
+  addAlbumSuccess: string;
+  addFromFile: string;
+  addFromUrl: string;
+  albumNotFound: string;
+  alreadyHaveAccount: string;
+  appName: string;
+  back: string;
+  cancel: string;
+  checkEmailVerified: string;
+  collaborators: string;
+  collaboratorsTooltip: string;
+  commonError: string;
+  confirm: string;
+  coOwners: string;
+  coOwnersTooltip: string;
+  copyright: string;
+  couldNotGetCollaborators: string;
+  couldNotGetUserInfo: string;
+  couldNotWriteImage: string;
+  createdAt: string;
+  darkMode: string;
+  deleteAccount: string;
+  deleteAccountConfirmation: string;
+  deleteAlbum: string;
+  deleteAlbumConfirmation: string;
+  deleteAlbumError: string;
+  deleteAlbumSuccess: string;
+  deleteDirectoryError: string;
+  description: string;
+  dragOrBrowse: string;
+  editAlbum: string;
+  editAlbumError: string;
+  email: string;
+  emailExists: string;
+  endpointNotFound: string;
+  favorite: string;
+  favoriteTooltip: string;
+  firstName: string;
+  fullName: string;
+  getAlbumError: string;
+  getAlbumsError: string;
+  getImageError: string;
+  getImagesError: string;
+  goBack: string;
+  home: string;
+  imageNotDeleted: string;
+  imageNotSaved: string;
+  imageNotUpdated: string;
+  images: string;
+  imageUrl: string;
+  incorrectPassword: string;
+  insertCollaboratorsError: string;
+  invalidEmail: string;
+  invalidImage: string;
+  invalidPassword: string;
+  updatedAt: string;
+  lastName: string;
+  login: string;
+  loginError: string;
+  logout: string;
+  loginSignup: string;
+  multipleImages: string;
+  name: string;
+  newPassword: string;
+  noAccount: string;
+  noAlbumId: string;
+  noAlbums: string;
+  noEmailExists: string;
+  noImageExists: string;
+  noImages: string;
+  nonExistentUserWarning: string;
+  noNotifications: string;
+  noNotificationsDetail: string;
+  noSessionId: string;
+  numOfPhotos: string;
+  okay: string;
+  password: string;
+  pleaseEnterA: string;
+  profilePicture: string;
+  public: string;
+  publicTooltip: string;
+  removeImage: string;
+  removeImageError: string;
+  setImageAsCover: string;
+  settings: string;
+  settingsNotSaved: string;
+  settingsSaved: string;
+  signup: string;
+  signupError: string;
+  submit: string;
+  tryAddingAlbum: string;
+  unlockPassword: string;
+  unsetCoverImage: string;
+  untitledAlbum: string;
+  updateImageError: string;
+  uploadImageError: string;
+  uploadingImage: string;
+  verifyEmail: string;
+  viewers: string;
+  viewersTooltip: string;
+  welcomeUser: string;
+  wrongSessionId: string;
+}
+
 /**
  * Object providing dynamic access to strings used throughout the site.
  * Needed to avoid string literals for consistency.
  */
-const Strings: { [key: string]: (params?: any) => string } = {
+const Strings: {
+  [key in keyof StringEntries]: (...params: any[]) => string;
+} = {
   accountNotDeleted: () => `${Strings.commonError()} Could not delete account.`,
   actionUnauthorized: () => "Action Unauthorized",
   addAlbum: () => "Add Album",
@@ -62,7 +173,8 @@ const Strings: { [key: string]: (params?: any) => string } = {
   getImagesError: () => `${Strings.commonError()} Could not get images.`,
   goBack: () => "Go Back",
   home: () => "Home",
-  imageNotDeleted: (image) => `Image not deleted ${JSON.stringify(image)}`,
+  imageNotDeleted: (image: string) =>
+    `Image not deleted ${JSON.stringify(image)}`,
   imageNotSaved: () => `${Strings.commonError()} Image not saved`,
   imageNotUpdated: () => `${Strings.commonError()} Image not updated`,
   images: () => "Images",
@@ -87,6 +199,7 @@ const Strings: { [key: string]: (params?: any) => string } = {
   noAlbums: () => "No Albums",
   noEmailExists: (email: string) => `Email doesn't exist (${email})`,
   noImageExists: (fileName: string) => `Image doesn't exist (${fileName})`,
+  noImages: () => "This album is empty",
   nonExistentUserWarning: () =>
     `You are saving this album with at least one user that does not currently have a Shadowbox account.
     This will open up access to your album to the first person who creates an account with that email.
@@ -101,9 +214,9 @@ const Strings: { [key: string]: (params?: any) => string } = {
   profilePicture: () => "Profile Picture",
   public: () => "Public",
   publicTooltip: () =>
-    "Should this album be viewable by anyone with a link? (Overrides Viewers)",
+    "Should this album be viewable by stringone with a link? (Overrides Viewers)",
   removeImage: () => "Remove image from album",
-  removeImageError: (fileName) =>
+  removeImageError: (fileName: string) =>
     `Could not remove image ${fileName} from album.`,
   setImageAsCover: () => "Set this image as the album cover",
   settings: () => "Settings",
@@ -116,10 +229,10 @@ const Strings: { [key: string]: (params?: any) => string } = {
   unlockPassword: () => "Change Password",
   unsetCoverImage: () => "Unset this image as the album cover",
   untitledAlbum: () => "Untitled Album",
-  updateImageError: (fileName) => `Error updating image ${fileName}.`,
-  uploadImageError: (fileName) => `Error uploading image ${fileName}.`,
-  uploadingImage: (fileName) => `Uploading image (${fileName})`,
-  verifyEmail: (email) =>
+  updateImageError: (fileName: string) => `Error updating image ${fileName}.`,
+  uploadImageError: (fileName: string) => `Error uploading image ${fileName}.`,
+  uploadingImage: (fileName: string) => `Uploading image (${fileName})`,
+  verifyEmail: (email: string) =>
     `Please check ${email} for the verification message, then return here.`,
   viewers: () => "Viewers",
   viewersTooltip: () =>

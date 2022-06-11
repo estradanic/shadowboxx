@@ -1,7 +1,7 @@
 import React from "react";
 import { Typography, TypographyProps } from "@material-ui/core";
 import { makeStyles } from "@material-ui/core/styles";
-import classnames from "classnames";
+import classNames from "classnames";
 
 const useStyles = makeStyles(() => ({
   root: {
@@ -19,7 +19,7 @@ const FancyTypography = ({
   const classes = useStyles();
 
   return (
-    <Typography {...rest} className={classnames(className, classes.root)}>
+    <Typography {...rest} className={classNames(className, classes.root)}>
       {children}
     </Typography>
   );

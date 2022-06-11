@@ -1,7 +1,12 @@
 import React from "react";
 import { makeStyles, Theme } from "@material-ui/core/styles";
 import FancyTypography from "./FancyTypography";
-import classnames from "classnames";
+import classNames from "classnames";
+import VariableColor from "../../types/VariableColor";
+
+interface UseStylesParams {
+  outlineColor: VariableColor;
+}
 
 const useStyles = makeStyles((theme: Theme) => ({
   corner: {
@@ -63,7 +68,8 @@ const useStyles = makeStyles((theme: Theme) => ({
   root: {
     backgroundColor: theme.palette.background.paper,
     border: `2px solid ${theme.palette.primary.dark}`,
-    outline: `2px dashed ${theme.palette.primary.dark}`,
+    outline: ({ outlineColor }: UseStylesParams) =>
+      `2px dashed ${theme.palette[outlineColor].dark}`,
     outlineOffset: theme.spacing(-1),
     padding: theme.spacing(4, 8),
     textAlign: "center",
@@ -73,29 +79,33 @@ const useStyles = makeStyles((theme: Theme) => ({
 }));
 
 export interface FancyTitleTypographyProps {
+  outlineColor?: VariableColor;
   children: React.ReactNode;
 }
 
-const FancyTitleTypography = ({ children }: FancyTitleTypographyProps) => {
-  const classes = useStyles();
+const FancyTitleTypography = ({
+  children,
+  outlineColor = "primary",
+}: FancyTitleTypographyProps) => {
+  const classes = useStyles({ outlineColor });
 
   return (
     <div className={classes.root}>
-      <div className={classnames(classes.topRight, classes.corner)} />
-      <div className={classnames(classes.topLeft, classes.corner)} />
-      <div className={classnames(classes.bottomRight, classes.corner)} />
-      <div className={classnames(classes.bottomLeft, classes.corner)} />
+      <div className={classNames(classes.topRight, classes.corner)} />
+      <div className={classNames(classes.topLeft, classes.corner)} />
+      <div className={classNames(classes.bottomRight, classes.corner)} />
+      <div className={classNames(classes.bottomLeft, classes.corner)} />
       <div
-        className={classnames(classes.top, classes.edge, classes.topBottom)}
+        className={classNames(classes.top, classes.edge, classes.topBottom)}
       />
       <div
-        className={classnames(classes.left, classes.edge, classes.leftRight)}
+        className={classNames(classes.left, classes.edge, classes.leftRight)}
       />
       <div
-        className={classnames(classes.bottom, classes.edge, classes.topBottom)}
+        className={classNames(classes.bottom, classes.edge, classes.topBottom)}
       />
       <div
-        className={classnames(classes.right, classes.edge, classes.leftRight)}
+        className={classNames(classes.right, classes.edge, classes.leftRight)}
       />
       <FancyTypography variant="h2">{children}</FancyTypography>
     </div>

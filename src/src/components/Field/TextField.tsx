@@ -10,6 +10,12 @@ const useStyles = makeStyles((theme: Theme) => ({
     "&& > div": {
       backgroundColor: theme.palette.background.paper,
     },
+    "&& > label": {
+      color: theme.palette.text.primary,
+    },
+    "&& > label.Mui-focused": {
+      color: theme.palette.primary.dark,
+    },
   },
 }));
 

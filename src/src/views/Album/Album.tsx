@@ -11,26 +11,16 @@ import { makeStyles, Theme } from "@material-ui/core/styles";
 import ParseImage from "../../types/Image";
 import FancyTitleTypography from "../../components/Typography/FancyTitleTypography";
 import { useRoutes } from "../../app/routes";
+import Image from "../../components/Image/Image";
+import Empty from "../../components/Svgs/Empty";
+import useRandomColor from "../../hooks/useRandomColor";
 
 const useStyles = makeStyles((theme: Theme) => ({
-  albumNotFoundContainer: {
+  svgContainer: {
     textAlign: "center",
   },
-  albumNotFound: {
+  svgText: {
     fontSize: "medium",
-  },
-  imageWrapper: {
-    minWidth: theme.spacing(40),
-    padding: theme.spacing(2),
-  },
-  image: {
-    display: "block",
-    borderRadius: theme.spacing(0.5),
-    overflow: "hidden",
-    marginTop: "auto",
-    marginBottom: "auto",
-    width: "100%",
-    border: `2px solid ${theme.palette.primary.dark}`,
   },
   imageContainer: {
     display: "flex",
@@ -57,6 +47,8 @@ const Album = () => {
   const { routeHistory } = useNavigationContext();
   const { routes } = useRoutes();
   const [showBackButton, setShowBackButton] = useState(false);
+
+  const randomColor = useRandomColor();
 
   useEffect(() => {
     if (routeHistory.length === 1) {
@@ -122,25 +114,39 @@ const Album = () => {
       {album ? (
         <>
           <Grid item sm={8}>
-            <FancyTitleTypography>{album.name}</FancyTitleTypography>
+            <FancyTitleTypography outlineColor={randomColor}>
+              {album.name}
+            </FancyTitleTypography>
           </Grid>
-          <Grid item container className={classes.imageContainer} xs={12}>
-            {images?.map((image) => (
-              <Grid key={image.id} item xs={4} className={classes.imageWrapper}>
-                <img
-                  className={classes.image}
-                  src={image.file.url()}
-                  alt={image.file.name()}
-                />
-              </Grid>
-            ))}
-          </Grid>
+          {images ? (
+            <Grid item container className={classes.imageContainer} xs={12}>
+              {[...images]
+                .sort((a, b) => a.compareTo(b))
+                ?.map((image) => (
+                  <Grid key={image.id} item xs={12} md={6} lg={4}>
+                    <Image
+                      borderColor={randomColor}
+                      src={image.file.url()}
+                      alt={image.file.name()}
+                    />
+                  </Grid>
+                ))}
+            </Grid>
+          ) : (
+            <Grid item className={classes.svgContainer}>
+              <Empty height="40vh" />
+              <br />
+              <Typography className={classes.svgText} variant="overline">
+                {Strings.noImages()}
+              </Typography>
+            </Grid>
+          )}
         </>
       ) : (
-        <Grid item className={classes.albumNotFoundContainer}>
+        <Grid item className={classes.svgContainer}>
           <Void height="40vh" />
           <br />
-          <Typography className={classes.albumNotFound} variant="overline">
+          <Typography className={classes.svgText} variant="overline">
             {Strings.albumNotFound()}
           </Typography>
           <br />

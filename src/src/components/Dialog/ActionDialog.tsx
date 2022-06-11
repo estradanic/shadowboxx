@@ -213,7 +213,7 @@ const ActionDialogContent = memo(
   ({ message, type, children }: ActionDialogContentProps) => {
     return (
       <DialogContent>
-        <DialogContentText>{message}</DialogContentText>
+        <DialogContentText color="textPrimary">{message}</DialogContentText>
         {type === "prompt" && children}
       </DialogContent>
     );

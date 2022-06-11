@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { InputAdornment } from "@material-ui/core";
 import { makeStyles, Theme } from "@material-ui/core/styles";
 import { Visibility, VisibilityOff } from "@material-ui/icons";
-import TextField, { TextFieldProps } from "../Field/TextField";
+import TextField, { TextFieldProps } from "./TextField";
 
 const useStyles = makeStyles((theme: Theme) => ({
   endAdornment: {
