@@ -8,10 +8,10 @@ import {
   useMediaQuery,
 } from "@material-ui/core";
 import { Home, ExitToApp, Settings, Menu } from "@material-ui/icons";
-import ListItemLink from "../Link/ListItemLink";
 import { makeStyles, Theme, useTheme } from "@material-ui/core/styles";
-import Strings from "../../resources/Strings";
-import { useUserContext } from "../../app/UserContext";
+import { Strings } from "../../resources";
+import { useUserContext } from "../../contexts";
+import ListItemLink from "../Link/ListItemLink";
 
 const useStyles = makeStyles((theme: Theme) => ({
   drawer: {

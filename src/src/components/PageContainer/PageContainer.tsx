@@ -1,8 +1,8 @@
 import React from "react";
 import { Container, ContainerProps, Grid } from "@material-ui/core";
 import { makeStyles, Theme } from "@material-ui/core/styles";
+import { useGlobalLoadingContext } from "../../contexts";
 import LoadingWrapper from "../Loader/LoadingWrapper";
-import { useNavigationContext } from "../../app/NavigationContext";
 
 const useStyles = makeStyles((theme: Theme) => ({
   container: {
@@ -26,7 +26,7 @@ export interface PageContainerProps extends Omit<ContainerProps, "maxWidth"> {
 /** Component to wrap every view in the app */
 const PageContainer = ({ children, loading, ...rest }: PageContainerProps) => {
   const classes = useStyles();
-  const { globalLoading } = useNavigationContext();
+  const { globalLoading } = useGlobalLoadingContext();
 
   return (
     <LoadingWrapper loading={loading || globalLoading}>

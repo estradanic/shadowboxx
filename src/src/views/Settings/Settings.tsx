@@ -1,11 +1,4 @@
 import React, { useEffect, useState } from "react";
-import { useView } from "../View";
-import {
-  PageContainer,
-  ImageField,
-  TextField,
-  useSnackbar,
-} from "../../components";
 import {
   Grid,
   Card,
@@ -15,13 +8,18 @@ import {
   FormControl,
 } from "@material-ui/core";
 import { Brightness7, Brightness2 } from "@material-ui/icons";
-import Strings from "../../resources/Strings";
 import { makeStyles, Theme } from "@material-ui/core/styles";
-import { ErrorState, validateEmail } from "../../utils/formUtils";
-import { isNullOrWhitespace } from "../../utils/stringUtils";
-import { ImageContextProvider } from "../../app/ImageContext";
-import { useUserContext } from "../../app/UserContext";
-import FancyTypography from "../../components/Typography/FancyTypography";
+import {
+  PageContainer,
+  ImageField,
+  TextField,
+  useSnackbar,
+  FancyTypography,
+} from "../../components";
+import { Strings } from "../../resources";
+import { ErrorState, validateEmail, isNullOrWhitespace } from "../../utils";
+import { useUserContext, ImageContextProvider } from "../../contexts";
+import { useView } from "../View";
 
 const useStyles = makeStyles((theme: Theme) => ({
   cardTitle: {

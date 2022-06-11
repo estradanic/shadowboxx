@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { makeStyles, Theme } from "@material-ui/core/styles";
 import { Card, Grid, Typography, Button } from "@material-ui/core";
 import Strings from "../../resources/Strings";
+import { ErrorState, validateEmail } from "../../utils";
 import {
   PasswordField,
   Link,
@@ -9,13 +10,9 @@ import {
   TextField,
   useSnackbar,
 } from "../../components";
-import { ErrorState, validateEmail } from "../../utils/formUtils";
-import { useNavigationContext } from "../../app/NavigationContext";
-import { useHistory } from "react-router-dom";
-import { useRoutes } from "../../app/routes";
 import { useView } from "../View";
-import ParseUser from "../../types/User";
-import { useUserContext } from "../../app/UserContext";
+import { ParseUser } from "../../types";
+import { useUserContext, useGlobalLoadingContext } from "../../contexts";
 
 const useStyles = makeStyles((theme: Theme) => ({
   cardTitle: {
@@ -56,9 +53,7 @@ const Login = () => {
   const [errors, setErrors] = useState<ErrorState<"email" | "password">>(
     DefaultErrorState
   );
-  const { redirectRoute, setGlobalLoading } = useNavigationContext();
-  const history = useHistory();
-  const { routes } = useRoutes();
+  const { setGlobalLoading } = useGlobalLoadingContext();
   const { enqueueErrorSnackbar } = useSnackbar();
   const { updateLoggedInUser } = useUserContext();
 
@@ -81,16 +76,10 @@ const Login = () => {
       const user = ParseUser.fromAttributes({ username: email, password });
       user
         .login(updateLoggedInUser)
-        .then(() => {
-          setGlobalLoading(false);
-          if (redirectRoute?.viewId) {
-            history.push(redirectRoute.path);
-          } else {
-            history.push(routes["Home"].path);
-          }
-        })
         .catch((error) => {
           enqueueErrorSnackbar(error?.message ?? Strings.loginError());
+        })
+        .finally(() => {
           setGlobalLoading(false);
         });
     }

@@ -3,11 +3,10 @@ import { Autocomplete, AutocompleteProps } from "@material-ui/lab";
 import UserChip from "../User/UserChip";
 import TextField from "../Field/TextField";
 import debounce from "lodash/debounce";
-import { isNullOrWhitespace } from "../../utils/stringUtils";
 import { makeStyles, Theme } from "@material-ui/core/styles";
-import ParseAlbum from "../../types/Album";
-import ParseUser from "../../types/User";
-import { useUserContext } from "../../app/UserContext";
+import { isNullOrWhitespace } from "../../utils";
+import { useUserContext } from "../../contexts";
+import { ParseAlbum, ParseUser } from "../../types";
 
 const useStyles = makeStyles((theme: Theme) => ({
   endAdornment: {

@@ -1,8 +1,7 @@
 import { ComponentType } from "react";
-import { RouteHistory, RouteParams } from "./NavigationContext";
-import isEmpty from "lodash/isEmpty";
 import { lazy } from "react";
 
+// Lazy importing these to allow code-splitting
 const Home = lazy(() => import("../views/Home/Home"));
 const Login = lazy(() => import("../views/Login/Login"));
 const Settings = lazy(() => import("../views/Settings/Settings"));
@@ -21,8 +20,6 @@ export interface RouteProps {
   view: ComponentType<any>;
   /** React Router path */
   path: string;
-  /** Key (viewId) for the parent route (/parent/child in the path) */
-  parentKey?: string;
   /** What layout to use for this route. Defaults to DefaultLayout */
   layout?: string;
   /** Does path have to match exactly */
@@ -31,8 +28,6 @@ export interface RouteProps {
   tryAuthenticate?: boolean;
   /** Redirect to login page if not authenticated */
   redirectOnAuthFail?: boolean;
-  /** Function to run on page load */
-  middleware?: () => void;
 }
 
 /**
@@ -82,36 +77,4 @@ const routes: { [key: string]: RouteProps } = {
   },
 };
 
-/**
- * Helper function to get the path for a route including parameters
- */
-const getRoutePath = (
-  routeHistoryEntry: RouteHistory,
-  routeParams: RouteParams
-): string => {
-  const templatePath = `${routes[routeHistoryEntry.viewId]?.path}${
-    routeHistoryEntry.search
-  }`;
-  if (!templatePath) {
-    return "";
-  }
-
-  if (isEmpty(routeParams)) {
-    return templatePath;
-  }
-
-  // @ts-ignore: routeParams is definitely not empty as per above check
-  const params = routeParams[viewId];
-  if (!params || isEmpty(params)) {
-    return templatePath;
-  }
-
-  let path = templatePath;
-  Object.keys(params).forEach((param) => {
-    path = path.replace(`:${param}`, params[param]);
-  });
-
-  return path;
-};
-
-export const useRoutes = () => ({ getRoutePath, routes });
+export default routes;

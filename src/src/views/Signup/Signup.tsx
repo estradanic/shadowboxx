@@ -1,7 +1,8 @@
 import React, { useState } from "react";
 import { makeStyles, Theme } from "@material-ui/core/styles";
 import { Card, Grid, Typography, Button } from "@material-ui/core";
-import Strings from "../../resources/Strings";
+import { useHistory } from "react-router-dom";
+import { Strings } from "../../resources";
 import {
   PasswordField,
   Link,
@@ -13,14 +14,12 @@ import {
   ErrorState,
   validateEmail,
   validatePassword,
-} from "../../utils/formUtils";
-import { isNullOrWhitespace } from "../../utils/stringUtils";
-import { useNavigationContext } from "../../app/NavigationContext";
-import { useHistory } from "react-router-dom";
-import { useRoutes } from "../../app/routes";
+  isNullOrWhitespace,
+} from "../../utils";
+import { routes } from "../../app";
+import { ParseUser } from "../../types";
+import { useUserContext, useGlobalLoadingContext } from "../../contexts";
 import { useView } from "../View";
-import ParseUser from "../../types/User";
-import { useUserContext } from "../../app/UserContext";
 
 const useStyles = makeStyles((theme: Theme) => ({
   card: {
@@ -69,8 +68,7 @@ const Signup = () => {
   const [errors, setErrors] = useState<
     ErrorState<"email" | "firstName" | "lastName" | "password">
   >(DefaultErrorState);
-  const { setGlobalLoading } = useNavigationContext();
-  const { routes } = useRoutes();
+  const { setGlobalLoading } = useGlobalLoadingContext();
   const history = useHistory();
   const { enqueueErrorSnackbar } = useSnackbar();
   const { updateLoggedInUser } = useUserContext();

@@ -1,16 +1,17 @@
 import React from "react";
 import ReactDOM from "react-dom";
-import "./index.css";
-import App from "./app/App";
 import {
   MuiThemeProvider,
   unstable_createMuiStrictModeTheme as createMuiTheme,
 } from "@material-ui/core/styles";
-import { NavigationContextProvider } from "./app/NavigationContext";
-import { SnackbarProvider } from "./components";
-import { NotificationsContextProvider } from "./app/NotificationsContext";
-import { ActionDialogContextProvider } from "./components/Dialog/ActionDialog";
-import { UserContextProvider } from "./app/UserContext";
+import { SnackbarProvider, ActionDialogContextProvider } from "./components";
+import {
+  UserContextProvider,
+  NotificationsContextProvider,
+  GlobalLoadingContextProvider,
+} from "./contexts";
+import App from "./app/App";
+import "./index.css";
 
 const theme = createMuiTheme({
   palette: {
@@ -71,7 +72,7 @@ ReactDOM.render(
   <React.StrictMode>
     <MuiThemeProvider theme={theme}>
       <SnackbarProvider>
-        <NavigationContextProvider>
+        <GlobalLoadingContextProvider>
           <NotificationsContextProvider>
             <ActionDialogContextProvider>
               <UserContextProvider>
@@ -79,7 +80,7 @@ ReactDOM.render(
               </UserContextProvider>
             </ActionDialogContextProvider>
           </NotificationsContextProvider>
-        </NavigationContextProvider>
+        </GlobalLoadingContextProvider>
       </SnackbarProvider>
     </MuiThemeProvider>
   </React.StrictMode>,

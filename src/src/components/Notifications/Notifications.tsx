@@ -15,13 +15,13 @@ import {
   Close,
   Notifications as NotificationsIcon,
 } from "@material-ui/icons";
+import cx from "classnames";
 import {
   useNotificationsContext,
   Notification as NotificationProps,
-} from "../../app/NotificationsContext";
-import cx from "classnames";
-import Strings from "../../resources/Strings";
-import { elide } from "../../utils/stringUtils";
+} from "../../contexts";
+import { Strings } from "../../resources";
+import { elide } from "../../utils";
 import Tooltip from "../Tooltip/Tooltip";
 
 const useStyles = makeStyles((theme: Theme) => ({

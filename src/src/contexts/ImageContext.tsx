@@ -1,9 +1,9 @@
 import React, { useState, createContext, useContext, useRef } from "react";
 import { useNotificationsContext } from "./NotificationsContext";
-import Strings from "../resources/Strings";
 import { CircularProgress } from "@material-ui/core";
 import { useSnackbar } from "../components";
-import ParseImage, { Image } from "../types/Image";
+import { Strings } from "../resources";
+import { ParseImage, Image } from "../types";
 
 export enum ImageActionCommand {
   DELETE,

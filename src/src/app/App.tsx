@@ -1,7 +1,5 @@
 import React, { Suspense } from "react";
 import { BrowserRouter as Router, Switch } from "react-router-dom";
-import ViewWrapper from "./RouteWrapper";
-import { useRoutes } from "./routes";
 import {
   CircularProgress,
   ThemeProvider,
@@ -9,7 +7,9 @@ import {
 } from "@material-ui/core";
 import { Theme } from "@material-ui/core/styles";
 import { initializeParse } from "@parse/react";
-import { useUserContext } from "./UserContext";
+import { useUserContext } from "../contexts";
+import routes from "./routes";
+import ViewWrapper from "./RouteWrapper";
 
 const PARSE_APPLICATION_ID = "aX17fiOL3N1Lklz83UnWMP6oympHLszezxXAXokH";
 const PARSE_JAVASCRIPT_KEY = "otMMK0SVH7LEIL1TbqlIbemXf0jpfEurJ9FQ7gri";
@@ -17,7 +17,6 @@ const PARSE_HOST_URL = "http://shadowbox.b4a.io";
 initializeParse(PARSE_HOST_URL, PARSE_APPLICATION_ID, PARSE_JAVASCRIPT_KEY);
 
 const App = () => {
-  const { routes } = useRoutes();
   const { loggedInUser } = useUserContext();
 
   const darkTheme = (lightTheme: Theme) =>

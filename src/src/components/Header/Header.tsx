@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import {
   AppBar,
   AppBarProps,
@@ -8,17 +8,15 @@ import {
   Typography,
 } from "@material-ui/core";
 import { makeStyles, Theme, useTheme } from "@material-ui/core/styles";
-import Breadcrumbs from "../Breadcrumbs/Breadcrumbs";
-import Strings from "../../resources/Strings";
-import { useNavigationContext } from "../../app/NavigationContext";
+import { useHistory } from "react-router-dom";
+import { routes } from "../../app";
+import { Strings } from "../../resources";
+import { useUserContext } from "../../contexts";
 import Link from "../Link/Link";
 import BackButton from "../Button/BackButton";
 import AppMenu from "../Menu/AppMenu";
-import { useHistory } from "react-router-dom";
-import { UserAvatar } from "..";
-import { useRoutes } from "../../app/routes";
+import UserAvatar from "../User/UserAvatar";
 import Notifications from "../Notifications/Notifications";
-import { useUserContext } from "../../app/UserContext";
 
 const useStyles = makeStyles((theme: Theme) => ({
   backButton: {
@@ -64,25 +62,8 @@ const Header = ({ viewId, ...rest }: HeaderProps) => {
   const theme = useTheme();
   const xs = useMediaQuery(theme.breakpoints.down("xs"));
   const classes = useStyles({ xs });
-  const { routeHistory } = useNavigationContext();
   const history = useHistory();
-  const [showBackButton, setShowBackButton] = useState(false);
-  const { routes } = useRoutes();
   const { loggedInUser, profilePicture } = useUserContext();
-
-  useEffect(() => {
-    if (routeHistory.length === 1) {
-      setShowBackButton(
-        routeHistory[0].viewId !== viewId &&
-          !!routes[routeHistory[0].viewId]?.tryAuthenticate
-      );
-    } else if (routeHistory.length > 1) {
-      setShowBackButton(
-        routeHistory[1].viewId !== viewId &&
-          !!routes[routeHistory[1].viewId]?.tryAuthenticate
-      );
-    }
-  }, [routeHistory.length, routeHistory, viewId, routes]);
 
   return (
     <header>
@@ -106,7 +87,7 @@ const Header = ({ viewId, ...rest }: HeaderProps) => {
           )}
         </Toolbar>
         <Toolbar variant="dense">
-          {showBackButton && (
+          {history.length > 1 && (
             <BackButton
               className={classes.backButton}
               variant="outlined"
@@ -114,7 +95,7 @@ const Header = ({ viewId, ...rest }: HeaderProps) => {
               size="small"
             />
           )}
-          <Breadcrumbs viewId={viewId} />
+          <Typography variant="overline">{routes[viewId].viewName}</Typography>
           {loggedInUser && (
             <>
               <Notifications className={classes.notifications} />

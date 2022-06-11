@@ -1,19 +1,18 @@
 import React, { memo, useEffect, useRef, useState } from "react";
-import { useView } from "../View";
+import { Fab, Typography, Grid } from "@material-ui/core";
+import { Add } from "@material-ui/icons";
+import { makeStyles, Theme } from "@material-ui/core/styles";
 import {
   PageContainer,
   AlbumCard,
   AlbumFormDialog,
   useSnackbar,
+  BlankCanvas,
 } from "../../components";
-import { Fab, Typography, Grid } from "@material-ui/core";
-import { Add } from "@material-ui/icons";
-import { makeStyles, Theme } from "@material-ui/core/styles";
-import Strings from "../../resources/Strings";
-import ParseAlbum from "../../types/Album";
-import BlankCanvas from "../../components/Svgs/BlankCanvas";
-import { useNavigationContext } from "../../app/NavigationContext";
-import { useUserContext } from "../../app/UserContext";
+import { Strings } from "../../resources";
+import { ParseAlbum } from "../../types";
+import { useGlobalLoadingContext, useUserContext } from "../../contexts";
+import { useView } from "../View";
 
 const useStyles = makeStyles((theme: Theme) => ({
   fab: {
@@ -46,7 +45,7 @@ const HomePage = memo(() => {
   const classes = useStyles();
   const [addAlbumDialogOpen, setAddAlbumDialogOpen] = useState(false);
   const { enqueueErrorSnackbar, enqueueSuccessSnackbar } = useSnackbar();
-  const { setGlobalLoading, globalLoading } = useNavigationContext();
+  const { setGlobalLoading, globalLoading } = useGlobalLoadingContext();
   const [albums, setAlbums] = useState<ParseAlbum[]>([]);
   const gotAlbums = useRef(false);
   const { loggedInUser } = useUserContext();

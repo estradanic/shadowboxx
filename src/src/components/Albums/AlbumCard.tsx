@@ -15,15 +15,15 @@ import {
 import { makeStyles, Theme, useTheme } from "@material-ui/core/styles";
 import { MoreVert, Public, Star } from "@material-ui/icons";
 import { useHistory } from "react-router-dom";
-import Strings from "../../resources/Strings";
+import { Strings } from "../../resources";
+import { routes } from "../../app";
+import { ParseAlbum } from "../../types";
 import UserAvatar from "../User/UserAvatar";
-import ParseAlbum from "../../types/Album";
 import Empty from "../Svgs/Empty";
 import { useSnackbar } from "../Snackbar/Snackbar";
-import { AlbumFormDialog } from "..";
+import AlbumFormDialog from "./AlbumFormDialog";
 import Tooltip from "../Tooltip/Tooltip";
 import { useActionDialogContext } from "../Dialog/ActionDialog";
-import { useRoutes } from "../../app/routes";
 import ParseUser from "../../types/User";
 import ParseImage from "../../types/Image";
 
@@ -162,7 +162,6 @@ const AlbumCard = ({ value, onChange }: AlbumCardProps) => {
     false
   );
   const history = useHistory();
-  const { routes } = useRoutes();
   const coverImage = useMemo(
     () => images?.find((image) => image.isCoverImage) ?? images?.[0],
     [images]

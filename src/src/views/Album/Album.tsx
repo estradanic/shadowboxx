@@ -1,19 +1,14 @@
 import React, { useEffect, useRef, useState } from "react";
-import { useView } from "../View";
 import { BackButton, PageContainer, useSnackbar } from "../../components";
-import { useLocation, useParams } from "react-router-dom";
-import ParseAlbum from "../../types/Album";
-import Strings from "../../resources/Strings";
-import { useNavigationContext } from "../../app/NavigationContext";
+import { useHistory, useLocation, useParams } from "react-router-dom";
 import { Grid, Typography } from "@material-ui/core";
-import Void from "../../components/Svgs/Void";
 import { makeStyles, Theme } from "@material-ui/core/styles";
-import ParseImage from "../../types/Image";
-import FancyTitleTypography from "../../components/Typography/FancyTitleTypography";
-import { useRoutes } from "../../app/routes";
-import Image from "../../components/Image/Image";
-import Empty from "../../components/Svgs/Empty";
-import useRandomColor from "../../hooks/useRandomColor";
+import { Strings } from "../../resources";
+import { ParseImage, ParseAlbum } from "../../types";
+import { Empty, Image, FancyTitleTypography, Void } from "../../components";
+import { useRandomColor } from "../../hooks";
+import { useGlobalLoadingContext } from "../../contexts";
+import { useView } from "../View";
 
 const useStyles = makeStyles((theme: Theme) => ({
   svgContainer: {
@@ -37,32 +32,14 @@ const Album = () => {
   const { search } = useLocation();
   const [album, setAlbum] = useState<ParseAlbum>();
   const { enqueueErrorSnackbar } = useSnackbar();
-  const { setGlobalLoading, globalLoading } = useNavigationContext();
+  const { setGlobalLoading, globalLoading } = useGlobalLoadingContext();
   const gotAlbum = useRef(false);
   const gotImages = useRef(false);
   const { id } = useParams<{ id: string }>();
   const classes = useStyles();
   const [images, setImages] = useState<ParseImage[]>();
-
-  const { routeHistory } = useNavigationContext();
-  const { routes } = useRoutes();
-  const [showBackButton, setShowBackButton] = useState(false);
-
+  const history = useHistory();
   const randomColor = useRandomColor();
-
-  useEffect(() => {
-    if (routeHistory.length === 1) {
-      setShowBackButton(
-        routeHistory[0].viewId !== "Album" &&
-          !!routes[routeHistory[0].viewId]?.tryAuthenticate
-      );
-    } else if (routeHistory.length > 1) {
-      setShowBackButton(
-        routeHistory[1].viewId !== "Album" &&
-          !!routes[routeHistory[1].viewId]?.tryAuthenticate
-      );
-    }
-  }, [routeHistory.length, routeHistory, routes]);
 
   useEffect(() => {
     if (!gotAlbum.current && !globalLoading) {
@@ -150,7 +127,7 @@ const Album = () => {
             {Strings.albumNotFound()}
           </Typography>
           <br />
-          {showBackButton && (
+          {history.length > 1 && (
             <BackButton color="inherit" placement="body" variant="text" />
           )}
         </Grid>

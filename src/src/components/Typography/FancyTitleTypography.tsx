@@ -2,7 +2,7 @@ import React from "react";
 import { makeStyles, Theme } from "@material-ui/core/styles";
 import FancyTypography from "./FancyTypography";
 import classNames from "classnames";
-import VariableColor from "../../types/VariableColor";
+import { VariableColor } from "../../types";
 
 interface UseStylesParams {
   outlineColor: VariableColor;

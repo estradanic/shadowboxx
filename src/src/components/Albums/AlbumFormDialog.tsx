@@ -1,11 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react";
-import ActionDialog, {
-  ActionDialogProps,
-  useActionDialogContext,
-} from "../Dialog/ActionDialog";
-import { Album } from "../../types/Album";
 import { makeStyles, Theme, useTheme } from "@material-ui/core/styles";
-import Strings from "../../resources/Strings";
 import {
   Checkbox,
   FormControl,
@@ -13,17 +7,20 @@ import {
   Grid,
   useMediaQuery,
 } from "@material-ui/core";
-import { ErrorState } from "../../utils/formUtils";
 import { Public, Star, StarBorder } from "@material-ui/icons";
-import { isNullOrWhitespace } from "../../utils/stringUtils";
+import { Strings } from "../../resources";
+import { ErrorState, isNullOrWhitespace } from "../../utils";
+import { ImageContextProvider } from "../../contexts";
+import { ParseUser, ParseImage, Album } from "../../types";
+import ActionDialog, {
+  ActionDialogProps,
+  useActionDialogContext,
+} from "../Dialog/ActionDialog";
 import ImageField from "../Field/ImageField";
 import { useSnackbar } from "../Snackbar/Snackbar";
 import UserField from "../Field/UserField";
 import TextField from "../Field/TextField";
 import Tooltip from "../Tooltip/Tooltip";
-import { ImageContextProvider } from "../../app/ImageContext";
-import ParseUser from "../../types/User";
-import ParseImage from "../../types/Image";
 
 const useStyles = makeStyles((theme: Theme) => ({
   checkboxLabel: {

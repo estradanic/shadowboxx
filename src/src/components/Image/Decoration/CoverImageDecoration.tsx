@@ -1,9 +1,9 @@
 import React from "react";
 import { makeStyles, Theme } from "@material-ui/core/styles";
-import ImageDecoration, { ImageDecorationProps } from "./ImageDecoration";
 import { Star } from "@material-ui/icons";
-import Strings from "../../../resources/Strings";
 import classNames from "classnames";
+import { Strings } from "../../../resources";
+import ImageDecoration, { ImageDecorationProps } from "./ImageDecoration";
 
 const useStyles = makeStyles((theme: Theme) => ({
   root: {

@@ -8,9 +8,8 @@ import React, {
 import { Avatar, AvatarProps } from "@material-ui/core";
 import { makeStyles, Theme } from "@material-ui/core/styles";
 import cx from "classnames";
-import ParseUser from "../../types/User";
-import ParseImage from "../../types/Image";
-import { useUserContext } from "../../app/UserContext";
+import { useUserContext } from "../../contexts";
+import { ParseUser, ParseImage } from "../../types";
 
 const useStyles = makeStyles((theme: Theme) => ({
   avatar: {

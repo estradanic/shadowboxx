@@ -3,17 +3,21 @@ import React, {
   useCallback,
   useContext,
   useEffect,
+  useRef,
   useState,
 } from "react";
-import ParseUser, {
+import Parse from "parse";
+import useInterval from "use-interval";
+import { useHistory } from "react-router-dom";
+import {
+  ParseUser,
   UpdateLoggedInUser,
   UpdateReason,
   User,
-} from "../types/User";
-import ParseImage, { Image } from "../types/Image";
-import Parse from "parse";
-import Strings from "../resources/Strings";
-import useInterval from "use-interval";
+  ParseImage,
+  Image,
+} from "../types";
+import { Strings } from "../resources";
 
 /**
  * Interface defining the return value of the UserContext
@@ -27,6 +31,10 @@ interface UserContextValue {
   updateLoggedInUser: UpdateLoggedInUser;
   /** Function to immediately apply updates to the loggedInUser */
   saveLoggedInUserUpdates: () => Promise<void>;
+  /** Path to redirect the user to after login */
+  redirectPath?: string;
+  /** Function to set the redirectPath */
+  setRedirectPath: React.Dispatch<React.SetStateAction<string | undefined>>;
 }
 
 /**
@@ -44,7 +52,9 @@ interface UserContextProviderProps {
 
 /** Custom context provider for UserContext */
 export const UserContextProvider = ({ children }: UserContextProviderProps) => {
-  const [initialized, setInitialized] = useState<boolean>(false);
+  const initialized = useRef<boolean>(false);
+  const [redirectPath, setRedirectPath] = useState<string>();
+  const history = useHistory();
 
   const [loggedInUser, setLoggedInUser] = useState<ParseUser | undefined>(
     Parse.User.current() ? new ParseUser(Parse.User.current()!) : undefined
@@ -73,6 +83,10 @@ export const UserContextProvider = ({ children }: UserContextProviderProps) => {
               console.error(Strings.couldNotGetUserInfo());
             }
           });
+          if (redirectPath) {
+            history.push(redirectPath);
+            setRedirectPath(undefined);
+          }
         }
         if (
           reason === UpdateReason.LOG_IN ||
@@ -89,7 +103,14 @@ export const UserContextProvider = ({ children }: UserContextProviderProps) => {
         }
       }
     },
-    [setLoggedInUser, setProfilePicture, loggedInUser, profilePicture?.id]
+    [
+      setLoggedInUser,
+      setProfilePicture,
+      loggedInUser,
+      profilePicture?.id,
+      history,
+      redirectPath,
+    ]
   );
 
   const saveLoggedInUserUpdates = async () => {
@@ -107,20 +128,22 @@ export const UserContextProvider = ({ children }: UserContextProviderProps) => {
   useInterval(saveLoggedInUserUpdates, 5000);
 
   useEffect(() => {
-    if (initialized) {
+    if (initialized.current) {
       return;
     }
-    setInitialized(true);
+    initialized.current = true;
     if (loggedInUser) {
       updateLoggedInUser(loggedInUser, UpdateReason.LOG_IN);
     }
-  }, [loggedInUser, updateLoggedInUser, initialized, setInitialized]);
+  }, [loggedInUser, updateLoggedInUser, initialized]);
 
   const value = {
     loggedInUser,
     profilePicture,
     updateLoggedInUser,
     saveLoggedInUserUpdates,
+    redirectPath,
+    setRedirectPath,
   };
 
   return <UserContext.Provider value={value}>{children}</UserContext.Provider>;

@@ -1,9 +1,9 @@
 import React, { ImgHTMLAttributes, memo } from "react";
 import { makeStyles, Theme } from "@material-ui/core/styles";
 import classNames from "classnames";
+import { VariableColor } from "../../types";
 import Tooltip from "../Tooltip/Tooltip";
 import { ImageDecorationProps } from "./Decoration/ImageDecoration";
-import VariableColor from "../../types/VariableColor";
 
 interface UseStylesParams {
   borderColor: VariableColor;

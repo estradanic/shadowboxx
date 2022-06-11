@@ -1,7 +1,7 @@
 import React, { memo, useEffect, useState } from "react";
 import { Typography, TypographyProps } from "@material-ui/core";
-import ParseUser from "../../types/User";
-import { useUserContext } from "../../app/UserContext";
+import { ParseUser } from "../../types";
+import { useUserContext } from "../../contexts";
 
 /** Interface defining props for UserLabel */
 export interface UserLabelProps extends TypographyProps {

@@ -1,9 +1,9 @@
 import React from "react";
 import { makeStyles, Theme } from "@material-ui/core/styles";
 import { SvgIconProps, SvgIconTypeMap } from "@material-ui/core";
-import Tooltip from "../../Tooltip/Tooltip";
 import { OverridableComponent } from "@material-ui/core/OverridableComponent";
 import classNames from "classnames";
+import Tooltip from "../../Tooltip/Tooltip";
 
 const useStyles = makeStyles((theme: Theme) => ({
   root: {

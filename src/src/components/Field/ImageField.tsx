@@ -2,20 +2,20 @@ import React, { useState, memo } from "react";
 import { InputAdornment, Avatar, Typography, Grid } from "@material-ui/core";
 import { Close, AddAPhoto, Link, Check } from "@material-ui/icons";
 import { makeStyles, Theme } from "@material-ui/core/styles";
-import { elide } from "../../utils/stringUtils";
-import Strings from "../../resources/Strings";
+import Parse from "parse";
 import uniqueId from "lodash/uniqueId";
+import { elide } from "../../utils";
+import { Strings } from "../../resources";
+import { ParseImage } from "../../types";
+import { useRandomColor } from "../../hooks";
 import TextField, { TextFieldProps } from "../Field/TextField";
 import Tooltip from "../Tooltip/Tooltip";
-import Parse from "parse";
-import ParseImage from "../../types/Image";
 import { useSnackbar } from "../Snackbar/Snackbar";
-import { useImageContext } from "../../app/ImageContext";
+import { useImageContext } from "../../contexts";
 import LoadingWrapper from "../Loader/LoadingWrapper";
 import Image from "../Image/Image";
 import RemoveImageDecoration from "../Image/Decoration/RemoveImageDecoration";
 import CoverImageDecoration from "../Image/Decoration/CoverImageDecoration";
-import useRandomColor from "../../hooks/useRandomColor";
 
 const useStyles = makeStyles((theme: Theme) => ({
   endAdornment: {

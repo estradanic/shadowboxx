@@ -1,5 +1,5 @@
 import { useMemo } from "react";
-import VariableColor from "../types/VariableColor";
+import { VariableColor } from "../types";
 
 const useRandomColor = (): VariableColor => {
   const randomColor: VariableColor = useMemo(() => {
