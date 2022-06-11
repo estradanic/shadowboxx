@@ -132,7 +132,9 @@ const Login = () => {
       <br />
       <br />
       <Typography variant="h6">{Strings.noAccount()}</Typography>
-      <Link to="/signup">{Strings.signup()}</Link>
+      <Link saveHistory={false} to="/signup">
+        {Strings.signup()}
+      </Link>
     </PageContainer>
   );
 };

@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
 import { BackButton, PageContainer, useSnackbar } from "../../components";
-import { useHistory, useLocation, useParams } from "react-router-dom";
+import { useLocation, useParams } from "react-router-dom";
 import { Grid, Typography } from "@material-ui/core";
 import { makeStyles, Theme } from "@material-ui/core/styles";
 import { Strings } from "../../resources";
@@ -38,7 +38,7 @@ const Album = () => {
   const { id } = useParams<{ id: string }>();
   const classes = useStyles();
   const [images, setImages] = useState<ParseImage[]>();
-  const history = useHistory();
+  const location = useLocation<{ previousLocation?: Location }>();
   const randomColor = useRandomColor();
 
   useEffect(() => {
@@ -127,7 +127,7 @@ const Album = () => {
             {Strings.albumNotFound()}
           </Typography>
           <br />
-          {history.length > 1 && (
+          {!!location.state.previousLocation && (
             <BackButton color="inherit" placement="body" variant="text" />
           )}
         </Grid>

@@ -14,7 +14,7 @@ import {
 } from "@material-ui/core";
 import { makeStyles, Theme, useTheme } from "@material-ui/core/styles";
 import { MoreVert, Public, Star } from "@material-ui/icons";
-import { useHistory } from "react-router-dom";
+import { useHistory, useLocation } from "react-router-dom";
 import { Strings } from "../../resources";
 import { routes } from "../../app";
 import { ParseAlbum } from "../../types";
@@ -105,6 +105,8 @@ const AlbumCard = ({ value, onChange }: AlbumCardProps) => {
   const [collaborators, setCollaborators] = useState<ParseUser[]>([]);
   const [viewers, setViewers] = useState<ParseUser[]>([]);
   const [owner, setOwner] = useState<ParseUser>();
+
+  const location = useLocation();
 
   useEffect(() => {
     ParseUser.query()
@@ -202,7 +204,9 @@ const AlbumCard = ({ value, onChange }: AlbumCardProps) => {
 
   const navigateToAlbum = () => {
     if (value?.id) {
-      history.push(routes["Album"].path.replace(":id", value.id));
+      history.push(routes["Album"].path.replace(":id", value.id), {
+        previousLocation: location,
+      });
     }
   };
 

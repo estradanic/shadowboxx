@@ -8,7 +8,7 @@ import {
   Typography,
 } from "@material-ui/core";
 import { makeStyles, Theme, useTheme } from "@material-ui/core/styles";
-import { useHistory } from "react-router-dom";
+import { useHistory, useLocation } from "react-router-dom";
 import { routes } from "../../app";
 import { Strings } from "../../resources";
 import { useUserContext } from "../../contexts";
@@ -63,6 +63,7 @@ const Header = ({ viewId, ...rest }: HeaderProps) => {
   const xs = useMediaQuery(theme.breakpoints.down("xs"));
   const classes = useStyles({ xs });
   const history = useHistory();
+  const location = useLocation<{ previousLocation?: Location }>();
   const { loggedInUser, profilePicture } = useUserContext();
 
   return (
@@ -87,7 +88,7 @@ const Header = ({ viewId, ...rest }: HeaderProps) => {
           )}
         </Toolbar>
         <Toolbar variant="dense">
-          {history.length > 1 && (
+          {!!location.state?.previousLocation && (
             <BackButton
               className={classes.backButton}
               variant="outlined"

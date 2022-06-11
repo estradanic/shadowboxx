@@ -203,7 +203,9 @@ const Signup = () => {
       <br />
       <br />
       <Typography variant="h6">{Strings.alreadyHaveAccount()}</Typography>
-      <Link to="/login">{Strings.login()}</Link>
+      <Link saveHistory={false} to="/login">
+        {Strings.login()}
+      </Link>
     </PageContainer>
   );
 };
