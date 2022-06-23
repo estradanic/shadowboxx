@@ -65,6 +65,7 @@ export interface StringEntries {
   logout: string;
   loginSignup: string;
   multipleImages: string;
+  myPictures: string;
   name: string;
   newPassword: string;
   noAccount: string;
@@ -192,6 +193,7 @@ const Strings: {
   logout: () => "Logout",
   loginSignup: () => "Login / Sign Up",
   multipleImages: () => "Multiple Images",
+  myPictures: () => "My Pictures",
   name: () => "Name",
   newPassword: () => "New Password",
   noAccount: () => "Don't have an account?",

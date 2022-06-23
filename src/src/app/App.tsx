@@ -1,5 +1,5 @@
 import React, { Suspense } from "react";
-import { BrowserRouter as Router, Switch } from "react-router-dom";
+import { Switch } from "react-router-dom";
 import {
   CircularProgress,
   ThemeProvider,
@@ -85,29 +85,27 @@ const App = () => {
 
   return (
     <ThemeProvider theme={darkTheme}>
-      <Router>
-        <Suspense
-          fallback={
-            <div
-              style={{
-                width: "100vw",
-                height: "100vh",
-                backgroundColor: "#1B71B5",
-                paddingTop: "45vh",
-                paddingLeft: "45vh",
-              }}
-            >
-              <CircularProgress style={{ color: "#C14E4E" }} />
-            </div>
-          }
-        >
-          <Switch>
-            {Object.keys(routes).map((routeKey) => (
-              <ViewWrapper key={routeKey} {...routes[routeKey]} />
-            ))}
-          </Switch>
-        </Suspense>
-      </Router>
+      <Suspense
+        fallback={
+          <div
+            style={{
+              width: "100vw",
+              height: "100vh",
+              backgroundColor: "#1B71B5",
+              paddingTop: "calc(50vh - 40px)",
+              paddingLeft: "calc(50vw - 40px)",
+            }}
+          >
+            <CircularProgress style={{ color: "#C14E4E" }} />
+          </div>
+        }
+      >
+        <Switch>
+          {Object.keys(routes).map((routeKey) => (
+            <ViewWrapper key={routeKey} {...routes[routeKey]} />
+          ))}
+        </Switch>
+      </Suspense>
     </ThemeProvider>
   );
 };

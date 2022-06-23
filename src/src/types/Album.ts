@@ -1,10 +1,11 @@
 import Parse from "parse";
+import ParsePointer from "./Pointer";
 import Object, { Attributes } from "./Object";
 
 /** Interface defining an Album */
 export interface Album extends Attributes {
   /** User that owns this album */
-  owner: string;
+  owner: ParsePointer;
   /** Images in the album */
   images: string[];
   /** Name of the album */
@@ -73,11 +74,11 @@ export default class ParseAlbum extends Object<Album> {
   }
 
   get owner(): Album["owner"] {
-    return this._album.get(ParseAlbum.COLUMNS.owner);
+    return new ParsePointer(this._album.get(ParseAlbum.COLUMNS.owner));
   }
 
   set owner(owner) {
-    this._album.set(ParseAlbum.COLUMNS.owner, owner);
+    this._album.set(ParseAlbum.COLUMNS.owner, owner._pointer);
   }
 
   get images(): Album["images"] {

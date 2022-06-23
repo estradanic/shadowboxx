@@ -1,4 +1,5 @@
 import Parse from "parse";
+import ParsePointer from "./Pointer";
 import Object, { Attributes } from "./Object";
 
 /** Interface defining an Image */
@@ -7,6 +8,8 @@ export interface Image extends Attributes {
   file: Parse.File;
   /** Whether the image is the selected cover image for the album */
   isCoverImage: boolean;
+  /** User that owns this picture */
+  owner: ParsePointer;
 }
 
 /**
@@ -25,6 +28,7 @@ export default class ParseImage extends Object<Image> {
     ...Object.COLUMNS,
     file: "file",
     isCoverImage: "isCoverImage",
+    owner: "owner",
   };
 
   _image: Parse.Object<Image>;
@@ -70,5 +74,13 @@ export default class ParseImage extends Object<Image> {
 
   set isCoverImage(isCoverImage) {
     this._image.set(ParseImage.COLUMNS.isCoverImage, isCoverImage);
+  }
+
+  get owner(): Image["owner"] {
+    return new ParsePointer(this._image.get(ParseImage.COLUMNS.owner));
+  }
+
+  set owner(owner) {
+    this._image.set(ParseImage.COLUMNS.owner, owner._pointer);
   }
 }

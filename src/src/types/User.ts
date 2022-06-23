@@ -87,8 +87,8 @@ export default class ParseUser {
     return new ParseUser(await this._user.fetch());
   }
 
-  toPointer(): Parse.Pointer {
-    return this._user.toPointer();
+  toPointer(): Pointer {
+    return new Pointer(this._user.toPointer());
   }
 
   async login(updateLoggedInUser: UpdateLoggedInUser, options?: FullOptions) {

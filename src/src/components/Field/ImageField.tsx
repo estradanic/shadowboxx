@@ -11,7 +11,7 @@ import { useRandomColor } from "../../hooks";
 import TextField, { TextFieldProps } from "../Field/TextField";
 import Tooltip from "../Tooltip/Tooltip";
 import { useSnackbar } from "../Snackbar/Snackbar";
-import { useImageContext } from "../../contexts";
+import { useImageContext, useUserContext } from "../../contexts";
 import LoadingWrapper from "../Loader/LoadingWrapper";
 import Image from "../Image/Image";
 import RemoveImageDecoration from "../Image/Decoration/RemoveImageDecoration";
@@ -99,6 +99,7 @@ const ImageField = memo(
     const { uploadImage, loading, deleteImage } = useImageContext();
     const [showUrlInput, setShowUrlInput] = useState<boolean>(false);
     const [imageUrl, setImageUrl] = useState<string>("");
+    const { loggedInUser } = useUserContext();
 
     const inputId = uniqueId("profile-pic-input");
     const urlInputId = uniqueId("image-url-input");
@@ -114,7 +115,11 @@ const ImageField = memo(
         for (let i = 0; i < max; i++) {
           const file: any = event.target.files[i];
           const parseFile = new Parse.File(file.name, file);
-          uploadImage({ file: parseFile, isCoverImage: false })
+          uploadImage({
+            file: parseFile,
+            isCoverImage: false,
+            owner: loggedInUser!.toPointer(),
+          })
             .then((newImage) => {
               newImages.push(newImage);
               const newValue = multiple ? [...value, ...newImages] : newImages;
@@ -135,6 +140,7 @@ const ImageField = memo(
       const newImage = ParseImage.fromAttributes({
         file: parseFile,
         isCoverImage: false,
+        owner: loggedInUser!.toPointer(),
       });
 
       setShowUrlInput(false);

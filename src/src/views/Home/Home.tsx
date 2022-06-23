@@ -54,7 +54,6 @@ const HomePage = memo(() => {
     if (!gotAlbums.current && !globalLoading) {
       setGlobalLoading(true);
       ParseAlbum.query()
-        .equalTo(ParseAlbum.COLUMNS.owner, loggedInUser!.email)
         .findAll()
         .then((response) => {
           setAlbums(response.map((album) => new ParseAlbum(album)));
@@ -129,7 +128,7 @@ const HomePage = memo(() => {
       <AlbumFormDialog
         resetOnConfirm
         value={{
-          owner: loggedInUser!.email,
+          owner: loggedInUser!.toPointer(),
           images: [],
           name: Strings.untitledAlbum(),
           collaborators: [],

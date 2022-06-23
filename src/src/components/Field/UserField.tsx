@@ -53,7 +53,7 @@ const UserField = forwardRef(
     const updateOptions = debounce((value) => {
       if (!isNullOrWhitespace(value)) {
         ParseAlbum.query()
-          .equalTo(ParseAlbum.COLUMNS.owner, loggedInUser!.email)
+          .equalTo(ParseAlbum.COLUMNS.owner, loggedInUser?.toPointer())
           .findAll()
           .then((response) => {
             const relatedUsers: string[] = [];

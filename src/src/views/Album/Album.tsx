@@ -29,7 +29,6 @@ const useStyles = makeStyles((theme: Theme) => ({
  */
 const Album = () => {
   useView("Album");
-  const { search } = useLocation();
   const [album, setAlbum] = useState<ParseAlbum>();
   const { enqueueErrorSnackbar } = useSnackbar();
   const { setGlobalLoading, globalLoading } = useGlobalLoadingContext();
@@ -84,7 +83,7 @@ const Album = () => {
         enqueueErrorSnackbar(Strings.noAlbumId());
       }
     }
-  }, [search, enqueueErrorSnackbar, globalLoading, id, setGlobalLoading]);
+  }, [enqueueErrorSnackbar, globalLoading, id, setGlobalLoading]);
 
   return (
     <PageContainer>

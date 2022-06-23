@@ -1,5 +1,6 @@
 import React from "react";
 import ReactDOM from "react-dom";
+import { BrowserRouter as Router } from "react-router-dom";
 import {
   MuiThemeProvider,
   unstable_createMuiStrictModeTheme as createMuiTheme,
@@ -75,9 +76,11 @@ ReactDOM.render(
         <GlobalLoadingContextProvider>
           <NotificationsContextProvider>
             <ActionDialogContextProvider>
-              <UserContextProvider>
-                <App />
-              </UserContextProvider>
+              <Router>
+                <UserContextProvider>
+                  <App />
+                </UserContextProvider>
+              </Router>
             </ActionDialogContextProvider>
           </NotificationsContextProvider>
         </GlobalLoadingContextProvider>

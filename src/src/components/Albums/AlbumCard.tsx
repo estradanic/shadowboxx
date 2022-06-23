@@ -110,7 +110,7 @@ const AlbumCard = ({ value, onChange }: AlbumCardProps) => {
 
   useEffect(() => {
     ParseUser.query()
-      .equalTo(ParseUser.COLUMNS.email, value.owner)
+      .equalTo(ParseUser.COLUMNS.id, value.owner.id)
       .first()
       .then((response) => {
         setOwner(new ParseUser(response!));

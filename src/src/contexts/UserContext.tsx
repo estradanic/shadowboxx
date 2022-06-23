@@ -8,7 +8,7 @@ import React, {
 } from "react";
 import Parse from "parse";
 import useInterval from "use-interval";
-import { useHistory } from "react-router-dom";
+import { useHistory, useLocation } from "react-router-dom";
 import {
   ParseUser,
   UpdateLoggedInUser,
@@ -18,6 +18,7 @@ import {
   Image,
 } from "../types";
 import { Strings } from "../resources";
+import { routes } from "../app";
 
 /**
  * Interface defining the return value of the UserContext
@@ -55,6 +56,7 @@ export const UserContextProvider = ({ children }: UserContextProviderProps) => {
   const initialized = useRef<boolean>(false);
   const [redirectPath, setRedirectPath] = useState<string>();
   const history = useHistory();
+  const location = useLocation();
 
   const [loggedInUser, setLoggedInUser] = useState<ParseUser | undefined>(
     Parse.User.current() ? new ParseUser(Parse.User.current()!) : undefined
@@ -75,7 +77,7 @@ export const UserContextProvider = ({ children }: UserContextProviderProps) => {
         !loggedInUser ||
         newLoggedInUser.username === loggedInUser.username
       ) {
-        if (reason === UpdateReason.LOG_IN) {
+        if (reason === UpdateReason.LOG_IN || reason === UpdateReason.SIGN_UP) {
           newLoggedInUser.fetch().then((userResponse) => {
             if (userResponse) {
               setLoggedInUser(userResponse);
@@ -86,10 +88,16 @@ export const UserContextProvider = ({ children }: UserContextProviderProps) => {
           if (redirectPath) {
             history.push(redirectPath);
             setRedirectPath(undefined);
+          } else if (
+            location.pathname === routes["Login"].path ||
+            location.pathname === routes["Signup"].path
+          ) {
+            history.push(routes["Home"].path);
           }
         }
         if (
           reason === UpdateReason.LOG_IN ||
+          reason === UpdateReason.SIGN_UP ||
           newLoggedInUser.profilePicture?.id !== profilePicture?.id
         ) {
           new Parse.Query<Parse.Object<Image>>("Image")

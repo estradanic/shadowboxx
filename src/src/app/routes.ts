@@ -7,6 +7,7 @@ const Login = lazy(() => import("../views/Login/Login"));
 const Settings = lazy(() => import("../views/Settings/Settings"));
 const Signup = lazy(() => import("../views/Signup/Signup"));
 const Album = lazy(() => import("../views/Album/Album"));
+const MyPictures = lazy(() => import("../views/MyPictures/MyPictures"));
 
 /**
  * Interface defining a route object
@@ -54,6 +55,14 @@ const routes: { [key: string]: RouteProps } = {
     viewName: "Login",
     view: Login,
     path: "/login",
+  },
+  MyPictures: {
+    viewId: "MyPictures",
+    viewName: "My Pictures",
+    view: MyPictures,
+    path: "/mypictures",
+    tryAuthenticate: true,
+    redirectOnAuthFail: true,
   },
   Settings: {
     viewId: "Settings",

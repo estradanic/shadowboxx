@@ -10,6 +10,10 @@ export default class Pointer {
     this._pointer = pointer;
   }
 
+  get className(): string {
+    return this._pointer?.className ?? "";
+  }
+
   get exists(): boolean {
     return !!this._pointer;
   }
@@ -17,6 +21,6 @@ export default class Pointer {
   get id(): string {
     // The type for Pointer in the parse npm module isn't reliable.
     // Check for either objectId or id here.
-    return this._pointer.objectId || (this._pointer as any).id;
+    return this._pointer?.objectId ?? (this._pointer as any)?.id ?? "";
   }
 }
