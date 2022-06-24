@@ -99,7 +99,7 @@ const Album = () => {
               {[...images]
                 .sort((a, b) => a.compareTo(b))
                 ?.map((image) => (
-                  <Grid key={image.id} item xs={12} md={6} lg={4}>
+                  <Grid key={image.id} item xs={12} md={6} lg={4} xl={3}>
                     <Image
                       borderColor={randomColor}
                       src={image.file.url()}

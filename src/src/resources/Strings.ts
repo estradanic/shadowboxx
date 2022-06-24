@@ -65,7 +65,6 @@ export interface StringEntries {
   logout: string;
   loginSignup: string;
   multipleImages: string;
-  myPictures: string;
   name: string;
   newPassword: string;
   noAccount: string;
@@ -81,6 +80,7 @@ export interface StringEntries {
   numOfPhotos: string;
   okay: string;
   password: string;
+  pictures: string;
   pleaseEnterA: string;
   profilePicture: string;
   public: string;
@@ -193,7 +193,6 @@ const Strings: {
   logout: () => "Logout",
   loginSignup: () => "Login / Sign Up",
   multipleImages: () => "Multiple Images",
-  myPictures: () => "My Pictures",
   name: () => "Name",
   newPassword: () => "New Password",
   noAccount: () => "Don't have an account?",
@@ -212,6 +211,7 @@ const Strings: {
   numOfPhotos: (numOfPhotos: number) => `${numOfPhotos} photos.`,
   okay: () => "Okay",
   password: () => "Password",
+  pictures: () => "Pictures",
   pleaseEnterA: (field: string) => `Please enter a ${field}`,
   profilePicture: () => "Profile Picture",
   public: () => "Public",

@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { memo, useEffect, useMemo, useState } from "react";
 import {
   Card,
   CardHeader,
@@ -31,13 +31,11 @@ const useStyles = makeStyles((theme: Theme) => ({
   card: {
     maxWidth: theme.spacing(50),
     minWidth: theme.spacing(50),
-    margin: "auto",
-    marginBottom: theme.spacing(2),
+    margin: theme.spacing(2),
   },
   cardMobile: {
     width: `calc(100vw - ${theme.spacing(4)}px)`,
-    margin: "auto",
-    marginBottom: theme.spacing(2),
+    margin: theme.spacing(2),
   },
   media: {
     cursor: "pointer",
@@ -99,7 +97,7 @@ export interface AlbumCardProps {
 }
 
 /** Component for displaying basic information about an album */
-const AlbumCard = ({ value, onChange }: AlbumCardProps) => {
+const AlbumCard = memo(({ value, onChange }: AlbumCardProps) => {
   const [images, setImages] = useState<ParseImage[]>([]);
   const [coOwners, setCoOwners] = useState<ParseUser[]>([]);
   const [collaborators, setCollaborators] = useState<ParseUser[]>([]);
@@ -115,7 +113,7 @@ const AlbumCard = ({ value, onChange }: AlbumCardProps) => {
       .then((response) => {
         setOwner(new ParseUser(response!));
       });
-  }, [value.owner]);
+  }, [value.owner.id]);
 
   useEffect(() => {
     ParseImage.query()
@@ -172,7 +170,7 @@ const AlbumCard = ({ value, onChange }: AlbumCardProps) => {
 
   const classes = useStyles();
   const theme = useTheme();
-  const xs = useMediaQuery(theme.breakpoints.down("xs"));
+  const mobile = useMediaQuery(theme.breakpoints.down("sm"));
   const { openConfirm } = useActionDialogContext();
 
   const deleteAlbum = () => {
@@ -212,7 +210,7 @@ const AlbumCard = ({ value, onChange }: AlbumCardProps) => {
 
   return (
     <>
-      <Card className={xs ? classes.cardMobile : classes.card}>
+      <Card className={mobile ? classes.cardMobile : classes.card}>
         <CardHeader
           classes={{ title: classes.title, subheader: classes.subheader }}
           avatar={<UserAvatar email={owner?.email!} fetchUser={() => owner!} />}
@@ -383,6 +381,6 @@ const AlbumCard = ({ value, onChange }: AlbumCardProps) => {
       />
     </>
   );
-};
+});
 
 export default AlbumCard;

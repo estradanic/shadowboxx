@@ -7,8 +7,15 @@ import {
   ListItemText,
   useMediaQuery,
 } from "@material-ui/core";
-import { Home, ExitToApp, Settings, Menu } from "@material-ui/icons";
+import {
+  Home,
+  ExitToApp,
+  Settings,
+  Menu,
+  InsertPhoto,
+} from "@material-ui/icons";
 import { makeStyles, Theme, useTheme } from "@material-ui/core/styles";
+import { routes } from "../../app";
 import { Strings } from "../../resources";
 import { useUserContext } from "../../contexts";
 import ListItemLink from "../Link/ListItemLink";
@@ -40,23 +47,29 @@ const useStyles = makeStyles((theme: Theme) => ({
 /** Interface defining props for AppMenuList */
 export interface AppMenuListProps {
   /** Whether screen is extra-small or not */
-  xs?: boolean;
+  collapse?: boolean;
 }
 
 /** Component to display a list of actions or pages for the app */
-const AppMenuList = ({ xs = false }: AppMenuListProps) => {
+const AppMenuList = ({ collapse = false }: AppMenuListProps) => {
   const classes = useStyles();
   const { loggedInUser, updateLoggedInUser } = useUserContext();
 
   return (
-    <List className={xs ? "" : classes.horizontalList}>
-      <ListItemLink to="/">
+    <List className={collapse ? "" : classes.horizontalList}>
+      <ListItemLink to={routes["Home"].path}>
         <ListItemIcon className={classes.listItemIcon}>
           <Home />
         </ListItemIcon>
         <ListItemText primary={Strings.home()} />
       </ListItemLink>
-      <ListItemLink to="/settings">
+      <ListItemLink to={routes["Images"].path}>
+        <ListItemIcon className={classes.listItemIcon}>
+          <InsertPhoto />
+        </ListItemIcon>
+        <ListItemText primary={Strings.pictures()} />
+      </ListItemLink>
+      <ListItemLink to={routes["Settings"].path}>
         <ListItemIcon className={classes.listItemIcon}>
           <Settings />
         </ListItemIcon>
@@ -66,7 +79,7 @@ const AppMenuList = ({ xs = false }: AppMenuListProps) => {
         onClick={() => {
           loggedInUser?.logout(updateLoggedInUser);
         }}
-        to="/login"
+        to={routes["Login"].path}
       >
         <ListItemIcon className={classes.listItemIcon}>
           <ExitToApp />
@@ -82,9 +95,9 @@ const AppMenu = () => {
   const [drawerOpen, setDrawerOpen] = useState<boolean>(false);
   const classes = useStyles();
   const theme = useTheme();
-  const xs = useMediaQuery(theme.breakpoints.down("xs"));
+  const collapse = useMediaQuery(theme.breakpoints.down("sm"));
 
-  return xs ? (
+  return collapse ? (
     <>
       <IconButton
         onClick={() => setDrawerOpen(true)}
@@ -100,7 +113,7 @@ const AppMenu = () => {
         anchor="right"
         open={drawerOpen}
       >
-        <AppMenuList xs={xs} />
+        <AppMenuList collapse={collapse} />
       </SwipeableDrawer>
     </>
   ) : (

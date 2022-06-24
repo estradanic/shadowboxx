@@ -4,6 +4,7 @@ import React, {
   useCallback,
   useEffect,
   useState,
+  useRef,
 } from "react";
 import { Avatar, AvatarProps } from "@material-ui/core";
 import { makeStyles, Theme } from "@material-ui/core/styles";
@@ -38,10 +39,11 @@ const UserAvatar = forwardRef(
     const [src, setSrc] = useState("");
     const [firstName, setFirstName] = useState("");
     const [lastName, setLastName] = useState("");
+    const gotImage = useRef(false);
 
     const setProfilePicture = useCallback(
       (user: ParseUser) => {
-        if (user && user.profilePicture?.exists) {
+        if (user && user.profilePicture?.exists && !gotImage.current) {
           ParseImage.query()
             .equalTo(ParseImage.COLUMNS.id, user.profilePicture.id)
             .first()
@@ -51,6 +53,7 @@ const UserAvatar = forwardRef(
                   profilePictureResponse
                 );
                 setSrc(newProfilePicture?.file.url() ?? "");
+                gotImage.current = true;
               }
             });
         }

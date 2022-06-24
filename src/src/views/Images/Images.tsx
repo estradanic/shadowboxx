@@ -31,8 +31,8 @@ const useStyles = makeStyles((theme: Theme) => ({
 /**
  * Page for viewing all the logged in users's images
  */
-const MyPictures = () => {
-  useView("MyPictures");
+const Images = () => {
+  useView("Images");
   const gotImages = useRef(false);
   const randomColor = useRandomColor();
   const { setGlobalLoading, globalLoading } = useGlobalLoadingContext();
@@ -64,7 +64,7 @@ const MyPictures = () => {
     <PageContainer>
       <Grid item sm={8}>
         <FancyTitleTypography outlineColor={randomColor}>
-          {Strings.myPictures()}
+          {Strings.pictures()}
         </FancyTitleTypography>
       </Grid>
       {images.length ? (
@@ -72,7 +72,7 @@ const MyPictures = () => {
           {[...images]
             .sort((a, b) => a.compareTo(b))
             ?.map((image) => (
-              <Grid key={image.id} item xs={12} md={6} lg={4}>
+              <Grid key={image.id} item xs={12} md={6} lg={4} xl={3}>
                 <Image
                   borderColor={randomColor}
                   src={image.file.url()}
@@ -94,4 +94,4 @@ const MyPictures = () => {
   );
 };
 
-export default MyPictures;
+export default Images;

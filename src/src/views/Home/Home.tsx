@@ -32,6 +32,8 @@ const useStyles = makeStyles((theme: Theme) => ({
     display: "flex",
     flexWrap: "wrap",
     paddingBottom: theme.spacing(20),
+    alignSelf: "center",
+    maxWidth: "100%",
   },
   noAlbumsContainer: {
     textAlign: "center",

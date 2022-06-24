@@ -7,7 +7,6 @@ import React, {
   useState,
 } from "react";
 import Parse from "parse";
-import useInterval from "use-interval";
 import { useHistory, useLocation } from "react-router-dom";
 import {
   ParseUser,
@@ -118,6 +117,7 @@ export const UserContextProvider = ({ children }: UserContextProviderProps) => {
       profilePicture?.id,
       history,
       redirectPath,
+      location.pathname,
     ]
   );
 
@@ -132,8 +132,6 @@ export const UserContextProvider = ({ children }: UserContextProviderProps) => {
       setAttributes({ ...loggedInUser.attributes });
     }
   };
-
-  useInterval(saveLoggedInUserUpdates, 5000);
 
   useEffect(() => {
     if (initialized.current) {
