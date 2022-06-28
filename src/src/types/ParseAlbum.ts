@@ -1,6 +1,6 @@
 import Parse from "parse";
 import ParsePointer from "./ParsePointer";
-import ParseObject, { Attributes } from "./ParseObject";
+import ParseObject, { Attributes, ParsifyPointers } from "./ParseObject";
 
 /** Interface defining an Album */
 export interface Album extends Attributes {
@@ -46,16 +46,22 @@ export default class ParseAlbum extends ParseObject<Album> {
   };
 
   static query() {
-    return new Parse.Query<Parse.Object<Album>>("Album");
+    return new Parse.Query<Parse.Object<ParsifyPointers<Album>>>("Album");
   }
 
-  static fromAttributes(attributes: Album) {
-    return new ParseAlbum(new Parse.Object<Album>("Album", attributes));
+  static fromAttributes(attributes: Album): ParseAlbum {
+    const newAttributes: ParsifyPointers<Album> = {
+      ...attributes,
+      owner: attributes.owner._pointer,
+    };
+    return new ParseAlbum(
+      new Parse.Object<ParsifyPointers<Album>>("Album", newAttributes)
+    );
   }
 
-  _album: Parse.Object<Album>;
+  _album: Parse.Object<ParsifyPointers<Album>>;
 
-  constructor(album: Parse.Object<Album>) {
+  constructor(album: Parse.Object<ParsifyPointers<Album>>) {
     super(album);
     this._album = album;
   }

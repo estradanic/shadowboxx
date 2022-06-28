@@ -1,5 +1,5 @@
 import Parse from "parse";
-import Pointer from "./ParsePointer";
+import ParsePointer from "./ParsePointer";
 
 export interface Attributes {
   /** Unique id of the object in the database */
@@ -12,6 +12,19 @@ export interface Attributes {
   [key: string]: any;
 }
 
+export type ParsifyPointers<A extends Attributes> = {
+  [key in keyof A]: A[key] extends ParsePointer | undefined
+    ? Parse.Pointer
+    : A[key];
+};
+
+export const isPointer = (candidate: any) => {
+  if (candidate === null || candidate === undefined) {
+    return false;
+  }
+  return !!candidate.className && !candidate.exists;
+};
+
 /**
  * Class wrapping the Parse.Object class and providing convenience methods/properties
  */
@@ -22,14 +35,14 @@ export default class ParseObject<A extends Attributes> {
     updatedAt: "updatedAt",
   };
 
-  _object: Parse.Object<A>;
+  _object: Parse.Object<ParsifyPointers<A>>;
 
-  constructor(object: Parse.Object<A>) {
+  constructor(object: Parse.Object<ParsifyPointers<A>>) {
     this._object = object;
   }
 
-  toPointer(): Pointer {
-    return new Pointer(this._object.toPointer());
+  toPointer(): ParsePointer {
+    return new ParsePointer(this._object.toPointer());
   }
 
   get exists(): boolean {
@@ -37,7 +50,15 @@ export default class ParseObject<A extends Attributes> {
   }
 
   get attributes(): A {
-    return this._object.attributes;
+    const attributes: any = {};
+    for (const key in this._object.attributes) {
+      if (isPointer(this._object.attributes[key])) {
+        attributes[key] = new ParsePointer(this._object.attributes[key]);
+      } else {
+        attributes[key] = this._object.attributes[key];
+      }
+    }
+    return attributes;
   }
 
   get id(): A["objectId"] {

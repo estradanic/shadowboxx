@@ -1,6 +1,6 @@
 import Parse from "parse";
 import ParsePointer from "./ParsePointer";
-import ParseObject, { Attributes } from "./ParseObject";
+import ParseObject, { Attributes, ParsifyPointers } from "./ParseObject";
 
 /** Interface defining an Image */
 export interface Image extends Attributes {
@@ -16,12 +16,18 @@ export interface Image extends Attributes {
  * Class wrapping the Parse.Image class and providing convenience methods/properties
  */
 export default class ParseImage extends ParseObject<Image> {
-  static fromAttributes(attributes: Image) {
-    return new ParseImage(new Parse.Object<Image>("Image", attributes));
+  static fromAttributes(attributes: Image): ParseImage {
+    const newAttributes: ParsifyPointers<Image> = {
+      ...attributes,
+      owner: attributes.owner._pointer,
+    };
+    return new ParseImage(
+      new Parse.Object<ParsifyPointers<Image>>("Image", newAttributes)
+    );
   }
 
   static query() {
-    return new Parse.Query<Parse.Object<Image>>("Image");
+    return new Parse.Query<Parse.Object<ParsifyPointers<Image>>>("Image");
   }
 
   static COLUMNS: { [key: string]: string } = {
@@ -31,9 +37,9 @@ export default class ParseImage extends ParseObject<Image> {
     owner: "owner",
   };
 
-  _image: Parse.Object<Image>;
+  _image: Parse.Object<ParsifyPointers<Image>>;
 
-  constructor(image: Parse.Object<Image>) {
+  constructor(image: Parse.Object<ParsifyPointers<Image>>) {
     super(image);
     this._image = image;
   }

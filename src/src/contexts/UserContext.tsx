@@ -14,7 +14,6 @@ import {
   UpdateReason,
   User,
   ParseImage,
-  Image,
 } from "../types";
 import { Strings } from "../resources";
 import { routes } from "../app";
@@ -99,7 +98,7 @@ export const UserContextProvider = ({ children }: UserContextProviderProps) => {
           reason === UpdateReason.SIGN_UP ||
           newLoggedInUser.profilePicture?.id !== profilePicture?.id
         ) {
-          new Parse.Query<Parse.Object<Image>>("Image")
+          ParseImage.query()
             .equalTo(ParseImage.COLUMNS.id, newLoggedInUser.profilePicture?.id)
             .first()
             .then((profilePictureResponse) => {

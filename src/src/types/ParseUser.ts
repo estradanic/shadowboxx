@@ -1,5 +1,5 @@
 import Parse, { FullOptions } from "parse";
-import { Attributes } from "./ParseObject";
+import { Attributes, ParsifyPointers, isPointer } from "./ParseObject";
 import ParsePointer from "./ParsePointer";
 
 export interface User extends Attributes {
@@ -18,7 +18,7 @@ export interface User extends Attributes {
   /** Whether dark theme is enabled or not */
   isDarkThemeEnabled: boolean;
   /** Pointer to Image record for profile picture */
-  profilePicture?: Parse.Pointer;
+  profilePicture?: ParsePointer;
 }
 
 export type UpdateLoggedInUser = (
@@ -50,11 +50,11 @@ export default class ParseUser {
   };
 
   static query() {
-    return new Parse.Query<Parse.User<User>>("User");
+    return new Parse.Query<Parse.User<ParsifyPointers<User>>>("User");
   }
 
   static fromAttributes = (attributes: Partial<User>): ParseUser => {
-    const fullAttributes: User = {
+    const fullAttributes: ParsifyPointers<User> = {
       username: attributes.username ?? attributes.email ?? "",
       password: attributes.password ?? "",
       email: attributes.email ?? attributes.username ?? "",
@@ -62,14 +62,20 @@ export default class ParseUser {
       firstName:
         attributes.firstName ?? attributes.email ?? attributes.username ?? "",
       lastName: attributes.lastName ?? "",
-      profilePicture: attributes.profilePicture,
+      profilePicture: attributes.profilePicture?._pointer,
     };
-    return new ParseUser(new Parse.User(fullAttributes));
+    const newParseUser = new ParseUser(
+      new Parse.User<ParsifyPointers<User>>(fullAttributes)
+    );
+
+    // Set this again to make sure that the pointer is the right type
+    newParseUser.profilePicture = attributes.profilePicture;
+    return newParseUser;
   };
 
-  _user: Parse.User<User>;
+  _user: Parse.User<ParsifyPointers<User>>;
 
-  constructor(user: Parse.User<User>) {
+  constructor(user: Parse.User<ParsifyPointers<User>>) {
     this._user = user;
   }
 
@@ -116,10 +122,12 @@ export default class ParseUser {
   }
 
   async logout(updateLoggedInUser: UpdateLoggedInUser) {
-    return await Parse.User.logOut<Parse.User<User>>().then((loggedOutUser) => {
-      updateLoggedInUser(new ParseUser(loggedOutUser), UpdateReason.LOG_OUT);
-      return new ParseUser(loggedOutUser);
-    });
+    return await Parse.User.logOut<Parse.User<ParsifyPointers<User>>>().then(
+      (loggedOutUser) => {
+        updateLoggedInUser(new ParseUser(loggedOutUser), UpdateReason.LOG_OUT);
+        return new ParseUser(loggedOutUser);
+      }
+    );
   }
 
   get exists(): boolean {
@@ -127,7 +135,15 @@ export default class ParseUser {
   }
 
   get attributes(): User {
-    return this._user.attributes;
+    const attributes: any = {};
+    for (const key in this._user.attributes) {
+      if (isPointer(this._user.attributes[key])) {
+        attributes[key] = new ParsePointer(this._user.attributes[key]);
+      } else {
+        attributes[key] = this._user.attributes[key];
+      }
+    }
+    return attributes;
   }
 
   get id(): string | undefined {
