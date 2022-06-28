@@ -24,8 +24,8 @@ import { useSnackbar } from "../Snackbar/Snackbar";
 import AlbumFormDialog from "./AlbumFormDialog";
 import Tooltip from "../Tooltip/Tooltip";
 import { useActionDialogContext } from "../Dialog/ActionDialog";
-import ParseUser from "../../types/User";
-import ParseImage from "../../types/Image";
+import ParseUser from "../../types/ParseUser";
+import ParseImage from "../../types/ParseImage";
 
 const useStyles = makeStyles((theme: Theme) => ({
   card: {

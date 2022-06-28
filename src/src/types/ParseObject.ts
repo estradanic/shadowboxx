@@ -1,5 +1,5 @@
 import Parse from "parse";
-import Pointer from "./Pointer";
+import Pointer from "./ParsePointer";
 
 export interface Attributes {
   /** Unique id of the object in the database */
@@ -15,7 +15,7 @@ export interface Attributes {
 /**
  * Class wrapping the Parse.Object class and providing convenience methods/properties
  */
-export default class Object<A extends Attributes = Attributes> {
+export default class ParseObject<A extends Attributes> {
   static COLUMNS: { [key: string]: string } = {
     id: "objectId",
     createdAt: "createdAt",
@@ -41,7 +41,7 @@ export default class Object<A extends Attributes = Attributes> {
   }
 
   get id(): A["objectId"] {
-    return this._object.id;
+    return this._object.id || (this._object as any).objectId;
   }
 
   get createdAt(): A["createdAt"] {

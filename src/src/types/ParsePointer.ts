@@ -3,7 +3,7 @@ import Parse from "parse";
 /**
  * Class wrapping the Parse.Pointer class and providing convenience methods/properties
  */
-export default class Pointer {
+export default class ParsePointer {
   _pointer: Parse.Pointer;
 
   constructor(pointer: Parse.Pointer) {

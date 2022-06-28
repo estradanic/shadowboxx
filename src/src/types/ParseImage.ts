@@ -1,6 +1,6 @@
 import Parse from "parse";
-import ParsePointer from "./Pointer";
-import Object, { Attributes } from "./Object";
+import ParsePointer from "./ParsePointer";
+import ParseObject, { Attributes } from "./ParseObject";
 
 /** Interface defining an Image */
 export interface Image extends Attributes {
@@ -15,7 +15,7 @@ export interface Image extends Attributes {
 /**
  * Class wrapping the Parse.Image class and providing convenience methods/properties
  */
-export default class ParseImage extends Object<Image> {
+export default class ParseImage extends ParseObject<Image> {
   static fromAttributes(attributes: Image) {
     return new ParseImage(new Parse.Object<Image>("Image", attributes));
   }
@@ -25,7 +25,7 @@ export default class ParseImage extends Object<Image> {
   }
 
   static COLUMNS: { [key: string]: string } = {
-    ...Object.COLUMNS,
+    ...ParseObject.COLUMNS,
     file: "file",
     isCoverImage: "isCoverImage",
     owner: "owner",

@@ -1,6 +1,6 @@
 import Parse, { FullOptions } from "parse";
-import { Attributes } from "./Object";
-import Pointer from "./Pointer";
+import { Attributes } from "./ParseObject";
+import ParsePointer from "./ParsePointer";
 
 export interface User extends Attributes {
   /** Whether email has been verified or not */
@@ -87,8 +87,8 @@ export default class ParseUser {
     return new ParseUser(await this._user.fetch());
   }
 
-  toPointer(): Pointer {
-    return new Pointer(this._user.toPointer());
+  toPointer(): ParsePointer {
+    return new ParsePointer(this._user.toPointer());
   }
 
   async login(updateLoggedInUser: UpdateLoggedInUser, options?: FullOptions) {
@@ -186,8 +186,8 @@ export default class ParseUser {
     this._user.set(ParseUser.COLUMNS.isDarkThemeEnabled, isDarkThemeEnabled);
   }
 
-  get profilePicture(): Pointer | undefined {
-    return new Pointer(this._user.get(ParseUser.COLUMNS.profilePicture));
+  get profilePicture(): ParsePointer | undefined {
+    return new ParsePointer(this._user.get(ParseUser.COLUMNS.profilePicture));
   }
 
   set profilePicture(profilePicture) {

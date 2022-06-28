@@ -1,6 +1,6 @@
 import Parse from "parse";
-import ParsePointer from "./Pointer";
-import Object, { Attributes } from "./Object";
+import ParsePointer from "./ParsePointer";
+import ParseObject, { Attributes } from "./ParseObject";
 
 /** Interface defining an Album */
 export interface Album extends Attributes {
@@ -31,9 +31,9 @@ export interface Album extends Attributes {
 /**
  * Class wrapping the Parse.Album class and providing convenience methods/properties
  */
-export default class ParseAlbum extends Object<Album> {
+export default class ParseAlbum extends ParseObject<Album> {
   static COLUMNS: { [key: string]: string } = {
-    ...Object.COLUMNS,
+    ...ParseObject.COLUMNS,
     owner: "owner",
     images: "images",
     name: "name",
