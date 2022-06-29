@@ -1,4 +1,9 @@
-import React, { ForwardedRef, forwardRef, useState } from "react";
+import React, {
+  ForwardedRef,
+  forwardRef,
+  useState,
+  KeyboardEvent,
+} from "react";
 import { Autocomplete, AutocompleteProps } from "@material-ui/lab";
 import UserChip from "../User/UserChip";
 import TextField from "../Field/TextField";
@@ -6,7 +11,7 @@ import debounce from "lodash/debounce";
 import { makeStyles, Theme } from "@material-ui/core/styles";
 import { isNullOrWhitespace } from "../../utils";
 import { useUserContext } from "../../contexts";
-import { ParseAlbum, ParseUser } from "../../types";
+import { ParseAlbum } from "../../types";
 
 const useStyles = makeStyles((theme: Theme) => ({
   endAdornment: {
@@ -49,6 +54,7 @@ const UserField = forwardRef(
     const { loggedInUser } = useUserContext();
     const classes = useStyles();
     const [options, setOptions] = useState<string[]>([]);
+    const [inputValue, setInputValue] = useState<string>("");
 
     const updateOptions = debounce((value) => {
       if (!isNullOrWhitespace(value)) {
@@ -65,18 +71,27 @@ const UserField = forwardRef(
                 ...album.coOwners
               );
             });
-            ParseUser.query()
-              .containedIn(
-                ParseUser.COLUMNS.email,
-                Array.from(new Set(relatedUsers))
-              )
-              .findAll()
-              .then((response) => {
-                setOptions(response.map((user) => new ParseUser(user).email));
-              });
+            setOptions(Array.from(new Set(relatedUsers)));
           });
       }
     }, 500);
+
+    const onKeyDown = (event: KeyboardEvent) => {
+      switch (event.key) {
+        case "Enter":
+        case " ":
+        case ",":
+        case "Tab": {
+          if (inputValue.length > 0) {
+            onChange(value.concat([inputValue]));
+            setInputValue("");
+          }
+          event.preventDefault();
+          break;
+        }
+        default:
+      }
+    };
 
     return (
       <Autocomplete<string, true, false, true>
@@ -87,7 +102,9 @@ const UserField = forwardRef(
         fullWidth
         multiple
         freeSolo
+        inputValue={inputValue}
         onInputChange={(_, value) => {
+          setInputValue(value);
           updateOptions(value);
         }}
         onChange={(_, value) => onChange(value)}
@@ -105,7 +122,9 @@ const UserField = forwardRef(
             <UserChip {...getTagProps({ index })} email={user} />
           ))
         }
-        renderInput={(props) => <TextField label={label} {...props} />}
+        renderInput={(props) => (
+          <TextField label={label} {...props} onKeyDown={onKeyDown} />
+        )}
         {...rest}
       />
     );

@@ -1,6 +1,8 @@
 import Parse from "parse";
 import ParsePointer from "./ParsePointer";
 import ParseObject, { Attributes, ParsifyPointers } from "./ParseObject";
+import ParseImage from "./ParseImage";
+import ParseUser from "./ParseUser";
 
 /** Interface defining an Album */
 export interface Album extends Attributes {
@@ -66,13 +68,83 @@ export default class ParseAlbum extends ParseObject<Album> {
     this._album = album;
   }
 
+  async save() {
+    const owner = await ParseUser.query()
+      .equalTo(ParseUser.COLUMNS.id, this.owner.id)
+      .first();
+    return (await this.isPublic)
+      ? this.savePublic(owner!)
+      : this.savePrivate(owner!);
+  }
+
+  async addCollaboratorAccess(acl: Parse.ACL, imageAcl: Parse.ACL) {
+    if (this.collaborators && this.collaborators.length) {
+      const collaborators = await ParseUser.query()
+        .containedIn(ParseUser.COLUMNS.email, this.collaborators)
+        .findAll();
+      for (const collaborator of collaborators) {
+        acl.setReadAccess(collaborator, true);
+        acl.setWriteAccess(collaborator, false);
+        imageAcl.setReadAccess(collaborator, true);
+      }
+    }
+  }
+
+  async addViewerAccess(acl: Parse.ACL, imageAcl: Parse.ACL) {
+    if (this.viewers) {
+      const viewers = await ParseUser.query()
+        .containedIn(ParseUser.COLUMNS.email, this.viewers)
+        .findAll();
+      for (const viewer of viewers) {
+        acl.setReadAccess(viewer, true);
+        imageAcl.setReadAccess(viewer, true);
+      }
+    }
+  }
+
+  async setImageAcl(imageAcl: Parse.ACL) {
+    const images = await ParseImage.query()
+      .containedIn(ParseImage.COLUMNS.id, this.images)
+      .findAll();
+    for (const image of images) {
+      image.setACL(imageAcl);
+      try {
+        await image.save();
+      } catch {}
+    }
+  }
+
+  async savePrivate(owner: Parse.User) {
+    const acl = new Parse.ACL(owner);
+    const imageAcl = new Parse.ACL(owner);
+
+    await this.addCollaboratorAccess(acl, imageAcl);
+    await this.addViewerAccess(acl, imageAcl);
+
+    await this.setImageAcl(imageAcl);
+
+    this._album.setACL(acl);
+    return new ParseAlbum(await this._album.save());
+  }
+
+  async savePublic(owner: Parse.User) {
+    const acl = new Parse.ACL(owner);
+    acl.setPublicReadAccess(true);
+    const imageAcl = new Parse.ACL(owner);
+    imageAcl.setPublicReadAccess(true);
+
+    await this.addCollaboratorAccess(acl, imageAcl);
+    await this.addViewerAccess(acl, imageAcl);
+
+    await this.setImageAcl(imageAcl);
+
+    this._album.setACL(acl);
+    return new ParseAlbum(await this._album.save());
+  }
+
   async update(attributes: Album) {
     this._album.set(attributes);
     return this.save();
-  }
-
-  async save() {
-    return new ParseAlbum(await this._album.save());
   }
 
   async destroy() {
