@@ -125,12 +125,6 @@ const UserField = forwardRef(
         multiple
         freeSolo
         inputValue={inputValue}
-        onBlur={() => {
-          if (inputValue) {
-            onChange(value.concat([inputValue]));
-            setInputValue("");
-          }
-        }}
         onInputChange={(_, newInputValue) => {
           if (newInputValue.endsWith(" ") || newInputValue.endsWith(",")) {
             onChange(
@@ -159,7 +153,17 @@ const UserField = forwardRef(
           ))
         }
         renderInput={(props) => (
-          <TextField label={label} {...props} onKeyDown={onKeyDown} />
+          <TextField
+            label={label}
+            {...props}
+            onKeyDown={onKeyDown}
+            onBlur={() => {
+              if (inputValue) {
+                onChange(value.concat([inputValue]));
+                setInputValue("");
+              }
+            }}
+          />
         )}
         {...rest}
       />
