@@ -100,7 +100,6 @@ export interface AlbumCardProps {
 /** Component for displaying basic information about an album */
 const AlbumCard = memo(({ value, onChange }: AlbumCardProps) => {
   const [images, setImages] = useState<ParseImage[]>([]);
-  const [coOwners, setCoOwners] = useState<ParseUser[]>([]);
   const [collaborators, setCollaborators] = useState<ParseUser[]>([]);
   const [viewers, setViewers] = useState<ParseUser[]>([]);
   const [owner, setOwner] = useState<ParseUser>();
@@ -140,19 +139,12 @@ const AlbumCard = memo(({ value, onChange }: AlbumCardProps) => {
 
   useEffect(() => {
     ParseUser.query()
-      .containedIn(ParseUser.COLUMNS.email, value.coOwners)
-      .findAll()
-      .then((response) => {
-        setCoOwners(response.map((coOwner) => new ParseUser(coOwner)));
-      });
-  }, [value.coOwners]);
-
-  useEffect(() => {
-    ParseUser.query()
       .containedIn(ParseUser.COLUMNS.email, value.collaborators)
       .findAll()
       .then((response) => {
-        setCollaborators(response.map((coOwner) => new ParseUser(coOwner)));
+        setCollaborators(
+          response.map((collaborator) => new ParseUser(collaborator))
+        );
       });
   }, [value.collaborators]);
 
@@ -161,7 +153,7 @@ const AlbumCard = memo(({ value, onChange }: AlbumCardProps) => {
       .containedIn(ParseUser.COLUMNS.email, value.viewers)
       .findAll()
       .then((response) => {
-        setViewers(response.map((coOwner) => new ParseUser(coOwner)));
+        setViewers(response.map((viewer) => new ParseUser(viewer)));
       });
   }, [value.viewers]);
 
@@ -280,27 +272,8 @@ const AlbumCard = memo(({ value, onChange }: AlbumCardProps) => {
                 {Strings.updatedAt(value?.updatedAt)}
               </Typography>
             </Grid>
-            {(!!coOwners?.length ||
-              !!collaborators?.length ||
-              !!viewers?.length) && (
+            {(!!collaborators?.length || !!viewers?.length) && (
               <Grid className={classes.collaborators} item container xs={12}>
-                {coOwners?.map((coOwner) => (
-                  <Grid item key={coOwner?.email}>
-                    <Tooltip
-                      title={
-                        coOwner?.firstName
-                          ? `${coOwner?.firstName} ${coOwner?.lastName}`
-                          : coOwner?.email ?? ""
-                      }
-                    >
-                      <UserAvatar
-                        className={classes.collaboratorAvatar}
-                        email={coOwner.email}
-                        fetchUser={() => coOwner}
-                      />
-                    </Tooltip>
-                  </Grid>
-                ))}
                 {collaborators?.map((collaborator) => (
                   <Grid item key={collaborator?.email}>
                     <Tooltip

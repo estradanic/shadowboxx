@@ -135,7 +135,6 @@ const HomePage = memo(() => {
           name: Strings.untitledAlbum(),
           collaborators: [],
           viewers: [],
-          coOwners: [],
         }}
         open={addAlbumDialogOpen}
         handleCancel={() => setAddAlbumDialogOpen(false)}

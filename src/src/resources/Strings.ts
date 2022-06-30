@@ -16,8 +16,6 @@ export interface StringEntries {
   collaboratorsTooltip: string;
   commonError: string;
   confirm: string;
-  coOwners: string;
-  coOwnersTooltip: string;
   copyright: string;
   couldNotGetCollaborators: string;
   couldNotGetUserInfo: string;
@@ -134,9 +132,6 @@ const Strings: {
     "Users who will be allowed to add images to this album. (Enter email)",
   commonError: () => "Something went wrong!",
   confirm: () => "Confirm",
-  coOwners: () => "Co-Owners",
-  coOwnersTooltip: () =>
-    "Users who will have full edit access to this album. (Enter email)",
   copyright: () => `© Nicholas Estrada ${new Date().getFullYear()}`,
   couldNotGetCollaborators: () =>
     `${Strings.commonError()}. Could not get collaborators.`,

@@ -94,10 +94,6 @@ const AlbumFormDialog = ({
   const [viewers, setViewers] = useState<Album["viewers"]>(
     initialValue.viewers
   );
-  const [coOwners, setCoOwners] = useState<Album["coOwners"]>(
-    initialValue.coOwners
-  );
-
   const [images, setImages] = useState<ParseImage[]>([]);
 
   const { loggedInUser } = useUserContext();
@@ -124,7 +120,6 @@ const AlbumFormDialog = ({
     setIsPublic(initialValue.isPublic);
     setCollaborators(initialValue.collaborators);
     setViewers(initialValue.viewers);
-    setCoOwners(initialValue.coOwners);
     setErrors(defaultErrors);
   }, [
     setName,
@@ -133,7 +128,6 @@ const AlbumFormDialog = ({
     setIsPublic,
     setCollaborators,
     setViewers,
-    setCoOwners,
     setErrors,
     initialValue,
     defaultErrors,
@@ -183,13 +177,9 @@ const AlbumFormDialog = ({
 
   const handleConfirm = async () => {
     if (validate()) {
-      const userEmails = new Set([...viewers, ...collaborators, ...coOwners]);
+      const userEmails = new Set([...viewers, ...collaborators]);
       const signedUpUserCount = await new Parse.Query("User")
-        .containedIn(ParseUser.COLUMNS.email, [
-          ...viewers,
-          ...collaborators,
-          ...coOwners,
-        ])
+        .containedIn(ParseUser.COLUMNS.email, [...viewers, ...collaborators])
         .count();
       if (signedUpUserCount < userEmails.size) {
         openConfirm(Strings.nonExistentUserWarning(), () => {
@@ -202,7 +192,6 @@ const AlbumFormDialog = ({
             isPublic,
             collaborators,
             viewers,
-            coOwners,
           });
         });
       } else {
@@ -215,7 +204,6 @@ const AlbumFormDialog = ({
           isPublic,
           collaborators,
           viewers,
-          coOwners,
         });
       }
       if (resetOnConfirm) {

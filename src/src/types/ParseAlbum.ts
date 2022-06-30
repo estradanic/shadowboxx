@@ -22,8 +22,6 @@ export interface Album extends Attributes {
   collaborators: string[];
   /** Collaborators with "view" access */
   viewers: string[];
-  /** Collaborators with "edit" access */
-  coOwners: string[];
   /** Last edited date */
   updatedAt?: Date;
   /** Created date */
@@ -43,7 +41,6 @@ export default class ParseAlbum extends ParseObject<Album> {
     isFavorite: "isFavorite",
     isPublic: "isPublic",
     collaborators: "collaborators",
-    coOwners: "coOwners",
     viewers: "viewers",
   };
 
@@ -214,13 +211,5 @@ export default class ParseAlbum extends ParseObject<Album> {
 
   set viewers(viewers) {
     this._album.set(ParseAlbum.COLUMNS.viewers, viewers);
-  }
-
-  get coOwners(): Album["coOwners"] {
-    return this._album.get(ParseAlbum.COLUMNS.coOwners);
-  }
-
-  set coOwners(coOwners) {
-    this._album.set(ParseAlbum.COLUMNS.coOwners, coOwners);
   }
 }

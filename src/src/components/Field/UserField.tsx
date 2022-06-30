@@ -77,11 +77,7 @@ const UserField = forwardRef(
               const relatedUsers: string[] = [];
               for (const albumResponse of response) {
                 const album = new ParseAlbum(albumResponse);
-                relatedUsers.push(
-                  ...album.collaborators,
-                  ...album.viewers,
-                  ...album.coOwners
-                );
+                relatedUsers.push(...album.collaborators, ...album.viewers);
                 const ownerUser = await ParseUser.query()
                   .equalTo(ParseUser.COLUMNS.id, album.owner.id)
                   .first();
