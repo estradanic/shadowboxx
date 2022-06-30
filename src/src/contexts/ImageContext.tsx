@@ -27,7 +27,7 @@ interface ImageContextValue {
   /** A completion value for Progress components */
   progress: number;
   /** Function to upload an image */
-  uploadImage: (image: Image) => Promise<ParseImage>;
+  uploadImage: (image: Image, acl?: Parse.ACL) => Promise<ParseImage>;
   /** Function to delete image */
   deleteImage: (parseImage: ParseImage) => Promise<void>;
 }
@@ -62,7 +62,7 @@ export const ImageContextProvider = ({
     setProgress(newProgress);
   };
 
-  const uploadImage = async (image: Image) => {
+  const uploadImage = async (image: Image, acl?: Parse.ACL) => {
     setLoading(true);
 
     const action: ImageAction = { image, command: ImageActionCommand.UPLOAD };
@@ -84,6 +84,9 @@ export const ImageContextProvider = ({
     }
 
     let parseImage: ParseImage = ParseImage.fromAttributes(image);
+    if (acl) {
+      parseImage.setACL(acl);
+    }
     if (!failed) {
       try {
         parseImage = await parseImage.save();

@@ -78,10 +78,10 @@ export interface ImageFieldProps
   value: ParseImage[];
   /** Function to run when the value changes */
   onChange: (value: ParseImage[]) => void;
-  /** Whether to only save the thumbnail or not */
-  thumbnailOnly?: boolean;
   /** Whether multiple images can be selected or not */
   multiple?: boolean;
+  /** ACL to save new images with after upload */
+  acl?: Parse.ACL;
 }
 
 /** Component to input images from the filesystem or online */
@@ -89,9 +89,9 @@ const ImageField = memo(
   ({
     onChange,
     label,
-    thumbnailOnly = false,
     value = [],
     multiple = false,
+    acl,
     ...rest
   }: ImageFieldProps) => {
     const classes = useStyles();
@@ -115,11 +115,14 @@ const ImageField = memo(
         for (let i = 0; i < max; i++) {
           const file: any = event.target.files[i];
           const parseFile = new Parse.File(file.name, file);
-          uploadImage({
-            file: parseFile,
-            isCoverImage: false,
-            owner: loggedInUser!.toPointer(),
-          })
+          uploadImage(
+            {
+              file: parseFile,
+              isCoverImage: false,
+              owner: loggedInUser!.toPointer(),
+            },
+            acl
+          )
             .then((newImage) => {
               newImages.push(newImage);
               const newValue = multiple ? [...value, ...newImages] : newImages;

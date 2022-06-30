@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import {
   Grid,
   Card,
@@ -189,6 +189,13 @@ const Settings = () => {
     }
   };
 
+  const profilePictureAcl = useMemo(() => {
+    const acl = new Parse.ACL(loggedInUser?._user);
+    acl.setPublicReadAccess(true);
+    acl.setPublicWriteAccess(false);
+    return acl;
+  }, [loggedInUser]);
+
   return (
     <PageContainer loading={loading}>
       <Grid item lg={6} sm={8}>
@@ -232,7 +239,7 @@ const Settings = () => {
               <Grid item xs={12}>
                 <ImageContextProvider>
                   <ImageField
-                    thumbnailOnly
+                    acl={profilePictureAcl}
                     autoComplete="none"
                     value={
                       settings.profilePicture ? [settings.profilePicture] : []

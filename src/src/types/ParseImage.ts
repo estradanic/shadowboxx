@@ -1,6 +1,7 @@
 import Parse from "parse";
 import ParsePointer from "./ParsePointer";
 import ParseObject, { Attributes, ParsifyPointers } from "./ParseObject";
+import ParseUser from "./ParseUser";
 
 /** Interface defining an Image */
 export interface Image extends Attributes {
@@ -59,6 +60,15 @@ export default class ParseImage extends ParseObject<Image> {
   }
 
   async save() {
+    if (!this._image.getACL()) {
+      const owner = await ParseUser.query()
+        .equalTo(ParseUser.COLUMNS.id, this.owner.id)
+        .first();
+      const acl = new Parse.ACL(owner);
+      acl.setPublicReadAccess(false);
+      acl.setPublicWriteAccess(false);
+      this._image.setACL(acl);
+    }
     return new ParseImage(await this._image.save());
   }
 

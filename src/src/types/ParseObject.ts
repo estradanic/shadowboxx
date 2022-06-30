@@ -49,6 +49,10 @@ export default class ParseObject<A extends Attributes> {
     return this._object.toPointer();
   }
 
+  setACL(acl: Parse.ACL): void {
+    this._object.setACL(acl);
+  }
+
   get exists(): boolean {
     return !!this._object;
   }
