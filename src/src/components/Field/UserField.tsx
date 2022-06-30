@@ -3,15 +3,15 @@ import React, {
   forwardRef,
   useState,
   KeyboardEvent,
+  useEffect,
+  useRef,
 } from "react";
 import { Autocomplete, AutocompleteProps } from "@material-ui/lab";
 import UserChip from "../User/UserChip";
 import TextField from "../Field/TextField";
-import debounce from "lodash/debounce";
 import { makeStyles, Theme } from "@material-ui/core/styles";
-import { isNullOrWhitespace } from "../../utils";
 import { useUserContext } from "../../contexts";
-import { ParseAlbum } from "../../types";
+import { ParseAlbum, ParseUser } from "../../types";
 
 const useStyles = makeStyles((theme: Theme) => ({
   endAdornment: {
@@ -53,28 +53,50 @@ const UserField = forwardRef(
   ) => {
     const { loggedInUser } = useUserContext();
     const classes = useStyles();
+    const gotOptions = useRef(false);
     const [options, setOptions] = useState<string[]>([]);
     const [inputValue, setInputValue] = useState<string>("");
 
-    const updateOptions = debounce((value) => {
-      if (!isNullOrWhitespace(value)) {
-        ParseAlbum.query()
-          .equalTo(ParseAlbum.COLUMNS.owner, loggedInUser?.toPointer())
-          .findAll()
-          .then((response) => {
-            const relatedUsers: string[] = [];
-            response.forEach((albumResponse) => {
-              const album = new ParseAlbum(albumResponse);
-              relatedUsers.push(
-                ...album.collaborators,
-                ...album.viewers,
-                ...album.coOwners
+    useEffect(() => {
+      if (!gotOptions.current) {
+        (async () => {
+          await Parse.Query.or(
+            ParseAlbum.query().equalTo(
+              ParseAlbum.COLUMNS.owner,
+              loggedInUser?.toNativePointer()
+            ),
+            ParseAlbum.query().containsAll(ParseAlbum.COLUMNS.collaborators, [
+              loggedInUser!.email,
+            ]),
+            ParseAlbum.query().containsAll(ParseAlbum.COLUMNS.viewers, [
+              loggedInUser!.email,
+            ])
+          )
+            .findAll()
+            .then(async (response) => {
+              const relatedUsers: string[] = [];
+              for (const albumResponse of response) {
+                const album = new ParseAlbum(albumResponse);
+                relatedUsers.push(
+                  ...album.collaborators,
+                  ...album.viewers,
+                  ...album.coOwners
+                );
+                const ownerUser = await ParseUser.query()
+                  .equalTo(ParseUser.COLUMNS.id, album.owner.id)
+                  .first();
+                relatedUsers.push(new ParseUser(ownerUser!).email);
+              }
+              setOptions(
+                Array.from(new Set(relatedUsers)).filter(
+                  (option) => option !== loggedInUser?.email
+                )
               );
             });
-            setOptions(Array.from(new Set(relatedUsers)));
-          });
+        })();
+        gotOptions.current = true;
       }
-    }, 500);
+    }, [setOptions, loggedInUser]);
 
     const onKeyDown = (event: KeyboardEvent) => {
       switch (event.key) {
@@ -103,9 +125,23 @@ const UserField = forwardRef(
         multiple
         freeSolo
         inputValue={inputValue}
-        onInputChange={(_, value) => {
-          setInputValue(value);
-          updateOptions(value);
+        onBlur={() => {
+          if (inputValue) {
+            onChange(value.concat([inputValue]));
+            setInputValue("");
+          }
+        }}
+        onInputChange={(_, newInputValue) => {
+          if (newInputValue.endsWith(" ") || newInputValue.endsWith(",")) {
+            onChange(
+              value.concat([
+                newInputValue.substring(0, newInputValue.length - 1),
+              ])
+            );
+            setInputValue("");
+          } else {
+            setInputValue(newInputValue);
+          }
         }}
         onChange={(_, value) => onChange(value)}
         filterOptions={(options, { inputValue }) =>

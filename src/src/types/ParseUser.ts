@@ -97,6 +97,10 @@ export default class ParseUser {
     return new ParsePointer(this._user.toPointer());
   }
 
+  toNativePointer(): Parse.Pointer {
+    return this._user.toPointer();
+  }
+
   async login(updateLoggedInUser: UpdateLoggedInUser, options?: FullOptions) {
     return await this._user.logIn(options).then((loggedInUser) => {
       updateLoggedInUser(new ParseUser(loggedInUser), UpdateReason.LOG_IN);
@@ -171,7 +175,11 @@ export default class ParseUser {
   }
 
   get email(): string {
-    return this._user.get(ParseUser.COLUMNS.email);
+    return (
+      this._user.get(ParseUser.COLUMNS.email) ??
+      this._user.getEmail() ??
+      this._user.getUsername()
+    );
   }
 
   set email(email) {

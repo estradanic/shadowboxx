@@ -84,8 +84,9 @@ export default class ParseAlbum extends ParseObject<Album> {
         .findAll();
       for (const collaborator of collaborators) {
         acl.setReadAccess(collaborator, true);
-        acl.setWriteAccess(collaborator, false);
+        acl.setWriteAccess(collaborator, true);
         imageAcl.setReadAccess(collaborator, true);
+        imageAcl.setWriteAccess(collaborator, true);
       }
     }
   }

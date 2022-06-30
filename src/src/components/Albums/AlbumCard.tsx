@@ -18,6 +18,7 @@ import { useHistory, useLocation } from "react-router-dom";
 import { Strings } from "../../resources";
 import { routes } from "../../app";
 import { ParseAlbum } from "../../types";
+import { useUserContext } from "../../contexts";
 import UserAvatar from "../User/UserAvatar";
 import Empty from "../Svgs/Empty";
 import { useSnackbar } from "../Snackbar/Snackbar";
@@ -103,6 +104,19 @@ const AlbumCard = memo(({ value, onChange }: AlbumCardProps) => {
   const [collaborators, setCollaborators] = useState<ParseUser[]>([]);
   const [viewers, setViewers] = useState<ParseUser[]>([]);
   const [owner, setOwner] = useState<ParseUser>();
+
+  const { loggedInUser } = useUserContext();
+  const isViewer = useMemo(
+    () =>
+      loggedInUser?.id !== value.owner.id &&
+      !value.collaborators.includes(loggedInUser?.email!) &&
+      value.viewers.includes(loggedInUser?.email!),
+    [loggedInUser, value.owner.id, value.collaborators, value.viewers]
+  );
+  const isOwner = useMemo(() => loggedInUser?.id === value.owner.id, [
+    loggedInUser?.id,
+    value.owner.id,
+  ]);
 
   const location = useLocation();
 
@@ -215,17 +229,21 @@ const AlbumCard = memo(({ value, onChange }: AlbumCardProps) => {
           classes={{ title: classes.title, subheader: classes.subheader }}
           avatar={<UserAvatar email={owner?.email!} fetchUser={() => owner!} />}
           action={
-            <>
-              <IconButton onClick={(e) => setAnchorEl(e.currentTarget)}>
-                <MoreVert className={classes.icon} />
-              </IconButton>
-              <Menu open={!!anchorEl} anchorEl={anchorEl} onClose={closeMenu}>
-                <MenuItem onClick={editAlbum}>{Strings.editAlbum()}</MenuItem>
-                <MenuItem onClick={deleteAlbum}>
-                  {Strings.deleteAlbum()}
-                </MenuItem>
-              </Menu>
-            </>
+            isViewer ? undefined : (
+              <>
+                <IconButton onClick={(e) => setAnchorEl(e.currentTarget)}>
+                  <MoreVert className={classes.icon} />
+                </IconButton>
+                <Menu open={!!anchorEl} anchorEl={anchorEl} onClose={closeMenu}>
+                  <MenuItem onClick={editAlbum}>{Strings.editAlbum()}</MenuItem>
+                  {isOwner && (
+                    <MenuItem onClick={deleteAlbum}>
+                      {Strings.deleteAlbum()}
+                    </MenuItem>
+                  )}
+                </Menu>
+              </>
+            )
           }
           title={value?.name}
           subheader={`${Strings.numOfPhotos(images?.length ?? 0)} ${
@@ -296,6 +314,7 @@ const AlbumCard = memo(({ value, onChange }: AlbumCardProps) => {
                         className={classes.collaboratorAvatar}
                         email={collaborator.email}
                         fetchUser={() => collaborator}
+                        key={collaborator.email}
                       />
                     </Tooltip>
                   </Grid>
@@ -313,6 +332,7 @@ const AlbumCard = memo(({ value, onChange }: AlbumCardProps) => {
                         className={classes.collaboratorAvatar}
                         email={viewer.email}
                         fetchUser={() => viewer}
+                        key={viewer.email}
                       />
                     </Tooltip>
                   </Grid>
@@ -321,47 +341,49 @@ const AlbumCard = memo(({ value, onChange }: AlbumCardProps) => {
             )}
           </Grid>
         </CardContent>
-        <CardActions disableSpacing>
-          <IconButton
-            onClick={() => {
-              const oldIsFavorite = value?.isFavorite;
-              value.isFavorite = !oldIsFavorite;
-              value
-                ?.save()
-                .then((response) => {
-                  setIsFavorite(!!response.isFavorite);
-                })
-                .catch((error) => {
-                  value.isFavorite = oldIsFavorite;
-                  enqueueErrorSnackbar(
-                    error?.message ?? Strings.editAlbumError()
-                  );
-                });
-            }}
-          >
-            <Star className={isFavorite ? classes.favorite : classes.icon} />
-          </IconButton>
-          <IconButton
-            className={classes.public}
-            onClick={() => {
-              const oldIsPublic = value?.isPublic;
-              value.isPublic = !oldIsPublic;
-              value
-                ?.save()
-                .then((response) => {
-                  setIsPublic(!!response.isPublic);
-                })
-                .catch((error) => {
-                  value.isPublic = oldIsPublic;
-                  enqueueErrorSnackbar(
-                    error?.message ?? Strings.editAlbumError()
-                  );
-                });
-            }}
-          >
-            <Public className={isPublic ? classes.isPublic : classes.icon} />
-          </IconButton>
-        </CardActions>
+        {isOwner && (
+          <CardActions disableSpacing>
+            <IconButton
+              onClick={() => {
+                const oldIsFavorite = value?.isFavorite;
+                value.isFavorite = !oldIsFavorite;
+                value
+                  ?.save()
+                  .then((response) => {
+                    setIsFavorite(!!response.isFavorite);
+                  })
+                  .catch((error) => {
+                    value.isFavorite = oldIsFavorite;
+                    enqueueErrorSnackbar(
+                      error?.message ?? Strings.editAlbumError()
+                    );
+                  });
+              }}
+            >
+              <Star className={isFavorite ? classes.favorite : classes.icon} />
+            </IconButton>
+            <IconButton
+              className={classes.public}
+              onClick={() => {
+                const oldIsPublic = value?.isPublic;
+                value.isPublic = !oldIsPublic;
+                value
+                  ?.save()
+                  .then((response) => {
+                    setIsPublic(!!response.isPublic);
+                  })
+                  .catch((error) => {
+                    value.isPublic = oldIsPublic;
+                    enqueueErrorSnackbar(
+                      error?.message ?? Strings.editAlbumError()
+                    );
+                  });
+              }}
+            >
+              <Public className={isPublic ? classes.isPublic : classes.icon} />
+            </IconButton>
+          </CardActions>
+        )}
       </Card>
       <AlbumFormDialog
         value={value.attributes}

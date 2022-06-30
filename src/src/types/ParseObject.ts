@@ -45,6 +45,10 @@ export default class ParseObject<A extends Attributes> {
     return new ParsePointer(this._object.toPointer());
   }
 
+  toNativePointer(): Parse.Pointer {
+    return this._object.toPointer();
+  }
+
   get exists(): boolean {
     return !!this._object;
   }

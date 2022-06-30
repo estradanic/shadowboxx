@@ -10,7 +10,7 @@ import {
 import { Public, Star, StarBorder } from "@material-ui/icons";
 import { Strings } from "../../resources";
 import { ErrorState, isNullOrWhitespace } from "../../utils";
-import { ImageContextProvider } from "../../contexts";
+import { ImageContextProvider, useUserContext } from "../../contexts";
 import { ParseUser, ParseImage, Album } from "../../types";
 import ActionDialog, {
   ActionDialogProps,
@@ -99,6 +99,12 @@ const AlbumFormDialog = ({
   );
 
   const [images, setImages] = useState<ParseImage[]>([]);
+
+  const { loggedInUser } = useUserContext();
+  const isCollaborator = useMemo(
+    () => loggedInUser?.id !== initialValue.owner.id,
+    [loggedInUser?.id, initialValue.owner.id]
+  );
 
   const defaultErrors = useMemo(
     () => ({
@@ -262,73 +268,70 @@ const AlbumFormDialog = ({
             multiline
           />
         </Grid>
-        <Grid item xs={12}>
-          <Tooltip title={Strings.favoriteTooltip()}>
-            <FormControl fullWidth className={classes.checkbox}>
-              <FormControlLabel
-                control={
-                  <Checkbox
-                    icon={<StarBorder className={classes.favoriteIcon} />}
-                    checked={!!isFavorite}
-                    onChange={(_, checked) => setIsFavorite(checked)}
-                    checkedIcon={<Star className={classes.favoriteIcon} />}
-                  />
-                }
-                label={Strings.favorite()}
-                labelPlacement="start"
-                className={classes.checkboxLabel}
-              />
-            </FormControl>
-          </Tooltip>
-        </Grid>
-        <Grid item xs={12}>
-          <Tooltip title={Strings.publicTooltip()}>
-            <FormControl fullWidth className={classes.checkbox}>
-              <FormControlLabel
-                control={
-                  <Checkbox
-                    icon={<Public className={classes.publicIcon} />}
-                    checked={!!isPublic}
-                    onChange={(_, checked) => setIsPublic(checked)}
-                    checkedIcon={
-                      <Public className={classes.publicIconChecked} />
+        {!isCollaborator && (
+          <>
+            <Grid item xs={12}>
+              <Tooltip title={Strings.favoriteTooltip()}>
+                <FormControl fullWidth className={classes.checkbox}>
+                  <FormControlLabel
+                    control={
+                      <Checkbox
+                        disabled={isCollaborator}
+                        icon={<StarBorder className={classes.favoriteIcon} />}
+                        checked={!!isFavorite}
+                        onChange={(_, checked) => setIsFavorite(checked)}
+                        checkedIcon={<Star className={classes.favoriteIcon} />}
+                      />
                     }
+                    label={Strings.favorite()}
+                    labelPlacement="start"
+                    className={classes.checkboxLabel}
                   />
-                }
-                label={Strings.public()}
-                labelPlacement="start"
-                className={classes.checkboxLabel}
-              />
-            </FormControl>
-          </Tooltip>
-        </Grid>
-        <Grid item xs={12}>
-          <Tooltip title={Strings.coOwnersTooltip()}>
-            <UserField
-              value={coOwners}
-              label={Strings.coOwners()}
-              onChange={(coOwners) => setCoOwners(coOwners)}
-            />
-          </Tooltip>
-        </Grid>
-        <Grid item xs={12}>
-          <Tooltip title={Strings.collaboratorsTooltip()}>
-            <UserField
-              value={collaborators}
-              label={Strings.collaborators()}
-              onChange={(collaborators) => setCollaborators(collaborators)}
-            />
-          </Tooltip>
-        </Grid>
-        <Grid item xs={12}>
-          <Tooltip title={Strings.viewersTooltip()}>
-            <UserField
-              value={viewers}
-              label={Strings.viewers()}
-              onChange={(viewers) => setViewers(viewers)}
-            />
-          </Tooltip>
-        </Grid>
+                </FormControl>
+              </Tooltip>
+            </Grid>
+            <Grid item xs={12}>
+              <Tooltip title={Strings.publicTooltip()}>
+                <FormControl fullWidth className={classes.checkbox}>
+                  <FormControlLabel
+                    control={
+                      <Checkbox
+                        disabled={isCollaborator}
+                        icon={<Public className={classes.publicIcon} />}
+                        checked={!!isPublic}
+                        onChange={(_, checked) => setIsPublic(checked)}
+                        checkedIcon={
+                          <Public className={classes.publicIconChecked} />
+                        }
+                      />
+                    }
+                    label={Strings.public()}
+                    labelPlacement="start"
+                    className={classes.checkboxLabel}
+                  />
+                </FormControl>
+              </Tooltip>
+            </Grid>
+            <Grid item xs={12}>
+              <Tooltip title={Strings.collaboratorsTooltip()}>
+                <UserField
+                  value={collaborators}
+                  label={Strings.collaborators()}
+                  onChange={(collaborators) => setCollaborators(collaborators)}
+                />
+              </Tooltip>
+            </Grid>
+            <Grid item xs={12}>
+              <Tooltip title={Strings.viewersTooltip()}>
+                <UserField
+                  value={viewers}
+                  label={Strings.viewers()}
+                  onChange={(viewers) => setViewers(viewers)}
+                />
+              </Tooltip>
+            </Grid>
+          </>
+        )}
         <Grid item xs={12}>
           <ImageContextProvider>
             <ImageField
