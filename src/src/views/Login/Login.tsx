@@ -73,7 +73,10 @@ const Login = () => {
   const login = () => {
     if (validate()) {
       setGlobalLoading(true);
-      const user = ParseUser.fromAttributes({ username: email, password });
+      const user = ParseUser.fromAttributes({
+        username: email.toLocaleLowerCase(),
+        password,
+      });
       user
         .login(updateLoggedInUser)
         .catch((error) => {

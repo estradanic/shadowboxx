@@ -19,7 +19,7 @@ export const validateEmail = (email: string): boolean => {
  * Helper function to validate passwords
  */
 export const validatePassword = (password: string): boolean => {
-  return /^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%^&*])(?=.{8,})/.test(
+  return /^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[^0-9A-Za-z])(?=.{8,})/.test(
     password
   );
 };

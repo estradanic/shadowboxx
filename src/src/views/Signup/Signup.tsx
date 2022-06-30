@@ -114,7 +114,7 @@ const Signup = () => {
     if (validate()) {
       setGlobalLoading(true);
       const user = ParseUser.fromAttributes({
-        username: email,
+        username: email.toLocaleLowerCase(),
         password,
         firstName,
         lastName,
