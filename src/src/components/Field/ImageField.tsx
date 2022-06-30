@@ -194,7 +194,11 @@ const ImageField = memo(
     };
 
     return (
-      <>
+      <LoadingWrapper
+        loading={loading}
+        backgroundColor="transparent"
+        verticalPosition="top"
+      >
         <TextField // Url src input
           style={{ display: showUrlInput ? "inherit" : "none" }}
           id={urlInputId}
@@ -278,52 +282,50 @@ const ImageField = memo(
           {...rest}
         />
         {multiple && !!value.length && (
-          <LoadingWrapper loading={loading} backgroundColor="transparent">
-            <Grid container className={classes.multiImageContainer}>
-              {value.map((image: ParseImage, index) => {
-                const file = image.file;
-                return (
-                  <Grid
-                    xs={12}
-                    md={6}
-                    lg={4}
-                    item
-                    className={classes.imageWrapper}
-                    key={image.id}
-                  >
-                    <Image
-                      borderColor={randomColor}
-                      src={file.url()}
-                      alt={file.name()}
-                      decorations={[
-                        <RemoveImageDecoration
-                          onClick={async () => {
-                            const newValue = value.filter(
-                              (valueImage) => image.id !== valueImage.id
-                            );
-                            onChange(newValue);
-                            await deleteImage(image);
-                          }}
-                        />,
-                        <CoverImageDecoration
-                          checked={image.isCoverImage}
-                          onClick={async () => {
-                            if (image.isCoverImage) {
-                              await unsetCoverImage(image, index);
-                            } else {
-                              await setCoverImage(image, index);
-                            }
-                          }}
-                        />,
-                      ]}
-                    />
-                  </Grid>
-                );
-              })}
-            </Grid>
-          </LoadingWrapper>
+          <Grid container className={classes.multiImageContainer}>
+            {value.map((image: ParseImage, index) => {
+              const file = image.file;
+              return (
+                <Grid
+                  xs={12}
+                  md={6}
+                  lg={4}
+                  item
+                  className={classes.imageWrapper}
+                  key={image.id}
+                >
+                  <Image
+                    borderColor={randomColor}
+                    src={file.url()}
+                    alt={file.name()}
+                    decorations={[
+                      <RemoveImageDecoration
+                        onClick={async () => {
+                          const newValue = value.filter(
+                            (valueImage) => image.id !== valueImage.id
+                          );
+                          onChange(newValue);
+                          await deleteImage(image);
+                        }}
+                      />,
+                      <CoverImageDecoration
+                        checked={image.isCoverImage}
+                        onClick={async () => {
+                          if (image.isCoverImage) {
+                            await unsetCoverImage(image, index);
+                          } else {
+                            await setCoverImage(image, index);
+                          }
+                        }}
+                      />,
+                    ]}
+                  />
+                </Grid>
+              );
+            })}
+          </Grid>
         )}
-      </>
+      </LoadingWrapper>
     );
   }
 );

@@ -1,9 +1,11 @@
 import React, { useState, createContext, useContext, useRef } from "react";
 import { useNotificationsContext } from "./NotificationsContext";
-import { CircularProgress } from "@material-ui/core";
+import { CircularProgress, useMediaQuery } from "@material-ui/core";
+import { useTheme } from "@material-ui/core/styles";
 import { useSnackbar } from "../components";
 import { Strings } from "../resources";
 import { ParseImage, Image } from "../types";
+import { useGlobalLoadingContext } from "./GlobalLoadingContext";
 
 export enum ImageActionCommand {
   DELETE,
@@ -50,6 +52,10 @@ export const ImageContextProvider = ({
   const [loading, setLoading] = useState<boolean>(false);
   const { enqueueErrorSnackbar } = useSnackbar();
 
+  const { setGlobalLoading } = useGlobalLoadingContext();
+  const theme = useTheme();
+  const mobile = useMediaQuery(theme.breakpoints.down("sm"));
+
   const recalculateProgress = () => {
     const completedActions = actions.current.filter(
       (action) => action.completed
@@ -58,12 +64,16 @@ export const ImageContextProvider = ({
       (completedActions.length / actions.current.length) * 100;
     if (newProgress === 100) {
       setLoading(false);
+      setGlobalLoading(false);
     }
     setProgress(newProgress);
   };
 
   const uploadImage = async (image: Image, acl?: Parse.ACL) => {
     setLoading(true);
+    if (mobile) {
+      setGlobalLoading(true);
+    }
 
     const action: ImageAction = { image, command: ImageActionCommand.UPLOAD };
     actions.current.push(action);
@@ -106,6 +116,9 @@ export const ImageContextProvider = ({
 
   const deleteImage = async (parseImage: ParseImage) => {
     setLoading(true);
+    if (mobile) {
+      setGlobalLoading(true);
+    }
     const action: ImageAction = {
       image: parseImage.attributes,
       command: ImageActionCommand.DELETE,

@@ -17,12 +17,17 @@ const useStyles = makeStyles((theme: Theme) => ({
   loader: {
     position: "absolute",
     zIndex: 100,
-    top: "30%",
     left: "calc(50% - 20px)",
     display: "flex",
     flexDirection: "column",
     alignItems: "center",
     justifyContent: "center",
+  },
+  centerPositionLoader: {
+    top: "calc(50% - 20px)",
+  },
+  topPositionLoader: {
+    top: theme.spacing(1),
   },
   spinner: {
     color: theme.palette.error.light,
@@ -40,6 +45,8 @@ export interface LoadingWrapperProps extends CircularProgressProps {
   children?: ReactNode;
   /** Background color for the overlay */
   backgroundColor?: string;
+  /** Where vertically to position the spinner */
+  verticalPosition?: "center" | "top";
 }
 
 /** Component to disable input on elements and show visual clues while they are loading */
@@ -49,6 +56,7 @@ const LoadingWrapper = ({
   children,
   className,
   backgroundColor,
+  verticalPosition = "center",
   ...rest
 }: LoadingWrapperProps) => {
   const classes = useStyles({ loading, backgroundColor });
@@ -57,7 +65,13 @@ const LoadingWrapper = ({
     <div className={classNames(classes.root, className)}>
       <div className={classes.wrapper}>{children}</div>
       {loading && (
-        <div className={classes.loader}>
+        <div
+          className={classNames({
+            [classes.loader]: true,
+            [classes.topPositionLoader]: verticalPosition === "top",
+            [classes.centerPositionLoader]: verticalPosition === "center",
+          })}
+        >
           <CircularProgress
             disableShrink
             className={classes.spinner}
