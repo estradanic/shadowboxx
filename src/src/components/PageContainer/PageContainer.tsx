@@ -19,18 +19,23 @@ const useStyles = makeStyles((theme: Theme) => ({
 }));
 
 /** Interface defining props for PageContainer */
-export interface PageContainerProps extends Omit<ContainerProps, "maxWidth"> {
-  /** Whether the page is loading or not */
-  loading?: boolean;
-}
+export interface PageContainerProps extends Omit<ContainerProps, "maxWidth"> {}
 
 /** Component to wrap every view in the app */
-const PageContainer = ({ children, loading, ...rest }: PageContainerProps) => {
+const PageContainer = ({ children, ...rest }: PageContainerProps) => {
   const classes = useStyles();
-  const { globalLoading } = useGlobalLoadingContext();
+  const {
+    globalLoading,
+    globalProgress,
+    globalLoaderType,
+  } = useGlobalLoadingContext();
 
   return (
-    <LoadingWrapper loading={loading || globalLoading}>
+    <LoadingWrapper
+      loading={globalLoading}
+      type={globalLoaderType}
+      progress={globalProgress}
+    >
       <Container maxWidth={false} className={classes.container} {...rest}>
         <Grid
           container

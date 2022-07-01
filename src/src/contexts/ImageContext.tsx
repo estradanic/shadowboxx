@@ -1,7 +1,6 @@
-import React, { useState, createContext, useContext, useRef } from "react";
+import React, { createContext, useContext, useRef } from "react";
 import { useNotificationsContext } from "./NotificationsContext";
-import { CircularProgress, useMediaQuery } from "@material-ui/core";
-import { useTheme } from "@material-ui/core/styles";
+import { CircularProgress } from "@material-ui/core";
 import { useSnackbar } from "../components";
 import { Strings } from "../resources";
 import { ParseImage, Image } from "../types";
@@ -24,10 +23,6 @@ export interface ImageAction {
 
 /** Interface defining the value of ImageContextProvider */
 interface ImageContextValue {
-  /** Whether there are actions currently in progress or not */
-  loading: boolean;
-  /** A completion value for Progress components */
-  progress: number;
   /** Function to upload an image */
   uploadImage: (image: Image, acl?: Parse.ACL) => Promise<ParseImage>;
   /** Function to delete image */
@@ -48,13 +43,14 @@ export const ImageContextProvider = ({
 }: ImageContextProviderProps) => {
   const actions = useRef<ImageAction[]>([]);
   const { addNotification } = useNotificationsContext();
-  const [progress, setProgress] = useState<number>(0);
-  const [loading, setLoading] = useState<boolean>(false);
   const { enqueueErrorSnackbar } = useSnackbar();
 
-  const { setGlobalLoading } = useGlobalLoadingContext();
-  const theme = useTheme();
-  const mobile = useMediaQuery(theme.breakpoints.down("sm"));
+  const {
+    setGlobalLoading,
+    setGlobalLoaderType,
+    setGlobalProgress,
+    resetGlobalLoader,
+  } = useGlobalLoadingContext();
 
   const recalculateProgress = () => {
     const completedActions = actions.current.filter(
@@ -63,17 +59,14 @@ export const ImageContextProvider = ({
     const newProgress =
       (completedActions.length / actions.current.length) * 100;
     if (newProgress === 100) {
-      setLoading(false);
-      setGlobalLoading(false);
+      resetGlobalLoader();
     }
-    setProgress(newProgress);
+    setGlobalProgress(newProgress);
   };
 
   const uploadImage = async (image: Image, acl?: Parse.ACL) => {
-    setLoading(true);
-    if (mobile) {
-      setGlobalLoading(true);
-    }
+    setGlobalLoaderType("determinate");
+    setGlobalLoading(true);
 
     const action: ImageAction = { image, command: ImageActionCommand.UPLOAD };
     actions.current.push(action);
@@ -115,10 +108,8 @@ export const ImageContextProvider = ({
   };
 
   const deleteImage = async (parseImage: ParseImage) => {
-    setLoading(true);
-    if (mobile) {
-      setGlobalLoading(true);
-    }
+    setGlobalLoading(true);
+    setGlobalLoaderType("determinate");
     const action: ImageAction = {
       image: parseImage.attributes,
       command: ImageActionCommand.DELETE,
@@ -138,8 +129,6 @@ export const ImageContextProvider = ({
   const value: ImageContextValue = {
     uploadImage,
     deleteImage,
-    progress,
-    loading,
   };
 
   return (

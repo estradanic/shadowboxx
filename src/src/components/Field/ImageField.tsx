@@ -12,7 +12,6 @@ import TextField, { TextFieldProps } from "../Field/TextField";
 import Tooltip from "../Tooltip/Tooltip";
 import { useSnackbar } from "../Snackbar/Snackbar";
 import { useImageContext, useUserContext } from "../../contexts";
-import LoadingWrapper from "../Loader/LoadingWrapper";
 import Image from "../Image/Image";
 import RemoveImageDecoration from "../Image/Decoration/RemoveImageDecoration";
 import CoverImageDecoration from "../Image/Decoration/CoverImageDecoration";
@@ -96,7 +95,7 @@ const ImageField = memo(
   }: ImageFieldProps) => {
     const classes = useStyles();
 
-    const { uploadImage, loading, deleteImage } = useImageContext();
+    const { uploadImage, deleteImage } = useImageContext();
     const [showUrlInput, setShowUrlInput] = useState<boolean>(false);
     const [imageUrl, setImageUrl] = useState<string>("");
     const { loggedInUser } = useUserContext();
@@ -194,11 +193,7 @@ const ImageField = memo(
     };
 
     return (
-      <LoadingWrapper
-        loading={loading}
-        backgroundColor="transparent"
-        verticalPosition="top"
-      >
+      <>
         <TextField // Url src input
           style={{ display: showUrlInput ? "inherit" : "none" }}
           id={urlInputId}
@@ -325,7 +320,7 @@ const ImageField = memo(
             })}
           </Grid>
         )}
-      </LoadingWrapper>
+      </>
     );
   }
 );

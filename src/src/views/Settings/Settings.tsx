@@ -18,7 +18,11 @@ import {
 } from "../../components";
 import { Strings } from "../../resources";
 import { ErrorState, validateEmail, isNullOrWhitespace } from "../../utils";
-import { useUserContext, ImageContextProvider } from "../../contexts";
+import {
+  useUserContext,
+  ImageContextProvider,
+  useGlobalLoadingContext,
+} from "../../contexts";
 import { useView } from "../View";
 
 const useStyles = makeStyles((theme: Theme) => ({
@@ -108,8 +112,9 @@ const Settings = () => {
     saveLoggedInUserUpdates,
   } = useUserContext();
 
+  const { setGlobalLoading } = useGlobalLoadingContext();
+
   const classes = useStyles();
-  const [loading, setLoading] = useState<boolean>(false);
   const [errors, setErrors] = useState<
     ErrorState<
       "email" | "firstName" | "lastName" | "password" | "profilePicture"
@@ -171,7 +176,7 @@ const Settings = () => {
 
   const changeUserInfo = () => {
     if (validate()) {
-      setLoading(true);
+      setGlobalLoading(true);
       loggedInUser!.email = settings.email;
       loggedInUser!.firstName = settings.firstName;
       loggedInUser!.lastName = settings.lastName;
@@ -180,10 +185,10 @@ const Settings = () => {
       saveLoggedInUserUpdates()
         .then(() => {
           enqueueSuccessSnackbar(Strings.settingsSaved());
-          setLoading(false);
+          setGlobalLoading(false);
         })
         .catch((error) => {
-          setLoading(false);
+          setGlobalLoading(false);
           enqueueErrorSnackbar(error?.message ?? Strings.settingsNotSaved());
         });
     }
@@ -197,7 +202,7 @@ const Settings = () => {
   }, [loggedInUser]);
 
   return (
-    <PageContainer loading={loading}>
+    <PageContainer>
       <Grid item lg={6} sm={8}>
         <Card>
           <form autoComplete="off">
