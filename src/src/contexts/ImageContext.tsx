@@ -1,7 +1,8 @@
 import React, { createContext, useContext, useRef } from "react";
 import { useNotificationsContext } from "./NotificationsContext";
 import { CircularProgress } from "@material-ui/core";
-import { useSnackbar } from "../components";
+import { makeStyles, Theme } from "@material-ui/core/styles";
+import { FancyTypography, useSnackbar } from "../components";
 import { Strings } from "../resources";
 import { ParseImage, Image } from "../types";
 import { useGlobalLoadingContext } from "./GlobalLoadingContext";
@@ -38,6 +39,13 @@ interface ImageContextProviderProps {
   children: React.ReactNode;
 }
 
+const useStyles = makeStyles((theme: Theme) => ({
+  uploadingImages: {
+    color: theme.palette.primary.contrastText,
+    fontSize: theme.typography.h3.fontSize,
+  },
+}));
+
 export const ImageContextProvider = ({
   children,
 }: ImageContextProviderProps) => {
@@ -45,10 +53,13 @@ export const ImageContextProvider = ({
   const { addNotification } = useNotificationsContext();
   const { enqueueErrorSnackbar } = useSnackbar();
 
+  const classes = useStyles();
+
   const {
     setGlobalLoading,
     setGlobalLoaderType,
     setGlobalProgress,
+    setGlobalLoaderContent,
     resetGlobalLoader,
   } = useGlobalLoadingContext();
 
@@ -56,16 +67,22 @@ export const ImageContextProvider = ({
     const completedActions = actions.current.filter(
       (action) => action.completed
     );
-    const newProgress =
-      (completedActions.length / actions.current.length) * 100;
+    let newProgress = (completedActions.length / actions.current.length) * 100;
     if (newProgress === 100) {
       resetGlobalLoader();
+    } else if (newProgress === 0) {
+      newProgress = 5;
     }
     setGlobalProgress(newProgress);
   };
 
   const uploadImage = async (image: Image, acl?: Parse.ACL) => {
     setGlobalLoaderType("determinate");
+    setGlobalLoaderContent(
+      <FancyTypography className={classes.uploadingImages}>
+        {Strings.uploadingImages()}
+      </FancyTypography>
+    );
     setGlobalLoading(true);
 
     const action: ImageAction = { image, command: ImageActionCommand.UPLOAD };

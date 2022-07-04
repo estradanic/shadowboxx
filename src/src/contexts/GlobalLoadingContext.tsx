@@ -20,6 +20,12 @@ interface GlobalLoadingContextValue {
   setGlobalLoaderType: React.Dispatch<
     React.SetStateAction<LoadingWrapperProps["type"]>
   >;
+  /** Content (such as text) to show in the loader */
+  globalLoaderContent?: LoadingWrapperProps["content"];
+  /** Function to set globalLoaderContent */
+  setGlobalLoaderContent: React.Dispatch<
+    React.SetStateAction<LoadingWrapperProps["content"]>
+  >;
   /** Function to reset the global loader back to defaults ({loading: false, progress: 0, type: "indeterminate"}) */
   resetGlobalLoader: () => void;
 }
@@ -41,15 +47,19 @@ export const GlobalLoadingContextProvider = ({
   >(false);
   const [globalProgress, setGlobalProgress] = useState<
     LoadingWrapperProps["progress"]
-  >(0);
+  >(5);
   const [globalLoaderType, setGlobalLoaderType] = useState<
     LoadingWrapperProps["type"]
   >("indeterminate");
+  const [globalLoaderContent, setGlobalLoaderContent] = useState<
+    LoadingWrapperProps["content"]
+  >();
 
   const resetGlobalLoader = () => {
     setGlobalLoading(false);
-    setGlobalProgress(0);
+    setGlobalProgress(5);
     setGlobalLoaderType("indeterminate");
+    setGlobalLoaderContent(undefined);
   };
 
   return (
@@ -61,6 +71,8 @@ export const GlobalLoadingContextProvider = ({
         setGlobalProgress,
         globalLoaderType,
         setGlobalLoaderType,
+        globalLoaderContent,
+        setGlobalLoaderContent,
         resetGlobalLoader,
       }}
     >

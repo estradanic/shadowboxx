@@ -99,6 +99,7 @@ export interface StringEntries {
   updateImageError: string;
   uploadImageError: string;
   uploadingImage: string;
+  uploadingImages: string;
   verifyEmail: string;
   viewers: string;
   viewersTooltip: string;
@@ -229,6 +230,7 @@ const Strings: {
   updateImageError: (fileName: string) => `Error updating image ${fileName}.`,
   uploadImageError: (fileName: string) => `Error uploading image ${fileName}.`,
   uploadingImage: (fileName: string) => `Uploading image (${fileName})`,
+  uploadingImages: () => "Uploading images...",
   verifyEmail: (email: string) =>
     `Please check ${email} for the verification message, then return here.`,
   viewers: () => "Viewers",

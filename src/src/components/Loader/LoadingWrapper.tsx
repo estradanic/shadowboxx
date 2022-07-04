@@ -7,31 +7,37 @@ import {
 } from "@material-ui/core";
 import { makeStyles, Theme } from "@material-ui/core/styles";
 import classNames from "classnames";
+import { opacity } from "../../utils";
 
-// TODO: Fix zIndeces
 const useStyles = makeStyles((theme: Theme) => ({
   root: {
-    zIndex: 1399,
     display: "block",
     position: "relative",
-    backgroundColor: ({ backgroundColor }) =>
-      backgroundColor ?? theme.palette.background.default,
   },
   wrapper: {
-    zIndex: 1399,
     pointerEvents: ({ loading }: any) => (loading ? "none" : "auto"),
-    opacity: ({ loading }: any) => (loading ? 0.3 : 1),
+  },
+  loaderWrapper: {
+    position: "absolute",
+    top: theme.spacing(-16),
+    left: 0,
+    right: 0,
+    bottom: theme.spacing(-6),
+    width: "100vw",
+    height: "100vh",
+    backgroundColor: ({ backgroundColor }) =>
+      opacity(backgroundColor ?? theme.palette.background.default, 0.7),
+    zIndex: 1400,
   },
   loader: {
     position: "absolute",
-    zIndex: 1400,
     display: "flex",
     flexDirection: "column",
     alignItems: "center",
     justifyContent: "center",
   },
   centerPositionLoader: {
-    top: "calc(50% - 20px)",
+    top: "calc(50% - 32px)",
   },
   topPositionLoader: {
     top: theme.spacing(1),
@@ -47,10 +53,14 @@ const useStyles = makeStyles((theme: Theme) => ({
   spinner: {
     color: theme.palette.error.light,
     margin: "auto",
+    marginBottom: theme.spacing(2),
   },
   progress: {
-    color: theme.palette.error.light,
+    "& div": {
+      backgroundColor: theme.palette.error.light,
+    },
     width: "100%",
+    marginBottom: theme.spacing(2),
   },
 }));
 
@@ -92,29 +102,31 @@ const LoadingWrapper = ({
     <div className={classNames(classes.root, className)}>
       <div className={classes.wrapper}>{children}</div>
       {loading && (
-        <div
-          className={classNames({
-            [classes.loader]: true,
-            [classes.topPositionLoader]: verticalPosition === "top",
-            [classes.centerPositionLoader]: verticalPosition === "center",
-            [classes.indeterminateLoader]: type === "indeterminate",
-            [classes.determinateLoader]: type === "determinate",
-          })}
-        >
-          {type === "indeterminate" ? (
-            <CircularProgress
-              disableShrink
-              className={classes.spinner}
-              {...rest}
-            />
-          ) : (
-            <LinearProgress
-              variant="determinate"
-              value={progress}
-              className={classes.progress}
-            />
-          )}
-          {content}
+        <div className={classes.loaderWrapper}>
+          <div
+            className={classNames({
+              [classes.loader]: true,
+              [classes.topPositionLoader]: verticalPosition === "top",
+              [classes.centerPositionLoader]: verticalPosition === "center",
+              [classes.indeterminateLoader]: type === "indeterminate",
+              [classes.determinateLoader]: type === "determinate",
+            })}
+          >
+            {type === "indeterminate" ? (
+              <CircularProgress
+                disableShrink
+                className={classes.spinner}
+                {...rest}
+              />
+            ) : (
+              <LinearProgress
+                variant="determinate"
+                value={progress}
+                className={classes.progress}
+              />
+            )}
+            {content}
+          </div>
         </div>
       )}
     </div>

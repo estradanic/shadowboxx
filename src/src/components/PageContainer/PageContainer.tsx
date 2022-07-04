@@ -28,6 +28,7 @@ const PageContainer = ({ children, ...rest }: PageContainerProps) => {
     globalLoading,
     globalProgress,
     globalLoaderType,
+    globalLoaderContent,
   } = useGlobalLoadingContext();
 
   return (
@@ -35,6 +36,7 @@ const PageContainer = ({ children, ...rest }: PageContainerProps) => {
       loading={globalLoading}
       type={globalLoaderType}
       progress={globalProgress}
+      content={globalLoaderContent}
     >
       <Container maxWidth={false} className={classes.container} {...rest}>
         <Grid
