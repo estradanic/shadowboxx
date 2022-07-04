@@ -20,3 +20,14 @@ export const elide = (
     input.length - endLength - 1
   )}`;
 };
+
+/**
+ * Parse only allows mostly alphanumeric characters in file names
+ */
+export const makeValidFileName = (input: string): string => {
+  const fileName = input?.replaceAll(/[^A-Z0-9a-z_. ]/g, "");
+  if (isNullOrWhitespace(fileName)) {
+    throw new Error("Filename cannot be whitespace or empty");
+  }
+  return fileName;
+};

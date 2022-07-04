@@ -4,7 +4,7 @@ import { Close, AddAPhoto, Link, Check } from "@material-ui/icons";
 import { makeStyles, Theme } from "@material-ui/core/styles";
 import Parse from "parse";
 import uniqueId from "lodash/uniqueId";
-import { elide } from "../../utils";
+import { elide, makeValidFileName } from "../../utils";
 import { Strings } from "../../resources";
 import { ParseImage } from "../../types";
 import { useRandomColor } from "../../hooks";
@@ -113,7 +113,7 @@ const ImageField = memo(
         const newImages: ParseImage[] = [];
         for (let i = 0; i < max; i++) {
           const file: any = event.target.files[i];
-          const parseFile = new Parse.File(file.name, file);
+          const parseFile = new Parse.File(makeValidFileName(file.name), file);
           uploadImage(
             {
               file: parseFile,
