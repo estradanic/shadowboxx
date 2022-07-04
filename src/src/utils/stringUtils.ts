@@ -1,3 +1,5 @@
+import Strings from "../resources/Strings";
+
 /**
  * Helper function to check if a string is null or whitespace
  */
@@ -27,7 +29,7 @@ export const elide = (
 export const makeValidFileName = (input: string): string => {
   const fileName = input?.replaceAll(/[^A-Z0-9a-z_. ]/g, "");
   if (isNullOrWhitespace(fileName)) {
-    throw new Error("Filename cannot be whitespace or empty");
+    throw new Error(Strings.invalidEmptyFilename());
   }
   return fileName;
 };

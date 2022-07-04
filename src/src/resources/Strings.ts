@@ -54,6 +54,7 @@ export interface StringEntries {
   incorrectPassword: string;
   insertCollaboratorsError: string;
   invalidEmail: string;
+  invalidEmptyFilename: string;
   invalidImage: string;
   invalidPassword: string;
   updatedAt: string;
@@ -179,6 +180,7 @@ const Strings: {
   incorrectPassword: () => "Incorrect password",
   insertCollaboratorsError: () => "Error inserting collaborators",
   invalidEmail: (email: string) => `Invalid email (${email})`,
+  invalidEmptyFilename: () => "File name cannot be empty!",
   invalidImage: (image: { src: string; fileName: string }) =>
     `Invalid image (${(image && JSON.stringify(image)) || image})`,
   invalidPassword: (password: string) => `Invalid password (${password})`,
