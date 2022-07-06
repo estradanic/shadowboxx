@@ -16,6 +16,7 @@ export interface StringEntries {
   collaborators: string;
   collaboratorsTooltip: string;
   commonError: string;
+  commonSaved: string;
   confirm: string;
   copyright: string;
   couldNotGetCollaborators: string;
@@ -136,6 +137,7 @@ const Strings: {
   collaboratorsTooltip: () =>
     "Users who will be allowed to add images to this album. (Enter email)",
   commonError: () => "Something went wrong!",
+  commonSaved: () => "Saved!",
   confirm: () => "Confirm",
   copyright: () => `© Nicholas Estrada ${new Date().getFullYear()}`,
   couldNotGetCollaborators: () =>

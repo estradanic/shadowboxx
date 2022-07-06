@@ -79,14 +79,18 @@ export default class ParseUser {
     this._user = user;
   }
 
-  isEqual(pi: ParseUser): boolean {
+  equals(that: ParseUser): boolean {
     return (
-      this.email === pi.email &&
-      this.isDarkThemeEnabled === pi.isDarkThemeEnabled &&
-      this.firstName === pi.firstName &&
-      this.lastName === pi.lastName &&
-      this.profilePicture?.id === pi.profilePicture?.id
+      this.email === that.email &&
+      this.isDarkThemeEnabled === that.isDarkThemeEnabled &&
+      this.firstName === that.firstName &&
+      this.lastName === that.lastName &&
+      this.profilePicture?.id === that.profilePicture?.id
     );
+  }
+
+  hashString(): string {
+    return this.id ?? `${this.firstName}${this.lastName}${this.email}`;
   }
 
   async fetch() {

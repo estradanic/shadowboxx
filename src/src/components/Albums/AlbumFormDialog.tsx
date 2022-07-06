@@ -8,6 +8,7 @@ import {
   useMediaQuery,
 } from "@material-ui/core";
 import { Public, Star, StarBorder } from "@material-ui/icons";
+import { Set } from "immutable";
 import { Strings } from "../../resources";
 import { ErrorState, isNullOrWhitespace } from "../../utils";
 import { ImageContextProvider, useUserContext } from "../../contexts";
@@ -177,7 +178,7 @@ const AlbumFormDialog = ({
 
   const handleConfirm = async () => {
     if (validate()) {
-      const userEmails = new Set([...viewers, ...collaborators]);
+      const userEmails = Set([...viewers, ...collaborators]);
       const signedUpUserCount = await new Parse.Query("User")
         .containedIn(ParseUser.COLUMNS.email, [...viewers, ...collaborators])
         .count();

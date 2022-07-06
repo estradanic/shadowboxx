@@ -53,6 +53,14 @@ export default class ParseObject<A extends Attributes> {
     this._object.setACL(acl);
   }
 
+  equals(that: ParseObject<A>): boolean {
+    return this.id === that.id;
+  }
+
+  hashString(): string {
+    return this.id ?? "";
+  }
+
   get exists(): boolean {
     return !!this._object;
   }

@@ -7,6 +7,7 @@ import React, {
   useRef,
 } from "react";
 import { Autocomplete, AutocompleteProps } from "@material-ui/lab";
+import { Set } from "immutable";
 import UserChip from "../User/UserChip";
 import TextField from "../Field/TextField";
 import { makeStyles, Theme } from "@material-ui/core/styles";
@@ -84,7 +85,7 @@ const UserField = forwardRef(
                 relatedUsers.push(new ParseUser(ownerUser!).email);
               }
               setOptions(
-                Array.from(new Set(relatedUsers)).filter(
+                Array.from(Set(relatedUsers)).filter(
                   (option) => option !== loggedInUser?.email
                 )
               );

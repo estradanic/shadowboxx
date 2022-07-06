@@ -2,6 +2,7 @@ import React, { useCallback, useEffect, useRef, useState } from "react";
 import { Grid, Typography, useMediaQuery } from "@material-ui/core";
 import { makeStyles, Theme, useTheme } from "@material-ui/core/styles";
 import classNames from "classnames";
+import { dedupeFast } from "../../utils";
 import { Strings } from "../../resources";
 import { useUserContext } from "../../contexts";
 import { useRandomColor } from "../../hooks";
@@ -68,7 +69,13 @@ const ImageSelectionDialog = ({
   const [value, setValue] = useState<ParseImage[]>(initialValue);
   const classes = useStyles();
   const gotImages = useRef(false);
+
+  // Images that the current user owns, not those shared to them.
+  const [userOwnedImages, setUserOwnedImages] = useState<ParseImage[]>([]);
+
+  // Images that the current user owns + those in the current value
   const [images, setImages] = useState<ParseImage[]>(initialValue);
+
   const { loggedInUser } = useUserContext();
   const { enqueueErrorSnackbar } = useSnackbar();
   const randomColor = useRandomColor();
@@ -81,9 +88,9 @@ const ImageSelectionDialog = ({
         .equalTo(ParseImage.COLUMNS.owner, loggedInUser?.toNativePointer())
         .findAll()
         .then((response) => {
-          setImages(
+          setUserOwnedImages(
             response?.map((imageResponse) => new ParseImage(imageResponse)) ??
-              value
+              []
           );
         })
         .catch((error) => {
@@ -95,9 +102,17 @@ const ImageSelectionDialog = ({
     }
   }, [setImages, loggedInUser, enqueueErrorSnackbar, value]);
 
+  useEffect(() => {
+    if (gotImages.current) {
+      setImages(
+        dedupeFast<ParseImage>([...initialValue, ...userOwnedImages])
+      );
+      setValue(initialValue);
+    }
+  }, [initialValue, userOwnedImages]);
+
   const handleConfirm = () => {
     piHandleConfirm(value);
-    setValue(initialValue);
   };
 
   const handleCancel = () => {

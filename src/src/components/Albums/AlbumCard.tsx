@@ -13,12 +13,12 @@ import {
   useMediaQuery,
 } from "@material-ui/core";
 import { makeStyles, Theme, useTheme } from "@material-ui/core/styles";
-import { MoreVert, Public, Star } from "@material-ui/icons";
+import { MoreVert, Star } from "@material-ui/icons";
 import { useHistory, useLocation } from "react-router-dom";
 import { Strings } from "../../resources";
 import { routes } from "../../app";
 import { ParseAlbum } from "../../types";
-import { useUserContext } from "../../contexts";
+import { ImageContextProvider, useUserContext } from "../../contexts";
 import UserAvatar from "../User/UserAvatar";
 import Empty from "../Svgs/Empty";
 import { useSnackbar } from "../Snackbar/Snackbar";
@@ -27,6 +27,7 @@ import Tooltip from "../Tooltip/Tooltip";
 import { useActionDialogContext } from "../Dialog/ActionDialog";
 import ParseUser from "../../types/ParseUser";
 import ParseImage from "../../types/ParseImage";
+import { ImageField } from "../Field";
 
 const useStyles = makeStyles((theme: Theme) => ({
   card: {
@@ -51,11 +52,11 @@ const useStyles = makeStyles((theme: Theme) => ({
   favorite: {
     color: theme.palette.warning.light,
   },
-  public: {
+  addImages: {
+    "&&& svg": {
+      color: theme.palette.text.primary,
+    },
     marginLeft: "auto",
-  },
-  isPublic: {
-    color: theme.palette.success.main,
   },
   updatedAt: {
     float: "right",
@@ -160,7 +161,6 @@ const AlbumCard = memo(({ value, onChange }: AlbumCardProps) => {
   const [isFavorite, setIsFavorite] = useState<boolean>(
     value?.isFavorite ?? false
   );
-  const [isPublic, setIsPublic] = useState<boolean>(value?.isPublic ?? false);
 
   const { enqueueErrorSnackbar, enqueueSuccessSnackbar } = useSnackbar();
   const [anchorEl, setAnchorEl] = useState<Element>();
@@ -215,7 +215,7 @@ const AlbumCard = memo(({ value, onChange }: AlbumCardProps) => {
   };
 
   return (
-    <>
+    <ImageContextProvider>
       <Card className={mobile ? classes.cardMobile : classes.card}>
         <CardHeader
           classes={{ title: classes.title, subheader: classes.subheader }}
@@ -335,26 +335,24 @@ const AlbumCard = memo(({ value, onChange }: AlbumCardProps) => {
             >
               <Star className={isFavorite ? classes.favorite : classes.icon} />
             </IconButton>
-            <IconButton
-              className={classes.public}
-              onClick={() => {
-                const oldIsPublic = value?.isPublic;
-                value.isPublic = !oldIsPublic;
+            <ImageField
+              ButtonProps={{ className: classes.addImages }}
+              variant="button"
+              value={images}
+              onChange={(newImages) => {
+                value.images = newImages.map((image) => image.id!);
                 value
-                  ?.save()
-                  .then((response) => {
-                    setIsPublic(!!response.isPublic);
+                  .save()
+                  .then(() => {
+                    enqueueSuccessSnackbar(Strings.commonSaved());
                   })
                   .catch((error) => {
-                    value.isPublic = oldIsPublic;
                     enqueueErrorSnackbar(
                       error?.message ?? Strings.editAlbumError()
                     );
                   });
               }}
-            >
-              <Public className={isPublic ? classes.isPublic : classes.icon} />
-            </IconButton>
+            />
           </CardActions>
         )}
       </Card>
@@ -374,7 +372,7 @@ const AlbumCard = memo(({ value, onChange }: AlbumCardProps) => {
             });
         }}
       />
-    </>
+    </ImageContextProvider>
   );
 });
 

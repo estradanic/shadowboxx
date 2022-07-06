@@ -125,7 +125,7 @@ export const UserContextProvider = ({ children }: UserContextProviderProps) => {
       initialized &&
       loggedInUser?.attributes &&
       attributes &&
-      !loggedInUser.isEqual(ParseUser.fromAttributes(attributes))
+      !loggedInUser.equals(ParseUser.fromAttributes(attributes))
     ) {
       setLoggedInUser(await loggedInUser.update(updateLoggedInUser));
       setAttributes({ ...loggedInUser.attributes });

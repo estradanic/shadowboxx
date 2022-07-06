@@ -1,10 +1,20 @@
 import React, { useState, memo } from "react";
-import { InputAdornment, Avatar, Typography, Grid } from "@material-ui/core";
+import {
+  InputAdornment,
+  Avatar,
+  Typography,
+  Grid,
+  Menu,
+  MenuItem,
+  IconButton,
+  IconButtonProps,
+} from "@material-ui/core";
 import { Close, AddAPhoto, Link, Check, Cloud } from "@material-ui/icons";
 import { makeStyles, Theme } from "@material-ui/core/styles";
 import Parse from "parse";
 import uniqueId from "lodash/uniqueId";
 import classNames from "classnames";
+import { Set } from "immutable";
 import { elide, makeValidFileName } from "../../utils";
 import { Strings } from "../../resources";
 import { ParseImage } from "../../types";
@@ -77,7 +87,7 @@ const useStyles = makeStyles((theme: Theme) => ({
 
 /** Interface defining props for ImageField */
 export interface ImageFieldProps
-  extends Omit<TextFieldProps, "value" | "onChange"> {
+  extends Omit<TextFieldProps, "value" | "onChange" | "variant"> {
   /** Value of the field, array of Images */
   value: ParseImage[];
   /** Function to run when the value changes */
@@ -86,6 +96,10 @@ export interface ImageFieldProps
   multiple?: boolean;
   /** ACL to save new images with after upload */
   acl?: Parse.ACL;
+  /** Variant for how to display the field */
+  variant?: "button" | "field";
+  /** Props to pass to the IconButton when variant=="button" */
+  ButtonProps?: IconButtonProps;
 }
 
 /** Component to input images from the filesystem or online */
@@ -96,15 +110,20 @@ const ImageField = memo(
     value = [],
     multiple = false,
     acl,
+    variant = "field",
+    ButtonProps = {},
     ...rest
   }: ImageFieldProps) => {
     const classes = useStyles();
 
-    const { uploadImage, deleteImage } = useImageContext();
+    const { uploadImage } = useImageContext();
     const [showUrlInput, setShowUrlInput] = useState<boolean>(false);
     const [showLibraryDialog, setShowLibraryDialog] = useState<boolean>(false);
     const [imageUrl, setImageUrl] = useState<string>("");
     const { loggedInUser } = useUserContext();
+
+    const [anchorEl, setAnchorEl] = useState<Element>();
+    const closeMenu = () => setAnchorEl(undefined);
 
     const inputId = uniqueId("profile-pic-input");
     const urlInputId = uniqueId("image-url-input");
@@ -114,8 +133,7 @@ const ImageField = memo(
     const randomColor = useRandomColor();
 
     const onChange = (newValue: ParseImage[]) => {
-      // TODO: dedupe
-      piOnChange(newValue);
+      piOnChange(Array.from(Set(newValue)));
     };
 
     const addFromFile = (event: any) => {
@@ -222,144 +240,161 @@ const ImageField = memo(
           }}
           handleCancel={() => setShowLibraryDialog(false)}
         />
-        <TextField // Url src input
-          style={{ display: showUrlInput ? "inherit" : "none" }}
-          id={urlInputId}
-          inputRef={(input) => input && input.focus()}
-          fullWidth
-          onChange={(event) => setImageUrl(event.target.value)}
-          onKeyPress={(event) => {
-            if (event.key === "Enter") {
-              addImageFromUrl();
-            }
-          }}
-          value={imageUrl}
-          label={Strings.imageUrl()}
-          InputProps={{
-            endAdornment: (
-              <>
-                <InputAdornment position="end" onClick={addImageFromUrl}>
-                  <Check
-                    className={classNames(
-                      classes.endAdornment,
-                      classes.success
+        {variant === "field" ? (
+          <>
+            <TextField // Url src input
+              style={{ display: showUrlInput ? "inherit" : "none" }}
+              id={urlInputId}
+              inputRef={(input) => input && input.focus()}
+              fullWidth
+              onChange={(event) => setImageUrl(event.target.value)}
+              onKeyPress={(event) => {
+                if (event.key === "Enter") {
+                  addImageFromUrl();
+                }
+              }}
+              value={imageUrl}
+              label={Strings.imageUrl()}
+              InputProps={{
+                endAdornment: (
+                  <>
+                    <InputAdornment position="end" onClick={addImageFromUrl}>
+                      <Check
+                        className={classNames(
+                          classes.endAdornment,
+                          classes.success
+                        )}
+                      />
+                    </InputAdornment>
+                    <InputAdornment
+                      position="end"
+                      onClick={() => setShowUrlInput(false)}
+                    >
+                      <Close color="error" className={classes.endAdornment} />
+                    </InputAdornment>
+                  </>
+                ),
+              }}
+            />
+            <TextField // Main input
+              className={classes.main}
+              id={inputId}
+              style={{ display: showUrlInput ? "none" : "inherit" }}
+              onChange={addFromFile}
+              fullWidth
+              inputProps={{
+                accept: "image/*",
+                multiple,
+                className: classes.input,
+              }}
+              type="file"
+              label={label}
+              InputProps={{
+                endAdornment: (
+                  <>
+                    <InputAdornment onClick={openUrlInput} position="end">
+                      <Tooltip title={Strings.addFromUrl()}>
+                        <Link className={classes.endAdornment} />
+                      </Tooltip>
+                    </InputAdornment>
+                    <InputAdornment
+                      position="end"
+                      onClick={() => setShowLibraryDialog(true)}
+                    >
+                      <Tooltip title={Strings.addFromLibrary()}>
+                        <Cloud className={classes.endAdornment} />
+                      </Tooltip>
+                    </InputAdornment>
+                    <InputAdornment
+                      position="end"
+                      onClick={() => document.getElementById(inputId)?.click()}
+                    >
+                      <Tooltip title={Strings.addFromFile()}>
+                        <AddAPhoto className={classes.endAdornment} />
+                      </Tooltip>
+                    </InputAdornment>
+                    {!!value.length && !multiple && (
+                      <InputAdornment position="end">
+                        <Avatar
+                          className={classes.endAdornmentAvatar}
+                          src={value[0].file.url()}
+                          alt={value[0].file.name()}
+                        />
+                      </InputAdornment>
                     )}
-                  />
-                </InputAdornment>
-                <InputAdornment
-                  position="end"
-                  onClick={() => setShowUrlInput(false)}
-                >
-                  <Close color="error" className={classes.endAdornment} />
-                </InputAdornment>
-              </>
-            ),
-          }}
-        />
-        <TextField // Main input
-          className={classes.main}
-          id={inputId}
-          style={{ display: showUrlInput ? "none" : "inherit" }}
-          onChange={addFromFile}
-          fullWidth
-          inputProps={{
-            accept: "image/*",
-            multiple,
-            className: classes.input,
-          }}
-          type="file"
-          label={label}
-          InputProps={{
-            endAdornment: (
-              <>
-                <InputAdornment onClick={openUrlInput} position="end">
-                  <Tooltip title={Strings.addFromUrl()}>
-                    <Link className={classes.endAdornment} />
-                  </Tooltip>
-                </InputAdornment>
-                <InputAdornment
-                  position="end"
-                  onClick={() => setShowLibraryDialog(true)}
-                >
-                  <Tooltip title={Strings.addFromLibrary()}>
-                    <Cloud className={classes.endAdornment} />
-                  </Tooltip>
-                </InputAdornment>
-                <InputAdornment
-                  position="end"
-                  onClick={() => document.getElementById(inputId)?.click()}
-                >
-                  <Tooltip title={Strings.addFromFile()}>
-                    <AddAPhoto className={classes.endAdornment} />
-                  </Tooltip>
-                </InputAdornment>
-                {!!value.length && !multiple && (
-                  <InputAdornment position="end">
-                    <Avatar
-                      className={classes.endAdornmentAvatar}
-                      src={value[0].file.url()}
-                      alt={value[0].file.name()}
-                    />
+                  </>
+                ),
+                startAdornment: !!value.length && (
+                  <InputAdornment position="start">
+                    <Typography variant="body1">
+                      {value.length > 1 && multiple
+                        ? Strings.multipleImages(value.length)
+                        : elide(value[0].file.name(), 20, 3)}
+                    </Typography>
                   </InputAdornment>
-                )}
-              </>
-            ),
-            startAdornment: !!value.length && (
-              <InputAdornment position="start">
-                <Typography variant="body1">
-                  {value.length > 1 && multiple
-                    ? Strings.multipleImages(value.length)
-                    : elide(value[0].file.name(), 20, 3)}
-                </Typography>
-              </InputAdornment>
-            ),
-            readOnly: true,
-          }}
-          {...rest}
-        />
-        {multiple && !!value.length && (
-          <Grid container className={classes.multiImageContainer}>
-            {value.map((image: ParseImage, index) => {
-              const file = image.file;
-              return (
-                <Grid
-                  xs={12}
-                  md={6}
-                  lg={4}
-                  item
-                  className={classes.imageWrapper}
-                  key={image.id}
-                >
-                  <Image
-                    borderColor={randomColor}
-                    src={file.url()}
-                    alt={file.name()}
-                    decorations={[
-                      <RemoveImageDecoration
-                        onClick={async () => {
-                          const newValue = value.filter(
-                            (valueImage) => image.id !== valueImage.id
-                          );
-                          onChange(newValue);
-                          await deleteImage(image);
-                        }}
-                      />,
-                      <CoverImageDecoration
-                        checked={image.isCoverImage}
-                        onClick={async () => {
-                          if (image.isCoverImage) {
-                            await unsetCoverImage(image, index);
-                          } else {
-                            await setCoverImage(image, index);
-                          }
-                        }}
-                      />,
-                    ]}
-                  />
-                </Grid>
-              );
-            })}
-          </Grid>
+                ),
+                readOnly: true,
+              }}
+              {...rest}
+            />
+            {multiple && !!value.length && (
+              <Grid container className={classes.multiImageContainer}>
+                {value.map((image: ParseImage, index) => {
+                  const file = image.file;
+                  return (
+                    <Grid
+                      xs={12}
+                      md={6}
+                      lg={4}
+                      item
+                      className={classes.imageWrapper}
+                      key={image.id}
+                    >
+                      <Image
+                        borderColor={randomColor}
+                        src={file.url()}
+                        alt={file.name()}
+                        decorations={[
+                          <RemoveImageDecoration
+                            onClick={() => {
+                              const newValue = value.filter(
+                                (valueImage) => image.id !== valueImage.id
+                              );
+                              onChange(newValue);
+                            }}
+                          />,
+                          <CoverImageDecoration
+                            checked={image.isCoverImage}
+                            onClick={async () => {
+                              if (image.isCoverImage) {
+                                await unsetCoverImage(image, index);
+                              } else {
+                                await setCoverImage(image, index);
+                              }
+                            }}
+                          />,
+                        ]}
+                      />
+                    </Grid>
+                  );
+                })}
+              </Grid>
+            )}
+          </>
+        ) : (
+          <>
+            <Menu open={!!anchorEl} anchorEl={anchorEl} onClose={closeMenu}>
+              <MenuItem onClick={() => setShowLibraryDialog(true)}>
+                {Strings.addFromLibrary()}
+              </MenuItem>
+            </Menu>
+            <IconButton
+              onClick={(e) => setAnchorEl(e.currentTarget)}
+              {...ButtonProps}
+            >
+              <AddAPhoto className={classes.endAdornment} />
+            </IconButton>
+          </>
         )}
       </>
     );
