@@ -5,6 +5,7 @@ export interface StringEntries {
   addAlbumError: string;
   addAlbumSuccess: string;
   addFromFile: string;
+  addFromLibrary: string;
   addFromUrl: string;
   albumNotFound: string;
   alreadyHaveAccount: string;
@@ -86,6 +87,7 @@ export interface StringEntries {
   publicTooltip: string;
   removeImage: string;
   removeImageError: string;
+  selectImages: string;
   setImageAsCover: string;
   settings: string;
   settingsNotSaved: string;
@@ -121,6 +123,7 @@ const Strings: {
   addAlbumError: () => `${Strings.commonError()}. Could not add album.`,
   addAlbumSuccess: (album: string) => `Successfully added album ${album}`,
   addFromFile: () => "Add from file",
+  addFromLibrary: () => "Add from existing library",
   addFromUrl: () => "Add from URL",
   albumNotFound: (album: string) =>
     `Album not found${album ? ` (${album})` : ""}`,
@@ -218,6 +221,7 @@ const Strings: {
   removeImage: () => "Remove image from album",
   removeImageError: (fileName: string) =>
     `Could not remove image ${fileName} from album.`,
+  selectImages: () => "Select Images",
   setImageAsCover: () => "Set this image as the album cover",
   settings: () => "Settings",
   settingsNotSaved: () => `${Strings.commonError()} Settings not saved.`,

@@ -1,9 +1,10 @@
 import React, { useState, memo } from "react";
 import { InputAdornment, Avatar, Typography, Grid } from "@material-ui/core";
-import { Close, AddAPhoto, Link, Check } from "@material-ui/icons";
+import { Close, AddAPhoto, Link, Check, Cloud } from "@material-ui/icons";
 import { makeStyles, Theme } from "@material-ui/core/styles";
 import Parse from "parse";
 import uniqueId from "lodash/uniqueId";
+import classNames from "classnames";
 import { elide, makeValidFileName } from "../../utils";
 import { Strings } from "../../resources";
 import { ParseImage } from "../../types";
@@ -15,6 +16,7 @@ import { useImageContext, useUserContext } from "../../contexts";
 import Image from "../Image/Image";
 import RemoveImageDecoration from "../Image/Decoration/RemoveImageDecoration";
 import CoverImageDecoration from "../Image/Decoration/CoverImageDecoration";
+import ImageSelectionDialog from "../Images/ImageSelectionDialog";
 
 const useStyles = makeStyles((theme: Theme) => ({
   endAdornment: {
@@ -68,6 +70,9 @@ const useStyles = makeStyles((theme: Theme) => ({
       cursor: "default",
     },
   },
+  success: {
+    color: theme.palette.success.main,
+  },
 }));
 
 /** Interface defining props for ImageField */
@@ -86,7 +91,7 @@ export interface ImageFieldProps
 /** Component to input images from the filesystem or online */
 const ImageField = memo(
   ({
-    onChange,
+    onChange: piOnChange,
     label,
     value = [],
     multiple = false,
@@ -97,6 +102,7 @@ const ImageField = memo(
 
     const { uploadImage, deleteImage } = useImageContext();
     const [showUrlInput, setShowUrlInput] = useState<boolean>(false);
+    const [showLibraryDialog, setShowLibraryDialog] = useState<boolean>(false);
     const [imageUrl, setImageUrl] = useState<string>("");
     const { loggedInUser } = useUserContext();
 
@@ -106,6 +112,11 @@ const ImageField = memo(
     const { enqueueErrorSnackbar } = useSnackbar();
 
     const randomColor = useRandomColor();
+
+    const onChange = (newValue: ParseImage[]) => {
+      // TODO: dedupe
+      piOnChange(newValue);
+    };
 
     const addFromFile = (event: any) => {
       if (event.target.files?.[0]) {
@@ -139,18 +150,26 @@ const ImageField = memo(
     const addImageFromUrl = () => {
       const fileName = imageUrl.substring(imageUrl.lastIndexOf("/") + 1);
       const parseFile = new Parse.File(fileName, { uri: imageUrl });
-      const newImage = ParseImage.fromAttributes({
-        file: parseFile,
-        isCoverImage: false,
-        owner: loggedInUser!.toPointer(),
-      });
+      uploadImage(
+        {
+          file: parseFile,
+          isCoverImage: false,
+          owner: loggedInUser!.toPointer(),
+        },
+        acl
+      )
+        .then((newImage) => {
+          const newValue = multiple ? [...value, newImage] : [newImage];
+          onChange(newValue);
+        })
+        .catch((error) => {
+          enqueueErrorSnackbar(
+            error?.message ?? Strings.uploadImageError(fileName)
+          );
+        });
 
       setShowUrlInput(false);
-      if (multiple) {
-        onChange([...value, newImage]);
-      } else {
-        onChange([newImage]);
-      }
+      setImageUrl("");
     };
 
     const openUrlInput = () => {
@@ -194,6 +213,15 @@ const ImageField = memo(
 
     return (
       <>
+        <ImageSelectionDialog
+          value={value}
+          open={showLibraryDialog}
+          handleConfirm={(newValue) => {
+            onChange([...value, ...newValue]);
+            setShowLibraryDialog(false);
+          }}
+          handleCancel={() => setShowLibraryDialog(false)}
+        />
         <TextField // Url src input
           style={{ display: showUrlInput ? "inherit" : "none" }}
           id={urlInputId}
@@ -211,13 +239,18 @@ const ImageField = memo(
             endAdornment: (
               <>
                 <InputAdornment position="end" onClick={addImageFromUrl}>
-                  <Check className={classes.endAdornment} />
+                  <Check
+                    className={classNames(
+                      classes.endAdornment,
+                      classes.success
+                    )}
+                  />
                 </InputAdornment>
                 <InputAdornment
                   position="end"
                   onClick={() => setShowUrlInput(false)}
                 >
-                  <Close className={classes.endAdornment} />
+                  <Close color="error" className={classes.endAdornment} />
                 </InputAdornment>
               </>
             ),
@@ -242,6 +275,14 @@ const ImageField = memo(
                 <InputAdornment onClick={openUrlInput} position="end">
                   <Tooltip title={Strings.addFromUrl()}>
                     <Link className={classes.endAdornment} />
+                  </Tooltip>
+                </InputAdornment>
+                <InputAdornment
+                  position="end"
+                  onClick={() => setShowLibraryDialog(true)}
+                >
+                  <Tooltip title={Strings.addFromLibrary()}>
+                    <Cloud className={classes.endAdornment} />
                   </Tooltip>
                 </InputAdornment>
                 <InputAdornment
