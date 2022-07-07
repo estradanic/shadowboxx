@@ -402,11 +402,23 @@ const ImageField = memo(
                 value={imageUrl}
               />
             </InPortal>
+            <input
+              id={inputId}
+              type="file"
+              style={{ display: "none" }}
+              onChange={addFromFile}
+              accept="image/*"
+              multiple
+            />
             <Menu open={!!anchorEl} anchorEl={anchorEl} onClose={closeMenu}>
               <MenuItem onClick={() => setShowLibraryDialog(true)}>
                 {Strings.addFromLibrary()}
               </MenuItem>
-              <MenuItem>{Strings.addFromFile()}</MenuItem>
+              <MenuItem
+                onClick={() => document.getElementById(inputId)?.click()}
+              >
+                {Strings.addFromFile()}
+              </MenuItem>
               <MenuItem
                 onClick={() =>
                   openPrompt(
