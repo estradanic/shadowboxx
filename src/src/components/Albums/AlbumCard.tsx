@@ -336,6 +336,7 @@ const AlbumCard = memo(({ value, onChange }: AlbumCardProps) => {
               <Star className={isFavorite ? classes.favorite : classes.icon} />
             </IconButton>
             <ImageField
+              multiple
               ButtonProps={{ className: classes.addImages }}
               variant="button"
               value={images}

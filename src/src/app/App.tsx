@@ -10,6 +10,7 @@ import { initializeParse } from "@parse/react";
 import { useUserContext } from "../contexts";
 import routes from "./routes";
 import ViewWrapper from "./RouteWrapper";
+import { ActionDialogContextProvider, SnackbarProvider } from "../components";
 
 const PARSE_APPLICATION_ID = "aX17fiOL3N1Lklz83UnWMP6oympHLszezxXAXokH";
 const PARSE_JAVASCRIPT_KEY = "otMMK0SVH7LEIL1TbqlIbemXf0jpfEurJ9FQ7gri";
@@ -85,27 +86,31 @@ const App = () => {
 
   return (
     <ThemeProvider theme={darkTheme}>
-      <Suspense
-        fallback={
-          <div
-            style={{
-              width: "100vw",
-              height: "100vh",
-              backgroundColor: "#1B71B5",
-              paddingTop: "calc(50vh - 40px)",
-              paddingLeft: "calc(50vw - 40px)",
-            }}
+      <ActionDialogContextProvider>
+        <SnackbarProvider>
+          <Suspense
+            fallback={
+              <div
+                style={{
+                  width: "100vw",
+                  height: "100vh",
+                  backgroundColor: "#1B71B5",
+                  paddingTop: "calc(50vh - 40px)",
+                  paddingLeft: "calc(50vw - 40px)",
+                }}
+              >
+                <CircularProgress style={{ color: "#C14E4E" }} />
+              </div>
+            }
           >
-            <CircularProgress style={{ color: "#C14E4E" }} />
-          </div>
-        }
-      >
-        <Switch>
-          {Object.keys(routes).map((routeKey) => (
-            <ViewWrapper key={routeKey} {...routes[routeKey]} />
-          ))}
-        </Switch>
-      </Suspense>
+            <Switch>
+              {Object.keys(routes).map((routeKey) => (
+                <ViewWrapper key={routeKey} {...routes[routeKey]} />
+              ))}
+            </Switch>
+          </Suspense>
+        </SnackbarProvider>
+      </ActionDialogContextProvider>
     </ThemeProvider>
   );
 };

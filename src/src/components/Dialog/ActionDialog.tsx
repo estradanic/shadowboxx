@@ -15,6 +15,7 @@ import {
   DialogTitle,
   Typography,
 } from "@material-ui/core";
+import { HtmlPortalNode, OutPortal } from "react-reverse-portal";
 import { makeStyles, Theme } from "@material-ui/core/styles";
 import { Strings } from "../../resources";
 
@@ -95,7 +96,7 @@ interface ActionDialogContextValue {
   ) => void;
   /** Opens a prompt dialog */
   openPrompt: (
-    fields: ReactNode,
+    fieldsPortalNode: HtmlPortalNode,
     handleConfirm?: () => void,
     handleCancel?: () => void,
     actionDialogProps?: ActionDialogHookProps
@@ -121,7 +122,7 @@ export const ActionDialogContextProvider = ({
   const [open, setOpen] = useState<boolean>(false);
   const [type, setType] = useState<ActionDialogProps["type"]>("alert");
   const [message, setMessage] = useState<string>("");
-  const [fields, setFields] = useState<ReactNode>(<></>);
+  const [fieldsPortalNode, setFieldsPortalNode] = useState<HtmlPortalNode>();
   const [handleConfirm, setHandleConfirm] = useState(() => () => {});
   const [handleCancel, setHandleCancel] = useState(() => () => {});
   const [handleClose, setHandleClose] = useState(() => () => {});
@@ -161,13 +162,13 @@ export const ActionDialogContextProvider = ({
       setOpen(true);
     },
     openPrompt: (
-      piFields,
+      piFieldsPortalNode,
       piHandleConfirm,
       piHandleCancel,
       piActionDialogProps = {}
     ) => {
       setType("prompt");
-      setFields(piFields);
+      setFieldsPortalNode(piFieldsPortalNode);
       setHandleConfirm(() => () => {
         setOpen(false);
         piHandleConfirm?.();
@@ -193,7 +194,7 @@ export const ActionDialogContextProvider = ({
           type={type}
           {...actionDialogProps}
         >
-          {fields}
+          {!!fieldsPortalNode && <OutPortal node={fieldsPortalNode} />}
         </ActionDialog>
         {children}
       </>

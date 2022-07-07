@@ -5,7 +5,6 @@ import {
   MuiThemeProvider,
   unstable_createMuiStrictModeTheme as createMuiTheme,
 } from "@material-ui/core/styles";
-import { SnackbarProvider, ActionDialogContextProvider } from "./components";
 import {
   UserContextProvider,
   NotificationsContextProvider,
@@ -72,19 +71,15 @@ const theme = createMuiTheme({
 ReactDOM.render(
   <React.StrictMode>
     <MuiThemeProvider theme={theme}>
-      <SnackbarProvider>
-        <GlobalLoadingContextProvider>
-          <NotificationsContextProvider>
-            <ActionDialogContextProvider>
-              <Router>
-                <UserContextProvider>
-                  <App />
-                </UserContextProvider>
-              </Router>
-            </ActionDialogContextProvider>
-          </NotificationsContextProvider>
-        </GlobalLoadingContextProvider>
-      </SnackbarProvider>
+      <GlobalLoadingContextProvider>
+        <NotificationsContextProvider>
+          <Router>
+            <UserContextProvider>
+              <App />
+            </UserContextProvider>
+          </Router>
+        </NotificationsContextProvider>
+      </GlobalLoadingContextProvider>
     </MuiThemeProvider>
   </React.StrictMode>,
   document.getElementById("root")

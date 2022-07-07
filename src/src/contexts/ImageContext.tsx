@@ -6,6 +6,7 @@ import { FancyTypography, useSnackbar } from "../components";
 import { Strings } from "../resources";
 import { ParseImage, Image } from "../types";
 import { useGlobalLoadingContext } from "./GlobalLoadingContext";
+import { isNullOrWhitespace } from "../utils";
 
 export enum ImageActionCommand {
   DELETE,
@@ -94,13 +95,12 @@ export const ImageContextProvider = ({
     });
 
     let failed = false;
+    let error = null;
     try {
       image.file = await image.file.save();
     } catch (e: any) {
       failed = true;
-      enqueueErrorSnackbar(
-        e?.message ?? Strings.uploadImageError(image.file.name())
-      );
+      error = e;
     }
 
     let parseImage: ParseImage = ParseImage.fromAttributes(image);
@@ -111,9 +111,8 @@ export const ImageContextProvider = ({
       try {
         parseImage = await parseImage.save();
       } catch (e: any) {
-        enqueueErrorSnackbar(
-          e?.message ?? Strings.uploadImageError(image.file.name())
-        );
+        failed = true;
+        error = e;
       }
     }
 
@@ -121,7 +120,14 @@ export const ImageContextProvider = ({
     recalculateProgress();
     notification.remove();
 
-    return parseImage;
+    if (!failed) {
+      return parseImage;
+    } else {
+      if (isNullOrWhitespace(error.message)) {
+        error.message = Strings.uploadImageError();
+      }
+      throw error;
+    }
   };
 
   const deleteImage = async (parseImage: ParseImage) => {

@@ -1,4 +1,4 @@
-import React, { useState, memo } from "react";
+import React, { useState, memo, useMemo } from "react";
 import {
   InputAdornment,
   Avatar,
@@ -15,10 +15,11 @@ import Parse from "parse";
 import uniqueId from "lodash/uniqueId";
 import classNames from "classnames";
 import { Set } from "immutable";
+import { createHtmlPortalNode, InPortal } from "react-reverse-portal";
 import { elide, makeValidFileName } from "../../utils";
 import { Strings } from "../../resources";
 import { ParseImage } from "../../types";
-import { useRandomColor } from "../../hooks";
+import { useRandomColor, useRefState } from "../../hooks";
 import TextField, { TextFieldProps } from "../Field/TextField";
 import Tooltip from "../Tooltip/Tooltip";
 import { useSnackbar } from "../Snackbar/Snackbar";
@@ -27,6 +28,7 @@ import Image from "../Image/Image";
 import RemoveImageDecoration from "../Image/Decoration/RemoveImageDecoration";
 import CoverImageDecoration from "../Image/Decoration/CoverImageDecoration";
 import ImageSelectionDialog from "../Images/ImageSelectionDialog";
+import { useActionDialogContext } from "../Dialog/ActionDialog";
 
 const useStyles = makeStyles((theme: Theme) => ({
   endAdornment: {
@@ -119,7 +121,8 @@ const ImageField = memo(
     const { uploadImage } = useImageContext();
     const [showUrlInput, setShowUrlInput] = useState<boolean>(false);
     const [showLibraryDialog, setShowLibraryDialog] = useState<boolean>(false);
-    const [imageUrl, setImageUrl] = useState<string>("");
+    const [imageUrlRef, imageUrl, setImageUrl] = useRefState("");
+
     const { loggedInUser } = useUserContext();
 
     const [anchorEl, setAnchorEl] = useState<Element>();
@@ -135,6 +138,8 @@ const ImageField = memo(
     const onChange = (newValue: ParseImage[]) => {
       piOnChange(Array.from(Set(newValue)));
     };
+
+    const { openPrompt } = useActionDialogContext();
 
     const addFromFile = (event: any) => {
       if (event.target.files?.[0]) {
@@ -165,9 +170,11 @@ const ImageField = memo(
       }
     };
 
-    const addImageFromUrl = () => {
-      const fileName = imageUrl.substring(imageUrl.lastIndexOf("/") + 1);
-      const parseFile = new Parse.File(fileName, { uri: imageUrl });
+    const addFromUrl = () => {
+      const fileName = imageUrlRef.current.substring(
+        imageUrlRef.current.lastIndexOf("/") + 1
+      );
+      const parseFile = new Parse.File(fileName, { uri: imageUrlRef.current });
       uploadImage(
         {
           file: parseFile,
@@ -229,6 +236,11 @@ const ImageField = memo(
       }
     };
 
+    const dialogImageUrlInputPortalNode = useMemo(
+      () => createHtmlPortalNode(),
+      []
+    );
+
     return (
       <>
         <ImageSelectionDialog
@@ -250,7 +262,7 @@ const ImageField = memo(
               onChange={(event) => setImageUrl(event.target.value)}
               onKeyPress={(event) => {
                 if (event.key === "Enter") {
-                  addImageFromUrl();
+                  addFromUrl();
                 }
               }}
               value={imageUrl}
@@ -258,7 +270,7 @@ const ImageField = memo(
               InputProps={{
                 endAdornment: (
                   <>
-                    <InputAdornment position="end" onClick={addImageFromUrl}>
+                    <InputAdornment position="end" onClick={addFromUrl}>
                       <Check
                         className={classNames(
                           classes.endAdornment,
@@ -383,9 +395,32 @@ const ImageField = memo(
           </>
         ) : (
           <>
+            <InPortal node={dialogImageUrlInputPortalNode}>
+              <TextField
+                onChange={(e) => setImageUrl(e.target.value)}
+                label={Strings.imageUrl()}
+                value={imageUrl}
+              />
+            </InPortal>
             <Menu open={!!anchorEl} anchorEl={anchorEl} onClose={closeMenu}>
               <MenuItem onClick={() => setShowLibraryDialog(true)}>
                 {Strings.addFromLibrary()}
+              </MenuItem>
+              <MenuItem>{Strings.addFromFile()}</MenuItem>
+              <MenuItem
+                onClick={() =>
+                  openPrompt(
+                    dialogImageUrlInputPortalNode,
+                    addFromUrl,
+                    undefined,
+                    {
+                      title: Strings.addFromUrl(),
+                      confirmButtonColor: "success",
+                    }
+                  )
+                }
+              >
+                {Strings.addFromUrl()}
               </MenuItem>
             </Menu>
             <IconButton
