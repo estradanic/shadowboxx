@@ -332,23 +332,25 @@ const AlbumCard = memo(({ value, onChange }: AlbumCardProps) => {
               <Star className={isFavorite ? classes.favorite : classes.icon} />
             </IconButton>
           )}
-          <ImageField
-            multiple
-            ButtonProps={{ className: classes.addImages }}
-            variant="button"
-            value={images}
-            onChange={async (newImages) => {
-              value.images = newImages.map((image) => image.id!);
-              try {
-                await value.save();
-                enqueueSuccessSnackbar(Strings.commonSaved());
-              } catch (error: any) {
-                enqueueErrorSnackbar(
-                  error?.message ?? Strings.editAlbumError()
-                );
-              }
-            }}
-          />
+          {!isViewer && (
+            <ImageField
+              multiple
+              ButtonProps={{ className: classes.addImages }}
+              variant="button"
+              value={images}
+              onChange={async (newImages) => {
+                value.images = newImages.map((image) => image.id!);
+                try {
+                  await value.save();
+                  enqueueSuccessSnackbar(Strings.commonSaved());
+                } catch (error: any) {
+                  enqueueErrorSnackbar(
+                    error?.message ?? Strings.editAlbumError()
+                  );
+                }
+              }}
+            />
+          )}
         </CardActions>
       </Card>
       <AlbumFormDialog
