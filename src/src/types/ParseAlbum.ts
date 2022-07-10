@@ -71,7 +71,7 @@ export default class ParseAlbum extends ParseObject<Album> {
     const owner = await ParseUser.query()
       .equalTo(ParseUser.COLUMNS.id, this.owner.id)
       .first();
-    return (this.isPublic)
+    return this.isPublic
       ? await this.savePublic(owner!)
       : await this.savePrivate(owner!);
   }

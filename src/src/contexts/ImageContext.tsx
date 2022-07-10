@@ -83,7 +83,6 @@ export const ImageContextProvider = ({
           {Strings.uploadingImages()}
         </FancyTypography>
       ),
-      progress: 0,
     });
     const action: ImageAction = { image, command: ImageActionCommand.UPLOAD };
     actions.current.push(action);

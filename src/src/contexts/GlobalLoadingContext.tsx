@@ -6,7 +6,7 @@ type StartGlobalLoaderOptions = {
 } & (
   | {
       type: "determinate";
-      progress: LoadingWrapperProps["progress"];
+      progress?: LoadingWrapperProps["progress"];
     }
   | {
       type: "indeterminate";
@@ -70,7 +70,9 @@ export const GlobalLoadingContextProvider = ({
 
   const startGlobalLoader = (options?: StartGlobalLoaderOptions) => {
     if (options) {
-      setGlobalProgress(options.progress);
+      if (options.progress) {
+        setGlobalProgress(options.progress);
+      }
       setGlobalLoaderType(options.type);
       setGlobalLoaderContent(options.content);
     }

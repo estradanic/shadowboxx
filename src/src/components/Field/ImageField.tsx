@@ -144,27 +144,27 @@ const ImageField = memo(
     const addFromFile = async (event: any) => {
       if (event.target.files?.[0]) {
         const max = multiple ? event.target.files.length : 1;
-        const newImages: ParseImage[] = [];
+        const newImagePromises: Promise<ParseImage>[] = [];
         for (let i = 0; i < max; i++) {
           const file: any = event.target.files[i];
           const parseFile = new Parse.File(makeValidFileName(file.name), file);
-          try {
-            const newImage = await uploadImage(
+          newImagePromises.push(
+            uploadImage(
               {
                 file: parseFile,
                 isCoverImage: false,
                 owner: loggedInUser!.toPointer(),
               },
               acl
-            );
-            newImages.push(newImage);
-            const newValue = multiple ? [...value, ...newImages] : newImages;
-            await onChange(newValue);
-          } catch (error: any) {
-            enqueueErrorSnackbar(
-              error?.message ?? Strings.uploadImageError(file.name)
-            );
-          }
+            )
+          );
+        }
+        try {
+          const newImages = await Promise.all(newImagePromises);
+          const newValue = multiple ? [...value, ...newImages] : newImages;
+          await onChange(newValue);
+        } catch (error: any) {
+          enqueueErrorSnackbar(error?.message ?? Strings.uploadImageError());
         }
       }
     };

@@ -239,7 +239,8 @@ const Strings: {
   unsetCoverImage: () => "Unset this image as the album cover",
   untitledAlbum: () => "Untitled Album",
   updateImageError: (fileName: string) => `Error updating image ${fileName}.`,
-  uploadImageError: (fileName: string) => `Error uploading image ${fileName}.`,
+  uploadImageError: (fileName?: string) =>
+    `Error uploading image${fileName ? ` ${fileName}` : ""}.`,
   uploadingImage: (fileName: string) => `Uploading image (${fileName})`,
   uploadingImages: () => "Uploading images...",
   verifyEmail: (email: string) =>
