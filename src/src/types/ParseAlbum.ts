@@ -71,14 +71,9 @@ export default class ParseAlbum extends ParseObject<Album> {
     const owner = await ParseUser.query()
       .equalTo(ParseUser.COLUMNS.id, this.owner.id)
       .first();
-    let toReturn;
-    if (this.isPublic) {
-      toReturn = await this.savePublic(owner!);
-    } else {
-      toReturn = await this.savePrivate(owner!);
-    }
-    setLoading?.(false);
-    return toReturn;
+    return (this.isPublic)
+      ? await this.savePublic(owner!)
+      : await this.savePrivate(owner!);
   }
 
   async addCollaboratorAccess(acl: Parse.ACL, imageAcl: Parse.ACL) {
