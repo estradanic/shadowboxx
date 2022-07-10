@@ -1,4 +1,5 @@
 import Parse from "parse";
+import { Strings } from "../resources";
 import ParsePointer from "./ParsePointer";
 import ParseObject, { Attributes, ParsifyPointers } from "./ParseObject";
 import ParseImage from "./ParseImage";
@@ -65,13 +66,19 @@ export default class ParseAlbum extends ParseObject<Album> {
     this._album = album;
   }
 
-  async save() {
+  async save(setLoading?: (loading: boolean) => void) {
+    setLoading?.(true);
     const owner = await ParseUser.query()
       .equalTo(ParseUser.COLUMNS.id, this.owner.id)
       .first();
-    return (await this.isPublic)
-      ? this.savePublic(owner!)
-      : this.savePrivate(owner!);
+    let toReturn;
+    if (this.isPublic) {
+      toReturn = await this.savePublic(owner!);
+    } else {
+      toReturn = await this.savePrivate(owner!);
+    }
+    setLoading?.(false);
+    return toReturn;
   }
 
   async addCollaboratorAccess(acl: Parse.ACL, imageAcl: Parse.ACL) {
@@ -108,7 +115,9 @@ export default class ParseAlbum extends ParseObject<Album> {
       image.setACL(imageAcl);
       try {
         await image.save();
-      } catch {}
+      } catch (error: any) {
+        console.error(error ?? Strings.setAclError(image.id));
+      }
     }
   }
 

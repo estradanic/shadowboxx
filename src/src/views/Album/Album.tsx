@@ -31,7 +31,11 @@ const Album = () => {
   useView("Album");
   const [album, setAlbum] = useState<ParseAlbum>();
   const { enqueueErrorSnackbar } = useSnackbar();
-  const { setGlobalLoading, globalLoading } = useGlobalLoadingContext();
+  const {
+    startGlobalLoader,
+    stopGlobalLoader,
+    globalLoading,
+  } = useGlobalLoadingContext();
   const gotAlbum = useRef(false);
   const gotImages = useRef(false);
   const { id } = useParams<{ id: string }>();
@@ -43,7 +47,7 @@ const Album = () => {
   useEffect(() => {
     if (!gotAlbum.current && !globalLoading) {
       if (id) {
-        setGlobalLoading(true);
+        startGlobalLoader();
         ParseAlbum.query()
           .equalTo(ParseAlbum.COLUMNS.id, id)
           .first()
@@ -64,17 +68,21 @@ const Album = () => {
                 })
                 .finally(() => {
                   gotImages.current = true;
-                  setGlobalLoading(!gotAlbum.current);
+                  if (gotAlbum.current) {
+                    stopGlobalLoader();
+                  }
                 });
-              setGlobalLoading(!gotImages.current);
+              if (gotImages.current) {
+                stopGlobalLoader();
+              }
             } else {
               enqueueErrorSnackbar(Strings.albumNotFound(id));
-              setGlobalLoading(false);
+              stopGlobalLoader();
             }
           })
           .catch((e) => {
             enqueueErrorSnackbar(e.message ?? Strings.getAlbumError());
-            setGlobalLoading(false);
+            stopGlobalLoader();
           })
           .finally(() => {
             gotAlbum.current = true;
@@ -83,7 +91,13 @@ const Album = () => {
         enqueueErrorSnackbar(Strings.noAlbumId());
       }
     }
-  }, [enqueueErrorSnackbar, globalLoading, id, setGlobalLoading]);
+  }, [
+    enqueueErrorSnackbar,
+    globalLoading,
+    id,
+    startGlobalLoader,
+    stopGlobalLoader,
+  ]);
 
   return (
     <PageContainer>

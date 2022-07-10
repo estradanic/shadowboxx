@@ -56,7 +56,7 @@ export interface ActionDialogProps extends DialogProps {
   /** Function to run when the cancel button is clicked */
   handleCancel?: () => void;
   /** Function to run when the confirm button is clicked */
-  handleConfirm?: () => void;
+  handleConfirm?: () => Promise<void>;
   /** Function to run when the close button is clicked */
   handleClose?: () => void;
   /** What type of dialog this is, similar to builtin javascript alert, confirm, and prompt */
@@ -90,14 +90,14 @@ interface ActionDialogContextValue {
   /** Opens a confirmation dialog */
   openConfirm: (
     message: string,
-    handleConfirm?: () => void,
+    handleConfirm?: () => Promise<void>,
     handleCancel?: () => void,
     actionDialogProps?: ActionDialogHookProps
   ) => void;
   /** Opens a prompt dialog */
   openPrompt: (
     fieldsPortalNode: HtmlPortalNode,
-    handleConfirm?: () => void,
+    handleConfirm?: () => Promise<void>,
     handleCancel?: () => void,
     actionDialogProps?: ActionDialogHookProps
   ) => void;
@@ -123,7 +123,7 @@ export const ActionDialogContextProvider = ({
   const [type, setType] = useState<ActionDialogProps["type"]>("alert");
   const [message, setMessage] = useState<string>("");
   const [fieldsPortalNode, setFieldsPortalNode] = useState<HtmlPortalNode>();
-  const [handleConfirm, setHandleConfirm] = useState(() => () => {});
+  const [handleConfirm, setHandleConfirm] = useState(() => async () => {});
   const [handleCancel, setHandleCancel] = useState(() => () => {});
   const [handleClose, setHandleClose] = useState(() => () => {});
   const [
@@ -150,9 +150,9 @@ export const ActionDialogContextProvider = ({
     ) => {
       setType("confirm");
       setMessage(piMessage);
-      setHandleConfirm(() => () => {
+      setHandleConfirm(() => async () => {
         setOpen(false);
-        piHandleConfirm?.();
+        await piHandleConfirm?.();
       });
       setHandleCancel(() => () => {
         setOpen(false);
@@ -169,9 +169,9 @@ export const ActionDialogContextProvider = ({
     ) => {
       setType("prompt");
       setFieldsPortalNode(piFieldsPortalNode);
-      setHandleConfirm(() => () => {
+      setHandleConfirm(() => async () => {
         setOpen(false);
-        piHandleConfirm?.();
+        await piHandleConfirm?.();
       });
       setHandleCancel(() => () => {
         setOpen(false);

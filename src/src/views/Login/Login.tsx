@@ -53,7 +53,7 @@ const Login = () => {
   const [errors, setErrors] = useState<ErrorState<"email" | "password">>(
     DefaultErrorState
   );
-  const { setGlobalLoading } = useGlobalLoadingContext();
+  const { startGlobalLoader, stopGlobalLoader } = useGlobalLoadingContext();
   const { enqueueErrorSnackbar } = useSnackbar();
   const { updateLoggedInUser } = useUserContext();
 
@@ -72,7 +72,7 @@ const Login = () => {
 
   const login = () => {
     if (validate()) {
-      setGlobalLoading(true);
+      startGlobalLoader();
       const user = ParseUser.fromAttributes({
         username: email.toLocaleLowerCase(),
         password,
@@ -83,7 +83,7 @@ const Login = () => {
           enqueueErrorSnackbar(error?.message ?? Strings.loginError());
         })
         .finally(() => {
-          setGlobalLoading(false);
+          stopGlobalLoader();
         });
     }
   };

@@ -35,14 +35,18 @@ const Images = () => {
   useView("Images");
   const gotImages = useRef(false);
   const randomColor = useRandomColor();
-  const { setGlobalLoading, globalLoading } = useGlobalLoadingContext();
+  const {
+    startGlobalLoader,
+    stopGlobalLoader,
+    globalLoading,
+  } = useGlobalLoadingContext();
   const [images, setImages] = useState<ParseImage[]>([]);
   const { enqueueErrorSnackbar } = useSnackbar();
   const classes = useStyles();
 
   useEffect(() => {
     if (!gotImages.current && !globalLoading) {
-      setGlobalLoading(true);
+      startGlobalLoader();
       ParseImage.query()
         .findAll()
         .then((response) => {
@@ -54,11 +58,16 @@ const Images = () => {
           enqueueErrorSnackbar(Strings.getImagesError());
         })
         .finally(() => {
-          setGlobalLoading(false);
+          stopGlobalLoader();
           gotImages.current = true;
         });
     }
-  }, [enqueueErrorSnackbar, globalLoading, setGlobalLoading]);
+  }, [
+    enqueueErrorSnackbar,
+    globalLoading,
+    startGlobalLoader,
+    stopGlobalLoader,
+  ]);
 
   return (
     <PageContainer>

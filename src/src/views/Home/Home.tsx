@@ -47,14 +47,18 @@ const HomePage = memo(() => {
   const classes = useStyles();
   const [addAlbumDialogOpen, setAddAlbumDialogOpen] = useState(false);
   const { enqueueErrorSnackbar, enqueueSuccessSnackbar } = useSnackbar();
-  const { setGlobalLoading, globalLoading } = useGlobalLoadingContext();
+  const {
+    startGlobalLoader,
+    stopGlobalLoader,
+    globalLoading,
+  } = useGlobalLoadingContext();
   const [albums, setAlbums] = useState<ParseAlbum[]>([]);
   const gotAlbums = useRef(false);
   const { loggedInUser } = useUserContext();
 
   useEffect(() => {
     if (!gotAlbums.current && !globalLoading) {
-      setGlobalLoading(true);
+      startGlobalLoader();
       ParseAlbum.query()
         .findAll()
         .then((response) => {
@@ -64,7 +68,7 @@ const HomePage = memo(() => {
           enqueueErrorSnackbar(error?.message);
         })
         .finally(() => {
-          setGlobalLoading(false);
+          stopGlobalLoader();
           gotAlbums.current = true;
         });
     }
@@ -72,7 +76,8 @@ const HomePage = memo(() => {
     setAlbums,
     enqueueErrorSnackbar,
     globalLoading,
-    setGlobalLoading,
+    startGlobalLoader,
+    stopGlobalLoader,
     loggedInUser,
   ]);
 
@@ -91,7 +96,7 @@ const HomePage = memo(() => {
               )
               .map((album, index) => (
                 <AlbumCard
-                  onChange={(changedAlbum) => {
+                  onChange={async (changedAlbum) => {
                     const newAlbums = [...albums];
                     if (changedAlbum !== null) {
                       newAlbums[index] = changedAlbum;
@@ -138,16 +143,15 @@ const HomePage = memo(() => {
         }}
         open={addAlbumDialogOpen}
         handleCancel={() => setAddAlbumDialogOpen(false)}
-        handleConfirm={(attributes) => {
+        handleConfirm={async (attributes) => {
           setAddAlbumDialogOpen(false);
-          ParseAlbum.fromAttributes(attributes)
-            .save()
-            .then((response) => {
-              enqueueSuccessSnackbar(Strings.addAlbumSuccess(response?.name));
-            })
-            .catch((error) => {
-              enqueueErrorSnackbar(error?.message ?? Strings.addAlbumError());
-            });
+          try {
+            const response = await ParseAlbum.fromAttributes(attributes).save();
+            setAlbums((prev) => [...prev, response]);
+            enqueueSuccessSnackbar(Strings.addAlbumSuccess(response?.name));
+          } catch (error: any) {
+            enqueueErrorSnackbar(error?.message ?? Strings.addAlbumError());
+          }
         }}
       />
     </>

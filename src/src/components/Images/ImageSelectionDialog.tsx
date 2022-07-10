@@ -54,7 +54,7 @@ const useStyles = makeStyles((theme: Theme) => ({
 export interface ImageSelectionDialogProps
   extends Pick<ActionDialogProps, "open" | "handleCancel"> {
   /** Function to run when the confirm button is clicked */
-  handleConfirm: (value: ParseImage[]) => void;
+  handleConfirm: (value: ParseImage[]) => Promise<void>;
   /** Value of already selected images */
   value: ParseImage[];
 }
@@ -111,8 +111,8 @@ const ImageSelectionDialog = ({
     }
   }, [initialValue, userOwnedImages]);
 
-  const handleConfirm = () => {
-    piHandleConfirm(value);
+  const handleConfirm = async () => {
+    await piHandleConfirm(value);
   };
 
   const handleCancel = () => {

@@ -95,7 +95,7 @@ export interface AlbumCardProps {
    * Function to be run when the value changes.
    * Returns null if album was deleted.
    */
-  onChange: (value: ParseAlbum | null) => void;
+  onChange: (value: ParseAlbum | null) => Promise<void>;
 }
 
 /** Component for displaying basic information about an album */
@@ -183,16 +183,14 @@ const AlbumCard = memo(({ value, onChange }: AlbumCardProps) => {
     closeMenu();
     openConfirm(
       Strings.deleteAlbumConfirmation(),
-      () => {
-        value
-          .destroy()
-          .then(() => {
-            onChange(null);
-            enqueueSuccessSnackbar(Strings.deleteAlbumSuccess());
-          })
-          .catch((error) => {
-            enqueueErrorSnackbar(error?.message ?? Strings.deleteAlbumError());
-          });
+      async () => {
+        try {
+          await value.destroy();
+          await onChange(null);
+          enqueueSuccessSnackbar(Strings.deleteAlbumSuccess());
+        } catch (error: any) {
+          enqueueErrorSnackbar(error?.message ?? Strings.deleteAlbumError());
+        }
       },
       undefined,
       { confirmButtonColor: "error" }
@@ -314,63 +312,58 @@ const AlbumCard = memo(({ value, onChange }: AlbumCardProps) => {
             )}
           </Grid>
         </CardContent>
-        {isOwner && (
-          <CardActions disableSpacing>
+        <CardActions disableSpacing>
+          {isOwner && (
             <IconButton
-              onClick={() => {
+              onClick={async () => {
                 const oldIsFavorite = value?.isFavorite;
                 value.isFavorite = !oldIsFavorite;
-                value
-                  ?.save()
-                  .then((response) => {
-                    setIsFavorite(!!response.isFavorite);
-                  })
-                  .catch((error) => {
-                    value.isFavorite = oldIsFavorite;
-                    enqueueErrorSnackbar(
-                      error?.message ?? Strings.editAlbumError()
-                    );
-                  });
+                try {
+                  const response = await value?.save();
+                  setIsFavorite(!!response.isFavorite);
+                } catch (error: any) {
+                  value.isFavorite = oldIsFavorite;
+                  enqueueErrorSnackbar(
+                    error?.message ?? Strings.editAlbumError()
+                  );
+                }
               }}
             >
               <Star className={isFavorite ? classes.favorite : classes.icon} />
             </IconButton>
-            <ImageField
-              multiple
-              ButtonProps={{ className: classes.addImages }}
-              variant="button"
-              value={images}
-              onChange={(newImages) => {
-                value.images = newImages.map((image) => image.id!);
-                value
-                  .save()
-                  .then(() => {
-                    enqueueSuccessSnackbar(Strings.commonSaved());
-                  })
-                  .catch((error) => {
-                    enqueueErrorSnackbar(
-                      error?.message ?? Strings.editAlbumError()
-                    );
-                  });
-              }}
-            />
-          </CardActions>
-        )}
+          )}
+          <ImageField
+            multiple
+            ButtonProps={{ className: classes.addImages }}
+            variant="button"
+            value={images}
+            onChange={async (newImages) => {
+              value.images = newImages.map((image) => image.id!);
+              try {
+                await value.save();
+                enqueueSuccessSnackbar(Strings.commonSaved());
+              } catch (error: any) {
+                enqueueErrorSnackbar(
+                  error?.message ?? Strings.editAlbumError()
+                );
+              }
+            }}
+          />
+        </CardActions>
       </Card>
       <AlbumFormDialog
         value={value.attributes}
         open={editAlbumDialogOpen}
         handleCancel={() => setEditAlbumDialogOpen(false)}
-        handleConfirm={(attributes) => {
+        handleConfirm={async (attributes) => {
           setEditAlbumDialogOpen(false);
-          value
-            .update(attributes)
-            .then((response) => {
-              onChange(response);
-            })
-            .catch((error) => {
-              enqueueErrorSnackbar(error?.message ?? Strings.editAlbumError());
-            });
+          try {
+            const response = await value.update(attributes);
+            await onChange(response);
+            enqueueSuccessSnackbar(Strings.commonSaved());
+          } catch (error: any) {
+            enqueueErrorSnackbar(error?.message ?? Strings.editAlbumError());
+          }
         }}
       />
     </ImageContextProvider>

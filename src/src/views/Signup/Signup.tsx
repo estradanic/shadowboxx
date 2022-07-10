@@ -68,7 +68,7 @@ const Signup = () => {
   const [errors, setErrors] = useState<
     ErrorState<"email" | "firstName" | "lastName" | "password">
   >(DefaultErrorState);
-  const { setGlobalLoading } = useGlobalLoadingContext();
+  const { stopGlobalLoader, startGlobalLoader } = useGlobalLoadingContext();
   const history = useHistory();
   const { enqueueErrorSnackbar } = useSnackbar();
   const { updateLoggedInUser } = useUserContext();
@@ -110,25 +110,23 @@ const Signup = () => {
     );
   };
 
-  const signup = () => {
+  const signup = async () => {
     if (validate()) {
-      setGlobalLoading(true);
+      startGlobalLoader();
       const user = ParseUser.fromAttributes({
         username: email.toLocaleLowerCase(),
         password,
         firstName,
         lastName,
       });
-      user
-        .signup(updateLoggedInUser)
-        .then(() => {
-          setGlobalLoading(false);
-          history.push(routes["Home"].path);
-        })
-        .catch((error) => {
-          setGlobalLoading(false);
-          enqueueErrorSnackbar(error?.message ?? Strings.signupError());
-        });
+      try {
+        await user.signup(updateLoggedInUser);
+        history.push(routes["Home"].path);
+      } catch (error: any) {
+        enqueueErrorSnackbar(error?.message ?? Strings.signupError());
+      } finally {
+        stopGlobalLoader();
+      }
     }
   };
 

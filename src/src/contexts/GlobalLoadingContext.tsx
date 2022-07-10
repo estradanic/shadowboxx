@@ -1,33 +1,39 @@
 import React, { createContext, useContext, useState } from "react";
 import { LoadingWrapperProps } from "../components/Loader/LoadingWrapper";
 
+type StartGlobalLoaderOptions = {
+  content?: LoadingWrapperProps["content"];
+} & (
+  | {
+      type: "determinate";
+      progress: LoadingWrapperProps["progress"];
+    }
+  | {
+      type: "indeterminate";
+      progress?: undefined;
+    }
+);
+
+type UpdateGlobalLoaderOptions = {
+  content?: LoadingWrapperProps["content"];
+  progress?: LoadingWrapperProps["progress"];
+};
+
 interface GlobalLoadingContextValue {
   /** Whether the whole page is loading */
   globalLoading?: LoadingWrapperProps["loading"];
-  /** Function to set globalLoading */
-  setGlobalLoading: React.Dispatch<
-    React.SetStateAction<LoadingWrapperProps["loading"]>
-  >;
   /** Progress value (0-100) of the global loader */
   globalProgress?: LoadingWrapperProps["progress"];
-  /** Function to set globalProgress */
-  setGlobalProgress: React.Dispatch<
-    React.SetStateAction<LoadingWrapperProps["progress"]>
-  >;
   /** Type of the global loader */
   globalLoaderType?: LoadingWrapperProps["type"];
-  /** Function to set globalLoaderType */
-  setGlobalLoaderType: React.Dispatch<
-    React.SetStateAction<LoadingWrapperProps["type"]>
-  >;
   /** Content (such as text) to show in the loader */
   globalLoaderContent?: LoadingWrapperProps["content"];
-  /** Function to set globalLoaderContent */
-  setGlobalLoaderContent: React.Dispatch<
-    React.SetStateAction<LoadingWrapperProps["content"]>
-  >;
+  /** Function to start a global loader */
+  startGlobalLoader: (options?: StartGlobalLoaderOptions) => void;
+  /** Function to update a global loader */
+  updateGlobalLoader: (options: UpdateGlobalLoaderOptions) => void;
   /** Function to reset the global loader back to defaults ({loading: false, progress: 0, type: "indeterminate"}) */
-  resetGlobalLoader: () => void;
+  stopGlobalLoader: () => void;
 }
 
 const GlobalLoadingContext = createContext<
@@ -55,25 +61,41 @@ export const GlobalLoadingContextProvider = ({
     LoadingWrapperProps["content"]
   >();
 
-  const resetGlobalLoader = () => {
+  const stopGlobalLoader = () => {
     setGlobalLoading(false);
     setGlobalProgress(5);
     setGlobalLoaderType("indeterminate");
     setGlobalLoaderContent(undefined);
   };
 
+  const startGlobalLoader = (options?: StartGlobalLoaderOptions) => {
+    if (options) {
+      setGlobalProgress(options.progress);
+      setGlobalLoaderType(options.type);
+      setGlobalLoaderContent(options.content);
+    }
+    setGlobalLoading(true);
+  };
+
+  const updateGlobalLoader = (options: UpdateGlobalLoaderOptions) => {
+    if (options.progress !== undefined) {
+      setGlobalProgress(options.progress);
+    }
+    if (options.content !== undefined) {
+      setGlobalLoaderContent(options.content);
+    }
+  };
+
   return (
     <GlobalLoadingContext.Provider
       value={{
+        startGlobalLoader,
+        updateGlobalLoader,
+        stopGlobalLoader,
         globalLoading,
-        setGlobalLoading,
         globalProgress,
-        setGlobalProgress,
         globalLoaderType,
-        setGlobalLoaderType,
         globalLoaderContent,
-        setGlobalLoaderContent,
-        resetGlobalLoader,
       }}
     >
       {children}

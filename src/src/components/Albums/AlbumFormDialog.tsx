@@ -63,7 +63,7 @@ export interface AlbumFormDialogProps
   /** Value for the component */
   value: Album;
   /** Function to run when the confirm button is clicked */
-  handleConfirm: (value: Album) => void;
+  handleConfirm: (value: Album) => Promise<void>;
   /** Whether to reset dialog state when confirm button is clicked */
   resetOnConfirm?: boolean;
 }
@@ -183,8 +183,8 @@ const AlbumFormDialog = ({
         .containedIn(ParseUser.COLUMNS.email, [...viewers, ...collaborators])
         .count();
       if (signedUpUserCount < userEmails.size) {
-        openConfirm(Strings.nonExistentUserWarning(), () => {
-          piHandleConfirm({
+        openConfirm(Strings.nonExistentUserWarning(), async () => {
+          await piHandleConfirm({
             ...initialValue,
             images: imageIds,
             name,
@@ -196,7 +196,7 @@ const AlbumFormDialog = ({
           });
         });
       } else {
-        piHandleConfirm({
+        await piHandleConfirm({
           ...initialValue,
           images: imageIds,
           name,
@@ -327,7 +327,7 @@ const AlbumFormDialog = ({
               label={Strings.images()}
               multiple
               value={images}
-              onChange={(images) =>
+              onChange={async (images) =>
                 setImageIds(images.map((image) => image.id!))
               }
             />

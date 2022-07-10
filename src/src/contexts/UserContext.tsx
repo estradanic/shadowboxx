@@ -67,7 +67,7 @@ export const UserContextProvider = ({ children }: UserContextProviderProps) => {
   );
 
   const updateLoggedInUser = useCallback(
-    (newLoggedInUser: ParseUser, reason: UpdateReason) => {
+    async (newLoggedInUser: ParseUser, reason: UpdateReason) => {
       if (reason === UpdateReason.LOG_OUT) {
         setLoggedInUser(undefined);
         setProfilePicture(undefined);
@@ -76,13 +76,16 @@ export const UserContextProvider = ({ children }: UserContextProviderProps) => {
         newLoggedInUser.username === loggedInUser.username
       ) {
         if (reason === UpdateReason.LOG_IN || reason === UpdateReason.SIGN_UP) {
-          newLoggedInUser.fetch().then((userResponse) => {
+          try {
+            const userResponse = await newLoggedInUser.fetch();
             if (userResponse) {
               setLoggedInUser(userResponse);
             } else {
               console.error(Strings.couldNotGetUserInfo());
             }
-          });
+          } catch (error: any) {
+            console.error(error?.message ?? Strings.couldNotGetUserInfo());
+          }
           if (redirectPath) {
             history.push(redirectPath);
             setRedirectPath(undefined);

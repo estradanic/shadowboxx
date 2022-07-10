@@ -1,4 +1,5 @@
 import Parse, { FullOptions } from "parse";
+import { Strings } from "../resources";
 import { Attributes, ParsifyPointers, isPointer } from "./ParseObject";
 import ParsePointer from "./ParsePointer";
 
@@ -24,7 +25,7 @@ export interface User extends Attributes {
 export type UpdateLoggedInUser = (
   loggedInUser: ParseUser,
   reason: UpdateReason
-) => void;
+) => Promise<void>;
 
 export enum UpdateReason {
   LOG_IN,
@@ -106,36 +107,60 @@ export default class ParseUser {
   }
 
   async login(updateLoggedInUser: UpdateLoggedInUser, options?: FullOptions) {
-    return await this._user.logIn(options).then((loggedInUser) => {
-      updateLoggedInUser(new ParseUser(loggedInUser), UpdateReason.LOG_IN);
+    try {
+      const loggedInUser = await this._user.logIn(options);
+      await updateLoggedInUser(
+        new ParseUser(loggedInUser),
+        UpdateReason.LOG_IN
+      );
       return new ParseUser(loggedInUser);
-    });
+    } catch (error: any) {
+      console.error(error?.message ?? Strings.commonError());
+    }
   }
 
   async signup(updateLoggedInUser: UpdateLoggedInUser, options?: FullOptions) {
-    return await this._user.signUp(undefined, options).then((loggedInUser) => {
-      updateLoggedInUser(new ParseUser(loggedInUser), UpdateReason.SIGN_UP);
+    try {
+      const loggedInUser = await this._user.signUp(undefined, options);
+      await updateLoggedInUser(
+        new ParseUser(loggedInUser),
+        UpdateReason.SIGN_UP
+      );
       return new ParseUser(loggedInUser);
-    });
+    } catch (error: any) {
+      console.error(error?.message ?? Strings.commonError());
+    }
   }
 
   async update(
     updateLoggedInUser: UpdateLoggedInUser,
     options?: Parse.Object.SaveOptions
   ) {
-    return await this._user.save(undefined, options).then((loggedInUser) => {
-      updateLoggedInUser(new ParseUser(loggedInUser), UpdateReason.UPDATE);
+    try {
+      const loggedInUser = await this._user.save(undefined, options);
+      await updateLoggedInUser(
+        new ParseUser(loggedInUser),
+        UpdateReason.UPDATE
+      );
       return new ParseUser(loggedInUser);
-    });
+    } catch (error: any) {
+      console.error(error?.message ?? Strings.commonError());
+    }
   }
 
   async logout(updateLoggedInUser: UpdateLoggedInUser) {
-    return await Parse.User.logOut<Parse.User<ParsifyPointers<User>>>().then(
-      (loggedOutUser) => {
-        updateLoggedInUser(new ParseUser(loggedOutUser), UpdateReason.LOG_OUT);
-        return new ParseUser(loggedOutUser);
-      }
-    );
+    try {
+      const loggedOutUser = await Parse.User.logOut<
+        Parse.User<ParsifyPointers<User>>
+      >();
+      await updateLoggedInUser(
+        new ParseUser(loggedOutUser),
+        UpdateReason.LOG_OUT
+      );
+      return new ParseUser(loggedOutUser);
+    } catch (error: any) {
+      console.error(error?.message ?? Strings.commonError());
+    }
   }
 
   get exists(): boolean {

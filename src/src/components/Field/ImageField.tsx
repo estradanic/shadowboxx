@@ -93,7 +93,7 @@ export interface ImageFieldProps
   /** Value of the field, array of Images */
   value: ParseImage[];
   /** Function to run when the value changes */
-  onChange: (value: ParseImage[]) => void;
+  onChange: (value: ParseImage[]) => Promise<void>;
   /** Whether multiple images can be selected or not */
   multiple?: boolean;
   /** ACL to save new images with after upload */
@@ -135,64 +135,61 @@ const ImageField = memo(
 
     const randomColor = useRandomColor();
 
-    const onChange = (newValue: ParseImage[]) => {
-      piOnChange(Array.from(Set(newValue)));
+    const onChange = async (newValue: ParseImage[]) => {
+      await piOnChange(Array.from(Set(newValue)));
     };
 
     const { openPrompt } = useActionDialogContext();
 
-    const addFromFile = (event: any) => {
+    const addFromFile = async (event: any) => {
       if (event.target.files?.[0]) {
         const max = multiple ? event.target.files.length : 1;
         const newImages: ParseImage[] = [];
         for (let i = 0; i < max; i++) {
           const file: any = event.target.files[i];
           const parseFile = new Parse.File(makeValidFileName(file.name), file);
-          uploadImage(
-            {
-              file: parseFile,
-              isCoverImage: false,
-              owner: loggedInUser!.toPointer(),
-            },
-            acl
-          )
-            .then((newImage) => {
-              newImages.push(newImage);
-              const newValue = multiple ? [...value, ...newImages] : newImages;
-              onChange(newValue);
-            })
-            .catch((error) => {
-              enqueueErrorSnackbar(
-                error?.message ?? Strings.uploadImageError(file.name)
-              );
-            });
+          try {
+            const newImage = await uploadImage(
+              {
+                file: parseFile,
+                isCoverImage: false,
+                owner: loggedInUser!.toPointer(),
+              },
+              acl
+            );
+            newImages.push(newImage);
+            const newValue = multiple ? [...value, ...newImages] : newImages;
+            await onChange(newValue);
+          } catch (error: any) {
+            enqueueErrorSnackbar(
+              error?.message ?? Strings.uploadImageError(file.name)
+            );
+          }
         }
       }
     };
 
-    const addFromUrl = () => {
+    const addFromUrl = async () => {
       const fileName = imageUrlRef.current.substring(
         imageUrlRef.current.lastIndexOf("/") + 1
       );
       const parseFile = new Parse.File(fileName, { uri: imageUrlRef.current });
-      uploadImage(
-        {
-          file: parseFile,
-          isCoverImage: false,
-          owner: loggedInUser!.toPointer(),
-        },
-        acl
-      )
-        .then((newImage) => {
-          const newValue = multiple ? [...value, newImage] : [newImage];
-          onChange(newValue);
-        })
-        .catch((error) => {
-          enqueueErrorSnackbar(
-            error?.message ?? Strings.uploadImageError(fileName)
-          );
-        });
-
+      try {
+        const newImage = await uploadImage(
+          {
+            file: parseFile,
+            isCoverImage: false,
+            owner: loggedInUser!.toPointer(),
+          },
+          acl
+        );
+        const newValue = multiple ? [...value, newImage] : [newImage];
+        await onChange(newValue);
+      } catch (error: any) {
+        enqueueErrorSnackbar(
+          error?.message ?? Strings.uploadImageError(fileName)
+        );
+      }
       setShowUrlInput(false);
       setImageUrl("");
     };
@@ -214,7 +211,7 @@ const ImageField = memo(
           ].save();
         }
         newValue[index] = await image.save();
-        onChange(newValue);
+        await onChange(newValue);
       } catch (error: any) {
         enqueueErrorSnackbar(error?.message ?? Strings.commonError());
         image.isCoverImage = false;
@@ -229,7 +226,7 @@ const ImageField = memo(
       image.isCoverImage = false;
       try {
         newValue[index] = await image.save();
-        onChange(newValue);
+        await onChange(newValue);
       } catch (error: any) {
         enqueueErrorSnackbar(error?.message ?? Strings.commonError());
         image.isCoverImage = true;
@@ -246,9 +243,9 @@ const ImageField = memo(
         <ImageSelectionDialog
           value={value}
           open={showLibraryDialog}
-          handleConfirm={(newValue) => {
-            onChange([...value, ...newValue]);
+          handleConfirm={async (newValue) => {
             setShowLibraryDialog(false);
+            await onChange([...value, ...newValue]);
           }}
           handleCancel={() => setShowLibraryDialog(false)}
         />
@@ -368,11 +365,11 @@ const ImageField = memo(
                         alt={file.name()}
                         decorations={[
                           <RemoveImageDecoration
-                            onClick={() => {
+                            onClick={async () => {
                               const newValue = value.filter(
                                 (valueImage) => image.id !== valueImage.id
                               );
-                              onChange(newValue);
+                              await onChange(newValue);
                             }}
                           />,
                           <CoverImageDecoration

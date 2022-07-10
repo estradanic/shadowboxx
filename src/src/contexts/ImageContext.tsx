@@ -57,11 +57,9 @@ export const ImageContextProvider = ({
   const classes = useStyles();
 
   const {
-    setGlobalLoading,
-    setGlobalLoaderType,
-    setGlobalProgress,
-    setGlobalLoaderContent,
-    resetGlobalLoader,
+    startGlobalLoader,
+    stopGlobalLoader,
+    updateGlobalLoader,
   } = useGlobalLoadingContext();
 
   const recalculateProgress = () => {
@@ -70,22 +68,23 @@ export const ImageContextProvider = ({
     );
     let newProgress = (completedActions.length / actions.current.length) * 100;
     if (newProgress === 100) {
-      resetGlobalLoader();
+      stopGlobalLoader();
     } else if (newProgress === 0) {
       newProgress = 5;
     }
-    setGlobalProgress(newProgress);
+    updateGlobalLoader({ progress: newProgress });
   };
 
   const uploadImage = async (image: Image, acl?: Parse.ACL) => {
-    setGlobalLoaderType("determinate");
-    setGlobalLoaderContent(
-      <FancyTypography className={classes.uploadingImages}>
-        {Strings.uploadingImages()}
-      </FancyTypography>
-    );
-    setGlobalLoading(true);
-
+    startGlobalLoader({
+      type: "determinate",
+      content: (
+        <FancyTypography className={classes.uploadingImages}>
+          {Strings.uploadingImages()}
+        </FancyTypography>
+      ),
+      progress: 0,
+    });
     const action: ImageAction = { image, command: ImageActionCommand.UPLOAD };
     actions.current.push(action);
 
@@ -131,8 +130,7 @@ export const ImageContextProvider = ({
   };
 
   const deleteImage = async (parseImage: ParseImage) => {
-    setGlobalLoading(true);
-    setGlobalLoaderType("determinate");
+    startGlobalLoader();
     const action: ImageAction = {
       image: parseImage.attributes,
       command: ImageActionCommand.DELETE,

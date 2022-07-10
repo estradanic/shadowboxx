@@ -11,6 +11,7 @@ import { makeStyles, Theme } from "@material-ui/core/styles";
 import cx from "classnames";
 import { useUserContext } from "../../contexts";
 import { ParseUser, ParseImage } from "../../types";
+import { Strings } from "../../resources";
 
 const useStyles = makeStyles((theme: Theme) => ({
   avatar: {
@@ -42,20 +43,20 @@ const UserAvatar = forwardRef(
     const gotImage = useRef(false);
 
     const setProfilePicture = useCallback(
-      (user: ParseUser) => {
+      async (user: ParseUser) => {
         if (user && user.profilePicture?.exists && !gotImage.current) {
-          ParseImage.query()
-            .equalTo(ParseImage.COLUMNS.id, user.profilePicture.id)
-            .first()
-            .then((profilePictureResponse) => {
-              if (profilePictureResponse) {
-                const newProfilePicture = new ParseImage(
-                  profilePictureResponse
-                );
-                setSrc(newProfilePicture?.file.url() ?? "");
-                gotImage.current = true;
-              }
-            });
+          try {
+            const profilePictureResponse = await ParseImage.query()
+              .equalTo(ParseImage.COLUMNS.id, user.profilePicture.id)
+              .first();
+            if (profilePictureResponse) {
+              const newProfilePicture = new ParseImage(profilePictureResponse);
+              setSrc(newProfilePicture?.file.url() ?? "");
+              gotImage.current = true;
+            }
+          } catch (error: any) {
+            console.error(error?.message ?? Strings.getImageError());
+          }
         }
       },
       [setSrc]

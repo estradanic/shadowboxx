@@ -112,7 +112,7 @@ const Settings = () => {
     saveLoggedInUserUpdates,
   } = useUserContext();
 
-  const { setGlobalLoading } = useGlobalLoadingContext();
+  const { stopGlobalLoader, startGlobalLoader } = useGlobalLoadingContext();
 
   const classes = useStyles();
   const [errors, setErrors] = useState<
@@ -174,23 +174,22 @@ const Settings = () => {
     );
   };
 
-  const changeUserInfo = () => {
+  const changeUserInfo = async () => {
     if (validate()) {
-      setGlobalLoading(true);
+      startGlobalLoader();
       loggedInUser!.email = settings.email;
       loggedInUser!.firstName = settings.firstName;
       loggedInUser!.lastName = settings.lastName;
       loggedInUser!.profilePicture = settings.profilePicture?.toPointer();
       loggedInUser!.isDarkThemeEnabled = settings.isDarkThemeEnabled;
-      saveLoggedInUserUpdates()
-        .then(() => {
-          enqueueSuccessSnackbar(Strings.settingsSaved());
-          setGlobalLoading(false);
-        })
-        .catch((error) => {
-          setGlobalLoading(false);
-          enqueueErrorSnackbar(error?.message ?? Strings.settingsNotSaved());
-        });
+      try {
+        await saveLoggedInUserUpdates();
+        enqueueSuccessSnackbar(Strings.settingsSaved());
+      } catch (error: any) {
+        enqueueErrorSnackbar(error?.message ?? Strings.settingsNotSaved());
+      } finally {
+        stopGlobalLoader();
+      }
     }
   };
 
@@ -249,7 +248,7 @@ const Settings = () => {
                     value={
                       settings.profilePicture ? [settings.profilePicture] : []
                     }
-                    onChange={([newProfilePicture]) =>
+                    onChange={async ([newProfilePicture]) =>
                       setSettings((prev) => ({
                         ...prev,
                         profilePicture: newProfilePicture,
