@@ -1,4 +1,5 @@
 import Parse from "parse";
+import { removeExtension } from "../utils";
 import ParsePointer from "./ParsePointer";
 import ParseObject, { Attributes, ParsifyPointers } from "./ParseObject";
 import ParseUser from "./ParseUser";
@@ -11,6 +12,8 @@ export interface Image extends Attributes {
   isCoverImage: boolean;
   /** User that owns this picture */
   owner: ParsePointer;
+  /** Name of the image */
+  name: string;
 }
 
 /**
@@ -21,6 +24,7 @@ export default class ParseImage extends ParseObject<Image> {
     const newAttributes: ParsifyPointers<Image> = {
       ...attributes,
       owner: attributes.owner._pointer,
+      name: attributes.name,
     };
     return new ParseImage(
       new Parse.Object<ParsifyPointers<Image>>("Image", newAttributes)
@@ -36,6 +40,9 @@ export default class ParseImage extends ParseObject<Image> {
     file: "file",
     isCoverImage: "isCoverImage",
     owner: "owner",
+    name: "name",
+    thumbnail: "fileThumb",
+    mobileFile: "fileMobile",
   };
 
   _image: Parse.Object<ParsifyPointers<Image>>;
@@ -55,7 +62,7 @@ export default class ParseImage extends ParseObject<Image> {
     } else if (this.createdAt! < that.createdAt!) {
       return -1;
     } else {
-      return this.file?.name().localeCompare(that.file?.name()!);
+      return this.name.localeCompare(that.name!);
     }
   }
 
@@ -84,6 +91,18 @@ export default class ParseImage extends ParseObject<Image> {
     this._image.set(ParseImage.COLUMNS.file, file);
   }
 
+  get thumbnail(): Parse.File {
+    return (
+      this._image.get(ParseImage.COLUMNS.thumbnail) ??
+      this.mobileFile ??
+      this.file
+    );
+  }
+
+  get mobileFile(): Parse.File {
+    return this._image.get(ParseImage.COLUMNS.mobileFile) ?? this.file;
+  }
+
   get isCoverImage(): boolean {
     return this._image.get(ParseImage.COLUMNS.isCoverImage);
   }
@@ -98,5 +117,16 @@ export default class ParseImage extends ParseObject<Image> {
 
   set owner(owner) {
     this._image.set(ParseImage.COLUMNS.owner, owner._pointer);
+  }
+
+  get name(): Image["name"] {
+    return (
+      this._image.get(ParseImage.COLUMNS.name) ??
+      removeExtension(this.file.name())
+    );
+  }
+
+  set name(name) {
+    this._image.set(ParseImage.COLUMNS.name, name);
   }
 }

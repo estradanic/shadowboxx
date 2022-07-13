@@ -84,8 +84,8 @@ const Images = () => {
               <Grid key={image.id} item xs={12} md={6} lg={4} xl={3}>
                 <Image
                   borderColor={randomColor}
-                  src={image.file.url()}
-                  alt={image.file.name()}
+                  src={image.mobileFile.url()}
+                  alt={image.name}
                 />
               </Grid>
             ))}

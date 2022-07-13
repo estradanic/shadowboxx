@@ -51,7 +51,7 @@ const UserAvatar = forwardRef(
               .first();
             if (profilePictureResponse) {
               const newProfilePicture = new ParseImage(profilePictureResponse);
-              setSrc(newProfilePicture?.file.url() ?? "");
+              setSrc(newProfilePicture?.thumbnail.url() ?? "");
               gotImage.current = true;
             }
           } catch (error: any) {
@@ -69,7 +69,7 @@ const UserAvatar = forwardRef(
         setLastName(user?.lastName ?? "");
         setProfilePicture(user);
       } else if (email === loggedInUser?.email) {
-        setSrc(profilePicture?.file.url() ?? "");
+        setSrc(profilePicture?.thumbnail.url() ?? "");
         setFirstName(loggedInUser?.firstName ?? "");
         setLastName(loggedInUser?.lastName ?? "");
       } else {
@@ -92,7 +92,7 @@ const UserAvatar = forwardRef(
       email,
       loggedInUser,
       fetchUser,
-      profilePicture?.file,
+      profilePicture?.thumbnail,
       setProfilePicture,
     ]);
 

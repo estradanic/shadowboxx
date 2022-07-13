@@ -16,7 +16,7 @@ import uniqueId from "lodash/uniqueId";
 import classNames from "classnames";
 import { Set } from "immutable";
 import { createHtmlPortalNode, InPortal } from "react-reverse-portal";
-import { elide, makeValidFileName } from "../../utils";
+import { elide, makeValidFileName, removeExtension } from "../../utils";
 import { Strings } from "../../resources";
 import { ParseImage } from "../../types";
 import { useRandomColor, useRefState } from "../../hooks";
@@ -147,13 +147,15 @@ const ImageField = memo(
         const newImagePromises: Promise<ParseImage>[] = [];
         for (let i = 0; i < max; i++) {
           const file: any = event.target.files[i];
-          const parseFile = new Parse.File(makeValidFileName(file.name), file);
+          const fileName = makeValidFileName(file.name);
+          const parseFile = new Parse.File(fileName, file);
           newImagePromises.push(
             uploadImage(
               {
                 file: parseFile,
                 isCoverImage: false,
                 owner: loggedInUser!.toPointer(),
+                name: removeExtension(fileName),
               },
               acl
             )
@@ -170,8 +172,8 @@ const ImageField = memo(
     };
 
     const addFromUrl = async () => {
-      const fileName = imageUrlRef.current.substring(
-        imageUrlRef.current.lastIndexOf("/") + 1
+      const fileName = makeValidFileName(
+        imageUrlRef.current.substring(imageUrlRef.current.lastIndexOf("/") + 1)
       );
       const parseFile = new Parse.File(fileName, { uri: imageUrlRef.current });
       try {
@@ -180,6 +182,7 @@ const ImageField = memo(
             file: parseFile,
             isCoverImage: false,
             owner: loggedInUser!.toPointer(),
+            name: removeExtension(fileName),
           },
           acl
         );
@@ -326,8 +329,8 @@ const ImageField = memo(
                       <InputAdornment position="end">
                         <Avatar
                           className={classes.endAdornmentAvatar}
-                          src={value[0].file.url()}
-                          alt={value[0].file.name()}
+                          src={value[0].thumbnail.url()}
+                          alt={value[0].name}
                         />
                       </InputAdornment>
                     )}
@@ -338,7 +341,7 @@ const ImageField = memo(
                     <Typography variant="body1">
                       {value.length > 1 && multiple
                         ? Strings.multipleImages(value.length)
-                        : elide(value[0].file.name(), 20, 3)}
+                        : elide(value[0].name, 20, 3)}
                     </Typography>
                   </InputAdornment>
                 ),
@@ -349,7 +352,6 @@ const ImageField = memo(
             {multiple && !!value.length && (
               <Grid container className={classes.multiImageContainer}>
                 {value.map((image: ParseImage, index) => {
-                  const file = image.file;
                   return (
                     <Grid
                       xs={12}
@@ -361,8 +363,8 @@ const ImageField = memo(
                     >
                       <Image
                         borderColor={randomColor}
-                        src={file.url()}
-                        alt={file.name()}
+                        src={image.mobileFile.url()}
+                        alt={image.name}
                         decorations={[
                           <RemoveImageDecoration
                             onClick={async () => {
@@ -433,6 +435,7 @@ const ImageField = memo(
               </MenuItem>
             </Menu>
             <IconButton
+              name="add-photo"
               onClick={(e) => setAnchorEl(e.currentTarget)}
               {...ButtonProps}
             >

@@ -1,8 +1,16 @@
 {
-  "short_name": "Shadowbox",
+  "short_name": "Shadowboxx",
   "name": "Collaborative Photo Albums",
   "start_url": ".",
   "display": "standalone",
-  "theme_color": "#000000",
-  "background_color": "#ffffff"
+  "theme_color": "#ffffff",
+  "background_color" : "#1B71B5",
+  "icons" : [
+    {
+      "src": "/icon-512x512.png",
+      "type": "image/png",
+      "sizes": "512x512",
+      "purpose": "any maskable"
+    }
+  ]
 }

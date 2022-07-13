@@ -33,3 +33,11 @@ export const makeValidFileName = (input: string): string => {
   }
   return fileName;
 };
+
+export const removeExtension = (input: string): string => {
+  const fileName = input?.replace(/\..*$/, "");
+  if (isNullOrWhitespace(fileName)) {
+    throw new Error(Strings.invalidEmptyFilename());
+  }
+  return fileName;
+};

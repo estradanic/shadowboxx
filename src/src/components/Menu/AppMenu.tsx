@@ -103,6 +103,7 @@ const AppMenu = () => {
         onClick={() => setDrawerOpen(true)}
         className={classes.menuButton}
         color="inherit"
+        name="menu"
       >
         <Menu />
       </IconButton>

@@ -88,7 +88,7 @@ export const ImageContextProvider = ({
     actions.current.push(action);
 
     const notification = addNotification({
-      title: Strings.uploadingImage(image.file.name()),
+      title: Strings.uploadingImage(image.name),
       icon: <CircularProgress />,
     });
 

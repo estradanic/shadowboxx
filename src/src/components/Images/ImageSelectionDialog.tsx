@@ -159,8 +159,8 @@ const ImageSelectionDialog = ({
               >
                 <Image
                   borderColor={randomColor}
-                  src={image.file.url()}
-                  alt={image.file.name()}
+                  src={image.mobileFile.url()}
+                  alt={image.name}
                 />
                 <div
                   className={classNames({

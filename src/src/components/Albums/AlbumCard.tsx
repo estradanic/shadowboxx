@@ -172,7 +172,9 @@ const AlbumCard = memo(({ value, onChange }: AlbumCardProps) => {
     () => images?.find((image) => image.isCoverImage) ?? images?.[0],
     [images]
   );
-  const coverImageSrc = useMemo(() => coverImage?.file.url(), [coverImage]);
+  const coverImageSrc = useMemo(() => coverImage?.mobileFile.url(), [
+    coverImage,
+  ]);
 
   const classes = useStyles();
   const theme = useTheme();
@@ -221,7 +223,10 @@ const AlbumCard = memo(({ value, onChange }: AlbumCardProps) => {
           action={
             isViewer ? undefined : (
               <>
-                <IconButton onClick={(e) => setAnchorEl(e.currentTarget)}>
+                <IconButton
+                  onClick={(e) => setAnchorEl(e.currentTarget)}
+                  name="actions"
+                >
                   <MoreVert className={classes.icon} />
                 </IconButton>
                 <Menu open={!!anchorEl} anchorEl={anchorEl} onClose={closeMenu}>
@@ -244,7 +249,7 @@ const AlbumCard = memo(({ value, onChange }: AlbumCardProps) => {
           <CardMedia
             className={classes.media}
             image={coverImageSrc}
-            title={coverImage?.file.name()}
+            title={coverImage?.name}
             onClick={navigateToAlbum}
           />
         ) : (
@@ -315,6 +320,7 @@ const AlbumCard = memo(({ value, onChange }: AlbumCardProps) => {
         <CardActions disableSpacing>
           {isOwner && (
             <IconButton
+              name="favorite"
               onClick={async () => {
                 const oldIsFavorite = value?.isFavorite;
                 value.isFavorite = !oldIsFavorite;

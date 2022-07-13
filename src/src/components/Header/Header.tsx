@@ -82,6 +82,7 @@ const Header = ({ viewId, ...rest }: HeaderProps) => {
               variant="outlined"
               color="inherit"
               onClick={() => history.push("/login")}
+              name="login/signup"
             >
               {Strings.loginSignup()}
             </Button>
@@ -101,7 +102,7 @@ const Header = ({ viewId, ...rest }: HeaderProps) => {
             <>
               <Notifications className={classes.notifications} />
               <Typography variant="overline">{`${loggedInUser.firstName} ${loggedInUser.lastName}`}</Typography>
-              {!!profilePicture?.file?.url() && (
+              {!!profilePicture?.thumbnail?.url() && (
                 <UserAvatar
                   email={loggedInUser.email}
                   className={classes.profile}
