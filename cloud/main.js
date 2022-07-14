@@ -14,3 +14,25 @@ Parse.Cloud.beforeSave("Image", async (request) => {
     }
   }
 });
+
+Parse.Cloud.job("migrateImages", async () => {
+  const record = await new Parse.Query("Image")
+    .doesNotExist("name")
+    .first({useMasterKey: true});
+
+  console.log(record);
+
+  const name = record.get("file").name()
+    .replace(/\..*$/, "")
+    .replace(/^.{74}/, "");
+  record.set("name", name);
+  record.save(null, {useMasterKey: true})
+    .then(() => {
+      console.log("Successfully added name", name);
+    })
+    .catch((e) => {
+      console.error("Couldn't add name because", e.message);
+    });
+
+  return "Successfully added names to file " + JSON.stringify(record);
+});
