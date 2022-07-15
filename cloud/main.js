@@ -31,7 +31,7 @@ Parse.Cloud.beforeSave("Image", async (request) => {
         }).save()
       );
     } catch (e) {
-      throw e;
+      console.error(e);
     }
   }
 });
@@ -58,5 +58,5 @@ Parse.Cloud.job("migrateImages", async () => {
       console.error("Couldn't add name because", e.message);
     });
 
-  return "Successfully added names to file " + JSON.stringify(record);
+  return "Processing file " + record.id ?? record.objectId;
 });
