@@ -130,7 +130,7 @@ const Strings: {
   albumNotFound: (album: string) =>
     `Album not found${album ? ` (${album})` : ""}`,
   alreadyHaveAccount: () => "Already have an account?",
-  appName: () => "Shadowbox",
+  appName: () => "Shadowboxx",
   back: () => "Back",
   cancel: () => "Cancel",
   checkEmailVerified: () => "Check Verification Status",
@@ -206,7 +206,7 @@ const Strings: {
   noImageExists: (fileName: string) => `Image doesn't exist (${fileName})`,
   noImages: () => "This album is empty",
   nonExistentUserWarning: () =>
-    `You are saving this album with at least one user that does not currently have a Shadowbox account.
+    `You are saving this album with at least one user that does not currently have a Shadowboxx account.
     This will open up access to your album to the first person who creates an account with that email.
     This may pose a privacy/security risk. Do you wish to continue?`,
   noNotifications: () => "You're all caught up! :)",

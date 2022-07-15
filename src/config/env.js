@@ -62,7 +62,7 @@ const REACT_APP = /^REACT_APP_/i;
 
 const getParseVariables = () => {
   return NODE_ENV === "production" ?
-    ["aX17fiOL3N1Lklz83UnWMP6oympHLszezxXAXokH", "otMMK0SVH7LEIL1TbqlIbemXf0jpfEurJ9FQ7gri", "http://shadowbox.b4a.io"] :
+    ["aX17fiOL3N1Lklz83UnWMP6oympHLszezxXAXokH", "otMMK0SVH7LEIL1TbqlIbemXf0jpfEurJ9FQ7gri", "http://shadowboxx.b4a.io"] :
     ["GkKaaxNRxTc1XONlpCizJtzVIzkWYI6ZLxrLylT4", "vX8PThMi1vKelVwPkCRgkoRXDpBB5oDUeMO9PrZ2", "http://shadowboxxdevtest.b4a.io"];
 };
 

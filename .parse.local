@@ -1,10 +1,10 @@
 {
   "applications": {
-    "Shadowbox": {
+    "Shadowboxx": {
       "applicationId": "aX17fiOL3N1Lklz83UnWMP6oympHLszezxXAXokH"
     },
     "_default": {
-      "link": "Shadowbox"
+      "link": "Shadowboxx"
     }
   }
 }
