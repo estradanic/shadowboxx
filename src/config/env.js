@@ -60,6 +60,14 @@ process.env.NODE_PATH = (process.env.NODE_PATH || "")
 // injected into the application via DefinePlugin in webpack configuration.
 const REACT_APP = /^REACT_APP_/i;
 
+const getParseVariables = () => {
+  return NODE_ENV === "production" ?
+    ["aX17fiOL3N1Lklz83UnWMP6oympHLszezxXAXokH", "otMMK0SVH7LEIL1TbqlIbemXf0jpfEurJ9FQ7gri", "http://shadowbox.b4a.io"] :
+    ["GkKaaxNRxTc1XONlpCizJtzVIzkWYI6ZLxrLylT4", "vX8PThMi1vKelVwPkCRgkoRXDpBB5oDUeMO9PrZ2", "http://shadowboxxdevtest.b4a.io"];
+};
+
+const [PARSE_APPLICATION_ID, PARSE_JAVASCRIPT_KEY, PARSE_HOST_URL] = getParseVariables();
+
 function getClientEnvironment(publicUrl) {
   const raw = Object.keys(process.env)
     .filter((key) => REACT_APP.test(key))
@@ -77,6 +85,9 @@ function getClientEnvironment(publicUrl) {
         // This should only be used as an escape hatch. Normally you would put
         // images into the `src` and `import` them in code to get their paths.
         PUBLIC_URL: publicUrl,
+        PARSE_APPLICATION_ID,
+        PARSE_JAVASCRIPT_KEY,
+        PARSE_HOST_URL,
       },
     );
   // Stringify all values so we can feed into webpack DefinePlugin

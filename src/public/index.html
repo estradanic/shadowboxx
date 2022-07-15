@@ -66,6 +66,11 @@
               .catch((err) => console.log('Failure: ', err));
         })
       }
+      window.__env__ = {
+        PARSE_APPLICATION_ID: "%PARSE_APPLICATION_ID%",
+        PARSE_JAVASCRIPT_KEY: "%PARSE_JAVASCRIPT_KEY%",
+        PARSE_HOST_URL: "%PARSE_HOST_URL%",
+      };
     </script>
 
     <title>Shadowbox</title>

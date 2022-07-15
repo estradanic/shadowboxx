@@ -12,19 +12,16 @@ import routes from "./routes";
 import ViewWrapper from "./RouteWrapper";
 import { ActionDialogContextProvider, SnackbarProvider } from "../components";
 
-const PARSE_APPLICATION_ID = "aX17fiOL3N1Lklz83UnWMP6oympHLszezxXAXokH";
-const PARSE_JAVASCRIPT_KEY = "otMMK0SVH7LEIL1TbqlIbemXf0jpfEurJ9FQ7gri";
-const PARSE_HOST_URL = "http://shadowbox.b4a.io";
+declare const window: Window & { __env__: { [key: string]: any } };
 
-Parse.serverURL = PARSE_HOST_URL;
-Parse.initialize(PARSE_APPLICATION_ID, PARSE_JAVASCRIPT_KEY);
-// The types definitions are out of date, so we have to do this yay!
-// TODO: fix this once the definitions are back up to speed.
-const enableLocalDatastore = Parse.enableLocalDatastore as (
-  poll: boolean,
-  pollingMicrosecond?: number
-) => void;
-enableLocalDatastore(false);
+Parse.serverURL = window.__env__.PARSE_HOST_URL;
+Parse.initialize(
+  window.__env__.PARSE_APPLICATION_ID,
+  window.__env__.PARSE_JAVASCRIPT_KEY
+);
+
+// @ts-ignore: TODO remove this comment when the types are actually correct again
+Parse.enableLocalDatastore(false);
 
 const App = () => {
   const { loggedInUser } = useUserContext();
