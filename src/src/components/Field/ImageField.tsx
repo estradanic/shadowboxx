@@ -351,44 +351,46 @@ const ImageField = memo(
             />
             {multiple && !!value.length && (
               <Grid container className={classes.multiImageContainer}>
-                {value.map((image: ParseImage, index) => {
-                  return (
-                    <Grid
-                      xs={12}
-                      md={6}
-                      lg={4}
-                      item
-                      className={classes.imageWrapper}
-                      key={image.id}
-                    >
-                      <Image
-                        borderColor={randomColor}
-                        src={image.mobileFile.url()}
-                        alt={image.name}
-                        decorations={[
-                          <RemoveImageDecoration
-                            onClick={async () => {
-                              const newValue = value.filter(
-                                (valueImage) => image.id !== valueImage.id
-                              );
-                              await onChange(newValue);
-                            }}
-                          />,
-                          <CoverImageDecoration
-                            checked={image.isCoverImage}
-                            onClick={async () => {
-                              if (image.isCoverImage) {
-                                await unsetCoverImage(image, index);
-                              } else {
-                                await setCoverImage(image, index);
-                              }
-                            }}
-                          />,
-                        ]}
-                      />
-                    </Grid>
-                  );
-                })}
+                {[...value.sort((a, b) => a.compareTo(b))].map(
+                  (image: ParseImage, index) => {
+                    return (
+                      <Grid
+                        xs={12}
+                        md={6}
+                        lg={4}
+                        item
+                        className={classes.imageWrapper}
+                        key={image.id}
+                      >
+                        <Image
+                          borderColor={randomColor}
+                          src={image.mobileFile.url()}
+                          alt={image.name}
+                          decorations={[
+                            <RemoveImageDecoration
+                              onClick={async () => {
+                                const newValue = value.filter(
+                                  (valueImage) => image.id !== valueImage.id
+                                );
+                                await onChange(newValue);
+                              }}
+                            />,
+                            <CoverImageDecoration
+                              checked={image.isCoverImage}
+                              onClick={async () => {
+                                if (image.isCoverImage) {
+                                  await unsetCoverImage(image, index);
+                                } else {
+                                  await setCoverImage(image, index);
+                                }
+                              }}
+                            />,
+                          ]}
+                        />
+                      </Grid>
+                    );
+                  }
+                )}
               </Grid>
             )}
           </>
