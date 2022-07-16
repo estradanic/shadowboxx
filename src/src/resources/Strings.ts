@@ -55,6 +55,9 @@ export interface StringEntries {
   imageUrl: string;
   incorrectPassword: string;
   insertCollaboratorsError: string;
+  install: string;
+  installed: string;
+  installPrompt: string;
   invalidEmail: string;
   invalidEmptyFilename: string;
   invalidImage: string;
@@ -78,6 +81,7 @@ export interface StringEntries {
   noNotifications: string;
   noNotificationsDetail: string;
   noSessionId: string;
+  notInstalled: string;
   numOfPhotos: string;
   okay: string;
   password: string;
@@ -185,6 +189,9 @@ const Strings: {
   imageUrl: () => "Image URL",
   incorrectPassword: () => "Incorrect password",
   insertCollaboratorsError: () => "Error inserting collaborators",
+  install: () => "Install App",
+  installed: () => "Installed! :)",
+  installPrompt: () => "Enjoy your photos even offline!",
   invalidEmail: (email: string) => `Invalid email (${email})`,
   invalidEmptyFilename: () => "File name cannot be empty!",
   invalidImage: (image: { src: string; fileName: string }) =>
@@ -212,6 +219,7 @@ const Strings: {
   noNotifications: () => "You're all caught up! :)",
   noNotificationsDetail: () => "No Notifications",
   noSessionId: () => "No session id provided",
+  notInstalled: () => "Not installed :(",
   numOfPhotos: (numOfPhotos: number) => `${numOfPhotos} photos.`,
   okay: () => "Okay",
   password: () => "Password",

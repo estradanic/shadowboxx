@@ -58,9 +58,9 @@ export default class ParseImage extends ParseObject<Image> {
     } else if (that.isCoverImage) {
       return 1;
     } else if (this.createdAt! > that.createdAt!) {
-      return 1;
-    } else if (this.createdAt! < that.createdAt!) {
       return -1;
+    } else if (this.createdAt! < that.createdAt!) {
+      return 1;
     } else {
       return this.name.localeCompare(that.name!);
     }
