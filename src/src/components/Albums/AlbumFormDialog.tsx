@@ -75,7 +75,7 @@ const AlbumFormDialog = ({
   open,
   handleCancel: piHandleCancel,
   handleConfirm: piHandleConfirm,
-  resetOnConfirm,
+  resetOnConfirm = true,
 }: AlbumFormDialogProps) => {
   const [imageIds, setImageIds] = useState<Album["images"]>(
     initialValue.images
@@ -143,10 +143,6 @@ const AlbumFormDialog = ({
         setImages(response.map((image) => new ParseImage(image)));
       });
   }, [imageIds]);
-
-  useEffect(() => {
-    reinitialize();
-  }, [initialValue, reinitialize]);
 
   const classes = useStyles();
   const theme = useTheme();
@@ -328,8 +324,8 @@ const AlbumFormDialog = ({
               label={Strings.images()}
               multiple
               value={images}
-              onChange={async (images) =>
-                setImageIds(images.map((image) => image.id!))
+              onChange={async (newImages) =>
+                setImageIds(newImages.map((image) => image.id!))
               }
             />
           </ImageContextProvider>
