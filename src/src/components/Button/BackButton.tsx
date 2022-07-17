@@ -21,7 +21,7 @@ const BackButton = ({ placement = "header", ...rest }: BackButtonProps) => {
   return (
     <Button
       startIcon={startIcon}
-      onClick={() => history.push(location.state.previousLocation)}
+      onClick={() => history.push(location.state?.previousLocation)}
       {...rest}
     >
       {text}

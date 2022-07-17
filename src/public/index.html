@@ -59,18 +59,17 @@
       Register the service-worker
     -->
     <script>
+      globalThis.__env__ = {};
       if ("serviceWorker" in navigator) {
         window.addEventListener("load", () => {
-          navigator.serviceWorker.register('./service-worker.js')
+          navigator.serviceWorker.register('/service-worker.js?version=%SERVICE_WORKER_VERSION_NUMBER%', {scope: "/"})
               .then((reg) => console.log('Success: ', reg.scope))
               .catch((err) => console.log('Failure: ', err));
-        })
+        });
       }
-      window.__env__ = {
-        PARSE_APPLICATION_ID: "%PARSE_APPLICATION_ID%",
-        PARSE_JAVASCRIPT_KEY: "%PARSE_JAVASCRIPT_KEY%",
-        PARSE_HOST_URL: "%PARSE_HOST_URL%",
-      };
+      globalThis.__env__.PARSE_APPLICATION_ID = "%PARSE_APPLICATION_ID%";
+      globalThis.__env__.PARSE_JAVASCRIPT_KEY = "%PARSE_JAVASCRIPT_KEY%";
+      globalThis.__env__.PARSE_HOST_URL = "%PARSE_HOST_URL%";
     </script>
 
     <title>Shadowboxx</title>

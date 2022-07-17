@@ -67,6 +67,7 @@ const getParseVariables = () => {
 };
 
 const [PARSE_APPLICATION_ID, PARSE_JAVASCRIPT_KEY, PARSE_HOST_URL] = getParseVariables();
+const {version: SERVICE_WORKER_VERSION_NUMBER} = require("../public/variables.json");
 
 function getClientEnvironment(publicUrl) {
   const raw = Object.keys(process.env)
@@ -88,6 +89,7 @@ function getClientEnvironment(publicUrl) {
         PARSE_APPLICATION_ID,
         PARSE_JAVASCRIPT_KEY,
         PARSE_HOST_URL,
+        SERVICE_WORKER_VERSION_NUMBER,
       },
     );
   // Stringify all values so we can feed into webpack DefinePlugin

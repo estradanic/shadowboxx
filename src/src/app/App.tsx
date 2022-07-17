@@ -12,12 +12,12 @@ import routes from "./routes";
 import ViewWrapper from "./RouteWrapper";
 import { ActionDialogContextProvider, SnackbarProvider } from "../components";
 
-declare const window: Window & { __env__: { [key: string]: any } };
+declare const globalThis: any;
 
-Parse.serverURL = window.__env__.PARSE_HOST_URL;
+Parse.serverURL = globalThis.__env__?.PARSE_HOST_URL;
 Parse.initialize(
-  window.__env__.PARSE_APPLICATION_ID,
-  window.__env__.PARSE_JAVASCRIPT_KEY
+  globalThis.__env__?.PARSE_APPLICATION_ID,
+  globalThis.__env__?.PARSE_JAVASCRIPT_KEY
 );
 
 // @ts-ignore: TODO remove this comment when the types are actually correct again

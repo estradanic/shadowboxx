@@ -140,7 +140,7 @@ const Album = () => {
             {Strings.albumNotFound()}
           </Typography>
           <br />
-          {!!location.state.previousLocation && (
+          {!!location.state?.previousLocation && (
             <BackButton color="inherit" placement="body" variant="text" />
           )}
         </Grid>
