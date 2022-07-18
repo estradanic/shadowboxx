@@ -27,9 +27,11 @@ const unRoutedPaths = [
   "export_data",
 ];
 
-app.enable('trust proxy');
+app.enable("trust proxy");
 app.use((req, res, next) => {
-    req.secure ? next() : res.redirect('https://' + req.headers.host + req.url);
+  req.secure || app.get("X-Forwarded-Proto") != "http"
+    ? next()
+    : res.redirect("https://" + req.headers.host + req.url);
 });
 
 app.use((req, res, next) => {
