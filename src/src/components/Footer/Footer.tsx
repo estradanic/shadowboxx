@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { AppBar, Toolbar, Typography, Button } from "@material-ui/core";
 import { makeStyles, Theme } from "@material-ui/core/styles";
+import { Offline, Online } from "react-detect-offline";
 import { Strings } from "../../resources";
 import { useSnackbar } from "../Snackbar";
 
@@ -9,7 +10,7 @@ const useStyles = makeStyles((theme: Theme) => ({
     top: "auto",
     bottom: 0,
   },
-  copyright: {
+  centeredText: {
     margin: "auto",
   },
   installLabel: {
@@ -19,6 +20,10 @@ const useStyles = makeStyles((theme: Theme) => ({
     marginLeft: "auto",
     backgroundColor: theme.palette.success.main,
     color: theme.palette.success.contrastText,
+  },
+  offlineIndicator: {
+    backgroundColor: theme.palette.error.main,
+    color: theme.palette.error.contrastText,
   },
 }));
 
@@ -85,27 +90,36 @@ const Footer = () => {
       component="footer"
       className={classes.appBar}
     >
-      <Toolbar variant="dense">
-        {showInstallPrompt ? (
-          <>
-            <Typography className={classes.installLabel} variant="overline">
-              {Strings.installPrompt()}
+      <Online>
+        <Toolbar variant="dense">
+          {showInstallPrompt ? (
+            <>
+              <Typography className={classes.installLabel} variant="overline">
+                {Strings.installPrompt()}
+              </Typography>
+              <Button
+                className={classes.installButton}
+                onClick={install}
+                variant="contained"
+                size="small"
+              >
+                {Strings.install()}
+              </Button>
+            </>
+          ) : (
+            <Typography className={classes.centeredText} color="inherit">
+              {Strings.copyright()}
             </Typography>
-            <Button
-              className={classes.installButton}
-              onClick={install}
-              variant="contained"
-              size="small"
-            >
-              {Strings.install()}
-            </Button>
-          </>
-        ) : (
-          <Typography className={classes.copyright} color="inherit">
-            {Strings.copyright()}
+          )}
+        </Toolbar>
+      </Online>
+      <Offline>
+        <Toolbar variant="dense" className={classes.offlineIndicator}>
+          <Typography className={classes.centeredText}>
+            {Strings.offline()}
           </Typography>
-        )}
-      </Toolbar>
+        </Toolbar>
+      </Offline>
     </AppBar>
   );
 };

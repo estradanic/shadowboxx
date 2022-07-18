@@ -83,6 +83,7 @@ export interface StringEntries {
   noSessionId: string;
   notInstalled: string;
   numOfPhotos: string;
+  offline: string;
   okay: string;
   password: string;
   pictures: string;
@@ -221,6 +222,7 @@ const Strings: {
   noSessionId: () => "No session id provided",
   notInstalled: () => "Not installed :(",
   numOfPhotos: (numOfPhotos: number) => `${numOfPhotos} photos.`,
+  offline: () => "You are offline. Viewing mode only",
   okay: () => "Okay",
   password: () => "Password",
   pictures: () => "Pictures",

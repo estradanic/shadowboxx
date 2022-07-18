@@ -14,6 +14,7 @@ import {
 } from "@material-ui/core";
 import { makeStyles, Theme, useTheme } from "@material-ui/core/styles";
 import { MoreVert, Star } from "@material-ui/icons";
+import { Online } from "react-detect-offline";
 import { useHistory, useLocation } from "react-router-dom";
 import { Strings } from "../../resources";
 import { routes } from "../../app";
@@ -222,7 +223,7 @@ const AlbumCard = memo(({ value, onChange }: AlbumCardProps) => {
           avatar={<UserAvatar email={owner?.email!} fetchUser={() => owner!} />}
           action={
             isViewer ? undefined : (
-              <>
+              <Online>
                 <IconButton
                   onClick={(e) => setAnchorEl(e.currentTarget)}
                   name="actions"
@@ -237,7 +238,7 @@ const AlbumCard = memo(({ value, onChange }: AlbumCardProps) => {
                     </MenuItem>
                   )}
                 </Menu>
-              </>
+              </Online>
             )
           }
           title={value?.name}
@@ -318,45 +319,53 @@ const AlbumCard = memo(({ value, onChange }: AlbumCardProps) => {
           </Grid>
         </CardContent>
         <CardActions disableSpacing>
-          {isOwner && (
-            <IconButton
-              name="favorite"
-              onClick={async () => {
-                const oldIsFavorite = value?.isFavorite;
-                value.isFavorite = !oldIsFavorite;
-                try {
-                  const response = await value?.save();
-                  setIsFavorite(!!response.isFavorite);
-                } catch (error: any) {
-                  value.isFavorite = oldIsFavorite;
-                  enqueueErrorSnackbar(
-                    error?.message ?? Strings.editAlbumError()
-                  );
-                }
-              }}
-            >
-              <Star className={isFavorite ? classes.favorite : classes.icon} />
-            </IconButton>
-          )}
-          {!isViewer && (
-            <ImageField
-              multiple
-              ButtonProps={{ className: classes.addImages }}
-              variant="button"
-              value={images}
-              onChange={async (newImages) => {
-                value.images = newImages.map((image) => image.id!);
-                try {
-                  await value.save();
-                  enqueueSuccessSnackbar(Strings.commonSaved());
-                } catch (error: any) {
-                  enqueueErrorSnackbar(
-                    error?.message ?? Strings.editAlbumError()
-                  );
-                }
-              }}
-            />
-          )}
+          <>
+            {isOwner && (
+              <Online>
+                <IconButton
+                  name="favorite"
+                  onClick={async () => {
+                    const oldIsFavorite = value?.isFavorite;
+                    value.isFavorite = !oldIsFavorite;
+                    try {
+                      const response = await value?.save();
+                      setIsFavorite(!!response.isFavorite);
+                    } catch (error: any) {
+                      value.isFavorite = oldIsFavorite;
+                      enqueueErrorSnackbar(
+                        error?.message ?? Strings.editAlbumError()
+                      );
+                    }
+                  }}
+                >
+                  <Star
+                    className={isFavorite ? classes.favorite : classes.icon}
+                  />
+                </IconButton>
+              </Online>
+            )}
+            {!isViewer && (
+              <Online>
+                <ImageField
+                  multiple
+                  ButtonProps={{ className: classes.addImages }}
+                  variant="button"
+                  value={images}
+                  onChange={async (newImages) => {
+                    value.images = newImages.map((image) => image.id!);
+                    try {
+                      await value.save();
+                      enqueueSuccessSnackbar(Strings.commonSaved());
+                    } catch (error: any) {
+                      enqueueErrorSnackbar(
+                        error?.message ?? Strings.editAlbumError()
+                      );
+                    }
+                  }}
+                />
+              </Online>
+            )}
+          </>
         </CardActions>
       </Card>
       <AlbumFormDialog

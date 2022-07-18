@@ -114,6 +114,7 @@ const ImageField = memo(
     acl,
     variant = "field",
     ButtonProps = {},
+    disabled,
     ...rest
   }: ImageFieldProps) => {
     const classes = useStyles();
@@ -304,12 +305,17 @@ const ImageField = memo(
               InputProps={{
                 endAdornment: (
                   <>
-                    <InputAdornment onClick={openUrlInput} position="end">
+                    <InputAdornment
+                      disablePointerEvents={disabled}
+                      onClick={openUrlInput}
+                      position="end"
+                    >
                       <Tooltip title={Strings.addFromUrl()}>
                         <Link className={classes.endAdornment} />
                       </Tooltip>
                     </InputAdornment>
                     <InputAdornment
+                      disablePointerEvents={disabled}
                       position="end"
                       onClick={() => setShowLibraryDialog(true)}
                     >
@@ -318,6 +324,7 @@ const ImageField = memo(
                       </Tooltip>
                     </InputAdornment>
                     <InputAdornment
+                      disablePointerEvents={disabled}
                       position="end"
                       onClick={() => document.getElementById(inputId)?.click()}
                     >
@@ -326,7 +333,10 @@ const ImageField = memo(
                       </Tooltip>
                     </InputAdornment>
                     {!!value.length && !multiple && (
-                      <InputAdornment position="end">
+                      <InputAdornment
+                        disablePointerEvents={disabled}
+                        position="end"
+                      >
                         <Avatar
                           className={classes.endAdornmentAvatar}
                           src={value[0].thumbnail.url()}
@@ -347,6 +357,7 @@ const ImageField = memo(
                 ),
                 readOnly: true,
               }}
+              disabled={disabled}
               {...rest}
             />
             {multiple && !!value.length && (
