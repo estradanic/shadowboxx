@@ -156,7 +156,7 @@ export const Notification = forwardRef(
           </IconButton>
         </MenuItem>
         <Collapse className={classes.detail} in={open}>
-          {detail ?? <Typography>{title}</Typography>}
+          <Typography>{detail ?? title}</Typography>
         </Collapse>
       </>
     );

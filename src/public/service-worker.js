@@ -1,6 +1,14 @@
 let CACHE_NAME = "BAD_VERSION";
 const self = this;
 
+const frontendRoutes = [
+  "/",
+  "/login",
+  "/images",
+  "/settings",
+  "/signup",
+];
+
 // Import idb-keyval library: https://github.com/jakearchibald/idb-keyval#all-bundles
 // Idb-keyval creates a IndexedDB database with simple operations such as `get` and `set`
 self.importScripts('https://cdn.jsdelivr.net/npm/idb-keyval@6/dist/umd.js');
@@ -15,9 +23,15 @@ self.addEventListener("install", async (event) => {
             CACHE_NAME = "version-" + variables.version;
             console.log("Version:", CACHE_NAME);
             return caches.open(CACHE_NAME)
-              .then((cache) => cache.addAll(Object.values(assets.files)))
-  })))));
+              .then((cache) => {
+                return cache.addAll(Object.values(assets.files))
+                  .then(cache.addAll(frontendRoutes)
+                    .then(self.skipWaiting()));
+  })})))));
 });
+
+// Whether to put new cache entries.
+let useCache = true;
 
 // Activate the SW
 self.addEventListener("activate", (event) => {
@@ -28,7 +42,8 @@ self.addEventListener("activate", (event) => {
       .then((cacheNames) => Promise.all(
         cacheNames.map((cacheName) => {
           if(!cacheWhitelist.includes(cacheName)) {
-            return caches.delete(cacheName);
+            return caches.delete(cacheName)
+              .then(self.clients.claim());
           }
         })
       ))
@@ -84,19 +99,14 @@ const deserializeResponse = (data) => {
   return Promise.resolve(new Response(data.body, data));
 };
 
-// Function to only allow a request to go 10 seconds before killing it
-const tenSecondFetch = (request) => {
-  const controller = new AbortController();
-  const timeoutId = setTimeout(() => controller.abort(), 10000);
-  return fetch(request, {signal: controller.signal})
-    .finally(() => clearTimeout(timeoutId));
-};
-
 // Middleware for fetches (caching vs. online)
 self.addEventListener("fetch", (event) => {
   // Don't bother managing non-http requests or requests to httpbin.org,
   // which are used for determining online status
-  if (!event.request.url.startsWith("http") || event.request.url.includes("httpbin.org")) {
+  if (
+    !event.request.url.startsWith("http")
+      || event.request.url.includes("httpbin.org")
+  ) {
     return;
   }
   if (event.request.url.includes("parsefiles.back4app.com")) {
@@ -106,9 +116,11 @@ self.addEventListener("fetch", (event) => {
         .then((cache) => cache.match(event.request)
           .then((cacheResponse) => {
             if (!cacheResponse) {
-              return tenSecondFetch(event.request.clone())
+              return fetch(event.request.clone())
                 .then((networkResponse) => {
-                  cache.put(event.request, networkResponse.clone());
+                  if (useCache) {
+                    cache.put(event.request, networkResponse.clone());
+                  }
                   return networkResponse;
                 })
             } else {
@@ -122,11 +134,13 @@ self.addEventListener("fetch", (event) => {
     // Respond with cached only if online doesn't work
     event.respondWith(
       caches.open(CACHE_NAME)
-        .then((cache) => tenSecondFetch(event.request)
+        .then((cache) => fetch(event.request)
           .then((response) => {
             if (!!response) {
-              cache.put(event.request, response.clone())
-                .catch((e) => console.error(e, "Request:", event.request));
+              if (useCache) {
+                cache.put(event.request, response.clone())
+                  .catch((e) => console.error(e, "Request:", event.request));
+              }
               return response;
             }
             const cacheKey = event.request.mode === "navigate" ? "/index.html" : event.request;
@@ -150,17 +164,19 @@ self.addEventListener("fetch", (event) => {
     // For other requests, we use idbKeyval
     // Respond with cached only if online doesn't work
     event.respondWith(
-      tenSecondFetch(event.request.clone())
+      fetch(event.request.clone())
         .then((response) => {
           if (!!response) {
-            serializeRequest(event.request)
-              .then((serializedRequest) => {
-                if (serializedRequest !== null) {
-                 serializeResponse(response)
-                  .then((serializedResponse) => idbKeyval.set(serializedRequest, serializedResponse)
-                    .catch((e) => console.warn("Could not cache response.", e, "Request:", serializedRequest, "Response:", serializedResponse)))
-                }
-              });
+            if (useCache) {
+              serializeRequest(event.request)
+                .then((serializedRequest) => {
+                  if (serializedRequest !== null) {
+                  serializeResponse(response)
+                    .then((serializedResponse) => idbKeyval.set(serializedRequest, serializedResponse)
+                      .catch((e) => console.warn("Could not cache response.", e, "Request:", serializedRequest, "Response:", serializedResponse)))
+                  }
+                });
+            }
             return response.clone();
           } else {
             console.warn("Network response was empty. Returning from cache");
@@ -173,5 +189,11 @@ self.addEventListener("fetch", (event) => {
           .then((serializedRequest) => idbKeyval.get(serializedRequest)
             .then((serializedResponse) => deserializeResponse(serializedResponse))))
     );
+  }
+});
+
+self.addEventListener("message", (event) => {
+  if (event.data.useCache !== undefined) {
+    useCache = event.data.useCache;
   }
 });

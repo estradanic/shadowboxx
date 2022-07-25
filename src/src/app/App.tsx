@@ -1,4 +1,4 @@
-import React, { Suspense } from "react";
+import React, { Suspense, useEffect } from "react";
 import { Switch } from "react-router-dom";
 import {
   CircularProgress,
@@ -6,12 +6,13 @@ import {
   unstable_createMuiStrictModeTheme as createMuiTheme,
 } from "@material-ui/core";
 import { Theme } from "@material-ui/core/styles";
+import { DiscFull } from "@material-ui/icons";
 import Parse from "parse";
-import { useUserContext } from "../contexts";
+import { useNotificationsContext, useUserContext } from "../contexts";
+import { ActionDialogContextProvider, SnackbarProvider } from "../components";
+import { Strings } from "../resources";
 import routes from "./routes";
 import ViewWrapper from "./RouteWrapper";
-import { ActionDialogContextProvider, SnackbarProvider } from "../components";
-
 declare const globalThis: any;
 
 Parse.serverURL = globalThis.__env__?.PARSE_HOST_URL;
@@ -25,6 +26,7 @@ Parse.enableLocalDatastore(false);
 
 const App = () => {
   const { loggedInUser } = useUserContext();
+  const { addNotification } = useNotificationsContext();
 
   const darkTheme = (lightTheme: Theme) =>
     createMuiTheme(
@@ -89,6 +91,20 @@ const App = () => {
   if (window.location.host.match(/^www\./) !== null) {
     window.location.host = window.location.host.substring(4);
   }
+
+  useEffect(() => {
+    navigator.storage.estimate().then((estimate) => {
+      if (estimate && estimate.quota !== undefined) {
+        if (estimate.quota < 500000000) {
+          addNotification({
+            title: Strings.notEnoughSpace(),
+            detail: Strings.limitedOffline(),
+            icon: <DiscFull />,
+          });
+        }
+      }
+    });
+  }, [addNotification]);
 
   return (
     <ThemeProvider theme={darkTheme}>

@@ -1,4 +1,10 @@
-import React, { useState, createContext, useContext, ReactNode } from "react";
+import React, {
+  useState,
+  createContext,
+  useContext,
+  ReactNode,
+  useCallback,
+} from "react";
 import { v4 as uuid } from "uuid";
 import { Notifications } from "@material-ui/icons";
 
@@ -50,23 +56,26 @@ export const NotificationsContextProvider = ({
   children,
 }: NotificationsContextProviderProps) => {
   const [notifications, setNotifications] = useState<Notification[]>([]);
-  const addNotification = ({
-    title,
-    icon = <Notifications />,
-    detail,
-    groupName,
-  }: AddNotificationParams) => {
-    const id = uuid();
-    const remove = () =>
-      setNotifications((prev) =>
-        prev.filter((notification) => notification.id !== id)
-      );
-    setNotifications((prev) => [
-      ...prev,
-      { id, title, icon, detail, groupName, remove },
-    ]);
-    return { id, title, icon, detail, groupName, remove };
-  };
+  const addNotification = useCallback(
+    ({
+      title,
+      icon = <Notifications />,
+      detail,
+      groupName,
+    }: AddNotificationParams) => {
+      const id = uuid();
+      const remove = () =>
+        setNotifications((prev) =>
+          prev.filter((notification) => notification.id !== id)
+        );
+      setNotifications((prev) => [
+        ...prev,
+        { id, title, icon, detail, groupName, remove },
+      ]);
+      return { id, title, icon, detail, groupName, remove };
+    },
+    [setNotifications]
+  );
 
   const value: NotificationsContextValue = {
     notifications,

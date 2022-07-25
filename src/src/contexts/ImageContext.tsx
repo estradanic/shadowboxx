@@ -1,7 +1,7 @@
 import React, { createContext, useContext, useRef } from "react";
 import Parse from "parse";
 import { useNotificationsContext } from "./NotificationsContext";
-import { CircularProgress } from "@material-ui/core";
+import { Error as MatError } from "@material-ui/icons";
 import { makeStyles, Theme } from "@material-ui/core/styles";
 import { FancyTypography, useSnackbar } from "../components";
 import { Strings } from "../resources";
@@ -88,11 +88,6 @@ export const ImageContextProvider = ({
     const action: ImageAction = { image, command: ImageActionCommand.UPLOAD };
     actions.current.push(action);
 
-    const notification = addNotification({
-      title: Strings.uploadingImage(image.name),
-      icon: <CircularProgress />,
-    });
-
     let failed = false;
     let error = null;
     try {
@@ -117,7 +112,6 @@ export const ImageContextProvider = ({
 
     action.completed = true;
     recalculateProgress();
-    notification.remove();
 
     if (!failed) {
       return parseImage;
@@ -125,6 +119,10 @@ export const ImageContextProvider = ({
       if (isNullOrWhitespace(error.message)) {
         error.message = Strings.uploadImageError();
       }
+      addNotification({
+        title: Strings.uploadImageError(),
+        icon: <MatError />,
+      });
       throw error;
     }
   };

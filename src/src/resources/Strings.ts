@@ -64,6 +64,7 @@ export interface StringEntries {
   invalidPassword: string;
   updatedAt: string;
   lastName: string;
+  limitedOffline: string;
   login: string;
   loginError: string;
   logout: string;
@@ -81,6 +82,7 @@ export interface StringEntries {
   noNotifications: string;
   noNotificationsDetail: string;
   noSessionId: string;
+  notEnoughSpace: string;
   notInstalled: string;
   numOfPhotos: string;
   offline: string;
@@ -200,6 +202,7 @@ const Strings: {
   invalidPassword: (password: string) => `Invalid password (${password})`,
   updatedAt: (updatedAt: Date) => `Edited: ${updatedAt.toLocaleDateString()}`,
   lastName: () => "Last Name",
+  limitedOffline: () => "Offline functionality will be limited.",
   login: () => "Login",
   loginError: () => `${Strings.commonError()} Could not log in.`,
   logout: () => "Logout",
@@ -220,6 +223,7 @@ const Strings: {
   noNotifications: () => "You're all caught up! :)",
   noNotificationsDetail: () => "No Notifications",
   noSessionId: () => "No session id provided",
+  notEnoughSpace: () => "Not enough storage space",
   notInstalled: () => "Not installed :(",
   numOfPhotos: (numOfPhotos: number) => `${numOfPhotos} photos.`,
   offline: () => "You are offline. Viewing mode only",
