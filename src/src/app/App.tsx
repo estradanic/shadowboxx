@@ -88,18 +88,45 @@ const App = () => {
         : { ...lightTheme }
     );
 
-  if (window.location.host.match(/^www\./) !== null) {
-    window.location.host = window.location.host.substring(4);
-  }
-
   useEffect(() => {
+    navigator.serviceWorker.register(
+      `/service-worker.js?version=${globalThis.__env__.SERVICE_WORKER_VERSION_NUMBER}`,
+      { scope: "/" }
+    );
+    if (window.location.host.match(/^www\./) !== null) {
+      window.location.host = window.location.host.substring(4);
+    }
+    navigator.storage.persisted().then((initialIsPersisted) => {
+      if (!initialIsPersisted) {
+        navigator.storage
+          .persist()
+          .then((isPersisted) =>
+            console.log(
+              "Storage ",
+              isPersisted ? "persisted!" : "not persisted..."
+            )
+          );
+      } else {
+        console.log("Storage persisted!");
+      }
+    });
     navigator.storage.estimate().then((estimate) => {
-      if (estimate && estimate.quota !== undefined) {
-        if (estimate.quota < 500000000) {
+      if (
+        estimate &&
+        estimate.quota !== undefined &&
+        estimate.usage !== undefined
+      ) {
+        const percent = ((estimate.usage / estimate.quota) * 100).toFixed(2);
+        console.log("Percent of storage used:", percent + "%");
+        console.log("Storage left:", estimate.quota / 1000000, "Megabytes");
+        if (estimate.quota - estimate.usage < 500000000) {
           addNotification({
             title: Strings.notEnoughSpace(),
             detail: Strings.limitedOffline(),
             icon: <DiscFull />,
+          });
+          navigator.serviceWorker.ready.then((registration) => {
+            registration.active?.postMessage({ useCache: false });
           });
         }
       }

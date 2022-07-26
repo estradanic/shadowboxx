@@ -249,7 +249,7 @@ const ImageField = memo(
           open={showLibraryDialog}
           handleConfirm={async (newValue) => {
             setShowLibraryDialog(false);
-            await onChange([...value, ...newValue]);
+            await onChange(multiple ? [...value, ...newValue] : newValue);
           }}
           handleCancel={() => setShowLibraryDialog(false)}
         />

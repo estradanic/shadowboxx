@@ -2,11 +2,12 @@ let CACHE_NAME = "BAD_VERSION";
 const self = this;
 
 const frontendRoutes = [
-  "/",
+  "/home",
   "/login",
   "/images",
   "/settings",
   "/signup",
+  "/",
 ];
 
 // Import idb-keyval library: https://github.com/jakearchibald/idb-keyval#all-bundles
@@ -25,8 +26,7 @@ self.addEventListener("install", async (event) => {
             return caches.open(CACHE_NAME)
               .then((cache) => {
                 return cache.addAll(Object.values(assets.files))
-                  .then(cache.addAll(frontendRoutes)
-                    .then(self.skipWaiting()));
+                  .then(self.skipWaiting());
   })})))));
 });
 
@@ -143,7 +143,10 @@ self.addEventListener("fetch", (event) => {
               }
               return response;
             }
-            const cacheKey = event.request.mode === "navigate" ? "/index.html" : event.request;
+            const cacheKey =
+              (
+                event.request.mode === "navigate" || frontendRoutes.includes(event.request.url)
+              ) ? "/index.html" : event.request;
             return cache.match(cacheKey)
               .then((response) => {
                 console.warn("Could not get network response. Returning from the cache.", e, "Request:", event.request, "Response:", response);

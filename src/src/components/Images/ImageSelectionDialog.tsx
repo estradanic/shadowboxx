@@ -57,6 +57,8 @@ export interface ImageSelectionDialogProps
   handleConfirm: (value: ParseImage[]) => Promise<void>;
   /** Value of already selected images */
   value: ParseImage[];
+  /** Whether multiple images can be selected */
+  multiple?: boolean;
 }
 
 /** Component to select images from existing library */
@@ -65,6 +67,7 @@ const ImageSelectionDialog = ({
   handleCancel: piHandleCancel,
   value: initialValue,
   open,
+  multiple = true,
 }: ImageSelectionDialogProps) => {
   const [value, setValue] = useState<ParseImage[]>(initialValue);
   const classes = useStyles();
@@ -168,14 +171,18 @@ const ImageSelectionDialog = ({
                     [classes.imageOverlay]: true,
                   })}
                   onClick={() => {
-                    if (isSelected(image.id)) {
-                      setValue((prev) =>
-                        prev.filter(
-                          (selectedImage) => selectedImage.id !== image.id
-                        )
-                      );
+                    if (multiple) {
+                      if (isSelected(image.id)) {
+                        setValue((prev) =>
+                          prev.filter(
+                            (selectedImage) => selectedImage.id !== image.id
+                          )
+                        );
+                      } else {
+                        setValue((prev) => [...prev, image]);
+                      }
                     } else {
-                      setValue((prev) => [...prev, image]);
+                      setValue([image]);
                     }
                   }}
                 >

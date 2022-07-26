@@ -59,37 +59,12 @@
       Register the service-worker
     -->
     <script>
-      globalThis.__env__ = {};
-      globalThis.__env__.PARSE_APPLICATION_ID = "%PARSE_APPLICATION_ID%";
-      globalThis.__env__.PARSE_JAVASCRIPT_KEY = "%PARSE_JAVASCRIPT_KEY%";
-      globalThis.__env__.PARSE_HOST_URL = "%PARSE_HOST_URL%";
-      const serviceWorkerURI = "/service-worker.js?version=%SERVICE_WORKER_VERSION_NUMBER%";
-      if (navigator.storage) {
-        navigator.storage.persisted((initialIsPersisted) => {
-          if (!initialIsPersisted) {
-            navigator.storage.persist()
-              .then((isPersisted) => console.log("Storage ", isPersisted ? "persisted!" : "not persisted..."));
-          } else {
-            console.log("Storage persisted!");
-          }
-        });
-        navigator.storage.estimate().then((estimate) => {
-          let useCache = true;
-          const percent = (estimate.usage / estimate.quota * 100).toFixed(2);
-          console.log("Percent of storage used:", percent + "%");
-          console.log("Storage left:", estimate.quota / 1000000, "Megabytes");
-          if (estimate.quota < 500000000) {
-            useCache = false;
-          }
-          if ("serviceWorker" in navigator) {
-            window.addEventListener("load", navigator.serviceWorker
-              .register(serviceWorkerURI, {scope: "/"})
-                .then((registration) => {
-                  registration.installing.postMessage({useCache});
-                }));
-          }
-        });
-      }
+      globalThis.__env__ = {
+        PARSE_APPLICATION_ID: "%PARSE_APPLICATION_ID%",
+        PARSE_JAVASCRIPT_KEY: "%PARSE_JAVASCRIPT_KEY%",
+        PARSE_HOST_URL: "%PARSE_HOST_URL%",
+        SERVICE_WORKER_VERSION_NUMBER: "%SERVICE_WORKER_VERSION_NUMBER%",
+      };
     </script>
 
     <title>Shadowboxx</title>
