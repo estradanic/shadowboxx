@@ -95,6 +95,7 @@ export interface StringEntries {
   publicTooltip: string;
   removeImage: string;
   removeImageError: string;
+  resizingImages: string;
   selectImages: string;
   setAclError: string;
   setImageAsCover: string;
@@ -238,6 +239,7 @@ const Strings: {
   removeImage: () => "Remove image from album",
   removeImageError: (fileName: string) =>
     `Could not remove image ${fileName} from album.`,
+  resizingImages: () => "Resizing Images...",
   selectImages: () => "Select Images",
   setAclError: (objectId: string) =>
     `${Strings.commonError()}. Could not set Acl for object ${objectId}`,

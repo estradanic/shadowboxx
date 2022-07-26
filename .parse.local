@@ -3,6 +3,9 @@
     "Shadowboxx": {
       "applicationId": "aX17fiOL3N1Lklz83UnWMP6oympHLszezxXAXokH"
     },
+    "ShadowboxxDevTest": {
+      "applicationId": "GkKaaxNRxTc1XONlpCizJtzVIzkWYI6ZLxrLylT4"
+    },
     "_default": {
       "link": "Shadowboxx"
     }

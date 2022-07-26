@@ -1,4 +1,4 @@
-import React, { useState, memo, useMemo } from "react";
+import React, { useState, memo, useMemo, ChangeEventHandler } from "react";
 import {
   InputAdornment,
   Avatar,
@@ -16,6 +16,7 @@ import uniqueId from "lodash/uniqueId";
 import classNames from "classnames";
 import { Set } from "immutable";
 import { createHtmlPortalNode, InPortal } from "react-reverse-portal";
+import { readAndCompressImage } from "browser-image-resizer";
 import { elide, makeValidFileName, removeExtension } from "../../utils";
 import { Strings } from "../../resources";
 import { ParseImage } from "../../types";
@@ -23,12 +24,17 @@ import { useRandomColor, useRefState } from "../../hooks";
 import TextField, { TextFieldProps } from "../Field/TextField";
 import Tooltip from "../Tooltip/Tooltip";
 import { useSnackbar } from "../Snackbar/Snackbar";
-import { useImageContext, useUserContext } from "../../contexts";
+import {
+  useGlobalLoadingContext,
+  useImageContext,
+  useUserContext,
+} from "../../contexts";
 import Image from "../Image/Image";
 import RemoveImageDecoration from "../Image/Decoration/RemoveImageDecoration";
 import CoverImageDecoration from "../Image/Decoration/CoverImageDecoration";
 import ImageSelectionDialog from "../Images/ImageSelectionDialog";
 import { useActionDialogContext } from "../Dialog/ActionDialog";
+import { FancyTypography } from "../Typography";
 
 const useStyles = makeStyles((theme: Theme) => ({
   endAdornment: {
@@ -85,6 +91,10 @@ const useStyles = makeStyles((theme: Theme) => ({
   success: {
     color: theme.palette.success.main,
   },
+  resizingImages: {
+    color: theme.palette.primary.contrastText,
+    fontSize: theme.typography.h3.fontSize,
+  },
 }));
 
 /** Interface defining props for ImageField */
@@ -123,6 +133,7 @@ const ImageField = memo(
     const [showUrlInput, setShowUrlInput] = useState<boolean>(false);
     const [showLibraryDialog, setShowLibraryDialog] = useState<boolean>(false);
     const [imageUrlRef, imageUrl, setImageUrl] = useRefState("");
+    const { startGlobalLoader, stopGlobalLoader } = useGlobalLoadingContext();
 
     const { loggedInUser } = useUserContext();
 
@@ -142,13 +153,45 @@ const ImageField = memo(
 
     const { openPrompt } = useActionDialogContext();
 
-    const addFromFile = async (event: any) => {
+    const addFromFile: ChangeEventHandler<HTMLInputElement> = async (event) => {
       if (event.target.files?.[0]) {
-        const max = multiple ? event.target.files.length : 1;
+        let files: File[] = [];
+        const fileNames: string[] = [];
+        for (let i = 0; i < event.target.files.length; i++) {
+          files[i] = event.target.files[i];
+          fileNames[i] = event.target.files[i].name;
+        }
+        const max = multiple ? files.length : 1;
+        const resizeImagePromises: Promise<File>[] = [];
+        for (let i = 0; i < max; i++) {
+          let file = files[i];
+          if (file.size > 15000000) {
+            resizeImagePromises.push(
+              readAndCompressImage(file, {
+                quality: 1,
+                maxWidth: 2400,
+                maxHeight: 2400,
+                mimeType: "image/webp",
+              })
+            );
+          } else {
+            resizeImagePromises.push(Promise.resolve(file));
+          }
+        }
+        startGlobalLoader({
+          type: "indeterminate",
+          content: (
+            <FancyTypography className={classes.resizingImages}>
+              {Strings.resizingImages()}
+            </FancyTypography>
+          ),
+        });
+        files = await Promise.all(resizeImagePromises);
+        stopGlobalLoader();
         const newImagePromises: Promise<ParseImage>[] = [];
         for (let i = 0; i < max; i++) {
-          const file: any = event.target.files[i];
-          const fileName = makeValidFileName(file.name);
+          let file = files[i];
+          const fileName = makeValidFileName(fileNames[i]);
           const parseFile = new Parse.File(fileName, file);
           newImagePromises.push(
             uploadImage(
@@ -420,7 +463,7 @@ const ImageField = memo(
               style={{ display: "none" }}
               onChange={addFromFile}
               accept="image/*"
-              multiple
+              multiple={multiple}
             />
             <Menu open={!!anchorEl} anchorEl={anchorEl} onClose={closeMenu}>
               <MenuItem onClick={() => setShowLibraryDialog(true)}>
