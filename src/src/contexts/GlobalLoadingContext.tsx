@@ -45,6 +45,7 @@ interface GlobalLoadingContextProviderProps {
   children: React.ReactNode;
 }
 
+/** Context to provide global loading function/status */
 export const GlobalLoadingContextProvider = ({
   children,
 }: GlobalLoadingContextProviderProps) => {

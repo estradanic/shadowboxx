@@ -10,7 +10,6 @@ import {
 } from "@material-ui/core";
 import { Brightness7, Brightness2 } from "@material-ui/icons";
 import { makeStyles, Theme } from "@material-ui/core/styles";
-import { Detector } from "react-detect-offline";
 import {
   PageContainer,
   ImageField,
@@ -24,6 +23,7 @@ import {
   useUserContext,
   ImageContextProvider,
   useGlobalLoadingContext,
+  useNetworkDetectionContext,
 } from "../../contexts";
 import { useView } from "../View";
 
@@ -112,6 +112,7 @@ const Settings = () => {
     useUserContext();
 
   const { stopGlobalLoader, startGlobalLoader } = useGlobalLoadingContext();
+  const { online } = useNetworkDetectionContext();
 
   const classes = useStyles();
   const [errors, setErrors] =
@@ -204,143 +205,137 @@ const Settings = () => {
     <PageContainer>
       <Grid item lg={6} sm={8}>
         <Card>
-          <Detector
-            render={({ online }) => (
-              <form autoComplete="off">
-                <Grid container direction="row">
-                  <Grid className={classes.cardTitle} item xs={12}>
-                    <FancyTypography variant="h4">
-                      {Strings.settings()}
-                    </FancyTypography>
-                  </Grid>
-                  <Grid item xs={12}>
-                    <FormControl
-                      disabled={!online}
-                      fullWidth
-                      className={classes.darkTheme}
-                    >
-                      <FormControlLabel
+          <form autoComplete="off">
+            <Grid container direction="row">
+              <Grid className={classes.cardTitle} item xs={12}>
+                <FancyTypography variant="h4">
+                  {Strings.settings()}
+                </FancyTypography>
+              </Grid>
+              <Grid item xs={12}>
+                <FormControl
+                  disabled={!online}
+                  fullWidth
+                  className={classes.darkTheme}
+                >
+                  <FormControlLabel
+                    disabled={!online}
+                    control={
+                      <Switch
                         disabled={!online}
-                        control={
-                          <Switch
-                            disabled={!online}
-                            classes={{
-                              root: classes.switchRoot,
-                              switchBase: classes.switchBase,
-                              track: classes.switchTrack,
-                              checked: classes.switchChecked,
-                            }}
-                            color="primary"
-                            checked={settings.isDarkThemeEnabled}
-                            onChange={(_, checked) =>
-                              setSettings((prev) => ({
-                                ...prev,
-                                isDarkThemeEnabled: checked,
-                              }))
-                            }
-                            icon={<Brightness7 />}
-                            checkedIcon={<Brightness2 />}
-                          />
-                        }
-                        label={Strings.darkMode()}
-                        labelPlacement="start"
-                        className={classes.darkThemeLabel}
-                      />
-                    </FormControl>
-                  </Grid>
-                  <Grid item xs={12}>
-                    <ImageContextProvider>
-                      <ImageField
-                        disabled={!online}
-                        acl={profilePictureAcl}
-                        autoComplete="none"
-                        value={
-                          settings.profilePicture
-                            ? [settings.profilePicture]
-                            : []
-                        }
-                        onChange={async ([newProfilePicture]) =>
+                        classes={{
+                          root: classes.switchRoot,
+                          switchBase: classes.switchBase,
+                          track: classes.switchTrack,
+                          checked: classes.switchChecked,
+                        }}
+                        color="primary"
+                        checked={settings.isDarkThemeEnabled}
+                        onChange={(_, checked) =>
                           setSettings((prev) => ({
                             ...prev,
-                            profilePicture: newProfilePicture,
+                            isDarkThemeEnabled: checked,
                           }))
                         }
-                        label={Strings.profilePicture()}
+                        icon={<Brightness7 />}
+                        checkedIcon={<Brightness2 />}
                       />
-                    </ImageContextProvider>
-                  </Grid>
-                  <Grid item xs={12}>
-                    <TextField
-                      disabled={!online}
-                      autoComplete="none"
-                      error={errors.firstName.isError}
-                      helperText={errors.firstName.errorMessage}
-                      fullWidth
-                      value={settings.firstName}
-                      onChange={(e) =>
-                        setSettings((prev) => ({
-                          ...prev,
-                          firstName: e.target.value,
-                        }))
-                      }
-                      label={Strings.firstName()}
-                      id="firstName"
-                      type="text"
-                    />
-                  </Grid>
-                  <Grid item xs={12}>
-                    <TextField
-                      disabled={!online}
-                      autoComplete="none"
-                      error={errors.lastName.isError}
-                      helperText={errors.lastName.errorMessage}
-                      fullWidth
-                      value={settings.lastName}
-                      onChange={(e) =>
-                        setSettings((prev) => ({
-                          ...prev,
-                          lastName: e.target.value,
-                        }))
-                      }
-                      label={Strings.lastName()}
-                      id="lastName"
-                      type="text"
-                    />
-                  </Grid>
-                  <Grid item xs={12}>
-                    <TextField
-                      disabled={!online}
-                      autoComplete="none"
-                      error={errors.email.isError}
-                      helperText={errors.email.errorMessage}
-                      fullWidth
-                      value={settings.email}
-                      onChange={(e) =>
-                        setSettings((prev) => ({
-                          ...prev,
-                          email: e.target.value,
-                        }))
-                      }
-                      label={Strings.email()}
-                      id="email"
-                      type="email"
-                    />
-                  </Grid>
-                  <Grid item xs={12}>
-                    <Button
-                      disabled={!online}
-                      fullWidth
-                      className={classes.submitButton}
-                      size="large"
-                      onClick={changeUserInfo}
-                    >
-                      {Strings.submit()}
-                    </Button>
-                  </Grid>
-                </Grid>
-              </form>
-            )}
-          />
+                    }
+                    label={Strings.darkMode()}
+                    labelPlacement="start"
+                    className={classes.darkThemeLabel}
+                  />
+                </FormControl>
+              </Grid>
+              <Grid item xs={12}>
+                <ImageContextProvider>
+                  <ImageField
+                    disabled={!online}
+                    acl={profilePictureAcl}
+                    autoComplete="none"
+                    value={
+                      settings.profilePicture ? [settings.profilePicture] : []
+                    }
+                    onChange={async ([newProfilePicture]) =>
+                      setSettings((prev) => ({
+                        ...prev,
+                        profilePicture: newProfilePicture,
+                      }))
+                    }
+                    label={Strings.profilePicture()}
+                  />
+                </ImageContextProvider>
+              </Grid>
+              <Grid item xs={12}>
+                <TextField
+                  disabled={!online}
+                  autoComplete="none"
+                  error={errors.firstName.isError}
+                  helperText={errors.firstName.errorMessage}
+                  fullWidth
+                  value={settings.firstName}
+                  onChange={(e) =>
+                    setSettings((prev) => ({
+                      ...prev,
+                      firstName: e.target.value,
+                    }))
+                  }
+                  label={Strings.firstName()}
+                  id="firstName"
+                  type="text"
+                />
+              </Grid>
+              <Grid item xs={12}>
+                <TextField
+                  disabled={!online}
+                  autoComplete="none"
+                  error={errors.lastName.isError}
+                  helperText={errors.lastName.errorMessage}
+                  fullWidth
+                  value={settings.lastName}
+                  onChange={(e) =>
+                    setSettings((prev) => ({
+                      ...prev,
+                      lastName: e.target.value,
+                    }))
+                  }
+                  label={Strings.lastName()}
+                  id="lastName"
+                  type="text"
+                />
+              </Grid>
+              <Grid item xs={12}>
+                <TextField
+                  disabled={!online}
+                  autoComplete="none"
+                  error={errors.email.isError}
+                  helperText={errors.email.errorMessage}
+                  fullWidth
+                  value={settings.email}
+                  onChange={(e) =>
+                    setSettings((prev) => ({
+                      ...prev,
+                      email: e.target.value,
+                    }))
+                  }
+                  label={Strings.email()}
+                  id="email"
+                  type="email"
+                />
+              </Grid>
+              <Grid item xs={12}>
+                <Button
+                  disabled={!online}
+                  fullWidth
+                  className={classes.submitButton}
+                  size="large"
+                  onClick={changeUserInfo}
+                >
+                  {Strings.submit()}
+                </Button>
+              </Grid>
+            </Grid>
+          </form>
         </Card>
       </Grid>
     </PageContainer>

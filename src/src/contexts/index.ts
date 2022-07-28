@@ -4,6 +4,10 @@ export {
 } from "./GlobalLoadingContext";
 export { ImageContextProvider, useImageContext } from "./ImageContext";
 export {
+  NetworkDetectionContextProvider,
+  useNetworkDetectionContext,
+} from "./NetworkDetectionContext";
+export {
   NotificationsContextProvider,
   useNotificationsContext,
 } from "./NotificationsContext";

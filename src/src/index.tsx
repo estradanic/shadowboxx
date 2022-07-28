@@ -9,6 +9,7 @@ import {
   UserContextProvider,
   NotificationsContextProvider,
   GlobalLoadingContextProvider,
+  NetworkDetectionContextProvider,
 } from "./contexts";
 import App from "./app/App";
 import "./index.css";
@@ -71,15 +72,17 @@ const theme = createMuiTheme({
 ReactDOM.render(
   <React.StrictMode>
     <MuiThemeProvider theme={theme}>
-      <GlobalLoadingContextProvider>
-        <NotificationsContextProvider>
-          <Router>
-            <UserContextProvider>
-              <App />
-            </UserContextProvider>
-          </Router>
-        </NotificationsContextProvider>
-      </GlobalLoadingContextProvider>
+      <NetworkDetectionContextProvider>
+        <GlobalLoadingContextProvider>
+          <NotificationsContextProvider>
+            <Router>
+              <UserContextProvider>
+                <App />
+              </UserContextProvider>
+            </Router>
+          </NotificationsContextProvider>
+        </GlobalLoadingContextProvider>
+      </NetworkDetectionContextProvider>
     </MuiThemeProvider>
   </React.StrictMode>,
   document.getElementById("root")

@@ -14,7 +14,6 @@ import {
 } from "@material-ui/core";
 import { makeStyles, Theme, useTheme } from "@material-ui/core/styles";
 import { MoreVert, Star } from "@material-ui/icons";
-import { Online } from "react-detect-offline";
 import { useHistory, useLocation } from "react-router-dom";
 import { Strings } from "../../resources";
 import { routes } from "../../app";
@@ -28,7 +27,8 @@ import Tooltip from "../Tooltip/Tooltip";
 import { useActionDialogContext } from "../Dialog/ActionDialog";
 import ParseUser from "../../types/ParseUser";
 import ParseImage from "../../types/ParseImage";
-import { ImageField } from "../Field";
+import ImageField from "../Field/ImageField";
+import Online from "../NetworkDetector/Online";
 
 const useStyles = makeStyles((theme: Theme) => ({
   card: {

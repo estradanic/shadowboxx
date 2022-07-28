@@ -9,6 +9,7 @@ export * from "./Layout";
 export * from "./Link";
 export * from "./Loader";
 export * from "./Menu";
+export * from "./NetworkDetector";
 export * from "./Notifications";
 export * from "./PageContainer";
 export * from "./Snackbar";

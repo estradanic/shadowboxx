@@ -25,8 +25,7 @@ self.addEventListener("install", async (event) => {
             console.log("Version:", CACHE_NAME);
             return caches.open(CACHE_NAME)
               .then((cache) => {
-                return cache.addAll(Object.values(assets.files))
-                  .then(self.skipWaiting());
+                return cache.addAll(Object.values(assets.files));
   })})))));
 });
 

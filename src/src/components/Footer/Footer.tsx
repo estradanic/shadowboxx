@@ -1,9 +1,10 @@
 import React, { useState } from "react";
 import { AppBar, Toolbar, Typography, Button } from "@material-ui/core";
 import { makeStyles, Theme } from "@material-ui/core/styles";
-import { Offline, Online } from "react-detect-offline";
 import { Strings } from "../../resources";
 import { useSnackbar } from "../Snackbar";
+import Offline from "../NetworkDetector/Offline";
+import Online from "../NetworkDetector/Online";
 
 const useStyles = makeStyles((theme: Theme) => ({
   appBar: {
