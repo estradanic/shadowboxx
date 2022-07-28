@@ -19,10 +19,10 @@ const useStyles = makeStyles((theme: Theme) => ({
   },
   loaderWrapper: {
     position: "absolute",
-    top: theme.spacing(-16),
+    top: 0,
     left: 0,
     right: 0,
-    bottom: theme.spacing(-6),
+    bottom: 0,
     width: "100vw",
     height: "100vh",
     backgroundColor: ({ backgroundColor }) =>
@@ -35,32 +35,28 @@ const useStyles = makeStyles((theme: Theme) => ({
     flexDirection: "column",
     alignItems: "center",
     justifyContent: "center",
-  },
-  centerPositionLoader: {
-    top: "calc(50% - 32px)",
-  },
-  topPositionLoader: {
-    top: theme.spacing(1),
-  },
-  indeterminateLoader: {
-    left: "calc(50% - 20px)",
-  },
-  determinateLoader: {
     left: "25vw",
     right: "25vw",
     width: "50vw",
+  },
+  centerPositionLoader: {
+    top: "30vh",
+  },
+  topPositionLoader: {
+    top: theme.spacing(1),
   },
   spinner: {
     color: theme.palette.error.light,
     margin: "auto",
     marginBottom: theme.spacing(2),
+    height: theme.spacing(5),
   },
   progress: {
     "& div": {
       backgroundColor: theme.palette.error.light,
     },
     width: "100%",
-    marginBottom: theme.spacing(2),
+    marginBottom: theme.spacing(4.5),
   },
 }));
 
@@ -108,8 +104,6 @@ const LoadingWrapper = ({
               [classes.loader]: true,
               [classes.topPositionLoader]: verticalPosition === "top",
               [classes.centerPositionLoader]: verticalPosition === "center",
-              [classes.indeterminateLoader]: type === "indeterminate",
-              [classes.determinateLoader]: type === "determinate",
             })}
           >
             {type === "indeterminate" ? (

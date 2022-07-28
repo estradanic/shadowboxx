@@ -48,18 +48,14 @@ interface GlobalLoadingContextProviderProps {
 export const GlobalLoadingContextProvider = ({
   children,
 }: GlobalLoadingContextProviderProps) => {
-  const [globalLoading, setGlobalLoading] = useState<
-    LoadingWrapperProps["loading"]
-  >(false);
-  const [globalProgress, setGlobalProgress] = useState<
-    LoadingWrapperProps["progress"]
-  >(5);
-  const [globalLoaderType, setGlobalLoaderType] = useState<
-    LoadingWrapperProps["type"]
-  >("indeterminate");
-  const [globalLoaderContent, setGlobalLoaderContent] = useState<
-    LoadingWrapperProps["content"]
-  >();
+  const [globalLoading, setGlobalLoading] =
+    useState<LoadingWrapperProps["loading"]>(false);
+  const [globalProgress, setGlobalProgress] =
+    useState<LoadingWrapperProps["progress"]>(5);
+  const [globalLoaderType, setGlobalLoaderType] =
+    useState<LoadingWrapperProps["type"]>("indeterminate");
+  const [globalLoaderContent, setGlobalLoaderContent] =
+    useState<LoadingWrapperProps["content"]>();
 
   const stopGlobalLoader = () => {
     setGlobalLoading(false);

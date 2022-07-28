@@ -103,13 +103,11 @@ const ImageSelectionDialog = ({
           gotImages.current = true;
         });
     }
-  }, [setImages, loggedInUser, enqueueErrorSnackbar, value]);
+  }, [setUserOwnedImages, loggedInUser, enqueueErrorSnackbar]);
 
   useEffect(() => {
     if (gotImages.current) {
-      setImages(
-        dedupeFast<ParseImage>([...initialValue, ...userOwnedImages])
-      );
+      setImages(dedupeFast<ParseImage>([...initialValue, ...userOwnedImages]));
       setValue(initialValue);
     }
   }, [initialValue, userOwnedImages]);

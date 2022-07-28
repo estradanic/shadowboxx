@@ -114,10 +114,10 @@ const AlbumCard = memo(({ value, onChange }: AlbumCardProps) => {
       value.viewers.includes(loggedInUser?.email!),
     [loggedInUser, value.owner.id, value.collaborators, value.viewers]
   );
-  const isOwner = useMemo(() => loggedInUser?.id === value.owner.id, [
-    loggedInUser?.id,
-    value.owner.id,
-  ]);
+  const isOwner = useMemo(
+    () => loggedInUser?.id === value.owner.id,
+    [loggedInUser?.id, value.owner.id]
+  );
 
   const location = useLocation();
 
@@ -165,17 +165,17 @@ const AlbumCard = memo(({ value, onChange }: AlbumCardProps) => {
 
   const { enqueueErrorSnackbar, enqueueSuccessSnackbar } = useSnackbar();
   const [anchorEl, setAnchorEl] = useState<Element>();
-  const [editAlbumDialogOpen, setEditAlbumDialogOpen] = useState<boolean>(
-    false
-  );
+  const [editAlbumDialogOpen, setEditAlbumDialogOpen] =
+    useState<boolean>(false);
   const history = useHistory();
   const coverImage = useMemo(
     () => images?.find((image) => image.isCoverImage) ?? images?.[0],
     [images]
   );
-  const coverImageSrc = useMemo(() => coverImage?.mobileFile.url(), [
-    coverImage,
-  ]);
+  const coverImageSrc = useMemo(
+    () => coverImage?.mobileFile.url(),
+    [coverImage]
+  );
 
   const classes = useStyles();
   const theme = useTheme();

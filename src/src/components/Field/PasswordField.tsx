@@ -12,14 +12,15 @@ const useStyles = makeStyles((theme: Theme) => ({
   input: {
     backgroundColor: `${theme.palette.background.paper} !important`,
     color: `${theme.palette.text.primary} !important`,
-    "&:-webkit-autofill, &:-moz-autofill, &:-o-autofill, &:-khtml-autofill, &:-internal-autofill-selected": {
-      backgroundColor: `${theme.palette.background.paper} !important`,
-      color: `${theme.palette.text.primary} !important`,
-      "&:focus": {
+    "&:-webkit-autofill, &:-moz-autofill, &:-o-autofill, &:-khtml-autofill, &:-internal-autofill-selected":
+      {
         backgroundColor: `${theme.palette.background.paper} !important`,
         color: `${theme.palette.text.primary} !important`,
+        "&:focus": {
+          backgroundColor: `${theme.palette.background.paper} !important`,
+          color: `${theme.palette.text.primary} !important`,
+        },
       },
-    },
   },
 }));
 

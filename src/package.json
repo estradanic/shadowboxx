@@ -4,7 +4,7 @@
   "license": "UNLICENSED",
   "private": true,
   "engines": {
-    "node": "12.x"
+    "node": "16.x"
   },
   "dependencies": {
     "@babel/core": "7.12.3",
@@ -18,14 +18,13 @@
     "@types/deep-equal": "^1.0.1",
     "@types/lodash": "^4.14.168",
     "@types/md5": "^2.3.0",
-    "@types/node": "^12.0.0",
+    "@types/node": "^16.0.0",
     "@types/parse": "^2.18.16",
     "@types/password-hash": "^1.2.20",
-    "@types/react": "^17.0.0",
     "@types/react-burger-menu": "^2.6.2",
     "@types/react-detect-offline": "^2.4.1",
-    "@types/react-dom": "^17.0.0",
-    "@types/react-router-dom": "^5.1.7",
+    "@types/react-dom": "^18.0.6",
+    "@types/react-router-dom": "^5.3.3",
     "@types/uuid": "^8.3.3",
     "@typescript-eslint/eslint-plugin": "^4.5.0",
     "@typescript-eslint/parser": "^4.5.0",
@@ -104,6 +103,7 @@
     "build:prod": "yarn format && yarn install && node scripts/build.js",
     "start": "serve -p 8080 ./dist -s",
     "start:prod": "http-server -p 8080 ./build",
+    "iterate": "yarn build && yarn start",
     "deploy": "yarn build && rm -rf ../public/* && cp -r ./build/* ../public && b4a deploy ShadowboxxDevTest",
     "deploy:prod": "yarn build && rm -rf ../public/* && cp -r ./build/* ../public && b4a deploy Shadowboxx"
   },

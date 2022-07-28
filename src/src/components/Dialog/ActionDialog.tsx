@@ -126,10 +126,8 @@ export const ActionDialogContextProvider = ({
   const [handleConfirm, setHandleConfirm] = useState(() => async () => {});
   const [handleCancel, setHandleCancel] = useState(() => () => {});
   const [handleClose, setHandleClose] = useState(() => () => {});
-  const [
-    actionDialogProps,
-    setActionDialogProps,
-  ] = useState<ActionDialogHookProps>({});
+  const [actionDialogProps, setActionDialogProps] =
+    useState<ActionDialogHookProps>({});
 
   const value: ActionDialogContextValue = {
     openAlert: (piMessage, piHandleClose, piActionDialogProps = {}) => {

@@ -30,10 +30,6 @@ const useStyles = makeStyles((theme: Theme) => ({
       marginRight: theme.spacing(2),
     },
   },
-  collapseContainer: {
-    minWidth: 0,
-    width: "fit-content",
-  },
 }));
 
 /** Hook providing easy access to enqueuing different kinds of Snackbars */

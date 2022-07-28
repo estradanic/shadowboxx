@@ -108,20 +108,18 @@ const DefaultErrorState = {
  */
 const Settings = () => {
   useView("Settings");
-  const {
-    loggedInUser,
-    profilePicture,
-    saveLoggedInUserUpdates,
-  } = useUserContext();
+  const { loggedInUser, profilePicture, saveLoggedInUserUpdates } =
+    useUserContext();
 
   const { stopGlobalLoader, startGlobalLoader } = useGlobalLoadingContext();
 
   const classes = useStyles();
-  const [errors, setErrors] = useState<
-    ErrorState<
-      "email" | "firstName" | "lastName" | "password" | "profilePicture"
-    >
-  >(DefaultErrorState);
+  const [errors, setErrors] =
+    useState<
+      ErrorState<
+        "email" | "firstName" | "lastName" | "password" | "profilePicture"
+      >
+    >(DefaultErrorState);
   const [settings, setSettings] = useState({
     isDarkThemeEnabled: !!loggedInUser?.isDarkThemeEnabled,
     profilePicture,

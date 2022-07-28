@@ -1,4 +1,10 @@
-import React, { createContext, useContext, useRef } from "react";
+import React, {
+  createContext,
+  useCallback,
+  useContext,
+  useRef,
+  useState,
+} from "react";
 import Parse from "parse";
 import { useNotificationsContext } from "./NotificationsContext";
 import { Error as MatError } from "@material-ui/icons";
@@ -8,6 +14,7 @@ import { Strings } from "../resources";
 import { ParseImage, Image } from "../types";
 import { useGlobalLoadingContext } from "./GlobalLoadingContext";
 import { isNullOrWhitespace } from "../utils";
+import { ImageSelectionDialog } from "../components/Images";
 
 export enum ImageActionCommand {
   DELETE,
@@ -24,12 +31,23 @@ export interface ImageAction {
   completed?: boolean;
 }
 
+export type PromptImageSelectionDialogProps = {
+  /** Function to run when prompt is canceled */
+  handleCancel?: () => Promise<void>;
+  /** Function to run when selection is confirmed */
+  handleConfirm?: (newValue: ParseImage[]) => Promise<void>;
+  /** Initial value of images selected */
+  value: ParseImage[];
+};
+
 /** Interface defining the value of ImageContextProvider */
 interface ImageContextValue {
   /** Function to upload an image */
   uploadImage: (image: Image, acl?: Parse.ACL) => Promise<ParseImage>;
   /** Function to delete image */
   deleteImage: (parseImage: ParseImage) => Promise<void>;
+  /** Function to open an ImageSelectionDialog prompt */
+  promptImageSelectionDialog: (props: PromptImageSelectionDialogProps) => void;
 }
 
 /** Context to manage Images */
@@ -57,11 +75,44 @@ export const ImageContextProvider = ({
 
   const classes = useStyles();
 
-  const {
-    startGlobalLoader,
-    stopGlobalLoader,
-    updateGlobalLoader,
-  } = useGlobalLoadingContext();
+  const { startGlobalLoader, stopGlobalLoader, updateGlobalLoader } =
+    useGlobalLoadingContext();
+
+  const [selectionDialogValue, setSelectionDialogValue] = useState<
+    ParseImage[]
+  >([]);
+  const [selectionDialogOpen, setSelectionDialogOpen] = useState(false);
+  const [handleCancel, setHandleCancel] = useState<() => Promise<void>>(
+    () => async () => setSelectionDialogOpen(false)
+  );
+  const [handleConfirm, setHandleConfirm] = useState<
+    (newValue: ParseImage[]) => Promise<void>
+  >(() => async (_: ParseImage[]) => setSelectionDialogOpen(false));
+
+  const promptImageSelectionDialog = useCallback(
+    ({
+      handleCancel: piHandleCancel,
+      handleConfirm: piHandleConfirm,
+      value: piValue,
+    }: PromptImageSelectionDialogProps) => {
+      setHandleCancel(() => async () => {
+        setSelectionDialogOpen(false);
+        await piHandleCancel?.();
+      });
+      setHandleConfirm(() => async (newValue: ParseImage[]) => {
+        setSelectionDialogOpen(false);
+        await piHandleConfirm?.(newValue);
+      });
+      setSelectionDialogValue(piValue);
+      setSelectionDialogOpen(true);
+    },
+    [
+      setSelectionDialogOpen,
+      setSelectionDialogValue,
+      setHandleCancel,
+      setHandleConfirm,
+    ]
+  );
 
   const recalculateProgress = () => {
     const completedActions = actions.current.filter(
@@ -149,10 +200,19 @@ export const ImageContextProvider = ({
   const value: ImageContextValue = {
     uploadImage,
     deleteImage,
+    promptImageSelectionDialog,
   };
 
   return (
-    <ImageContext.Provider value={value}>{children}</ImageContext.Provider>
+    <ImageContext.Provider value={value}>
+      <ImageSelectionDialog
+        value={selectionDialogValue}
+        open={selectionDialogOpen}
+        handleConfirm={handleConfirm}
+        handleCancel={handleCancel}
+      />
+      {children}
+    </ImageContext.Provider>
   );
 };
 

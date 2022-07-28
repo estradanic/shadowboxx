@@ -65,9 +65,10 @@ const Signup = () => {
   const [password, setPassword] = useState<string>("");
   const [firstName, setFirstName] = useState<string>("");
   const [lastName, setLastName] = useState<string>("");
-  const [errors, setErrors] = useState<
-    ErrorState<"email" | "firstName" | "lastName" | "password">
-  >(DefaultErrorState);
+  const [errors, setErrors] =
+    useState<ErrorState<"email" | "firstName" | "lastName" | "password">>(
+      DefaultErrorState
+    );
   const { stopGlobalLoader, startGlobalLoader } = useGlobalLoadingContext();
   const history = useHistory();
   const { enqueueErrorSnackbar } = useSnackbar();

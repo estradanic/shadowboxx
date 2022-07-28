@@ -56,10 +56,8 @@ interface BeforeInstallPromptEvent extends Event {
  */
 const Footer = () => {
   const classes = useStyles();
-  const [
-    installPrompt,
-    setInstallPrompt,
-  ] = useState<BeforeInstallPromptEvent>();
+  const [installPrompt, setInstallPrompt] =
+    useState<BeforeInstallPromptEvent>();
   const [showInstallPrompt, setShowInstallPrompt] = useState<boolean>();
 
   const { enqueueSuccessSnackbar, enqueueErrorSnackbar } = useSnackbar();

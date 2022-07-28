@@ -32,7 +32,6 @@ import {
 import Image from "../Image/Image";
 import RemoveImageDecoration from "../Image/Decoration/RemoveImageDecoration";
 import CoverImageDecoration from "../Image/Decoration/CoverImageDecoration";
-import ImageSelectionDialog from "../Images/ImageSelectionDialog";
 import { useActionDialogContext } from "../Dialog/ActionDialog";
 import { FancyTypography } from "../Typography";
 
@@ -129,9 +128,8 @@ const ImageField = memo(
   }: ImageFieldProps) => {
     const classes = useStyles();
 
-    const { uploadImage } = useImageContext();
+    const { uploadImage, promptImageSelectionDialog } = useImageContext();
     const [showUrlInput, setShowUrlInput] = useState<boolean>(false);
-    const [showLibraryDialog, setShowLibraryDialog] = useState<boolean>(false);
     const [imageUrlRef, imageUrl, setImageUrl] = useRefState("");
     const { startGlobalLoader, stopGlobalLoader } = useGlobalLoadingContext();
 
@@ -155,6 +153,14 @@ const ImageField = memo(
 
     const addFromFile: ChangeEventHandler<HTMLInputElement> = async (event) => {
       if (event.target.files?.[0]) {
+        startGlobalLoader({
+          type: "indeterminate",
+          content: (
+            <FancyTypography className={classes.resizingImages}>
+              {Strings.processingImages()}
+            </FancyTypography>
+          ),
+        });
         let files: File[] = [];
         const fileNames: string[] = [];
         for (let i = 0; i < event.target.files.length; i++) {
@@ -178,14 +184,6 @@ const ImageField = memo(
             resizeImagePromises.push(Promise.resolve(file));
           }
         }
-        startGlobalLoader({
-          type: "indeterminate",
-          content: (
-            <FancyTypography className={classes.resizingImages}>
-              {Strings.resizingImages()}
-            </FancyTypography>
-          ),
-        });
         files = await Promise.all(resizeImagePromises);
         stopGlobalLoader();
         const newImagePromises: Promise<ParseImage>[] = [];
@@ -287,15 +285,6 @@ const ImageField = memo(
 
     return (
       <>
-        <ImageSelectionDialog
-          value={value}
-          open={showLibraryDialog}
-          handleConfirm={async (newValue) => {
-            setShowLibraryDialog(false);
-            await onChange(multiple ? [...value, ...newValue] : newValue);
-          }}
-          handleCancel={() => setShowLibraryDialog(false)}
-        />
         {variant === "field" ? (
           <>
             <TextField // Url src input
@@ -360,7 +349,15 @@ const ImageField = memo(
                     <InputAdornment
                       disablePointerEvents={disabled}
                       position="end"
-                      onClick={() => setShowLibraryDialog(true)}
+                      onClick={() =>
+                        promptImageSelectionDialog({
+                          handleConfirm: async (newValue) =>
+                            await onChange(
+                              multiple ? [...value, ...newValue] : newValue
+                            ),
+                          value,
+                        })
+                      }
                     >
                       <Tooltip title={Strings.addFromLibrary()}>
                         <Cloud className={classes.endAdornment} />
@@ -466,7 +463,17 @@ const ImageField = memo(
               multiple={multiple}
             />
             <Menu open={!!anchorEl} anchorEl={anchorEl} onClose={closeMenu}>
-              <MenuItem onClick={() => setShowLibraryDialog(true)}>
+              <MenuItem
+                onClick={() =>
+                  promptImageSelectionDialog({
+                    handleConfirm: async (newValue) =>
+                      await onChange(
+                        multiple ? [...value, ...newValue] : newValue
+                      ),
+                    value,
+                  })
+                }
+              >
                 {Strings.addFromLibrary()}
               </MenuItem>
               <MenuItem

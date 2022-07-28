@@ -78,7 +78,11 @@ const Notifications = ({ className }: NotificationsProps) => {
         className={className}
         onClick={(e) => setAnchorEl(e.currentTarget)}
       >
-        <Badge badgeContent={notifications.length} color="error">
+        <Badge
+          overlap="rectangular"
+          badgeContent={notifications.length}
+          color="error"
+        >
           <NotificationsIcon
             className={cx(
               classes.icon,

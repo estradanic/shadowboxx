@@ -43,7 +43,7 @@ const PageContainer = ({ children, ...rest }: PageContainerProps) => {
           container
           direction="column"
           alignItems="center"
-          justify="center"
+          justifyContent="center"
           className={classes.grid}
         >
           {children}

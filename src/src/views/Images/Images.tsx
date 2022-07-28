@@ -35,11 +35,8 @@ const Images = () => {
   useView("Images");
   const gotImages = useRef(false);
   const randomColor = useRandomColor();
-  const {
-    startGlobalLoader,
-    stopGlobalLoader,
-    globalLoading,
-  } = useGlobalLoadingContext();
+  const { startGlobalLoader, stopGlobalLoader, globalLoading } =
+    useGlobalLoadingContext();
   const [images, setImages] = useState<ParseImage[]>([]);
   const { enqueueErrorSnackbar } = useSnackbar();
   const classes = useStyles();

@@ -1,16 +1,15 @@
 export type Equalable<T> = {
   [key in keyof T]: T[key];
-} &
-  (
-    | {
-        equals: (that: T) => boolean;
-        compareTo?: (that: T) => number;
-      }
-    | {
-        equals?: (that: T) => boolean;
-        compareTo: (that: T) => number;
-      }
-  );
+} & (
+  | {
+      equals: (that: T) => boolean;
+      compareTo?: (that: T) => number;
+    }
+  | {
+      equals?: (that: T) => boolean;
+      compareTo: (that: T) => number;
+    }
+);
 
 export type Hashable<T> = {
   [key in keyof T]: T[key];

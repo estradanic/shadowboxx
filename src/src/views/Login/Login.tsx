@@ -50,9 +50,8 @@ const Login = () => {
   const classes = useStyles();
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
-  const [errors, setErrors] = useState<ErrorState<"email" | "password">>(
-    DefaultErrorState
-  );
+  const [errors, setErrors] =
+    useState<ErrorState<"email" | "password">>(DefaultErrorState);
   const { startGlobalLoader, stopGlobalLoader } = useGlobalLoadingContext();
   const { enqueueErrorSnackbar } = useSnackbar();
   const { updateLoggedInUser } = useUserContext();

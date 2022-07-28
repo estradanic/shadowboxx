@@ -47,11 +47,8 @@ const HomePage = memo(() => {
   const classes = useStyles();
   const [addAlbumDialogOpen, setAddAlbumDialogOpen] = useState(false);
   const { enqueueErrorSnackbar, enqueueSuccessSnackbar } = useSnackbar();
-  const {
-    startGlobalLoader,
-    stopGlobalLoader,
-    globalLoading,
-  } = useGlobalLoadingContext();
+  const { startGlobalLoader, stopGlobalLoader, globalLoading } =
+    useGlobalLoadingContext();
   const [albums, setAlbums] = useState<ParseAlbum[]>([]);
   const gotAlbums = useRef(false);
   const { loggedInUser } = useUserContext();
@@ -86,7 +83,7 @@ const HomePage = memo(() => {
       <Grid container direction="column">
         {!!albums.length ? (
           <Grid item className={classes.albumsContainer}>
-            {albums
+            {[...albums]
               .sort((a, b) =>
                 a.isFavorite && b.isFavorite
                   ? a.name.localeCompare(b.name)

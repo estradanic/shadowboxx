@@ -31,11 +31,8 @@ const Album = () => {
   useView("Album");
   const [album, setAlbum] = useState<ParseAlbum>();
   const { enqueueErrorSnackbar } = useSnackbar();
-  const {
-    startGlobalLoader,
-    stopGlobalLoader,
-    globalLoading,
-  } = useGlobalLoadingContext();
+  const { startGlobalLoader, stopGlobalLoader, globalLoading } =
+    useGlobalLoadingContext();
   const gotAlbum = useRef(false);
   const gotImages = useRef(false);
   const { id } = useParams<{ id: string }>();
