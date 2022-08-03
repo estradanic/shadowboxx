@@ -101,11 +101,12 @@ export interface AlbumCardProps {
 }
 
 /** Component for displaying basic information about an album */
-const AlbumCard = memo(({ value, onChange }: AlbumCardProps) => {
+const AlbumCard = memo(({ value: initialValue, onChange }: AlbumCardProps) => {
   const [images, setImages] = useState<ParseImage[]>([]);
   const [collaborators, setCollaborators] = useState<ParseUser[]>([]);
   const [viewers, setViewers] = useState<ParseUser[]>([]);
   const [owner, setOwner] = useState<ParseUser>();
+  const [value, setValue] = useState<ParseAlbum>(initialValue);
   const gotImages = useRef(false);
   const gotCollaborators = useRef(false);
   const gotViewers = useRef(false);
@@ -182,10 +183,6 @@ const AlbumCard = memo(({ value, onChange }: AlbumCardProps) => {
         .catch(() => (gotViewers.current = false));
     }
   }, [value.viewers]);
-
-  const [isFavorite, setIsFavorite] = useState<boolean>(
-    value?.isFavorite ?? false
-  );
 
   const { enqueueErrorSnackbar, enqueueSuccessSnackbar } = useSnackbar();
   const [anchorEl, setAnchorEl] = useState<Element>();
@@ -349,13 +346,13 @@ const AlbumCard = memo(({ value, onChange }: AlbumCardProps) => {
                 <IconButton
                   name="favorite"
                   onClick={async () => {
-                    const oldIsFavorite = value?.isFavorite;
-                    value.isFavorite = !oldIsFavorite;
                     try {
-                      const response = await value?.save();
-                      setIsFavorite(!!response.isFavorite);
+                      const newValue = await value.update({
+                        ...value.attributes,
+                        isFavorite: !value.isFavorite,
+                      });
+                      setValue(newValue);
                     } catch (error: any) {
-                      value.isFavorite = oldIsFavorite;
                       enqueueErrorSnackbar(
                         error?.message ?? Strings.editAlbumError()
                       );
@@ -363,7 +360,9 @@ const AlbumCard = memo(({ value, onChange }: AlbumCardProps) => {
                   }}
                 >
                   <Star
-                    className={isFavorite ? classes.favorite : classes.icon}
+                    className={
+                      value.isFavorite ? classes.favorite : classes.icon
+                    }
                   />
                 </IconButton>
               </Online>
@@ -376,9 +375,13 @@ const AlbumCard = memo(({ value, onChange }: AlbumCardProps) => {
                   variant="button"
                   value={images}
                   onChange={async (newImages) => {
-                    value.images = newImages.map((image) => image.id!);
                     try {
-                      await value.save();
+                      const newValue = await value.update({
+                        ...value.attributes,
+                        images: newImages.map((image) => image.id!),
+                      });
+                      gotImages.current = false;
+                      setValue(newValue);
                       enqueueSuccessSnackbar(Strings.commonSaved());
                     } catch (error: any) {
                       enqueueErrorSnackbar(
@@ -400,6 +403,9 @@ const AlbumCard = memo(({ value, onChange }: AlbumCardProps) => {
           setEditAlbumDialogOpen(false);
           try {
             const response = await value.update(attributes);
+            gotImages.current = false;
+            gotCollaborators.current = false;
+            gotViewers.current = false;
             await onChange(response);
             enqueueSuccessSnackbar(Strings.commonSaved());
           } catch (error: any) {

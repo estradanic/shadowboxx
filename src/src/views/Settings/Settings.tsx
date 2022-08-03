@@ -194,7 +194,7 @@ const Settings = () => {
     }
   };
 
-  const profilePictureAcl = useMemo(() => {
+  const profilePictureACL = useMemo(() => {
     const acl = new Parse.ACL(loggedInUser?._user);
     acl.setPublicReadAccess(true);
     acl.setPublicWriteAccess(false);
@@ -251,7 +251,7 @@ const Settings = () => {
                 <ImageContextProvider>
                   <ImageField
                     disabled={!online}
-                    acl={profilePictureAcl}
+                    acl={profilePictureACL}
                     autoComplete="none"
                     value={
                       settings.profilePicture ? [settings.profilePicture] : []

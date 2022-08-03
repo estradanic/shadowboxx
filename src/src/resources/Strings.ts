@@ -97,7 +97,6 @@ export interface StringEntries {
   removeImageError: string;
   processingImages: string;
   selectImages: string;
-  setAclError: string;
   setImageAsCover: string;
   settings: string;
   settingsNotSaved: string;
@@ -241,8 +240,6 @@ const Strings: {
     `Could not remove image ${fileName} from album.`,
   processingImages: () => "Processing Images...",
   selectImages: () => "Select Images",
-  setAclError: (objectId: string) =>
-    `${Strings.commonError()}. Could not set Acl for object ${objectId}`,
   setImageAsCover: () => "Set this image as the album cover",
   settings: () => "Settings",
   settingsNotSaved: () => `${Strings.commonError()} Settings not saved.`,

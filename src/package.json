@@ -38,6 +38,8 @@
     "babel-eslint": "^10.1.0",
     "babel-loader": "8.2.5",
     "babel-plugin-named-asset-import": "^0.3.7",
+    "babel-plugin-polyfill-corejs2": "^0.3.2",
+    "babel-plugin-polyfill-corejs3": "^0.5.3",
     "babel-preset-react-app": "^10.0.0",
     "bfj": "^7.0.2",
     "browser-image-resizer": "^2.2.1",

@@ -109,7 +109,14 @@ const ImageSelectionDialog = ({
           stopGlobalLoader();
         });
     }
-  }, [setUserOwnedImages, loggedInUser, enqueueErrorSnackbar, open]);
+  }, [
+    setUserOwnedImages,
+    loggedInUser,
+    enqueueErrorSnackbar,
+    open,
+    startGlobalLoader,
+    stopGlobalLoader,
+  ]);
 
   useEffect(() => {
     if (gotImages.current) {
