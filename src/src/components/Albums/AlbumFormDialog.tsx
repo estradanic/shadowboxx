@@ -12,7 +12,11 @@ import { Public, Star, StarBorder } from "@material-ui/icons";
 import { Set } from "immutable";
 import { Strings } from "../../resources";
 import { ErrorState, isNullOrWhitespace } from "../../utils";
-import { ImageContextProvider, useUserContext } from "../../contexts";
+import {
+  ImageContextProvider,
+  useGlobalLoadingContext,
+  useUserContext,
+} from "../../contexts";
 import { ParseUser, ParseImage, Album } from "../../types";
 import ActionDialog, {
   ActionDialogProps,
@@ -77,6 +81,8 @@ const AlbumFormDialog = ({
   handleConfirm: piHandleConfirm,
   resetOnConfirm = true,
 }: AlbumFormDialogProps) => {
+  const { startGlobalLoader, stopGlobalLoader } = useGlobalLoadingContext();
+
   const [imageIds, setImageIds] = useState<Album["images"]>(
     initialValue.images
   );
@@ -136,13 +142,18 @@ const AlbumFormDialog = ({
   ]);
 
   useEffect(() => {
-    ParseImage.query()
-      .containedIn(ParseImage.COLUMNS.id, imageIds)
-      .findAll()
-      .then((response) => {
-        setImages(response.map((image) => new ParseImage(image)));
-      });
-  }, [imageIds]);
+    if (open) {
+      startGlobalLoader();
+      ParseImage.query()
+        .containedIn(ParseImage.COLUMNS.id, imageIds)
+        .findAll()
+        .then(async (response) => {
+          await Parse.Object.pinAll(response);
+          setImages(response.map((image) => new ParseImage(image)));
+        })
+        .finally(() => stopGlobalLoader());
+    }
+  }, [imageIds, open]);
 
   const classes = useStyles();
   const theme = useTheme();

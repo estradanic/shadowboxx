@@ -95,6 +95,7 @@ export const ImageContextProvider = ({
       handleConfirm: piHandleConfirm,
       value: piValue,
     }: PromptImageSelectionDialogProps) => {
+      setSelectionDialogOpen(true);
       setHandleCancel(() => async () => {
         setSelectionDialogOpen(false);
         await piHandleCancel?.();
@@ -104,7 +105,6 @@ export const ImageContextProvider = ({
         await piHandleConfirm?.(newValue);
       });
       setSelectionDialogValue(piValue);
-      setSelectionDialogOpen(true);
     },
     [
       setSelectionDialogOpen,

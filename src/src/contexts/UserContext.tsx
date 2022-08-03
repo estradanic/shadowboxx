@@ -97,17 +97,16 @@ export const UserContextProvider = ({ children }: UserContextProviderProps) => {
           }
         }
         if (
-          reason === UpdateReason.LOG_IN ||
-          reason === UpdateReason.SIGN_UP ||
-          newLoggedInUser.profilePicture?.id !== profilePicture?.id
+          newLoggedInUser.profilePicture?.id &&
+          (reason === UpdateReason.LOG_IN ||
+            reason === UpdateReason.SIGN_UP ||
+            newLoggedInUser.profilePicture?.id !== profilePicture?.id)
         ) {
           ParseImage.query()
-            .equalTo(ParseImage.COLUMNS.id, newLoggedInUser.profilePicture?.id)
-            .first()
-            .then((profilePictureResponse) => {
-              if (profilePictureResponse) {
-                setProfilePicture(new ParseImage(profilePictureResponse));
-              }
+            .get(newLoggedInUser.profilePicture.id)
+            .then(async (profilePictureResponse) => {
+              await profilePictureResponse.pin();
+              setProfilePicture(new ParseImage(profilePictureResponse));
             });
         }
       }

@@ -76,14 +76,14 @@ const UserField = forwardRef(
           )
             .findAll()
             .then(async (response) => {
+              await Parse.Object.pinAll(response);
               const relatedUsers: string[] = [];
               for (const albumResponse of response) {
                 const album = new ParseAlbum(albumResponse);
                 relatedUsers.push(...album.collaborators, ...album.viewers);
-                const ownerUser = await ParseUser.query()
-                  .equalTo(ParseUser.COLUMNS.id, album.owner.id)
-                  .first();
-                relatedUsers.push(new ParseUser(ownerUser!).email);
+                const ownerUser = await ParseUser.query().get(album.owner.id);
+                await ownerUser.pin();
+                relatedUsers.push(new ParseUser(ownerUser).email);
               }
               setOptions(
                 Array.from(Set(relatedUsers)).filter(

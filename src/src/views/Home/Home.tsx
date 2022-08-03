@@ -1,4 +1,5 @@
 import React, { memo, useEffect, useRef, useState } from "react";
+import Parse from "parse";
 import { Fab, Typography, Grid } from "@material-ui/core";
 import { Add } from "@material-ui/icons";
 import { makeStyles, Theme } from "@material-ui/core/styles";
@@ -55,18 +56,20 @@ const HomePage = memo(() => {
 
   useEffect(() => {
     if (!gotAlbums.current && !globalLoading) {
+      gotAlbums.current = true;
       startGlobalLoader();
       ParseAlbum.query()
         .findAll()
-        .then((response) => {
+        .then(async (response) => {
+          await Parse.Object.pinAll(response);
           setAlbums(response.map((album) => new ParseAlbum(album)));
         })
         .catch((error) => {
           enqueueErrorSnackbar(error?.message);
+          gotAlbums.current = false;
         })
         .finally(() => {
           stopGlobalLoader();
-          gotAlbums.current = true;
         });
     }
   }, [

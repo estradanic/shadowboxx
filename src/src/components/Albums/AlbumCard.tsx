@@ -1,4 +1,5 @@
-import React, { memo, useEffect, useMemo, useState } from "react";
+import React, { memo, useEffect, useMemo, useRef, useState } from "react";
+import Parse from "parse";
 import {
   Card,
   CardHeader,
@@ -105,6 +106,10 @@ const AlbumCard = memo(({ value, onChange }: AlbumCardProps) => {
   const [collaborators, setCollaborators] = useState<ParseUser[]>([]);
   const [viewers, setViewers] = useState<ParseUser[]>([]);
   const [owner, setOwner] = useState<ParseUser>();
+  const gotImages = useRef(false);
+  const gotCollaborators = useRef(false);
+  const gotViewers = useRef(false);
+  const gotOwner = useRef(false);
 
   const { loggedInUser } = useUserContext();
   const isViewer = useMemo(
@@ -122,41 +127,60 @@ const AlbumCard = memo(({ value, onChange }: AlbumCardProps) => {
   const location = useLocation();
 
   useEffect(() => {
-    ParseUser.query()
-      .equalTo(ParseUser.COLUMNS.id, value.owner.id)
-      .first()
-      .then((response) => {
-        setOwner(new ParseUser(response!));
-      });
+    if (!gotOwner.current) {
+      gotOwner.current = true;
+      ParseUser.query()
+        .get(value.owner.id)
+        .then(async (response) => {
+          await response.pin();
+          setOwner(new ParseUser(response!));
+        })
+        .catch(() => (gotOwner.current = false));
+    }
   }, [value.owner.id]);
 
   useEffect(() => {
-    ParseImage.query()
-      .containedIn(ParseImage.COLUMNS.id, value.images)
-      .findAll()
-      .then((response) => {
-        setImages(response.map((image) => new ParseImage(image)));
-      });
+    if (!gotImages.current) {
+      gotImages.current = true;
+      ParseImage.query()
+        .containedIn(ParseImage.COLUMNS.id, value.images)
+        .findAll()
+        .then(async (response) => {
+          await Parse.Object.pinAll(response);
+          setImages(response.map((image) => new ParseImage(image)));
+        })
+        .catch(() => (gotImages.current = false));
+    }
   }, [value.images]);
 
   useEffect(() => {
-    ParseUser.query()
-      .containedIn(ParseUser.COLUMNS.email, value.collaborators)
-      .findAll()
-      .then((response) => {
-        setCollaborators(
-          response.map((collaborator) => new ParseUser(collaborator))
-        );
-      });
+    if (!gotCollaborators.current) {
+      gotCollaborators.current = true;
+      ParseUser.query()
+        .containedIn(ParseUser.COLUMNS.email, value.collaborators)
+        .findAll()
+        .then(async (response) => {
+          await Parse.Object.pinAll(response);
+          setCollaborators(
+            response.map((collaborator) => new ParseUser(collaborator))
+          );
+        })
+        .catch(() => (gotCollaborators.current = false));
+    }
   }, [value.collaborators]);
 
   useEffect(() => {
-    ParseUser.query()
-      .containedIn(ParseUser.COLUMNS.email, value.viewers)
-      .findAll()
-      .then((response) => {
-        setViewers(response.map((viewer) => new ParseUser(viewer)));
-      });
+    if (!gotViewers.current) {
+      gotViewers.current = true;
+      ParseUser.query()
+        .containedIn(ParseUser.COLUMNS.email, value.viewers)
+        .findAll()
+        .then(async (response) => {
+          await Parse.Object.pinAll(response);
+          setViewers(response.map((viewer) => new ParseUser(viewer)));
+        })
+        .catch(() => (gotViewers.current = false));
+    }
   }, [value.viewers]);
 
   const [isFavorite, setIsFavorite] = useState<boolean>(

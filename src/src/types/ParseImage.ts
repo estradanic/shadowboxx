@@ -68,9 +68,8 @@ export default class ParseImage extends ParseObject<Image> {
 
   async save() {
     if (!this._image.getACL()) {
-      const owner = await ParseUser.query()
-        .equalTo(ParseUser.COLUMNS.id, this.owner.id)
-        .first();
+      const owner = await ParseUser.query().get(this.owner.id);
+      await owner.pin();
       const acl = new Parse.ACL(owner);
       acl.setPublicReadAccess(false);
       acl.setPublicWriteAccess(false);

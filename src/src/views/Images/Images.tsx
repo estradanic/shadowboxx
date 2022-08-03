@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
+import Parse from "parse";
 import { Grid, Typography } from "@material-ui/core";
 import { makeStyles, Theme } from "@material-ui/core/styles";
 import {
@@ -44,19 +45,21 @@ const Images = () => {
   useEffect(() => {
     if (!gotImages.current && !globalLoading) {
       startGlobalLoader();
+      gotImages.current = true;
       ParseImage.query()
         .findAll()
-        .then((response) => {
+        .then(async (response) => {
           if (response) {
+            await Parse.Object.pinAll(response);
             setImages(response.map((image) => new ParseImage(image)));
           }
         })
         .catch((e) => {
           enqueueErrorSnackbar(Strings.getImagesError());
+          gotImages.current = false;
         })
         .finally(() => {
           stopGlobalLoader();
-          gotImages.current = true;
         });
     }
   }, [

@@ -55,7 +55,7 @@ const UserChip = memo(({ email, fetchUser, ...rest }: UserChipProps) => {
         ParseUser.query()
           .equalTo(ParseUser.COLUMNS.email, email)
           .first()
-          .then((response) => {
+          .then(async (response) => {
             if (!response) {
               setUser(
                 ParseUser.fromAttributes({
@@ -65,6 +65,7 @@ const UserChip = memo(({ email, fetchUser, ...rest }: UserChipProps) => {
                 })
               );
             } else {
+              await response.pin();
               setUser(new ParseUser(response));
             }
           })

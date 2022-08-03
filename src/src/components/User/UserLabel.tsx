@@ -29,8 +29,9 @@ const UserLabel = memo(({ email, fetchUser, ...rest }: UserLabelProps) => {
       ParseUser.query()
         .equalTo(ParseUser.COLUMNS.email, email)
         .first()
-        .then((response) => {
+        .then(async (response) => {
           if (response) {
+            await response.pin();
             const fetchedUser = new ParseUser(response);
             setFirstName(fetchedUser?.firstName ?? fetchedUser.email);
             setLastName(fetchedUser?.lastName ?? "");

@@ -36,7 +36,8 @@ const UserAvatar = forwardRef(
     ref: ForwardedRef<any>
   ) => {
     const classes = useStyles();
-    const { loggedInUser, profilePicture } = useUserContext();
+    const { loggedInUser, profilePicture: loggedInUserProfilePicture } =
+      useUserContext();
     const [src, setSrc] = useState("");
     const [firstName, setFirstName] = useState("");
     const [lastName, setLastName] = useState("");
@@ -46,16 +47,16 @@ const UserAvatar = forwardRef(
       async (user: ParseUser) => {
         if (user && user.profilePicture?.exists && !gotImage.current) {
           try {
-            const profilePictureResponse = await ParseImage.query()
-              .equalTo(ParseImage.COLUMNS.id, user.profilePicture.id)
-              .first();
-            if (profilePictureResponse) {
-              const newProfilePicture = new ParseImage(profilePictureResponse);
-              setSrc(newProfilePicture?.thumbnail.url() ?? "");
-              gotImage.current = true;
-            }
+            gotImage.current = true;
+            const profilePictureResponse = await ParseImage.query().get(
+              user.profilePicture.id
+            );
+            await profilePictureResponse.pin();
+            const newProfilePicture = new ParseImage(profilePictureResponse);
+            setSrc(newProfilePicture?.thumbnail.url() ?? "");
           } catch (error: any) {
             console.error(error?.message ?? Strings.getImageError());
+            gotImage.current = false;
           }
         }
       },
@@ -69,15 +70,16 @@ const UserAvatar = forwardRef(
         setLastName(user?.lastName ?? "");
         setProfilePicture(user);
       } else if (email === loggedInUser?.email) {
-        setSrc(profilePicture?.thumbnail.url() ?? "");
+        setSrc(loggedInUserProfilePicture?.thumbnail.url() ?? "");
         setFirstName(loggedInUser?.firstName ?? "");
         setLastName(loggedInUser?.lastName ?? "");
       } else {
         ParseUser.query()
           .equalTo(ParseUser.COLUMNS.email, email)
           .first()
-          .then((response) => {
+          .then(async (response) => {
             if (response) {
+              await response.pin();
               const fetchedUser = new ParseUser(response);
               setProfilePicture(fetchedUser);
               setFirstName(fetchedUser?.firstName ?? email);
@@ -92,7 +94,7 @@ const UserAvatar = forwardRef(
       email,
       loggedInUser,
       fetchUser,
-      profilePicture?.thumbnail,
+      loggedInUserProfilePicture?.thumbnail,
       setProfilePicture,
     ]);
 

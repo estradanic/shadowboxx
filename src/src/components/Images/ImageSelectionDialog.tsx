@@ -1,10 +1,11 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
+import Parse from "parse";
 import { Grid, Typography, useMediaQuery } from "@material-ui/core";
 import { makeStyles, Theme, useTheme } from "@material-ui/core/styles";
 import classNames from "classnames";
 import { dedupeFast } from "../../utils";
 import { Strings } from "../../resources";
-import { useUserContext } from "../../contexts";
+import { useGlobalLoadingContext, useUserContext } from "../../contexts";
 import { useRandomColor } from "../../hooks";
 import { ParseImage } from "../../types";
 import ActionDialog, { ActionDialogProps } from "../Dialog/ActionDialog";
@@ -72,6 +73,7 @@ const ImageSelectionDialog = ({
   const [value, setValue] = useState<ParseImage[]>(initialValue);
   const classes = useStyles();
   const gotImages = useRef(false);
+  const { startGlobalLoader, stopGlobalLoader } = useGlobalLoadingContext();
 
   // Images that the current user owns, not those shared to them.
   const [userOwnedImages, setUserOwnedImages] = useState<ParseImage[]>([]);
@@ -86,11 +88,14 @@ const ImageSelectionDialog = ({
   const sm = useMediaQuery(theme.breakpoints.down("sm"));
 
   useEffect(() => {
-    if (!gotImages.current) {
+    if (!gotImages.current && open) {
+      startGlobalLoader();
+      gotImages.current = true;
       ParseImage.query()
         .equalTo(ParseImage.COLUMNS.owner, loggedInUser?.toNativePointer())
         .findAll()
-        .then((response) => {
+        .then(async (response) => {
+          await Parse.Object.pinAll(response);
           setUserOwnedImages(
             response?.map((imageResponse) => new ParseImage(imageResponse)) ??
               []
@@ -98,12 +103,13 @@ const ImageSelectionDialog = ({
         })
         .catch((error) => {
           enqueueErrorSnackbar(error.message ?? Strings.noImages());
+          gotImages.current = false;
         })
         .finally(() => {
-          gotImages.current = true;
+          stopGlobalLoader();
         });
     }
-  }, [setUserOwnedImages, loggedInUser, enqueueErrorSnackbar]);
+  }, [setUserOwnedImages, loggedInUser, enqueueErrorSnackbar, open]);
 
   useEffect(() => {
     if (gotImages.current) {

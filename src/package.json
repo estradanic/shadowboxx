@@ -104,8 +104,8 @@
     "start": "serve -p 8080 ./dist -s",
     "start:prod": "http-server -p 8080 ./build",
     "iterate": "yarn build && yarn start",
-    "deploy": "yarn build && rm -rf ../public/* && cp -r ./build/* ../public && b4a deploy ShadowboxxDevTest",
-    "deploy:prod": "yarn build && rm -rf ../public/* && cp -r ./build/* ../public && b4a deploy Shadowboxx"
+    "deploy": "yarn build && rm -rf ../public/* && cp -r ./dist/* ../public && b4a deploy ShadowboxxDevTest",
+    "deploy:prod": "yarn build:prod && rm -rf ../public/* && cp -r ./build/* ../public && b4a deploy Shadowboxx"
   },
   "eslintConfig": {
     "extends": [

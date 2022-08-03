@@ -68,12 +68,11 @@ export default class ParseAlbum extends ParseObject<Album> {
 
   async save(setLoading?: (loading: boolean) => void) {
     setLoading?.(true);
-    const owner = await ParseUser.query()
-      .equalTo(ParseUser.COLUMNS.id, this.owner.id)
-      .first();
+    const owner = await ParseUser.query().get(this.owner.id);
+    await owner.pin();
     return this.isPublic
-      ? await this.savePublic(owner!)
-      : await this.savePrivate(owner!);
+      ? await this.savePublic(owner)
+      : await this.savePrivate(owner);
   }
 
   async addCollaboratorAccess(acl: Parse.ACL, imageAcl: Parse.ACL) {
@@ -81,6 +80,7 @@ export default class ParseAlbum extends ParseObject<Album> {
       const collaborators = await ParseUser.query()
         .containedIn(ParseUser.COLUMNS.email, this.collaborators)
         .findAll();
+      await Parse.Object.pinAll(collaborators);
       for (const collaborator of collaborators) {
         acl.setReadAccess(collaborator, true);
         acl.setWriteAccess(collaborator, true);
@@ -95,6 +95,7 @@ export default class ParseAlbum extends ParseObject<Album> {
       const viewers = await ParseUser.query()
         .containedIn(ParseUser.COLUMNS.email, this.viewers)
         .findAll();
+      await Parse.Object.pinAll(viewers);
       for (const viewer of viewers) {
         acl.setReadAccess(viewer, true);
         imageAcl.setReadAccess(viewer, true);
@@ -106,6 +107,7 @@ export default class ParseAlbum extends ParseObject<Album> {
     const images = await ParseImage.query()
       .containedIn(ParseImage.COLUMNS.id, this.images)
       .findAll();
+    await Parse.Object.pinAll(images);
     for (const image of images) {
       image.setACL(imageAcl);
       try {

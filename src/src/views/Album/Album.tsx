@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
+import Parse from "parse";
 import { BackButton, PageContainer, useSnackbar } from "../../components";
 import { useLocation, useParams } from "react-router-dom";
 import { Grid, Typography } from "@material-ui/core";
@@ -45,44 +46,33 @@ const Album = () => {
     if (!gotAlbum.current && !globalLoading) {
       if (id) {
         startGlobalLoader();
+        gotAlbum.current = true;
         ParseAlbum.query()
-          .equalTo(ParseAlbum.COLUMNS.id, id)
-          .first()
-          .then((response) => {
-            if (response) {
-              const newAlbum = new ParseAlbum(response);
-              setAlbum(newAlbum);
-              ParseImage.query()
-                .containedIn(ParseImage.COLUMNS.id, newAlbum.images)
-                .findAll()
-                .then((imageResponse) => {
-                  setImages(
-                    imageResponse.map((image) => new ParseImage(image))
-                  );
-                })
-                .catch((e) => {
-                  enqueueErrorSnackbar(Strings.getImagesError());
-                })
-                .finally(() => {
-                  gotImages.current = true;
-                  if (gotAlbum.current) {
-                    stopGlobalLoader();
-                  }
-                });
-              if (gotImages.current) {
+          .get(id)
+          .then(async (response) => {
+            response.pin();
+            gotImages.current = true;
+            const newAlbum = new ParseAlbum(response);
+            setAlbum(newAlbum);
+            ParseImage.query()
+              .containedIn(ParseImage.COLUMNS.id, newAlbum.images)
+              .findAll()
+              .then(async (imageResponse) => {
+                await Parse.Object.pinAll(imageResponse);
+                setImages(imageResponse.map((image) => new ParseImage(image)));
+              })
+              .catch((e) => {
+                enqueueErrorSnackbar(Strings.getImagesError());
+                gotImages.current = false;
+              })
+              .finally(() => {
                 stopGlobalLoader();
-              }
-            } else {
-              enqueueErrorSnackbar(Strings.albumNotFound(id));
-              stopGlobalLoader();
-            }
+              });
           })
           .catch((e) => {
+            gotAlbum.current = false;
             enqueueErrorSnackbar(e.message ?? Strings.getAlbumError());
             stopGlobalLoader();
-          })
-          .finally(() => {
-            gotAlbum.current = true;
           });
       } else {
         enqueueErrorSnackbar(Strings.noAlbumId());
