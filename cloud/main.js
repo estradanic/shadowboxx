@@ -5,7 +5,7 @@ async function addCollaboratorAccess(album, albumACL, imageACL) {
     if (album.get("collaborators") && album.get("collaborators").length) {
       const collaborators = await new Parse.Query("User")
         .containedIn("email", album.get("collaborators"))
-        .findAll({ useMasterKey: true });
+        .find({ useMasterKey: true });
       for (const collaborator of collaborators) {
         albumACL.setReadAccess(collaborator, true);
         albumACL.setWriteAccess(collaborator, true);
@@ -23,7 +23,7 @@ async function addViewerAccess(album, albumACL, imageACL) {
     if (album.get("viewers") && album.get("viewers").length) {
       const viewers = await new Parse.Query("User")
         .containedIn("email", album.get("viewers"))
-        .findAll({ useMasterKey: true });
+        .find({ useMasterKey: true });
       for (const viewer of viewers) {
         albumACL.setReadAccess(viewer, true);
         imageACL.setReadAccess(viewer, true);
@@ -38,7 +38,7 @@ async function setImageACL(album, imageACL) {
   try {
     const images = await new Parse.Query("Image")
       .containedIn("objectId", album.get("images"))
-      .findAll({ useMasterKey: true });
+      .find({ useMasterKey: true });
     for (const image of images) {
       image.setACL(imageACL);
     }
