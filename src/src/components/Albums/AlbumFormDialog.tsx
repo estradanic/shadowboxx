@@ -1,4 +1,10 @@
-import React, { useCallback, useEffect, useMemo, useState } from "react";
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import Parse from "parse";
 import { makeStyles, Theme, useTheme } from "@material-ui/core/styles";
 import {
@@ -12,7 +18,11 @@ import { Public, Star, StarBorder } from "@material-ui/icons";
 import { Set } from "immutable";
 import { Strings } from "../../resources";
 import { ErrorState, isNullOrWhitespace } from "../../utils";
-import { ImageContextProvider, useUserContext } from "../../contexts";
+import {
+  ImageContextProvider,
+  useGlobalLoadingContext,
+  useUserContext,
+} from "../../contexts";
 import { ParseUser, ParseImage, Album } from "../../types";
 import ActionDialog, {
   ActionDialogProps,
@@ -98,6 +108,10 @@ const AlbumFormDialog = ({
   );
   const [images, setImages] = useState<ParseImage[]>([]);
 
+  const gotImages = useRef<boolean>(false);
+
+  const { startGlobalLoader, stopGlobalLoader } = useGlobalLoadingContext();
+
   const { loggedInUser } = useUserContext();
   const isCollaborator = useMemo(
     () => loggedInUser?.id !== initialValue.owner.id,
@@ -136,13 +150,22 @@ const AlbumFormDialog = ({
   ]);
 
   useEffect(() => {
-    if (open) {
+    if (open && !gotImages.current) {
+      gotImages.current = true;
+      startGlobalLoader();
       ParseImage.query()
         .containedIn(ParseImage.COLUMNS.id, imageIds)
         .findAll()
         .then(async (response) => {
           setImages(response.map((image) => new ParseImage(image)));
           await Parse.Object.pinAll(response);
+        })
+        .catch((error) => {
+          gotImages.current = false;
+          enqueueErrorSnackbar(error?.message ?? Strings.getImagesError());
+        })
+        .finally(() => {
+          stopGlobalLoader();
         });
     }
   }, [imageIds, open]);
