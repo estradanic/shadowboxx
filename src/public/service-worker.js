@@ -142,10 +142,8 @@ self.addEventListener("fetch", (event) => {
               }
               return response;
             }
-            const cacheKey =
-              (
-                event.request.mode === "navigate" || frontendRoutes.includes(event.request.url)
-              ) ? "/index.html" : event.request;
+            const cacheKey = frontendRoutes.includes(event.request.url)
+              ? "/index.html" : event.request;
             return cache.match(cacheKey)
               .then((response) => {
                 console.warn("Could not get network response. Returning from the cache.", e, "Request:", event.request, "Response:", response);
@@ -153,7 +151,7 @@ self.addEventListener("fetch", (event) => {
               });
           })
           .catch((e) => {
-            const cacheKey = event.request.mode === "navigate" ? "/index.html" : event.request;
+            const cacheKey = frontendRoutes.includes(event.request.url) ? "/index.html" : event.request;
             return cache.match(cacheKey)
               .then((response) => {
                 console.warn("Could not get network response. Returning from the cache.", e, "Request:", event.request, "Response:", response);
