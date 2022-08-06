@@ -24,8 +24,8 @@ export const NetworkDetectionContextProvider = ({
       polling={{
         url: "https://httpbin.org/get",
         enabled: true,
-        interval: 10000,
-        timeout: 3000,
+        interval: 7500,
+        timeout: 5000,
       }}
       render={({ online }) => (
         <NetworkDetectionContext.Provider value={{ online }}>
