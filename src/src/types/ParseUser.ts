@@ -160,6 +160,7 @@ export default class ParseUser {
       return new ParseUser(loggedOutUser);
     } catch (error: any) {
       console.error(error?.message ?? Strings.commonError());
+      await updateLoggedInUser(this, UpdateReason.LOG_OUT);
     }
   }
 

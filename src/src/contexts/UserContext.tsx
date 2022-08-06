@@ -71,6 +71,7 @@ export const UserContextProvider = ({ children }: UserContextProviderProps) => {
       if (reason === UpdateReason.LOG_OUT) {
         setLoggedInUser(undefined);
         setProfilePicture(undefined);
+        history.push(routes["Login"].path);
       } else if (
         !loggedInUser ||
         newLoggedInUser.username === loggedInUser.username

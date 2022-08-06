@@ -7,6 +7,8 @@ import {
 import { makeStyles, Theme } from "@material-ui/core/styles";
 import { Error, Check, Warning, Info } from "@material-ui/icons";
 import { Typography } from "@material-ui/core";
+import { useHistory } from "react-router";
+import { useUserContext } from "../../contexts";
 
 const useStyles = makeStyles((theme: Theme) => ({
   variantSuccess: {
@@ -36,6 +38,7 @@ const useStyles = makeStyles((theme: Theme) => ({
 export const useSnackbar = () => {
   const { enqueueSnackbar } = notistackUseSnackbar();
   const classes = useStyles();
+  const { loggedInUser, updateLoggedInUser } = useUserContext();
 
   const enqueueSuccessSnackbar = (message: string) => {
     enqueueSnackbar(<Typography>{message}</Typography>, {
@@ -56,6 +59,9 @@ export const useSnackbar = () => {
     });
   };
   const enqueueErrorSnackbar = (message: string) => {
+    if (message === "Invalid session token") {
+      loggedInUser?.logout(updateLoggedInUser);
+    }
     console.error(message);
     enqueueSnackbar(<Typography>{message}</Typography>, {
       variant: "error",
