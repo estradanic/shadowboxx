@@ -33,10 +33,8 @@ const setPermissionsOnAlbum = async (album: Parse.Object<Parse.Attributes>) => {
       .find({ useMasterKey: true });
     readWriteRole.getUsers().add(collaborators);
   }
-  if (!album.existed()) {
-    readWriteRole.getUsers().add(owner!);
-  }
 
+  readWriteRole.getUsers().add(owner!);
   await readRole.save(null, { useMasterKey: true });
   await readWriteRole.save(null, { useMasterKey: true });
 
