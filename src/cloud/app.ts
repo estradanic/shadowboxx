@@ -1,32 +1,7 @@
-let path = require("path");
+import path from "path";
+import express from "express";
 
-// const nativeParsePaths = [
-//   "apps",
-//   "batch",
-//   "requestPasswordReset",
-//   "files",
-//   "login",
-//   "logout",
-//   "user",
-//   "users",
-//   "Roles",
-//   "parse",
-//   "schemas",
-//   "functions",
-//   "classes",
-//   "aggregate",
-//   "cloud_code",
-//   "config",
-//   "hooks",
-//   "push_audiences",
-//   "installations",
-//   "push",
-//   "sessions",
-//   "events",
-//   "jobs",
-//   "export_progress",
-//   "export_data",
-// ];
+const app = express();
 
 const frontendRoutes = [
   "album",
@@ -39,6 +14,7 @@ const frontendRoutes = [
 ];
 
 app.enable("trust proxy");
+
 app.use((req, res, next) => {
   req.secure || app.get("X-Forwarded-Proto") != "http"
     ? next()

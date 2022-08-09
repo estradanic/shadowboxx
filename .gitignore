@@ -17,6 +17,9 @@ build/Release
 **/build/
 /public
 
+# Compiled distribution files
+/cloud/**/*.js
+
 # Yarn Integrity file
 **/.yarn-integrity
 

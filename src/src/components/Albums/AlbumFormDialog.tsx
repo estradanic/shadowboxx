@@ -356,9 +356,10 @@ const AlbumFormDialog = ({
               label={Strings.images()}
               multiple
               value={images}
-              onChange={async (newImages) =>
-                setImageIds(newImages.map((image) => image.id!))
-              }
+              onChange={async (newImages) => {
+                setImages(newImages);
+                setImageIds(newImages.map((image) => image.id!));
+              }}
             />
           </ImageContextProvider>
         </Grid>

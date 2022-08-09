@@ -28,10 +28,10 @@
     "@types/node": "^16.0.0",
     "@types/parse": "^2.18.16",
     "@types/password-hash": "^1.2.20",
-    "@types/react-burger-menu": "^2.6.2",
     "@types/react-detect-offline": "^2.4.1",
     "@types/react-dom": "^18.0.6",
     "@types/react-router-dom": "^5.3.3",
+    "@types/sharp": "^0.30.5",
     "@types/uuid": "^8.3.3",
     "@typescript-eslint/eslint-plugin": "^5.32.0",
     "@typescript-eslint/parser": "^5.32.0",
@@ -85,7 +85,6 @@
     "prompts": "2.4.0",
     "react": "^17.0.1",
     "react-app-polyfill": "^2.0.0",
-    "react-burger-menu": "^3.0.6",
     "react-detect-offline": "^2.4.5",
     "react-dev-utils": "^12.0.1",
     "react-dom": "^17.0.1",
@@ -112,15 +111,16 @@
     "workbox-webpack-plugin": "^6.5.4"
   },
   "scripts": {
-    "format": "prettier --write 'src/**/*.{ts,tsx,js,json,jsx}' && prettier --write '../cloud/**/*.{js,json}'",
+    "compileCloud": "cd ./cloud && tsc && cd ..",
+    "format": "prettier --write 'src/**/*.{ts,tsx,js,json,jsx}' && prettier --write 'cloud/**/*.{ts,json}'",
     "analyze": "source-map-explorer 'build/static/js/*.js'",
     "build": "yarn format && BUILD_PATH=dist node scripts/build-dev.js",
     "build:prod": "yarn format && yarn install && node scripts/build.js",
     "start": "serve -p 8080 ./dist -s",
     "start:prod": "http-server -p 8080 ./build",
     "iterate": "yarn build && yarn start",
-    "deploy": "yarn build && rm -rf ../public/* && cp -r ./dist/* ../public && b4a deploy ShadowboxxDevTest",
-    "deploy:prod": "yarn build:prod && rm -rf ../public/* && cp -r ./build/* ../public && b4a deploy Shadowboxx"
+    "deploy": "yarn build && yarn compileCloud && rm -rf ../public/* && cp -r ./dist/* ../public && b4a deploy ShadowboxxDevTest",
+    "deploy:prod": "yarn build:prod && yarn compileCloud && rm -rf ../public/* && cp -r ./build/* ../public && b4a deploy Shadowboxx"
   },
   "eslintConfig": {
     "extends": [
