@@ -148,6 +148,7 @@ const AlbumFormDialog = ({
     initialValue,
     defaultErrors,
   ]);
+  const { enqueueErrorSnackbar } = useSnackbar();
 
   useEffect(() => {
     if (open && !gotImages.current) {
@@ -168,12 +169,17 @@ const AlbumFormDialog = ({
           stopGlobalLoader();
         });
     }
-  }, [imageIds, open]);
+  }, [
+    imageIds,
+    open,
+    enqueueErrorSnackbar,
+    startGlobalLoader,
+    stopGlobalLoader,
+  ]);
 
   const classes = useStyles();
   const theme = useTheme();
   const sm = useMediaQuery(theme.breakpoints.down("sm"));
-  const { enqueueErrorSnackbar } = useSnackbar();
   const { openConfirm } = useActionDialogContext();
 
   const validate = () => {

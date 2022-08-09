@@ -7,7 +7,6 @@ import {
 import { makeStyles, Theme } from "@material-ui/core/styles";
 import { Error, Check, Warning, Info } from "@material-ui/icons";
 import { Typography } from "@material-ui/core";
-import { useHistory } from "react-router";
 import { useUserContext } from "../../contexts";
 
 const useStyles = makeStyles((theme: Theme) => ({
