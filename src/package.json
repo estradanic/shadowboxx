@@ -43,7 +43,7 @@
     "babel-preset-react-app": "^10.0.0",
     "bfj": "^7.0.2",
     "browser-image-resizer": "^2.2.1",
-    "camelcase": "^6.1.0",
+    "camelcase": "^7.0.0",
     "case-sensitive-paths-webpack-plugin": "2.3.0",
     "classnames": "^2.2.6",
     "css-loader": "4.3.0",
