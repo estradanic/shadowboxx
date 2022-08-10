@@ -1,7 +1,7 @@
 import path from "path";
-import express from "express";
+import { Application } from "express";
 
-const app = express();
+declare const app: Application;
 
 const frontendRoutes = [
   "album",
