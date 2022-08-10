@@ -91,8 +91,6 @@ export interface StringEntries {
   pictures: string;
   pleaseEnterA: string;
   profilePicture: string;
-  public: string;
-  publicTooltip: string;
   removeImage: string;
   removeImageError: string;
   processingImages: string;
@@ -232,9 +230,6 @@ const Strings: {
   pictures: () => "Pictures",
   pleaseEnterA: (field: string) => `Please enter a ${field}`,
   profilePicture: () => "Profile Picture",
-  public: () => "Public",
-  publicTooltip: () =>
-    "Should this album be viewable by stringone with a link? (Overrides Viewers)",
   removeImage: () => "Remove image from album",
   removeImageError: (fileName: string) =>
     `Could not remove image ${fileName} from album.`,

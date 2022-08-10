@@ -14,8 +14,6 @@ export interface Album extends Attributes {
   description?: string;
   /** Whether the album is "favorite" or not */
   isFavorite?: boolean;
-  /** Whether the album is publicly viewable or not */
-  isPublic?: boolean;
   /** Collaborators with "put" access */
   collaborators: string[];
   /** Collaborators with "view" access */
@@ -37,7 +35,6 @@ export default class ParseAlbum extends ParseObject<Album> {
     name: "name",
     description: "description",
     isFavorite: "isFavorite",
-    isPublic: "isPublic",
     collaborators: "collaborators",
     viewers: "viewers",
   };
@@ -114,14 +111,6 @@ export default class ParseAlbum extends ParseObject<Album> {
 
   set isFavorite(isFavorite) {
     this._album.set(ParseAlbum.COLUMNS.isFavorite, isFavorite);
-  }
-
-  get isPublic(): Album["isPublic"] {
-    return this._album.get(ParseAlbum.COLUMNS.isPublic);
-  }
-
-  set isPublic(isPublic) {
-    this._album.set(ParseAlbum.COLUMNS.isPublic, isPublic);
   }
 
   get collaborators(): Album["collaborators"] {

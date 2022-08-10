@@ -14,7 +14,7 @@ import {
   Grid,
   useMediaQuery,
 } from "@material-ui/core";
-import { Public, Star, StarBorder } from "@material-ui/icons";
+import { Star, StarBorder } from "@material-ui/icons";
 import { Set } from "immutable";
 import { Strings } from "../../resources";
 import { ErrorState, isNullOrWhitespace } from "../../utils";
@@ -56,16 +56,6 @@ const useStyles = makeStyles((theme: Theme) => ({
     color: theme.palette.warning.main,
     borderColor: theme.palette.warning.main,
   },
-  publicIcon: {
-    marginLeft: "auto",
-    marginRight: theme.spacing(1.5),
-    color: theme.palette.text.disabled,
-  },
-  publicIconChecked: {
-    marginLeft: "auto",
-    color: theme.palette.success.main,
-    marginRight: theme.spacing(1.5),
-  },
 }));
 
 /** Interface defining props for AlbumFormDialog */
@@ -81,31 +71,34 @@ export interface AlbumFormDialogProps
 
 /** Component to input values for creating or editing an Album */
 const AlbumFormDialog = ({
-  value: initialValue,
+  value,
   open,
   handleCancel: piHandleCancel,
   handleConfirm: piHandleConfirm,
   resetOnConfirm = true,
 }: AlbumFormDialogProps) => {
-  const [imageIds, setImageIds] = useState<Album["images"]>(
-    initialValue.images
-  );
-  const [name, setName] = useState<Album["name"]>(initialValue.name);
+  const [imageIds, setImageIds] = useState<Album["images"]>(value.images);
+  const [name, setName] = useState<Album["name"]>(value.name);
   const [description, setDescription] = useState<Album["description"]>(
-    initialValue.description
+    value.description
   );
   const [isFavorite, setIsFavorite] = useState<Album["isFavorite"]>(
-    initialValue.isFavorite
-  );
-  const [isPublic, setIsPublic] = useState<Album["isPublic"]>(
-    initialValue.isPublic
+    value.isFavorite
   );
   const [collaborators, setCollaborators] = useState<Album["collaborators"]>(
-    initialValue.collaborators
+    value.collaborators
   );
-  const [viewers, setViewers] = useState<Album["viewers"]>(
-    initialValue.viewers
-  );
+  const [viewers, setViewers] = useState<Album["viewers"]>(value.viewers);
+
+  useEffect(() => {
+    setImageIds(value.images);
+    setName(value.name);
+    setDescription(value.description);
+    setIsFavorite(value.isFavorite);
+    setCollaborators(value.collaborators);
+    setViewers(value.viewers);
+  }, [value]);
+
   const [images, setImages] = useState<ParseImage[]>([]);
 
   const gotImages = useRef<boolean>(false);
@@ -114,8 +107,8 @@ const AlbumFormDialog = ({
 
   const { loggedInUser } = useUserContext();
   const isCollaborator = useMemo(
-    () => loggedInUser?.id !== initialValue.owner.id,
-    [loggedInUser?.id, initialValue.owner.id]
+    () => loggedInUser?.id !== value.owner.id,
+    [loggedInUser?.id, value.owner.id]
   );
 
   const defaultErrors = useMemo(
@@ -130,22 +123,20 @@ const AlbumFormDialog = ({
   const [errors, setErrors] = useState<ErrorState<"name">>(defaultErrors);
 
   const reinitialize = useCallback(() => {
-    setName(initialValue.name);
-    setDescription(initialValue.description);
-    setIsFavorite(initialValue.isFavorite);
-    setIsPublic(initialValue.isPublic);
-    setCollaborators(initialValue.collaborators);
-    setViewers(initialValue.viewers);
+    setName(value.name);
+    setDescription(value.description);
+    setIsFavorite(value.isFavorite);
+    setCollaborators(value.collaborators);
+    setViewers(value.viewers);
     setErrors(defaultErrors);
   }, [
     setName,
     setDescription,
     setIsFavorite,
-    setIsPublic,
     setCollaborators,
     setViewers,
     setErrors,
-    initialValue,
+    value,
     defaultErrors,
   ]);
   const { enqueueErrorSnackbar } = useSnackbar();
@@ -214,24 +205,22 @@ const AlbumFormDialog = ({
       if (signedUpUserCount < userEmails.size) {
         openConfirm(Strings.nonExistentUserWarning(), async () => {
           await piHandleConfirm({
-            ...initialValue,
+            ...value,
             images: imageIds,
             name,
             description,
             isFavorite,
-            isPublic,
             collaborators,
             viewers,
           });
         });
       } else {
         await piHandleConfirm({
-          ...initialValue,
+          ...value,
           images: imageIds,
           name,
           description,
           isFavorite,
-          isPublic,
           collaborators,
           viewers,
         });
@@ -308,28 +297,7 @@ const AlbumFormDialog = ({
                 </FormControl>
               </Tooltip>
             </Grid>
-            <Grid item xs={12}>
-              <Tooltip title={Strings.publicTooltip()}>
-                <FormControl fullWidth className={classes.checkbox}>
-                  <FormControlLabel
-                    control={
-                      <Checkbox
-                        disabled={isCollaborator}
-                        icon={<Public className={classes.publicIcon} />}
-                        checked={!!isPublic}
-                        onChange={(_, checked) => setIsPublic(checked)}
-                        checkedIcon={
-                          <Public className={classes.publicIconChecked} />
-                        }
-                      />
-                    }
-                    label={Strings.public()}
-                    labelPlacement="start"
-                    className={classes.checkboxLabel}
-                  />
-                </FormControl>
-              </Tooltip>
-            </Grid>
+
             <Grid item xs={12}>
               <Tooltip title={Strings.collaboratorsTooltip()}>
                 <UserField

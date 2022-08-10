@@ -101,12 +101,11 @@ export interface AlbumCardProps {
 }
 
 /** Component for displaying basic information about an album */
-const AlbumCard = memo(({ value: initialValue, onChange }: AlbumCardProps) => {
+const AlbumCard = memo(({ value, onChange }: AlbumCardProps) => {
   const [images, setImages] = useState<ParseImage[]>([]);
   const [collaborators, setCollaborators] = useState<ParseUser[]>([]);
   const [viewers, setViewers] = useState<ParseUser[]>([]);
   const [owner, setOwner] = useState<ParseUser>();
-  const [value, setValue] = useState<ParseAlbum>(initialValue);
   const gotImages = useRef(false);
   const gotCollaborators = useRef(false);
   const gotViewers = useRef(false);
@@ -351,7 +350,7 @@ const AlbumCard = memo(({ value: initialValue, onChange }: AlbumCardProps) => {
                         ...value.attributes,
                         isFavorite: !value.isFavorite,
                       });
-                      setValue(newValue);
+                      await onChange(newValue);
                     } catch (error: any) {
                       enqueueErrorSnackbar(
                         error?.message ?? Strings.editAlbumError()
@@ -381,7 +380,7 @@ const AlbumCard = memo(({ value: initialValue, onChange }: AlbumCardProps) => {
                         images: newImages.map((image) => image.id!),
                       });
                       gotImages.current = false;
-                      setValue(newValue);
+                      await onChange(newValue);
                       enqueueSuccessSnackbar(Strings.commonSaved());
                     } catch (error: any) {
                       enqueueErrorSnackbar(

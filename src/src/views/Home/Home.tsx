@@ -103,6 +103,7 @@ const HomePage = memo(() => {
                     } else {
                       newAlbums.splice(index, 1);
                     }
+                    gotAlbums.current = false;
                     setAlbums(newAlbums);
                   }}
                   value={album}

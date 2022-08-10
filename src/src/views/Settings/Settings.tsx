@@ -197,7 +197,6 @@ const Settings = () => {
   const profilePictureACL = useMemo(() => {
     const acl = new Parse.ACL(loggedInUser?._user);
     acl.setPublicReadAccess(true);
-    acl.setPublicWriteAccess(false);
     return acl;
   }, [loggedInUser]);
 
