@@ -86,6 +86,8 @@ const Images = () => {
                   borderColor={randomColor}
                   src={image.mobileFile.url()}
                   alt={image.name}
+                  fullResolutionSrc={image.file.url()}
+                  showFullResolutionOnClick
                 />
               </Grid>
             ))}
