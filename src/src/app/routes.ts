@@ -49,6 +49,7 @@ const routes: { [key: string]: RouteProps } = {
     view: Home,
     path: "/home",
     tryAuthenticate: true,
+    redirectOnAuthFail: true,
   },
   Login: {
     viewId: "Login",

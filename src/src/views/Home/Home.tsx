@@ -44,7 +44,9 @@ const useStyles = makeStyles((theme: Theme) => ({
   },
 }));
 
-const HomePage = memo(() => {
+const Home = memo(() => {
+  useView("Home");
+
   const classes = useStyles();
   const [addAlbumDialogOpen, setAddAlbumDialogOpen] = useState(false);
   const { enqueueErrorSnackbar, enqueueSuccessSnackbar } = useSnackbar();
@@ -55,7 +57,7 @@ const HomePage = memo(() => {
   const { loggedInUser } = useUserContext();
 
   useEffect(() => {
-    if (!gotAlbums.current && !globalLoading) {
+    if (!gotAlbums.current && !globalLoading && loggedInUser) {
       gotAlbums.current = true;
       startGlobalLoader();
       ParseAlbum.query()
@@ -81,8 +83,12 @@ const HomePage = memo(() => {
     loggedInUser,
   ]);
 
+  if (!loggedInUser) {
+    return null;
+  }
+
   return (
-    <>
+    <PageContainer>
       <Grid container direction="column">
         {!!albums.length ? (
           <Grid item className={classes.albumsContainer}>
@@ -155,32 +161,8 @@ const HomePage = memo(() => {
           }
         }}
       />
-    </>
-  );
-});
-
-const LandingPage = () => {
-  return (
-    <>
-      <h2>Testing Parse</h2>
-    </>
-  );
-};
-
-/**
- * Home page of the site.
- * Either a landing page if not logged in,
- * Or the user's homepage if logged in.
- */
-const Home = () => {
-  useView("Home");
-  const { loggedInUser } = useUserContext();
-
-  return (
-    <PageContainer>
-      {loggedInUser ? <HomePage /> : <LandingPage />}
     </PageContainer>
   );
-};
+});
 
 export default Home;

@@ -1,4 +1,4 @@
-import { useCallback, useEffect } from "react";
+import { useCallback, useLayoutEffect } from "react";
 import { useHistory } from "react-router-dom";
 import { useUserContext } from "../contexts";
 import { routes } from "../app";
@@ -19,7 +19,7 @@ export const useView = (currentViewId: string) => {
     }
   }, [currentRoute, setRedirectPath, history]);
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     if (!loggedInUser && currentRoute.tryAuthenticate) {
       redirectToLogin();
     }

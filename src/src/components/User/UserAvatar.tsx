@@ -48,12 +48,14 @@ const UserAvatar = forwardRef(
         if (user && user.profilePicture?.exists && !gotImage.current) {
           try {
             gotImage.current = true;
-            const profilePictureResponse = await ParseImage.query().get(
-              user.profilePicture.id
-            );
-            await profilePictureResponse.pin();
-            const newProfilePicture = new ParseImage(profilePictureResponse);
-            setSrc(newProfilePicture?.thumbnail.url() ?? "");
+            const profilePictureResponse = await ParseImage.query()
+              .equalTo("objectId", user.profilePicture.id)
+              .first();
+            if (profilePictureResponse) {
+              await profilePictureResponse.pin();
+              const newProfilePicture = new ParseImage(profilePictureResponse);
+              setSrc(newProfilePicture?.thumbnail.url() ?? "");
+            }
           } catch (error: any) {
             console.error(error?.message ?? Strings.getImageError());
             gotImage.current = false;

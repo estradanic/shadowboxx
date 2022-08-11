@@ -103,12 +103,13 @@ export const UserContextProvider = ({ children }: UserContextProviderProps) => {
             reason === UpdateReason.SIGN_UP ||
             newLoggedInUser.profilePicture?.id !== profilePicture?.id)
         ) {
-          ParseImage.query()
-            .get(newLoggedInUser.profilePicture.id)
-            .then(async (profilePictureResponse) => {
-              await profilePictureResponse.pin();
-              setProfilePicture(new ParseImage(profilePictureResponse));
-            });
+          const profilePictureResponse = await ParseImage.query()
+            .equalTo("objectId", newLoggedInUser.profilePicture.id)
+            .first();
+          if (profilePictureResponse) {
+            await profilePictureResponse.pin();
+            setProfilePicture(new ParseImage(profilePictureResponse));
+          }
         }
       }
     },
