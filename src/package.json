@@ -20,7 +20,7 @@
     "@material-ui/lab": "^4.0.0-alpha.57",
     "@parse/react": "^0.0.1-alpha.18",
     "@svgr/webpack": "^6.3.1",
-    "@testing-library/react": "^11.1.0",
+    "@testing-library/react": "^12.1.5",
     "@types/classnames": "^2.2.11",
     "@types/deep-equal": "^1.0.1",
     "@types/lodash": "^4.14.168",
