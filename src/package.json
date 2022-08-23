@@ -46,7 +46,7 @@
     "camelcase": "^7.0.0",
     "case-sensitive-paths-webpack-plugin": "2.4.0",
     "classnames": "^2.2.6",
-    "css-loader": "4.3.0",
+    "css-loader": "5.2.7",
     "cssnano": "^5.1.12",
     "cssnano-preset-default": "^5.2.12",
     "dotenv": "16.0.1",
