@@ -75,7 +75,7 @@
     "password-hash": "^1.2.2",
     "pnp-webpack-plugin": "1.6.4",
     "postcss": "^8.2.15",
-    "postcss-flexbugs-fixes": "4.2.1",
+    "postcss-flexbugs-fixes": "5.0.2",
     "postcss-loader": "3.0.0",
     "postcss-normalize": "8.0.1",
     "postcss-preset-env": "6.7.0",
@@ -106,7 +106,7 @@
     "watchpack-chokidar2": "^2.0.1",
     "web-vitals": "^1.0.1",
     "webpack": "4.46.0",
-    "webpack-dev-server": "^4.6.0",
+    "webpack-dev-server": "^4.10.0",
     "webpack-manifest-plugin": "4.1.1",
     "workbox-webpack-plugin": "^6.5.4"
   },
