@@ -34,7 +34,7 @@
     "@types/sharp": "^0.30.5",
     "@types/uuid": "^8.3.3",
     "@typescript-eslint/eslint-plugin": "^5.32.0",
-    "@typescript-eslint/parser": "^5.32.0",
+    "@typescript-eslint/parser": "^5.34.0",
     "babel-eslint": "^10.1.0",
     "babel-loader": "8.2.5",
     "babel-plugin-named-asset-import": "^0.3.7",
@@ -106,7 +106,7 @@
     "watchpack-chokidar2": "^2.0.1",
     "web-vitals": "^1.0.1",
     "webpack": "4.46.0",
-    "webpack-dev-server": "^4.6.0",
+    "webpack-dev-server": "^4.10.0",
     "webpack-manifest-plugin": "4.1.1",
     "workbox-webpack-plugin": "^6.5.4"
   },
