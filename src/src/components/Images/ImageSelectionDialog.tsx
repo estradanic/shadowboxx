@@ -1,18 +1,17 @@
-import React, { useCallback, useEffect, useRef, useState } from "react";
-import Parse from "parse";
+import React, { useCallback, useMemo, useState } from "react";
 import { Grid, Typography, useMediaQuery } from "@material-ui/core";
 import { makeStyles, Theme, useTheme } from "@material-ui/core/styles";
 import classNames from "classnames";
 import { dedupeFast } from "../../utils";
 import { Strings } from "../../resources";
-import { useGlobalLoadingContext, useUserContext } from "../../contexts";
-import { useRandomColor } from "../../hooks";
+import { useUserContext } from "../../contexts";
+import { useRandomColor, useRequests } from "../../hooks";
 import { ParseImage } from "../../types";
 import ActionDialog, { ActionDialogProps } from "../Dialog/ActionDialog";
 import Image from "../Image/Image";
-import { useSnackbar } from "../Snackbar";
 import Empty from "../Svgs/Empty";
 import { Check } from "@material-ui/icons";
+import { useQuery } from "@tanstack/react-query";
 
 const useStyles = makeStyles((theme: Theme) => ({
   svgContainer: {
@@ -72,58 +71,32 @@ const ImageSelectionDialog = ({
 }: ImageSelectionDialogProps) => {
   const [value, setValue] = useState<ParseImage[]>(initialValue);
   const classes = useStyles();
-  const gotImages = useRef(false);
-  const { startGlobalLoader, stopGlobalLoader } = useGlobalLoadingContext();
-
-  // Images that the current user owns, not those shared to them.
-  const [userOwnedImages, setUserOwnedImages] = useState<ParseImage[]>([]);
-
-  // Images that the current user owns + those in the current value
-  const [images, setImages] = useState<ParseImage[]>(initialValue);
-
-  const { loggedInUser } = useUserContext();
-  const { enqueueErrorSnackbar } = useSnackbar();
+  const { getLoggedInUser } = useUserContext();
   const randomColor = useRandomColor();
   const theme = useTheme();
   const sm = useMediaQuery(theme.breakpoints.down("sm"));
+  const { getImagesByOwnerFunction, getImagesByOwnerQueryKey } = useRequests();
 
-  useEffect(() => {
-    if (!gotImages.current && open) {
-      startGlobalLoader();
-      gotImages.current = true;
-      ParseImage.query()
-        .equalTo(ParseImage.COLUMNS.owner, loggedInUser?.toNativePointer())
-        .findAll()
-        .then(async (response) => {
-          await Parse.Object.pinAll(response);
-          setUserOwnedImages(
-            response?.map((imageResponse) => new ParseImage(imageResponse)) ??
-              []
-          );
-        })
-        .catch((error) => {
-          enqueueErrorSnackbar(error.message ?? Strings.noImages());
-          gotImages.current = false;
-        })
-        .finally(() => {
-          stopGlobalLoader();
-        });
+  // Images that the current user owns, not those shared to them.
+  const { data: userOwnedImages } = useQuery<ParseImage[], Error>(
+    getImagesByOwnerQueryKey(getLoggedInUser()),
+    () =>
+      getImagesByOwnerFunction(getLoggedInUser(), {
+        showErrorsInSnackbar: true,
+      }),
+    {
+      initialData: [],
+      refetchInterval: 5 * 60 * 1000,
+      refetchOnMount: true,
+      refetchOnWindowFocus: false,
     }
-  }, [
-    setUserOwnedImages,
-    loggedInUser,
-    enqueueErrorSnackbar,
-    open,
-    startGlobalLoader,
-    stopGlobalLoader,
-  ]);
+  );
 
-  useEffect(() => {
-    if (gotImages.current) {
-      setImages(dedupeFast<ParseImage>([...initialValue, ...userOwnedImages]));
-      setValue(initialValue);
-    }
-  }, [initialValue, userOwnedImages]);
+  // Images that the current user owns + those in the passed in value
+  const images = useMemo(
+    () => dedupeFast([...initialValue, ...userOwnedImages]),
+    [initialValue, userOwnedImages]
+  );
 
   const handleConfirm = async () => {
     await piHandleConfirm(value);

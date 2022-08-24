@@ -1,6 +1,7 @@
 import React from "react";
 import { Container, ContainerProps, Grid } from "@material-ui/core";
 import { makeStyles, Theme } from "@material-ui/core/styles";
+import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import { useGlobalLoadingContext } from "../../contexts";
 import LoadingWrapper from "../Loader/LoadingWrapper";
 
@@ -47,6 +48,7 @@ const PageContainer = ({ children, ...rest }: PageContainerProps) => {
           className={classes.grid}
         >
           {children}
+          <ReactQueryDevtools initialIsOpen={false} />
         </Grid>
       </Container>
     </LoadingWrapper>

@@ -1,5 +1,4 @@
-import React, { memo, useEffect, useMemo, useRef, useState } from "react";
-import Parse from "parse";
+import React, { memo, useMemo, useState } from "react";
 import {
   Card,
   CardHeader,
@@ -30,6 +29,8 @@ import ParseUser from "../../types/ParseUser";
 import ParseImage from "../../types/ParseImage";
 import ImageField from "../Field/ImageField";
 import Online from "../NetworkDetector/Online";
+import { useRequests } from "../../hooks";
+import { useQuery } from "@tanstack/react-query";
 
 const useStyles = makeStyles((theme: Theme) => ({
   card: {
@@ -102,86 +103,58 @@ export interface AlbumCardProps {
 
 /** Component for displaying basic information about an album */
 const AlbumCard = memo(({ value, onChange }: AlbumCardProps) => {
-  const [images, setImages] = useState<ParseImage[]>([]);
-  const [collaborators, setCollaborators] = useState<ParseUser[]>([]);
-  const [viewers, setViewers] = useState<ParseUser[]>([]);
-  const [owner, setOwner] = useState<ParseUser>();
-  const gotImages = useRef(false);
-  const gotCollaborators = useRef(false);
-  const gotViewers = useRef(false);
-  const gotOwner = useRef(false);
+  const {
+    getUserByIdQueryKey,
+    getUserByIdFunction,
+    getImagesByIdFunction,
+    getImagesByIdQueryKey,
+    getUsersByEmailFunction,
+    getUsersByEmailQueryKey,
+  } = useRequests();
+  const { data: owner } = useQuery<ParseUser, Error>(
+    getUserByIdQueryKey(value.owner.id),
+    () => getUserByIdFunction(value.owner.id, { useLoader: false }),
+    {
+      refetchOnWindowFocus: false,
+    }
+  );
+  const { data: images } = useQuery<ParseImage[], Error>(
+    getImagesByIdQueryKey(value.images),
+    () => getImagesByIdFunction(value.images, { useLoader: false }),
+    {
+      refetchOnWindowFocus: false,
+      initialData: [],
+    }
+  );
+  const { data: collaborators } = useQuery<ParseUser[], Error>(
+    getUsersByEmailQueryKey(value.collaborators),
+    () => getUsersByEmailFunction(value.collaborators, { useLoader: false }),
+    {
+      refetchOnWindowFocus: false,
+    }
+  );
+  const { data: viewers } = useQuery<ParseUser[], Error>(
+    getUsersByEmailQueryKey(value.viewers),
+    () => getUsersByEmailFunction(value.viewers, { useLoader: false }),
+    {
+      refetchOnWindowFocus: false,
+    }
+  );
 
-  const { loggedInUser } = useUserContext();
+  const { getLoggedInUser } = useUserContext();
   const isViewer = useMemo(
     () =>
-      loggedInUser?.id !== value.owner.id &&
-      !value.collaborators.includes(loggedInUser?.email!) &&
-      value.viewers.includes(loggedInUser?.email!),
-    [loggedInUser, value.owner.id, value.collaborators, value.viewers]
+      getLoggedInUser().id !== value.owner.id &&
+      !value.collaborators.includes(getLoggedInUser().email) &&
+      value.viewers.includes(getLoggedInUser().email),
+    [getLoggedInUser, value.owner.id, value.collaborators, value.viewers]
   );
   const isOwner = useMemo(
-    () => loggedInUser?.id === value.owner.id,
-    [loggedInUser?.id, value.owner.id]
+    () => getLoggedInUser().id === value.owner.id,
+    [getLoggedInUser, value.owner.id]
   );
 
   const location = useLocation();
-
-  useEffect(() => {
-    if (!gotOwner.current) {
-      gotOwner.current = true;
-      ParseUser.query()
-        .get(value.owner.id)
-        .then(async (response) => {
-          await response.pin();
-          setOwner(new ParseUser(response!));
-        })
-        .catch(() => (gotOwner.current = false));
-    }
-  }, [value.owner.id]);
-
-  useEffect(() => {
-    if (!gotImages.current) {
-      gotImages.current = true;
-      ParseImage.query()
-        .containedIn(ParseImage.COLUMNS.id, value.images)
-        .findAll()
-        .then(async (response) => {
-          await Parse.Object.pinAll(response);
-          setImages(response.map((image) => new ParseImage(image)));
-        })
-        .catch(() => (gotImages.current = false));
-    }
-  }, [value.images]);
-
-  useEffect(() => {
-    if (!gotCollaborators.current) {
-      gotCollaborators.current = true;
-      ParseUser.query()
-        .containedIn(ParseUser.COLUMNS.email, value.collaborators)
-        .findAll()
-        .then(async (response) => {
-          await Parse.Object.pinAll(response);
-          setCollaborators(
-            response.map((collaborator) => new ParseUser(collaborator))
-          );
-        })
-        .catch(() => (gotCollaborators.current = false));
-    }
-  }, [value.collaborators]);
-
-  useEffect(() => {
-    if (!gotViewers.current) {
-      gotViewers.current = true;
-      ParseUser.query()
-        .containedIn(ParseUser.COLUMNS.email, value.viewers)
-        .findAll()
-        .then(async (response) => {
-          await Parse.Object.pinAll(response);
-          setViewers(response.map((viewer) => new ParseUser(viewer)));
-        })
-        .catch(() => (gotViewers.current = false));
-    }
-  }, [value.viewers]);
 
   const { enqueueErrorSnackbar, enqueueSuccessSnackbar } = useSnackbar();
   const [anchorEl, setAnchorEl] = useState<Element>();
@@ -189,7 +162,7 @@ const AlbumCard = memo(({ value, onChange }: AlbumCardProps) => {
     useState<boolean>(false);
   const history = useHistory();
   const coverImage = useMemo(
-    () => images?.find((image) => image.isCoverImage) ?? images?.[0],
+    () => images.find((image) => image.isCoverImage) ?? images[0],
     [images]
   );
   const coverImageSrc = useMemo(
@@ -262,7 +235,7 @@ const AlbumCard = memo(({ value, onChange }: AlbumCardProps) => {
             )
           }
           title={value?.name}
-          subheader={`${Strings.numOfPhotos(images?.length ?? 0)} ${
+          subheader={`${Strings.numOfPhotos(images.length ?? 0)} ${
             value?.description ?? ""
           }`}
         />
@@ -379,7 +352,6 @@ const AlbumCard = memo(({ value, onChange }: AlbumCardProps) => {
                         ...value.attributes,
                         images: newImages.map((image) => image.id!),
                       });
-                      gotImages.current = false;
                       await onChange(newValue);
                       enqueueSuccessSnackbar(Strings.commonSaved());
                     } catch (error: any) {
@@ -402,9 +374,6 @@ const AlbumCard = memo(({ value, onChange }: AlbumCardProps) => {
           setEditAlbumDialogOpen(false);
           try {
             const response = await value.update(attributes);
-            gotImages.current = false;
-            gotCollaborators.current = false;
-            gotViewers.current = false;
             await onChange(response);
             enqueueSuccessSnackbar(Strings.commonSaved());
           } catch (error: any) {

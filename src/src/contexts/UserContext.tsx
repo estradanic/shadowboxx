@@ -22,8 +22,10 @@ import { routes } from "../app";
  * Interface defining the return value of the UserContext
  */
 interface UserContextValue {
-  /** Currently logged in user */
-  loggedInUser?: ParseUser;
+  /** Is a user currently logged in? */
+  isUserLoggedIn: boolean;
+  /** Function to get currently logged in user */
+  getLoggedInUser: () => ParseUser;
   /** Profile picture of the currently logged in user */
   profilePicture?: ParseImage;
   /** Function to set the user on login, signup, or save */
@@ -107,7 +109,6 @@ export const UserContextProvider = ({ children }: UserContextProviderProps) => {
             .equalTo("objectId", newLoggedInUser.profilePicture.id)
             .first();
           if (profilePictureResponse) {
-            await profilePictureResponse.pin();
             setProfilePicture(new ParseImage(profilePictureResponse));
           }
         }
@@ -146,8 +147,16 @@ export const UserContextProvider = ({ children }: UserContextProviderProps) => {
     }
   }, [loggedInUser, updateLoggedInUser, initialized]);
 
+  const getLoggedInUser = () => {
+    if (loggedInUser) {
+      return loggedInUser;
+    }
+    throw new Error("User is not logged in!");
+  };
+
   const value = {
-    loggedInUser,
+    getLoggedInUser,
+    isUserLoggedIn: !!loggedInUser,
     profilePicture,
     updateLoggedInUser,
     saveLoggedInUserUpdates,

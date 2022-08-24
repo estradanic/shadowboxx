@@ -49,6 +49,7 @@ export interface StringEntries {
   goBack: string;
   home: string;
   imageNotDeleted: string;
+  imageNotFound: string;
   imageNotSaved: string;
   imageNotUpdated: string;
   images: string;
@@ -184,6 +185,7 @@ const Strings: {
   home: () => "Home",
   imageNotDeleted: (image: string) =>
     `Image not deleted ${JSON.stringify(image)}`,
+  imageNotFound: () => `${Strings.commonError()} Image not found`,
   imageNotSaved: () => `${Strings.commonError()} Image not saved`,
   imageNotUpdated: () => `${Strings.commonError()} Image not updated`,
   images: () => "Images",

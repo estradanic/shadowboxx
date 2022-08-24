@@ -1,11 +1,11 @@
 import React, { ImgHTMLAttributes, memo, useRef, useState } from "react";
 import { makeStyles, Theme } from "@material-ui/core/styles";
+import { Popper } from "@material-ui/core";
 import classNames from "classnames";
-import { VariableColor } from "../../types";
+import { VariableColor, Interdependent } from "../../types";
+import { opacity } from "../../utils";
 import Tooltip from "../Tooltip/Tooltip";
 import { ImageDecorationProps } from "./Decoration/ImageDecoration";
-import { Interdependent } from "../../types/TypeUtils";
-import { Popper } from "@material-ui/core";
 
 interface UseStylesParams {
   borderColor: VariableColor;
@@ -36,6 +36,7 @@ const useStyles = makeStyles((theme: Theme) => ({
     width: "100vw",
     height: "100vh",
     display: "flex",
+    backgroundColor: opacity(theme.palette.background.default, 0.7),
   },
   fullResolutionImage: {
     borderRadius: theme.spacing(0.5),

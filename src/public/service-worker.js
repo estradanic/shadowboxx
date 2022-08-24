@@ -49,55 +49,6 @@ self.addEventListener("activate", (event) => {
   );
 });
 
-const serializeHeaders = (headers) => {
-  const serialized = {};
-  for (const entry of headers.entries()) {
-    serialized[entry[0]] = entry[1];
-  }
-  return serialized;
-};
-
-const serializeResponse = (response) => {
-  const serialized = {
-    headers: serializeHeaders(response.headers),
-    status: response.status,
-    statusText: response.statusText,
-  };
-  return response.clone().text().then((body) => {
-    serialized.body = body;
-    return Promise.resolve(serialized);
-  })
-};
-
-const serializeRequest = (request) => {
-  const serialized = {
-    url: request.url,
-    headers: serializeHeaders(request.headers),
-    method: request.method,
-    mode: request.mode,
-    credentials: request.credentials,
-    cache: request.cache,
-    redirect: request.redirect,
-    referrer: request.referrer,
-  };
-
-  if (request.method !== "GET" && request.method !== "HEAD") {
-    return request.clone().text().then((body) => {
-      serialized.body = body;
-      if (JSON.parse(body)._method === "PUT") {
-        // This is a modifying request. We don't want to cache this.
-        return null;
-      }
-      return JSON.stringify(serialized);
-    });
-  }
-  return Promise.resolve(JSON.stringify(serialized));
-};
-
-const deserializeResponse = (data) => {
-  return Promise.resolve(new Response(data.body, data));
-};
-
 // Middleware for fetches (caching vs. online)
 self.addEventListener("fetch", (event) => {
   // Don't bother managing non-http requests or requests to httpbin.org,
@@ -159,35 +110,6 @@ self.addEventListener("fetch", (event) => {
               });
           })
         )
-    );
-  } else if (event.request.method !== "PUT") {
-    // For other requests, we use idbKeyval
-    // Respond with cached only if online doesn't work
-    event.respondWith(
-      fetch(event.request.clone())
-        .then((response) => {
-          if (!!response) {
-            if (useCache) {
-              serializeRequest(event.request)
-                .then((serializedRequest) => {
-                  if (serializedRequest !== null) {
-                  serializeResponse(response)
-                    .then((serializedResponse) => idbKeyval.set(serializedRequest, serializedResponse)
-                      .catch((e) => console.warn("Could not cache response.", e, "Request:", serializedRequest, "Response:", serializedResponse)))
-                  }
-                });
-            }
-            return response.clone();
-          } else {
-            console.warn("Network response was empty. Returning from cache");
-            return serializeRequest(event.request)
-              .then((serializedRequest) => idbKeyval.get(serializedRequest)
-                .then((serializedResponse) => deserializeResponse(serializedResponse)));
-          }
-        })
-        .catch(() => serializeRequest(event.request)
-          .then((serializedRequest) => idbKeyval.get(serializedRequest)
-            .then((serializedResponse) => deserializeResponse(serializedResponse))))
     );
   }
 });

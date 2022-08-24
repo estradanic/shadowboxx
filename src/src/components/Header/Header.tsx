@@ -64,7 +64,7 @@ const Header = ({ viewId, ...rest }: HeaderProps) => {
   const classes = useStyles({ xs });
   const history = useHistory();
   const location = useLocation<{ previousLocation?: Location }>();
-  const { loggedInUser, profilePicture } = useUserContext();
+  const { isUserLoggedIn, getLoggedInUser, profilePicture } = useUserContext();
 
   return (
     <header>
@@ -73,7 +73,7 @@ const Header = ({ viewId, ...rest }: HeaderProps) => {
           <Link className={classes.logo} to="/" color="inherit">
             {Strings.appName()}
           </Link>
-          {loggedInUser ? (
+          {isUserLoggedIn ? (
             <AppMenu />
           ) : (
             <Button
@@ -98,13 +98,15 @@ const Header = ({ viewId, ...rest }: HeaderProps) => {
             />
           )}
           <Typography variant="overline">{routes[viewId].viewName}</Typography>
-          {loggedInUser && (
+          {isUserLoggedIn && (
             <>
               <Notifications className={classes.notifications} />
-              <Typography variant="overline">{`${loggedInUser.firstName} ${loggedInUser.lastName}`}</Typography>
+              <Typography variant="overline">{`${getLoggedInUser().firstName} ${
+                getLoggedInUser().lastName
+              }`}</Typography>
               {!!profilePicture?.thumbnail?.url() && (
                 <UserAvatar
-                  email={loggedInUser.email}
+                  email={getLoggedInUser().email}
                   className={classes.profile}
                 />
               )}

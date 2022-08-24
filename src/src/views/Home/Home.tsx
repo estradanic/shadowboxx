@@ -1,8 +1,8 @@
-import React, { memo, useEffect, useRef, useState } from "react";
-import Parse from "parse";
+import React, { memo, useState } from "react";
 import { Fab, Typography, Grid } from "@material-ui/core";
 import { Add } from "@material-ui/icons";
 import { makeStyles, Theme } from "@material-ui/core/styles";
+import { useQuery } from "@tanstack/react-query";
 import {
   PageContainer,
   AlbumCard,
@@ -12,8 +12,9 @@ import {
 } from "../../components";
 import { Strings } from "../../resources";
 import { ParseAlbum } from "../../types";
-import { useGlobalLoadingContext, useUserContext } from "../../contexts";
+import { useUserContext } from "../../contexts";
 import { useView } from "../View";
+import { useRequests } from "../../hooks";
 
 const useStyles = makeStyles((theme: Theme) => ({
   fab: {
@@ -50,42 +51,19 @@ const Home = memo(() => {
   const classes = useStyles();
   const [addAlbumDialogOpen, setAddAlbumDialogOpen] = useState(false);
   const { enqueueErrorSnackbar, enqueueSuccessSnackbar } = useSnackbar();
-  const { startGlobalLoader, stopGlobalLoader, globalLoading } =
-    useGlobalLoadingContext();
-  const [albums, setAlbums] = useState<ParseAlbum[]>([]);
-  const gotAlbums = useRef(false);
-  const { loggedInUser } = useUserContext();
-
-  useEffect(() => {
-    if (!gotAlbums.current && !globalLoading && loggedInUser) {
-      gotAlbums.current = true;
-      startGlobalLoader();
-      ParseAlbum.query()
-        .findAll()
-        .then(async (response) => {
-          await Parse.Object.pinAll(response);
-          setAlbums(response.map((album) => new ParseAlbum(album)));
-        })
-        .catch((error) => {
-          enqueueErrorSnackbar(error?.message);
-          gotAlbums.current = false;
-        })
-        .finally(() => {
-          stopGlobalLoader();
-        });
+  const { getAllAlbumsFunction, getAllAlbumsQueryKey } = useRequests();
+  const { getLoggedInUser } = useUserContext();
+  const { data: albums, refetch: refetchAlbums } = useQuery<
+    ParseAlbum[],
+    Error
+  >(
+    getAllAlbumsQueryKey(),
+    () => getAllAlbumsFunction({ showErrorsInSnackbar: true }),
+    {
+      initialData: [],
+      refetchInterval: 5 * 60 * 1000,
     }
-  }, [
-    setAlbums,
-    enqueueErrorSnackbar,
-    globalLoading,
-    startGlobalLoader,
-    stopGlobalLoader,
-    loggedInUser,
-  ]);
-
-  if (!loggedInUser) {
-    return null;
-  }
+  );
 
   return (
     <PageContainer>
@@ -102,15 +80,8 @@ const Home = memo(() => {
               )
               .map((album, index) => (
                 <AlbumCard
-                  onChange={async (changedAlbum) => {
-                    const newAlbums = [...albums];
-                    if (changedAlbum !== null) {
-                      newAlbums[index] = changedAlbum;
-                    } else {
-                      newAlbums.splice(index, 1);
-                    }
-                    gotAlbums.current = false;
-                    setAlbums(newAlbums);
+                  onChange={async (_) => {
+                    await refetchAlbums();
                   }}
                   value={album}
                   key={album?.name}
@@ -142,7 +113,7 @@ const Home = memo(() => {
       <AlbumFormDialog
         resetOnConfirm
         value={{
-          owner: loggedInUser!.toPointer(),
+          owner: getLoggedInUser().toPointer(),
           images: [],
           name: Strings.untitledAlbum(),
           collaborators: [],
@@ -154,7 +125,7 @@ const Home = memo(() => {
           setAddAlbumDialogOpen(false);
           try {
             const response = await ParseAlbum.fromAttributes(attributes).save();
-            setAlbums((prev) => [...prev, response]);
+            await refetchAlbums();
             enqueueSuccessSnackbar(Strings.addAlbumSuccess(response?.name));
           } catch (error: any) {
             enqueueErrorSnackbar(error?.message ?? Strings.addAlbumError());

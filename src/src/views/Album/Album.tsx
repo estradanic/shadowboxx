@@ -1,15 +1,14 @@
-import React, { useEffect, useRef, useState } from "react";
-import Parse from "parse";
-import { BackButton, PageContainer, useSnackbar } from "../../components";
+import React from "react";
+import { BackButton, PageContainer } from "../../components";
 import { useLocation, useParams } from "react-router-dom";
 import { Grid, Typography } from "@material-ui/core";
 import { makeStyles, Theme } from "@material-ui/core/styles";
 import { Strings } from "../../resources";
 import { ParseImage, ParseAlbum } from "../../types";
 import { Empty, Image, FancyTitleTypography, Void } from "../../components";
-import { useRandomColor } from "../../hooks";
-import { useGlobalLoadingContext } from "../../contexts";
+import { useRandomColor, useRequests } from "../../hooks";
 import { useView } from "../View";
+import { useQuery } from "@tanstack/react-query";
 
 const useStyles = makeStyles((theme: Theme) => ({
   svgContainer: {
@@ -30,61 +29,33 @@ const useStyles = makeStyles((theme: Theme) => ({
  */
 const Album = () => {
   useView("Album");
-  const [album, setAlbum] = useState<ParseAlbum>();
-  const { enqueueErrorSnackbar } = useSnackbar();
-  const { startGlobalLoader, stopGlobalLoader, globalLoading } =
-    useGlobalLoadingContext();
-  const gotAlbum = useRef(false);
-  const gotImages = useRef(false);
   const { id } = useParams<{ id: string }>();
   const classes = useStyles();
-  const [images, setImages] = useState<ParseImage[]>();
   const location = useLocation<{ previousLocation?: Location }>();
   const randomColor = useRandomColor();
-
-  useEffect(() => {
-    if (!gotAlbum.current && !globalLoading) {
-      if (id) {
-        startGlobalLoader();
-        gotAlbum.current = true;
-        ParseAlbum.query()
-          .get(id)
-          .then(async (response) => {
-            response.pin();
-            gotImages.current = true;
-            const newAlbum = new ParseAlbum(response);
-            setAlbum(newAlbum);
-            ParseImage.query()
-              .containedIn(ParseImage.COLUMNS.id, newAlbum.images)
-              .findAll()
-              .then(async (imageResponse) => {
-                await Parse.Object.pinAll(imageResponse);
-                setImages(imageResponse.map((image) => new ParseImage(image)));
-              })
-              .catch((e) => {
-                enqueueErrorSnackbar(Strings.getImagesError());
-                gotImages.current = false;
-              })
-              .finally(() => {
-                stopGlobalLoader();
-              });
-          })
-          .catch((e) => {
-            gotAlbum.current = false;
-            enqueueErrorSnackbar(e.message ?? Strings.getAlbumError());
-            stopGlobalLoader();
-          });
-      } else {
-        enqueueErrorSnackbar(Strings.noAlbumId());
-      }
+  const {
+    getAlbumFunction,
+    getAlbumQueryKey,
+    getImagesByIdFunction,
+    getImagesByIdQueryKey,
+  } = useRequests();
+  const { data: album } = useQuery<ParseAlbum, Error>(
+    getAlbumQueryKey(id),
+    () => getAlbumFunction(id, { showErrorsInSnackbar: true }),
+    {
+      refetchInterval: 5 * 60 * 1000,
     }
-  }, [
-    enqueueErrorSnackbar,
-    globalLoading,
-    id,
-    startGlobalLoader,
-    stopGlobalLoader,
-  ]);
+  );
+  const { data: images } = useQuery<ParseImage[], Error>(
+    getImagesByIdQueryKey(album?.images ?? []),
+    () =>
+      getImagesByIdFunction(album?.images ?? [], {
+        showErrorsInSnackbar: true,
+      }),
+    {
+      initialData: [],
+    }
+  );
 
   return (
     <PageContainer>

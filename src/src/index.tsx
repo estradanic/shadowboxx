@@ -1,10 +1,11 @@
 import React from "react";
 import ReactDOM from "react-dom";
-import { BrowserRouter as Router } from "react-router-dom";
+import { BrowserRouter } from "react-router-dom";
 import {
   MuiThemeProvider,
   unstable_createMuiStrictModeTheme as createMuiTheme,
 } from "@material-ui/core/styles";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import {
   UserContextProvider,
   NotificationsContextProvider,
@@ -13,6 +14,8 @@ import {
 } from "./contexts";
 import App from "./app/App";
 import "./index.css";
+
+const queryClient = new QueryClient();
 
 const theme = createMuiTheme({
   palette: {
@@ -74,13 +77,15 @@ ReactDOM.render(
     <MuiThemeProvider theme={theme}>
       <NetworkDetectionContextProvider>
         <GlobalLoadingContextProvider>
-          <NotificationsContextProvider>
-            <Router>
-              <UserContextProvider>
-                <App />
-              </UserContextProvider>
-            </Router>
-          </NotificationsContextProvider>
+          <QueryClientProvider client={queryClient}>
+            <NotificationsContextProvider>
+              <BrowserRouter>
+                <UserContextProvider>
+                  <App />
+                </UserContextProvider>
+              </BrowserRouter>
+            </NotificationsContextProvider>
+          </QueryClientProvider>
         </GlobalLoadingContextProvider>
       </NetworkDetectionContextProvider>
     </MuiThemeProvider>

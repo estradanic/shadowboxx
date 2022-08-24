@@ -1,19 +1,17 @@
-import React, { useEffect, useRef, useState } from "react";
-import Parse from "parse";
+import React from "react";
 import { Grid, Typography } from "@material-ui/core";
 import { makeStyles, Theme } from "@material-ui/core/styles";
 import {
   Empty,
   FancyTitleTypography,
   PageContainer,
-  useSnackbar,
   Image,
 } from "../../components";
-import { useGlobalLoadingContext } from "../../contexts";
-import { useRandomColor } from "../../hooks";
+import { useRandomColor, useRequests } from "../../hooks";
 import { Strings } from "../../resources";
 import { ParseImage } from "../../types";
 import { useView } from "../View";
+import { useQuery } from "@tanstack/react-query";
 
 const useStyles = makeStyles((theme: Theme) => ({
   svgContainer: {
@@ -34,40 +32,17 @@ const useStyles = makeStyles((theme: Theme) => ({
  */
 const Images = () => {
   useView("Images");
-  const gotImages = useRef(false);
   const randomColor = useRandomColor();
-  const { startGlobalLoader, stopGlobalLoader, globalLoading } =
-    useGlobalLoadingContext();
-  const [images, setImages] = useState<ParseImage[]>([]);
-  const { enqueueErrorSnackbar } = useSnackbar();
   const classes = useStyles();
-
-  useEffect(() => {
-    if (!gotImages.current && !globalLoading) {
-      startGlobalLoader();
-      gotImages.current = true;
-      ParseImage.query()
-        .findAll()
-        .then(async (response) => {
-          if (response) {
-            await Parse.Object.pinAll(response);
-            setImages(response.map((image) => new ParseImage(image)));
-          }
-        })
-        .catch((e) => {
-          enqueueErrorSnackbar(Strings.getImagesError());
-          gotImages.current = false;
-        })
-        .finally(() => {
-          stopGlobalLoader();
-        });
+  const { getAllImagesFunction, getAllImagesQueryKey } = useRequests();
+  const { data: images } = useQuery<ParseImage[], Error>(
+    getAllImagesQueryKey(),
+    () => getAllImagesFunction({ showErrorsInSnackbar: true }),
+    {
+      initialData: [],
+      refetchInterval: 5 * 60 * 1000,
     }
-  }, [
-    enqueueErrorSnackbar,
-    globalLoading,
-    startGlobalLoader,
-    stopGlobalLoader,
-  ]);
+  );
 
   return (
     <PageContainer>

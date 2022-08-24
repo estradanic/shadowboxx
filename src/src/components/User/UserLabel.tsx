@@ -1,7 +1,8 @@
-import React, { memo, useEffect, useState } from "react";
+import React, { memo } from "react";
 import { Typography, TypographyProps } from "@material-ui/core";
 import { ParseUser } from "../../types";
-import { useUserContext } from "../../contexts";
+import { useRequests } from "../../hooks";
+import { useQuery } from "@tanstack/react-query";
 
 /** Interface defining props for UserLabel */
 export interface UserLabelProps extends TypographyProps {
@@ -13,43 +14,18 @@ export interface UserLabelProps extends TypographyProps {
 
 /** Component to display the name of a user */
 const UserLabel = memo(({ email, fetchUser, ...rest }: UserLabelProps) => {
-  const [firstName, setFirstName] = useState("");
-  const [lastName, setLastName] = useState("");
-  const { loggedInUser } = useUserContext();
-
-  useEffect(() => {
-    if (fetchUser) {
-      const user = fetchUser();
-      setFirstName(user?.firstName ?? user?.email ?? email);
-      setLastName(user?.lastName ?? "");
-    } else if (loggedInUser && email === loggedInUser?.email) {
-      setFirstName(loggedInUser.firstName);
-      setLastName(loggedInUser.lastName);
-    } else {
-      ParseUser.query()
-        .equalTo(ParseUser.COLUMNS.email, email)
-        .first()
-        .then(async (response) => {
-          if (response) {
-            await response.pin();
-            const fetchedUser = new ParseUser(response);
-            setFirstName(fetchedUser?.firstName ?? fetchedUser.email);
-            setLastName(fetchedUser?.lastName ?? "");
-          } else {
-            setFirstName(email);
-            setLastName("");
-          }
-        })
-        .catch(() => {
-          setFirstName(email);
-          setLastName("");
-        });
+  const { getUserByEmailFunction, getUserByEmailQueryKey } = useRequests();
+  const { data: user } = useQuery<ParseUser, Error>(
+    getUserByEmailQueryKey(email),
+    () => (fetchUser ? fetchUser() : getUserByEmailFunction(email)),
+    {
+      refetchOnWindowFocus: false,
     }
-  }, [email, loggedInUser, fetchUser]);
+  );
 
   return (
     <Typography variant="overline" {...rest}>
-      {`${firstName} ${lastName}`}
+      {user?.name}
     </Typography>
   );
 });

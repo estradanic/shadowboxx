@@ -9,3 +9,4 @@ export { default as ParsePointer } from "./ParsePointer";
 export { default as ParseUser, UpdateReason } from "./ParseUser";
 export type { User, UpdateLoggedInUser } from "./ParseUser";
 export type { default as VariableColor } from "./VariableColor";
+export * from "./TypeUtils";

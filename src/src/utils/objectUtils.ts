@@ -55,3 +55,9 @@ export const dedupeFast = <T>(
 
   return Array.from(deduped.values());
 };
+
+export const fromEntries = <Key extends PropertyKey, Value>(
+  entries: [Key, Value][]
+): { [key in Key]: Value } => {
+  return Object.fromEntries(entries) as { [key in Key]: Value };
+};

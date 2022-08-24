@@ -37,7 +37,7 @@ const useStyles = makeStyles((theme: Theme) => ({
 export const useSnackbar = () => {
   const { enqueueSnackbar } = notistackUseSnackbar();
   const classes = useStyles();
-  const { loggedInUser, updateLoggedInUser } = useUserContext();
+  const { getLoggedInUser, updateLoggedInUser } = useUserContext();
 
   const enqueueSuccessSnackbar = (message: string) => {
     enqueueSnackbar(<Typography>{message}</Typography>, {
@@ -59,7 +59,7 @@ export const useSnackbar = () => {
   };
   const enqueueErrorSnackbar = (message: string) => {
     if (message === "Invalid session token") {
-      loggedInUser?.logout(updateLoggedInUser);
+      getLoggedInUser().logout(updateLoggedInUser);
     }
     console.error(message);
     enqueueSnackbar(<Typography>{message}</Typography>, {

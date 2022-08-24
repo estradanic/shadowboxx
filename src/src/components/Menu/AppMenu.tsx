@@ -53,7 +53,7 @@ export interface AppMenuListProps {
 /** Component to display a list of actions or pages for the app */
 const AppMenuList = ({ collapse = false }: AppMenuListProps) => {
   const classes = useStyles();
-  const { loggedInUser, updateLoggedInUser } = useUserContext();
+  const { getLoggedInUser, updateLoggedInUser } = useUserContext();
 
   return (
     <List className={collapse ? "" : classes.horizontalList}>
@@ -77,7 +77,7 @@ const AppMenuList = ({ collapse = false }: AppMenuListProps) => {
       </ListItemLink>
       <ListItemLink
         onClick={() => {
-          loggedInUser?.logout(updateLoggedInUser);
+          getLoggedInUser().logout(updateLoggedInUser);
         }}
         to={routes["Login"].path}
       >

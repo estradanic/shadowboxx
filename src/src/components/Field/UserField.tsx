@@ -3,17 +3,13 @@ import React, {
   forwardRef,
   useState,
   KeyboardEvent,
-  useEffect,
-  useRef,
 } from "react";
-import Parse from "parse";
 import { Autocomplete, AutocompleteProps } from "@material-ui/lab";
-import { Set } from "immutable";
 import UserChip from "../User/UserChip";
 import TextField from "../Field/TextField";
 import { makeStyles, Theme } from "@material-ui/core/styles";
-import { useUserContext } from "../../contexts";
-import { ParseAlbum, ParseUser } from "../../types";
+import { useQuery } from "@tanstack/react-query";
+import { useRequests } from "../../hooks";
 
 const useStyles = makeStyles((theme: Theme) => ({
   endAdornment: {
@@ -53,48 +49,19 @@ const UserField = forwardRef(
     { label, onChange, value, ...rest }: UserFieldProps,
     ref: ForwardedRef<any>
   ) => {
-    const { loggedInUser } = useUserContext();
     const classes = useStyles();
-    const gotOptions = useRef(false);
-    const [options, setOptions] = useState<string[]>([]);
     const [inputValue, setInputValue] = useState<string>("");
 
-    useEffect(() => {
-      if (!gotOptions.current) {
-        (async () => {
-          await Parse.Query.or(
-            ParseAlbum.query().equalTo(
-              ParseAlbum.COLUMNS.owner,
-              loggedInUser?.toNativePointer()
-            ),
-            ParseAlbum.query().containsAll(ParseAlbum.COLUMNS.collaborators, [
-              loggedInUser!.email,
-            ]),
-            ParseAlbum.query().containsAll(ParseAlbum.COLUMNS.viewers, [
-              loggedInUser!.email,
-            ])
-          )
-            .findAll()
-            .then(async (response) => {
-              await Parse.Object.pinAll(response);
-              const relatedUsers: string[] = [];
-              for (const albumResponse of response) {
-                const album = new ParseAlbum(albumResponse);
-                relatedUsers.push(...album.collaborators, ...album.viewers);
-                const ownerUser = await ParseUser.query().get(album.owner.id);
-                await ownerUser.pin();
-                relatedUsers.push(new ParseUser(ownerUser).email);
-              }
-              setOptions(
-                Array.from(Set(relatedUsers)).filter(
-                  (option) => option !== loggedInUser?.email
-                )
-              );
-            });
-        })();
-        gotOptions.current = true;
+    const { getRelatedUserEmailsFunction, getRelatedUserEmailsQueryKey } =
+      useRequests();
+    const { data: options } = useQuery<string[], Error>(
+      getRelatedUserEmailsQueryKey(),
+      () => getRelatedUserEmailsFunction(),
+      {
+        refetchOnWindowFocus: false,
+        initialData: [],
       }
-    }, [setOptions, loggedInUser]);
+    );
 
     const onKeyDown = (event: KeyboardEvent) => {
       switch (event.key) {

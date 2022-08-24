@@ -1,7 +1,7 @@
 {
   "name": "shadowboxx",
   "version": "0.1.0",
-  "license": "UNLICENSED",
+  "license": "GPL3",
   "private": true,
   "engines": {
     "node": "16.x"
@@ -20,6 +20,8 @@
     "@material-ui/lab": "^4.0.0-alpha.57",
     "@parse/react": "^0.0.1-alpha.18",
     "@svgr/webpack": "^6.3.1",
+    "@tanstack/react-query": "^4.1.0",
+    "@tanstack/react-query-devtools": "^4.2.1",
     "@testing-library/react": "^12.1.5",
     "@types/classnames": "^2.2.11",
     "@types/deep-equal": "^1.0.1",
@@ -114,7 +116,7 @@
     "compileCloud": "cd ./cloud && tsc && cd ..",
     "format": "prettier --write 'src/**/*.{ts,tsx,js,json,jsx}' && prettier --write 'cloud/**/*.{ts,json}'",
     "analyze": "source-map-explorer 'build/static/js/*.js'",
-    "build": "yarn format && BUILD_PATH=dist node scripts/build-dev.js",
+    "build": "yarn format && BUILD_PATH=dist NODE_ENV=development node scripts/build-dev.js",
     "build:prod": "yarn format && yarn install && node scripts/build.js",
     "start": "serve -p 8080 ./dist -s",
     "start:prod": "http-server -p 8080 ./build",

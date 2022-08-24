@@ -1,17 +1,11 @@
-import React, {
-  ForwardedRef,
-  forwardRef,
-  useCallback,
-  useEffect,
-  useState,
-  useRef,
-} from "react";
+import React, { ForwardedRef, forwardRef } from "react";
 import { Avatar, AvatarProps } from "@material-ui/core";
 import { makeStyles, Theme } from "@material-ui/core/styles";
 import cx from "classnames";
-import { useUserContext } from "../../contexts";
 import { ParseUser, ParseImage } from "../../types";
 import { Strings } from "../../resources";
+import { useQuery } from "@tanstack/react-query";
+import { useRequests } from "../../hooks";
 
 const useStyles = makeStyles((theme: Theme) => ({
   avatar: {
@@ -36,76 +30,34 @@ const UserAvatar = forwardRef(
     ref: ForwardedRef<any>
   ) => {
     const classes = useStyles();
-    const { loggedInUser, profilePicture: loggedInUserProfilePicture } =
-      useUserContext();
-    const [src, setSrc] = useState("");
-    const [firstName, setFirstName] = useState("");
-    const [lastName, setLastName] = useState("");
-    const gotImage = useRef(false);
-
-    const setProfilePicture = useCallback(
-      async (user: ParseUser) => {
-        if (user && user.profilePicture?.exists && !gotImage.current) {
-          try {
-            gotImage.current = true;
-            const profilePictureResponse = await ParseImage.query()
-              .equalTo("objectId", user.profilePicture.id)
-              .first();
-            if (profilePictureResponse) {
-              await profilePictureResponse.pin();
-              const newProfilePicture = new ParseImage(profilePictureResponse);
-              setSrc(newProfilePicture?.thumbnail.url() ?? "");
-            }
-          } catch (error: any) {
-            console.error(error?.message ?? Strings.getImageError());
-            gotImage.current = false;
-          }
-        }
-      },
-      [setSrc]
-    );
-
-    useEffect(() => {
-      if (fetchUser) {
-        const user = fetchUser();
-        setFirstName(user?.firstName ?? user?.email ?? email);
-        setLastName(user?.lastName ?? "");
-        setProfilePicture(user);
-      } else if (email === loggedInUser?.email) {
-        setSrc(loggedInUserProfilePicture?.thumbnail.url() ?? "");
-        setFirstName(loggedInUser?.firstName ?? "");
-        setLastName(loggedInUser?.lastName ?? "");
-      } else {
-        ParseUser.query()
-          .equalTo(ParseUser.COLUMNS.email, email)
-          .first()
-          .then(async (response) => {
-            if (response) {
-              await response.pin();
-              const fetchedUser = new ParseUser(response);
-              setProfilePicture(fetchedUser);
-              setFirstName(fetchedUser?.firstName ?? email);
-              setLastName(fetchedUser?.lastName ?? "");
-            } else {
-              setFirstName(email);
-              setLastName("");
-            }
-          });
+    const {
+      getUserByEmailFunction,
+      getUserByEmailQueryKey,
+      getImageByIdFunction,
+      getImageByIdQueryKey,
+    } = useRequests();
+    const { data: user } = useQuery<ParseUser, Error>(
+      getUserByEmailQueryKey(email),
+      () => (fetchUser ? fetchUser() : getUserByEmailFunction(email)),
+      {
+        refetchOnWindowFocus: false,
       }
-    }, [
-      email,
-      loggedInUser,
-      fetchUser,
-      loggedInUserProfilePicture?.thumbnail,
-      setProfilePicture,
-    ]);
+    );
+    const { data: profilePicture } = useQuery<ParseImage, Error>(
+      getImageByIdQueryKey(user?.profilePicture?.id),
+      () => getImageByIdFunction(user?.profilePicture?.id),
+      {
+        refetchOnWindowFocus: false,
+        enabled: !!user?.profilePicture?.id,
+      }
+    );
 
     return (
       <Avatar
         ref={ref}
-        alt={`${firstName} ${lastName}`}
+        alt={user?.name ?? Strings.profilePicture()}
         className={cx(classes.avatar, piClassName)}
-        src={src}
+        src={profilePicture?.thumbnail?.url()}
         {...rest}
       />
     );

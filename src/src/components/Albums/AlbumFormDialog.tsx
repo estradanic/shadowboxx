@@ -1,10 +1,4 @@
-import React, {
-  useCallback,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from "react";
+import React, { useCallback, useMemo, useState } from "react";
 import Parse from "parse";
 import { makeStyles, Theme, useTheme } from "@material-ui/core/styles";
 import {
@@ -18,11 +12,7 @@ import { Star, StarBorder } from "@material-ui/icons";
 import { Set } from "immutable";
 import { Strings } from "../../resources";
 import { ErrorState, isNullOrWhitespace } from "../../utils";
-import {
-  ImageContextProvider,
-  useGlobalLoadingContext,
-  useUserContext,
-} from "../../contexts";
+import { ImageContextProvider, useUserContext } from "../../contexts";
 import { ParseUser, ParseImage, Album } from "../../types";
 import ActionDialog, {
   ActionDialogProps,
@@ -33,6 +23,8 @@ import { useSnackbar } from "../Snackbar/Snackbar";
 import UserField from "../Field/UserField";
 import TextField from "../Field/TextField";
 import Tooltip from "../Tooltip/Tooltip";
+import { useQuery } from "@tanstack/react-query";
+import { useRequests } from "../../hooks";
 
 const useStyles = makeStyles((theme: Theme) => ({
   checkboxLabel: {
@@ -90,25 +82,20 @@ const AlbumFormDialog = ({
   );
   const [viewers, setViewers] = useState<Album["viewers"]>(value.viewers);
 
-  useEffect(() => {
-    setImageIds(value.images);
-    setName(value.name);
-    setDescription(value.description);
-    setIsFavorite(value.isFavorite);
-    setCollaborators(value.collaborators);
-    setViewers(value.viewers);
-  }, [value]);
+  const { getImagesByIdFunction, getImagesByIdQueryKey } = useRequests();
+  const { data: images } = useQuery<ParseImage[], Error>(
+    getImagesByIdQueryKey(imageIds),
+    () => getImagesByIdFunction(imageIds, { showErrorsInSnackbar: true }),
+    {
+      refetchOnWindowFocus: false,
+      initialData: [],
+    }
+  );
 
-  const [images, setImages] = useState<ParseImage[]>([]);
-
-  const gotImages = useRef<boolean>(false);
-
-  const { startGlobalLoader, stopGlobalLoader } = useGlobalLoadingContext();
-
-  const { loggedInUser } = useUserContext();
+  const { getLoggedInUser } = useUserContext();
   const isCollaborator = useMemo(
-    () => loggedInUser?.id !== value.owner.id,
-    [loggedInUser?.id, value.owner.id]
+    () => getLoggedInUser().id !== value.owner.id,
+    [getLoggedInUser, value.owner.id]
   );
 
   const defaultErrors = useMemo(
@@ -140,33 +127,6 @@ const AlbumFormDialog = ({
     defaultErrors,
   ]);
   const { enqueueErrorSnackbar } = useSnackbar();
-
-  useEffect(() => {
-    if (open && !gotImages.current) {
-      gotImages.current = true;
-      startGlobalLoader();
-      ParseImage.query()
-        .containedIn(ParseImage.COLUMNS.id, imageIds)
-        .findAll()
-        .then(async (response) => {
-          setImages(response.map((image) => new ParseImage(image)));
-          await Parse.Object.pinAll(response);
-        })
-        .catch((error) => {
-          gotImages.current = false;
-          enqueueErrorSnackbar(error?.message ?? Strings.getImagesError());
-        })
-        .finally(() => {
-          stopGlobalLoader();
-        });
-    }
-  }, [
-    imageIds,
-    open,
-    enqueueErrorSnackbar,
-    startGlobalLoader,
-    stopGlobalLoader,
-  ]);
 
   const classes = useStyles();
   const theme = useTheme();
@@ -325,8 +285,8 @@ const AlbumFormDialog = ({
               multiple
               value={images}
               onChange={async (newImages) => {
-                setImages(newImages);
-                setImageIds(newImages.map((image) => image.id!));
+                const newImageIds = newImages.map((image) => image.id!);
+                setImageIds(newImageIds);
               }}
             />
           </ImageContextProvider>

@@ -232,6 +232,13 @@ export default class ParseUser {
     this._user.set(ParseUser.COLUMNS.firstName, firstName);
   }
 
+  get name(): string {
+    if (this.firstName && this.lastName) {
+      return `${this.firstName} ${this.lastName}`;
+    }
+    return this.email;
+  }
+
   get isDarkThemeEnabled(): boolean {
     return this._user.get(ParseUser.COLUMNS.isDarkThemeEnabled);
   }

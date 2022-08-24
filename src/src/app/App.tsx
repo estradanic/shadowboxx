@@ -25,12 +25,12 @@ Parse.initialize(
 Parse.enableLocalDatastore(false);
 
 const App = () => {
-  const { loggedInUser } = useUserContext();
+  const { getLoggedInUser } = useUserContext();
   const { addNotification } = useNotificationsContext();
 
   const darkTheme = (lightTheme: Theme) =>
     createMuiTheme(
-      loggedInUser?.isDarkThemeEnabled
+      getLoggedInUser()?.isDarkThemeEnabled
         ? {
             palette: {
               primary: {

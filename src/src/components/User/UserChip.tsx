@@ -1,10 +1,9 @@
-import React, { memo, useEffect, useRef, useState } from "react";
+import React, { memo } from "react";
 import UserLabel from "./UserLabel";
 import UserAvatar from "./UserAvatar";
 import { Chip, ChipProps } from "@material-ui/core";
 import { makeStyles, Theme } from "@material-ui/core/styles";
 import { ParseUser } from "../../types";
-import { useUserContext } from "../../contexts";
 
 const useStyles = makeStyles((theme: Theme) => ({
   root: {
@@ -40,58 +39,12 @@ export interface UserChipProps
 /** Component to display the name and profile picture of a user */
 const UserChip = memo(({ email, fetchUser, ...rest }: UserChipProps) => {
   const classes = useStyles();
-  const mountedRef = useRef(true);
-  const [user, setUser] = useState<ParseUser>();
-  const { loggedInUser } = useUserContext();
-
-  useEffect(() => {
-    if (mountedRef.current) {
-      if (fetchUser) {
-        setUser(fetchUser());
-      }
-      if (loggedInUser && email === loggedInUser.email) {
-        setUser(loggedInUser);
-      } else {
-        ParseUser.query()
-          .equalTo(ParseUser.COLUMNS.email, email)
-          .first()
-          .then(async (response) => {
-            if (!response) {
-              setUser(
-                ParseUser.fromAttributes({
-                  username: email,
-                  password: "",
-                  firstName: email,
-                })
-              );
-            } else {
-              await response.pin();
-              setUser(new ParseUser(response));
-            }
-          })
-          .catch(() => {
-            setUser(
-              ParseUser.fromAttributes({
-                username: email,
-                password: "",
-                firstName: email,
-              })
-            );
-          });
-      }
-    }
-    mountedRef.current = true;
-    return () => {
-      mountedRef.current = false;
-    };
-  }, [email, loggedInUser, setUser, fetchUser]);
-
   return (
     <Chip
       {...rest}
       classes={classes}
-      icon={<UserAvatar fetchUser={() => user!} email={user?.email!} />}
-      label={<UserLabel fetchUser={() => user!} email={user?.email!} />}
+      icon={<UserAvatar fetchUser={fetchUser} email={email} />}
+      label={<UserLabel fetchUser={fetchUser} email={email} />}
     />
   );
 });

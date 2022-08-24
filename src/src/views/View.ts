@@ -9,7 +9,7 @@ import { routes } from "../app";
 export const useView = (currentViewId: string) => {
   const history = useHistory();
   const currentRoute = routes[currentViewId];
-  const { loggedInUser, setRedirectPath } = useUserContext();
+  const { isUserLoggedIn, setRedirectPath } = useUserContext();
 
   const redirectToLogin = useCallback(() => {
     if (currentRoute.redirectOnAuthFail) {
@@ -20,8 +20,8 @@ export const useView = (currentViewId: string) => {
   }, [currentRoute, setRedirectPath, history]);
 
   useLayoutEffect(() => {
-    if (!loggedInUser && currentRoute.tryAuthenticate) {
+    if (!isUserLoggedIn && currentRoute.tryAuthenticate) {
       redirectToLogin();
     }
-  }, [currentRoute, redirectToLogin, loggedInUser]);
+  }, [currentRoute, redirectToLogin, isUserLoggedIn]);
 };

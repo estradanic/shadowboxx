@@ -133,7 +133,7 @@ const ImageField = memo(
     const [imageUrlRef, imageUrl, setImageUrl] = useRefState("");
     const { startGlobalLoader, stopGlobalLoader } = useGlobalLoadingContext();
 
-    const { loggedInUser } = useUserContext();
+    const { getLoggedInUser } = useUserContext();
 
     const [anchorEl, setAnchorEl] = useState<Element>();
     const closeMenu = () => setAnchorEl(undefined);
@@ -196,7 +196,7 @@ const ImageField = memo(
               {
                 file: parseFile,
                 isCoverImage: false,
-                owner: loggedInUser!.toPointer(),
+                owner: getLoggedInUser().toPointer(),
                 name: removeExtension(fileName),
               },
               acl
@@ -223,7 +223,7 @@ const ImageField = memo(
           {
             file: parseFile,
             isCoverImage: false,
-            owner: loggedInUser!.toPointer(),
+            owner: getLoggedInUser().toPointer(),
             name: removeExtension(fileName),
           },
           acl

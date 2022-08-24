@@ -35,6 +35,12 @@ export default class ParseObject<A extends Attributes> {
     updatedAt: "updatedAt",
   };
 
+  static query() {
+    return new Parse.Query<Parse.Object<ParsifyPointers<Attributes>>>(
+      Parse.Object
+    );
+  }
+
   _object: Parse.Object<ParsifyPointers<A>>;
 
   constructor(object: Parse.Object<ParsifyPointers<A>>) {

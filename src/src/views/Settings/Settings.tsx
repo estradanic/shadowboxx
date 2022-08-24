@@ -108,8 +108,12 @@ const DefaultErrorState = {
  */
 const Settings = () => {
   useView("Settings");
-  const { loggedInUser, profilePicture, saveLoggedInUserUpdates } =
-    useUserContext();
+  const {
+    getLoggedInUser,
+    isUserLoggedIn,
+    profilePicture,
+    saveLoggedInUserUpdates,
+  } = useUserContext();
 
   const { stopGlobalLoader, startGlobalLoader } = useGlobalLoadingContext();
   const { online } = useNetworkDetectionContext();
@@ -122,24 +126,24 @@ const Settings = () => {
       >
     >(DefaultErrorState);
   const [settings, setSettings] = useState({
-    isDarkThemeEnabled: !!loggedInUser?.isDarkThemeEnabled,
+    isDarkThemeEnabled: !!getLoggedInUser().isDarkThemeEnabled,
     profilePicture,
-    firstName: loggedInUser?.firstName ?? "",
-    lastName: loggedInUser?.lastName ?? "",
-    email: loggedInUser?.email ?? "",
+    firstName: getLoggedInUser().firstName ?? "",
+    lastName: getLoggedInUser().lastName ?? "",
+    email: getLoggedInUser().email ?? "",
   });
 
   useEffect(() => {
-    if (loggedInUser) {
+    if (isUserLoggedIn) {
       setSettings({
-        isDarkThemeEnabled: loggedInUser.isDarkThemeEnabled,
-        firstName: loggedInUser.firstName,
-        lastName: loggedInUser.lastName,
-        email: loggedInUser.email,
+        isDarkThemeEnabled: getLoggedInUser().isDarkThemeEnabled,
+        firstName: getLoggedInUser().firstName,
+        lastName: getLoggedInUser().lastName,
+        email: getLoggedInUser().email,
         profilePicture,
       });
     }
-  }, [loggedInUser, profilePicture]);
+  }, [getLoggedInUser, isUserLoggedIn, profilePicture]);
 
   const { enqueueErrorSnackbar, enqueueSuccessSnackbar } = useSnackbar();
 
@@ -178,11 +182,11 @@ const Settings = () => {
   const changeUserInfo = async () => {
     if (validate()) {
       startGlobalLoader();
-      loggedInUser!.email = settings.email;
-      loggedInUser!.firstName = settings.firstName;
-      loggedInUser!.lastName = settings.lastName;
-      loggedInUser!.profilePicture = settings.profilePicture?.toPointer();
-      loggedInUser!.isDarkThemeEnabled = settings.isDarkThemeEnabled;
+      getLoggedInUser().email = settings.email;
+      getLoggedInUser().firstName = settings.firstName;
+      getLoggedInUser().lastName = settings.lastName;
+      getLoggedInUser().profilePicture = settings.profilePicture?.toPointer();
+      getLoggedInUser().isDarkThemeEnabled = settings.isDarkThemeEnabled;
       try {
         await saveLoggedInUserUpdates();
         enqueueSuccessSnackbar(Strings.settingsSaved());
@@ -195,10 +199,10 @@ const Settings = () => {
   };
 
   const profilePictureACL = useMemo(() => {
-    const acl = new Parse.ACL(loggedInUser?._user);
+    const acl = new Parse.ACL(getLoggedInUser()._user);
     acl.setPublicReadAccess(true);
     return acl;
-  }, [loggedInUser]);
+  }, [getLoggedInUser]);
 
   return (
     <PageContainer>
