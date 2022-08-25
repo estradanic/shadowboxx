@@ -29,7 +29,7 @@ const ListItemLink = ({
 
   const onClick = (event: any) => {
     piOnClick?.(event);
-    navigate(to, {state});
+    navigate(to, { state });
   };
 
   return (

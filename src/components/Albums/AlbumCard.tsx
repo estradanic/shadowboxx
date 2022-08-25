@@ -203,7 +203,7 @@ const AlbumCard = memo(({ value, onChange }: AlbumCardProps) => {
   const navigateToAlbum = () => {
     if (value?.id) {
       navigate(routes["Album"].path.replace(":id", value.id), {
-        state: {previousLocation: location},
+        state: { previousLocation: location },
       });
     }
   };

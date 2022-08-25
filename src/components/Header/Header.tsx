@@ -63,7 +63,7 @@ const Header = ({ viewId, ...rest }: HeaderProps) => {
   const xs = useMediaQuery(theme.breakpoints.down("xs"));
   const classes = useStyles({ xs });
   const navigate = useNavigate();
-  const location = useLocation() as {state: { previousLocation?: Location }};
+  const location = useLocation() as { state: { previousLocation?: Location } };
   const { isUserLoggedIn, getLoggedInUser, profilePicture } = useUserContext();
 
   return (

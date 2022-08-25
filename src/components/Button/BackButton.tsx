@@ -13,7 +13,7 @@ interface BackButtonProps
 /** Component to move backwards one route in history */
 const BackButton = ({ placement = "header", ...rest }: BackButtonProps) => {
   const navigate = useNavigate();
-  const location = useLocation() as {state: {previousLocation: Location}};
+  const location = useLocation() as { state: { previousLocation: Location } };
 
   const startIcon = placement === "header" ? <ArrowBack /> : undefined;
   const text = placement === "header" ? Strings.back() : Strings.goBack();

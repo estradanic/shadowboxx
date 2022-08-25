@@ -9,7 +9,11 @@ import { Theme } from "@material-ui/core/styles";
 import { DiscFull } from "@material-ui/icons";
 import Parse from "parse";
 import { useNotificationsContext, useUserContext } from "../contexts";
-import { ActionDialogContextProvider, DefaultLayout, SnackbarProvider } from "../components";
+import {
+  ActionDialogContextProvider,
+  DefaultLayout,
+  SnackbarProvider,
+} from "../components";
 import { Strings } from "../resources";
 import routes from "./routes";
 declare const globalThis: any;
@@ -29,7 +33,7 @@ const App = () => {
 
   const darkTheme = (lightTheme: Theme) =>
     createMuiTheme(
-      (isUserLoggedIn && getLoggedInUser()?.isDarkThemeEnabled)
+      isUserLoggedIn && getLoggedInUser()?.isDarkThemeEnabled
         ? {
             palette: {
               primary: {
@@ -153,11 +157,15 @@ const App = () => {
           >
             <Routes>
               {Object.values(routes).map((route) => (
-                <Route key={route.viewName} element={
-                  <DefaultLayout viewId={route.viewId}>
-                    <route.View />
-                  </DefaultLayout>
-                } path={route.path} />
+                <Route
+                  key={route.viewName}
+                  element={
+                    <DefaultLayout viewId={route.viewId}>
+                      <route.View />
+                    </DefaultLayout>
+                  }
+                  path={route.path}
+                />
               ))}
             </Routes>
           </Suspense>

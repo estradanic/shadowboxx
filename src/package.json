@@ -92,7 +92,7 @@
     "iterate": "vite",
     "preview": "vite preview",
     "compileCloud": "cd ./cloud && tsc && cd ..",
-    "format": "prettier --write 'src/**/*.{ts,tsx,js,json,jsx}' && prettier --write 'cloud/**/*.{ts,json}'",
+    "format": "prettier --write '{@types,app,cloud,components,contexts,hooks,resources,types,utils,views}/**/*.{ts,tsx,js,json,jsx}' && prettier --write '*.{ts,tsx,js,json,jsx}'",
     "analyze": "source-map-explorer 'build/static/js/*.js'",
     "preDeploy": "yarn build && yarn compileCloud && rm -rf ../public/* && cp -r ./build/* ../public",
     "deploy": "yarn preDeploy && b4a deploy ShadowboxxDevTest",

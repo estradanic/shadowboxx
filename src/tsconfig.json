@@ -17,5 +17,16 @@
     "noEmit": true,
     "jsx": "react-jsx"
   },
-  "include": ["vite.config.ts", "@types", "app", "components", "contexts", "hooks", "resources", "types", "utils", "views"]
+  "include": [
+    "vite.config.ts",
+    "@types",
+    "app",
+    "components",
+    "contexts",
+    "hooks",
+    "resources",
+    "types",
+    "utils",
+    "views"
+  ]
 }
