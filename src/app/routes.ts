@@ -13,18 +13,14 @@ const Images = lazy(() => import("../views/Images/Images"));
  * Interface defining a route object
  */
 export interface RouteProps {
-  /** Name of view to appear in header */
+  /** Name of View to appear in header */
   viewName: string;
-  /** Id of view. Should be same as key in the routes object */
+  /** Id of View. Should be same as key in the routes object */
   viewId: string;
   /** React Component to render in the layout */
-  view: ComponentType<any>;
+  View: ComponentType<any>;
   /** React Router path */
   path: string;
-  /** What layout to use for this route. Defaults to DefaultLayout */
-  layout?: string;
-  /** Does path have to match exactly */
-  exact?: boolean;
   /** Whether to try to sessionId authenticate on page load */
   tryAuthenticate?: boolean;
   /** Redirect to login page if not authenticated */
@@ -38,7 +34,7 @@ const routes: { [key: string]: RouteProps } = {
   Album: {
     viewId: "Album",
     viewName: "Album",
-    view: Album,
+    View: Album,
     path: "/album/:id",
     tryAuthenticate: true,
     redirectOnAuthFail: true,
@@ -46,7 +42,7 @@ const routes: { [key: string]: RouteProps } = {
   Home: {
     viewId: "Home",
     viewName: "Home",
-    view: Home,
+    View: Home,
     path: "/home",
     tryAuthenticate: true,
     redirectOnAuthFail: true,
@@ -54,13 +50,13 @@ const routes: { [key: string]: RouteProps } = {
   Login: {
     viewId: "Login",
     viewName: "Login",
-    view: Login,
+    View: Login,
     path: "/login",
   },
   Images: {
     viewId: "Images",
     viewName: "Pictures",
-    view: Images,
+    View: Images,
     path: "/images",
     tryAuthenticate: true,
     redirectOnAuthFail: true,
@@ -68,7 +64,7 @@ const routes: { [key: string]: RouteProps } = {
   Settings: {
     viewId: "Settings",
     viewName: "Settings",
-    view: Settings,
+    View: Settings,
     path: "/settings",
     tryAuthenticate: true,
     redirectOnAuthFail: true,
@@ -76,13 +72,13 @@ const routes: { [key: string]: RouteProps } = {
   Signup: {
     viewId: "Signup",
     viewName: "Signup",
-    view: Signup,
+    View: Signup,
     path: "/signup",
   },
   Root: {
     viewId: "Home",
     viewName: "Home",
-    view: Home,
+    View: Home,
     path: "/",
   },
 };

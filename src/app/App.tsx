@@ -1,5 +1,5 @@
 import React, { Suspense, useEffect } from "react";
-import { Switch } from "react-router-dom";
+import { Routes, Route } from "react-router-dom";
 import {
   CircularProgress,
   ThemeProvider,
@@ -9,10 +9,9 @@ import { Theme } from "@material-ui/core/styles";
 import { DiscFull } from "@material-ui/icons";
 import Parse from "parse";
 import { useNotificationsContext, useUserContext } from "../contexts";
-import { ActionDialogContextProvider, SnackbarProvider } from "../components";
+import { ActionDialogContextProvider, DefaultLayout, SnackbarProvider } from "../components";
 import { Strings } from "../resources";
 import routes from "./routes";
-import ViewWrapper from "./RouteWrapper";
 declare const globalThis: any;
 
 Parse.serverURL = globalThis.__env__?.PARSE_HOST_URL;
@@ -25,12 +24,12 @@ Parse.initialize(
 Parse.enableLocalDatastore(false);
 
 const App = () => {
-  const { getLoggedInUser } = useUserContext();
+  const { getLoggedInUser, isUserLoggedIn } = useUserContext();
   const { addNotification } = useNotificationsContext();
 
   const darkTheme = (lightTheme: Theme) =>
     createMuiTheme(
-      getLoggedInUser()?.isDarkThemeEnabled
+      (isUserLoggedIn && getLoggedInUser()?.isDarkThemeEnabled)
         ? {
             palette: {
               primary: {
@@ -152,11 +151,15 @@ const App = () => {
               </div>
             }
           >
-            <Switch>
-              {Object.keys(routes).map((routeKey) => (
-                <ViewWrapper key={routeKey} {...routes[routeKey]} />
+            <Routes>
+              {Object.values(routes).map((route) => (
+                <Route key={route.viewName} element={
+                  <DefaultLayout viewId={route.viewId}>
+                    <route.View />
+                  </DefaultLayout>
+                } path={route.path} />
               ))}
-            </Switch>
+            </Routes>
           </Suspense>
         </SnackbarProvider>
       </ActionDialogContextProvider>

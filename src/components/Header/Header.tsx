@@ -8,7 +8,7 @@ import {
   Typography,
 } from "@material-ui/core";
 import { makeStyles, Theme, useTheme } from "@material-ui/core/styles";
-import { useHistory, useLocation } from "react-router-dom";
+import { useNavigate, useLocation, Location } from "react-router-dom";
 import { routes } from "../../app";
 import { Strings } from "../../resources";
 import { useUserContext } from "../../contexts";
@@ -62,8 +62,8 @@ const Header = ({ viewId, ...rest }: HeaderProps) => {
   const theme = useTheme();
   const xs = useMediaQuery(theme.breakpoints.down("xs"));
   const classes = useStyles({ xs });
-  const history = useHistory();
-  const location = useLocation<{ previousLocation?: Location }>();
+  const navigate = useNavigate();
+  const location = useLocation() as {state: { previousLocation?: Location }};
   const { isUserLoggedIn, getLoggedInUser, profilePicture } = useUserContext();
 
   return (
@@ -81,7 +81,7 @@ const Header = ({ viewId, ...rest }: HeaderProps) => {
               className={classes.loginButton}
               variant="outlined"
               color="inherit"
-              onClick={() => history.push("/login")}
+              onClick={() => navigate("/login")}
               name="login/signup"
             >
               {Strings.loginSignup()}

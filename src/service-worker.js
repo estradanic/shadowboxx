@@ -16,17 +16,15 @@ self.importScripts('https://cdn.jsdelivr.net/npm/idb-keyval@6/dist/umd.js');
 
 // Install SW
 self.addEventListener("install", async (event) => {
-  event.waitUntil(fetch("asset-manifest.json")
-    .then((assetsResponse) => assetsResponse.json()
-      .then((assets) => fetch("variables.json")
-        .then((variablesResponse) => variablesResponse.json()
-          .then((variables) => {
-            CACHE_NAME = "version-" + variables.version;
-            console.log("Version:", CACHE_NAME);
-            return caches.open(CACHE_NAME)
-              .then((cache) => {
-                return cache.addAll(Object.values(assets.files));
-  })})))));
+  event.waitUntil(fetch("variables.json")
+    .then((variablesResponse) => variablesResponse.json()
+      .then((variables) => {
+        CACHE_NAME = "version-" + variables.version;
+        console.log("Version:", CACHE_NAME);
+        return Promise.resolve();
+      })
+    )
+  )
 });
 
 // Whether to put new cache entries.

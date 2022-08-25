@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { makeStyles, Theme } from "@material-ui/core/styles";
 import { Card, Grid, Typography, Button } from "@material-ui/core";
-import { useHistory } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { Strings } from "../../resources";
 import {
   PasswordField,
@@ -70,7 +70,7 @@ const Signup = () => {
       DefaultErrorState
     );
   const { stopGlobalLoader, startGlobalLoader } = useGlobalLoadingContext();
-  const history = useHistory();
+  const navigate = useNavigate();
   const { enqueueErrorSnackbar } = useSnackbar();
   const { updateLoggedInUser } = useUserContext();
 
@@ -122,7 +122,7 @@ const Signup = () => {
       });
       try {
         await user.signup(updateLoggedInUser);
-        history.push(routes["Home"].path);
+        navigate(routes["Home"].path);
       } catch (error: any) {
         enqueueErrorSnackbar(error?.message ?? Strings.signupError());
       } finally {

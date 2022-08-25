@@ -7,7 +7,7 @@ import React, {
   useState,
 } from "react";
 import Parse from "parse";
-import { useHistory, useLocation } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import {
   ParseUser,
   UpdateLoggedInUser,
@@ -55,7 +55,7 @@ interface UserContextProviderProps {
 export const UserContextProvider = ({ children }: UserContextProviderProps) => {
   const initialized = useRef<boolean>(false);
   const [redirectPath, setRedirectPath] = useState<string>();
-  const history = useHistory();
+  const navigate = useNavigate();
   const location = useLocation();
 
   const [loggedInUser, setLoggedInUser] = useState<ParseUser | undefined>(
@@ -73,7 +73,7 @@ export const UserContextProvider = ({ children }: UserContextProviderProps) => {
       if (reason === UpdateReason.LOG_OUT) {
         setLoggedInUser(undefined);
         setProfilePicture(undefined);
-        history.push(routes["Login"].path);
+        navigate(routes["Login"].path);
       } else if (
         !loggedInUser ||
         newLoggedInUser.username === loggedInUser.username
@@ -90,13 +90,13 @@ export const UserContextProvider = ({ children }: UserContextProviderProps) => {
             console.error(error?.message ?? Strings.couldNotGetUserInfo());
           }
           if (redirectPath) {
-            history.push(redirectPath);
+            navigate(redirectPath);
             setRedirectPath(undefined);
           } else if (
             location.pathname === routes["Login"].path ||
             location.pathname === routes["Signup"].path
           ) {
-            history.push(routes["Home"].path);
+            navigate(routes["Home"].path);
           }
         }
         if (

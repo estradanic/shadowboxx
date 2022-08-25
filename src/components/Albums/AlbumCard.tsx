@@ -14,7 +14,7 @@ import {
 } from "@material-ui/core";
 import { makeStyles, Theme, useTheme } from "@material-ui/core/styles";
 import { MoreVert, Star } from "@material-ui/icons";
-import { useHistory, useLocation } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { Strings } from "../../resources";
 import { routes } from "../../app";
 import { ParseAlbum } from "../../types";
@@ -160,7 +160,7 @@ const AlbumCard = memo(({ value, onChange }: AlbumCardProps) => {
   const [anchorEl, setAnchorEl] = useState<Element>();
   const [editAlbumDialogOpen, setEditAlbumDialogOpen] =
     useState<boolean>(false);
-  const history = useHistory();
+  const navigate = useNavigate();
   const coverImage = useMemo(
     () => images.find((image) => image.isCoverImage) ?? images[0],
     [images]
@@ -202,8 +202,8 @@ const AlbumCard = memo(({ value, onChange }: AlbumCardProps) => {
 
   const navigateToAlbum = () => {
     if (value?.id) {
-      history.push(routes["Album"].path.replace(":id", value.id), {
-        previousLocation: location,
+      navigate(routes["Album"].path.replace(":id", value.id), {
+        state: {previousLocation: location},
       });
     }
   };
