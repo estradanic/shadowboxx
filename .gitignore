@@ -13,7 +13,7 @@ build/Release
 **/jspm_packages/
 
 # Distribution directories
-**/dist/
+**/dev-dist/
 **/build/
 /public
 
