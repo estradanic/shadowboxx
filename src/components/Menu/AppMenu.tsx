@@ -109,6 +109,7 @@ const AppMenu = () => {
         onOpen={() => setDrawerOpen(true)}
         anchor="right"
         open={drawerOpen}
+        onClick={() => setDrawerOpen(false)}
       >
         <AppMenuList collapse={collapse} />
       </SwipeableDrawer>

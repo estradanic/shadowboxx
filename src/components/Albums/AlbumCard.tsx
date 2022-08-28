@@ -240,7 +240,7 @@ const AlbumCard = memo(({ value, onChange }: AlbumCardProps) => {
                 >
                   <MoreVertIcon className={classes.icon} />
                 </IconButton>
-                <Menu open={!!anchorEl} anchorEl={anchorEl} onClose={closeMenu}>
+                <Menu open={!!anchorEl} anchorEl={anchorEl} onClose={closeMenu} onClick={closeMenu}>
                   <MenuItem onClick={editAlbum}>{Strings.editAlbum()}</MenuItem>
                   {isOwner && (
                     <MenuItem onClick={deleteAlbum}>
