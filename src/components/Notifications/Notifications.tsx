@@ -1,20 +1,16 @@
 import React, { ForwardedRef, forwardRef, useState } from "react";
-import {
-  Badge,
-  Collapse,
-  IconButton,
-  ListItemIcon,
-  Menu,
-  MenuItem,
-  Typography,
-} from "@material-ui/core";
-import { makeStyles, Theme } from "@material-ui/core";
-import {
-  ArrowDropDown,
-  ArrowDropUp,
-  Close,
-  Notifications as NotificationsIcon,
-} from "@material-ui/icons";
+import Badge from "@material-ui/core/Badge";
+import Collapse from "@material-ui/core/Collapse";
+import IconButton from "@material-ui/core/IconButton";
+import ListItemIcon from "@material-ui/core/ListItemIcon";
+import Menu from "@material-ui/core/Menu";
+import MenuItem from "@material-ui/core/MenuItem";
+import Typography from "@material-ui/core/Typography";
+import { makeStyles, Theme } from "@material-ui/core/styles";
+import ArrowDropDownIcon from "@material-ui/icons/ArrowDropDown";
+import ArrowDropUpIcon from "@material-ui/icons/ArrowDropUp";
+import CloseIcon from "@material-ui/icons/Close";
+import NotificationsIcon from "@material-ui/icons/Notifications";
 import cx from "classnames";
 import {
   useNotificationsContext,
@@ -144,9 +140,9 @@ export const Notification = forwardRef(
           </Tooltip>
           <IconButton className={classes.endIcons}>
             {open ? (
-              <ArrowDropUp className={classes.text} />
+              <ArrowDropUpIcon className={classes.text} />
             ) : (
-              <ArrowDropDown className={classes.text} />
+              <ArrowDropDownIcon className={classes.text} />
             )}
           </IconButton>
           <IconButton
@@ -156,7 +152,7 @@ export const Notification = forwardRef(
               remove();
             }}
           >
-            <Close className={classes.close} />
+            <CloseIcon className={classes.close} />
           </IconButton>
         </MenuItem>
         <Collapse className={classes.detail} in={open}>

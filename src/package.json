@@ -13,16 +13,15 @@
     "xmldom": "npm:@xmldom/xmldom@^0.7.0"
   },
   "dependencies": {
-    "@babel/core": "7.12.3",
     "@material-ui/core": "^4.11.3",
     "@material-ui/icons": "^4.11.2",
     "@material-ui/lab": "^4.0.0-alpha.57",
     "@parse/react": "^0.0.1-alpha.18",
     "@tanstack/react-query": "^4.1.0",
     "@tanstack/react-query-devtools": "^4.2.1",
-    "@testing-library/react": "^12.1.5",
     "@types/classnames": "^2.2.11",
     "@types/deep-equal": "^1.0.1",
+    "@types/express": "^4.17.13",
     "@types/lodash": "^4.14.168",
     "@types/md5": "^2.3.0",
     "@types/node": "^18.6.5",
@@ -33,10 +32,6 @@
     "@types/react-router-dom": "^5.3.3",
     "@types/sharp": "^0.30.5",
     "@types/uuid": "^8.3.3",
-    "@typescript-eslint/eslint-plugin": "^5.32.0",
-    "@typescript-eslint/parser": "^5.34.0",
-    "babel-eslint": "^10.1.0",
-    "babel-preset-react-app": "^10.0.0",
     "bfj": "^7.0.2",
     "browser-image-resizer": "^2.2.1",
     "camelcase": "^7.0.0",
@@ -45,16 +40,9 @@
     "cssnano-preset-default": "^5.2.12",
     "dotenv": "16.0.1",
     "dotenv-expand": "8.0.3",
-    "eslint": "^8.22.0",
-    "eslint-plugin-import": "^2.22.1",
-    "eslint-plugin-jsx-a11y": "^6.3.1",
-    "eslint-plugin-react": "^7.21.5",
-    "eslint-plugin-react-hooks": "^4.2.0",
-    "eslint-plugin-testing-library": "^5.6.0",
     "events": "^3.3.0",
     "fs-extra": "^10.1.0",
     "identity-obj-proxy": "3.0.0",
-    "immutable": "^4.1.0",
     "lodash": "^4.17.21",
     "md5": "^2.3.0",
     "mkdirp": "^1.0.4",
@@ -87,14 +75,16 @@
     "web-vitals": "^1.0.1"
   },
   "scripts": {
-    "build": "vite build",
+    "build": "vite build --mode development",
+    "build:prod": "vite build",
     "start": "vite serve",
     "iterate": "vite",
     "preview": "vite preview",
     "compileCloud": "cd ./cloud && tsc && cd ..",
     "format": "prettier --write '{@types,app,cloud,components,contexts,hooks,resources,types,utils,views}/**/*.{ts,tsx,js,json,jsx}' && prettier --write '*.{ts,tsx,js,json,jsx}'",
-    "analyze": "source-map-explorer 'build/static/js/*.js'",
+    "analyze": "source-map-explorer 'build/assets/*.js'",
     "preDeploy": "yarn build && yarn compileCloud && rm -rf ../public/* && cp -r ./build/* ../public",
+    "preDeploy:prod": "yarn build:prod && yarn compileCloud && rm -rf ../public/* && cp -r ./build/* ../public",
     "deploy": "yarn preDeploy && b4a deploy ShadowboxxDevTest",
     "deploy:prod": "yarn preDeploy && b4a deploy Shadowboxx"
   },
@@ -118,12 +108,6 @@
   "devDependencies": {
     "@vitejs/plugin-react": "^2.0.1",
     "vite": "^3.0.9",
-    "vite-plugin-html": "^3.2.0",
-    "vite-plugin-pwa": "^0.12.3"
-  },
-  "babel": {
-    "presets": [
-      "react-app"
-    ]
+    "vite-plugin-html": "^3.2.0"
   }
 }

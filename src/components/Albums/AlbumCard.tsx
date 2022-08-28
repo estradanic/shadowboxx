@@ -1,19 +1,18 @@
 import React, { memo, useMemo, useState } from "react";
-import {
-  Card,
-  CardHeader,
-  IconButton,
-  CardMedia,
-  CardContent,
-  Typography,
-  CardActions,
-  Grid,
-  Menu,
-  MenuItem,
-  useMediaQuery,
-} from "@material-ui/core";
+import Card from "@material-ui/core/Card";
+import CardHeader from "@material-ui/core/CardHeader";
+import IconButton from "@material-ui/core/IconButton";
+import CardMedia from "@material-ui/core/CardMedia";
+import CardContent from "@material-ui/core/CardContent";
+import Typography from "@material-ui/core/Typography";
+import CardActions from "@material-ui/core/CardActions";
+import Grid from "@material-ui/core/Grid";
+import Menu from "@material-ui/core/Menu";
+import MenuItem from "@material-ui/core/MenuItem";
+import useMediaQuery from "@material-ui/core/useMediaQuery";
 import { makeStyles, Theme, useTheme } from "@material-ui/core/styles";
-import { MoreVert, Star } from "@material-ui/icons";
+import MoreVertIcon from "@material-ui/icons/MoreVert";
+import StarIcon from "@material-ui/icons/Star";
 import { useNavigate, useLocation } from "react-router-dom";
 import { Strings } from "../../resources";
 import { routes } from "../../app";
@@ -106,39 +105,33 @@ const AlbumCard = memo(({ value, onChange }: AlbumCardProps) => {
   const {
     getUserByIdQueryKey,
     getUserByIdFunction,
+    getUserByIdOptions,
     getImagesByIdFunction,
+    getImagesByIdOptions,
     getImagesByIdQueryKey,
     getUsersByEmailFunction,
+    getUsersByEmailOptions,
     getUsersByEmailQueryKey,
   } = useRequests();
   const { data: owner } = useQuery<ParseUser, Error>(
     getUserByIdQueryKey(value.owner.id),
     () => getUserByIdFunction(value.owner.id, { useLoader: false }),
-    {
-      refetchOnWindowFocus: false,
-    }
+    getUserByIdOptions()
   );
   const { data: images } = useQuery<ParseImage[], Error>(
     getImagesByIdQueryKey(value.images),
     () => getImagesByIdFunction(value.images, { useLoader: false }),
-    {
-      refetchOnWindowFocus: false,
-      initialData: [],
-    }
+    getImagesByIdOptions({ refetchOnWindowFocus: false })
   );
   const { data: collaborators } = useQuery<ParseUser[], Error>(
     getUsersByEmailQueryKey(value.collaborators),
     () => getUsersByEmailFunction(value.collaborators, { useLoader: false }),
-    {
-      refetchOnWindowFocus: false,
-    }
+    getUsersByEmailOptions()
   );
   const { data: viewers } = useQuery<ParseUser[], Error>(
     getUsersByEmailQueryKey(value.viewers),
     () => getUsersByEmailFunction(value.viewers, { useLoader: false }),
-    {
-      refetchOnWindowFocus: false,
-    }
+    getUsersByEmailOptions()
   );
 
   const { getLoggedInUser } = useUserContext();
@@ -221,7 +214,7 @@ const AlbumCard = memo(({ value, onChange }: AlbumCardProps) => {
                   onClick={(e) => setAnchorEl(e.currentTarget)}
                   name="actions"
                 >
-                  <MoreVert className={classes.icon} />
+                  <MoreVertIcon className={classes.icon} />
                 </IconButton>
                 <Menu open={!!anchorEl} anchorEl={anchorEl} onClose={closeMenu}>
                   <MenuItem onClick={editAlbum}>{Strings.editAlbum()}</MenuItem>
@@ -269,9 +262,9 @@ const AlbumCard = memo(({ value, onChange }: AlbumCardProps) => {
                 {Strings.updatedAt(value?.updatedAt)}
               </Typography>
             </Grid>
-            {(!!collaborators?.length || !!viewers?.length) && (
+            {(!!collaborators.length || !!viewers.length) && (
               <Grid className={classes.collaborators} item container xs={12}>
-                {collaborators?.map((collaborator) => (
+                {collaborators.map((collaborator) => (
                   <Grid item key={collaborator?.email}>
                     <Tooltip
                       title={
@@ -289,7 +282,7 @@ const AlbumCard = memo(({ value, onChange }: AlbumCardProps) => {
                     </Tooltip>
                   </Grid>
                 ))}
-                {viewers?.map((viewer) => (
+                {viewers.map((viewer) => (
                   <Grid item key={viewer?.email}>
                     <Tooltip
                       title={
@@ -331,7 +324,7 @@ const AlbumCard = memo(({ value, onChange }: AlbumCardProps) => {
                     }
                   }}
                 >
-                  <Star
+                  <StarIcon
                     className={
                       value.isFavorite ? classes.favorite : classes.icon
                     }

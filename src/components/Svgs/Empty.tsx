@@ -1,6 +1,6 @@
 import React from "react";
 import Svg, { SvgProps } from "./Svg";
-import { useTheme } from "@material-ui/core";
+import { useTheme } from "@material-ui/core/styles";
 
 /** Svg to use when an album has no images */
 const Empty = ({ height }: Omit<SvgProps, "children">) => {

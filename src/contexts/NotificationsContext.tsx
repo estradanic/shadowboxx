@@ -6,7 +6,7 @@ import React, {
   useCallback,
 } from "react";
 import { v4 as uuid } from "uuid";
-import { Notifications } from "@material-ui/icons";
+import NotificationsIcon from "@material-ui/icons/Notifications";
 
 /** Interface defining a single notification */
 export interface Notification {
@@ -59,7 +59,7 @@ export const NotificationsContextProvider = ({
   const addNotification = useCallback(
     ({
       title,
-      icon = <Notifications />,
+      icon = <NotificationsIcon />,
       detail,
       groupName,
     }: AddNotificationParams) => {

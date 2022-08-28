@@ -13,7 +13,6 @@ import {
   NetworkDetectionContextProvider,
 } from "./contexts";
 import App from "./app/App";
-import "./index.css";
 
 const queryClient = new QueryClient();
 

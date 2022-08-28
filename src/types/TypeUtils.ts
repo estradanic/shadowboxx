@@ -6,3 +6,7 @@ export type Interdependent<T, Keys extends keyof T> = Omit<T, Keys> &
 export type KeysOfType<T, Keys> = keyof {
   [key in keyof Keys]: Keys[key] extends T ? key : never;
 };
+
+/** Wrapping type to "Optionalize" only specific fields */
+export type Optional<T, Keys extends keyof T> = Omit<T, Keys> &
+  Partial<Pick<T, Keys>>;

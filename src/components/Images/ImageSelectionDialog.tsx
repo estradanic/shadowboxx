@@ -1,5 +1,7 @@
 import React, { useCallback, useMemo, useState } from "react";
-import { Grid, Typography, useMediaQuery } from "@material-ui/core";
+import Grid from "@material-ui/core/Grid";
+import Typography from "@material-ui/core/Typography";
+import useMediaQuery from "@material-ui/core/useMediaQuery";
 import { makeStyles, Theme, useTheme } from "@material-ui/core/styles";
 import classNames from "classnames";
 import { dedupeFast } from "../../utils";
@@ -10,7 +12,7 @@ import { ParseImage } from "../../types";
 import ActionDialog, { ActionDialogProps } from "../Dialog/ActionDialog";
 import Image from "../Image/Image";
 import Empty from "../Svgs/Empty";
-import { Check } from "@material-ui/icons";
+import CheckIcon from "@material-ui/icons/Check";
 import { useQuery } from "@tanstack/react-query";
 
 const useStyles = makeStyles((theme: Theme) => ({
@@ -75,7 +77,11 @@ const ImageSelectionDialog = ({
   const randomColor = useRandomColor();
   const theme = useTheme();
   const sm = useMediaQuery(theme.breakpoints.down("sm"));
-  const { getImagesByOwnerFunction, getImagesByOwnerQueryKey } = useRequests();
+  const {
+    getImagesByOwnerFunction,
+    getImagesByOwnerQueryKey,
+    getImagesByOwnerOptions,
+  } = useRequests();
 
   // Images that the current user owns, not those shared to them.
   const { data: userOwnedImages } = useQuery<ParseImage[], Error>(
@@ -84,12 +90,7 @@ const ImageSelectionDialog = ({
       getImagesByOwnerFunction(getLoggedInUser(), {
         showErrorsInSnackbar: true,
       }),
-    {
-      initialData: [],
-      refetchInterval: 5 * 60 * 1000,
-      refetchOnMount: true,
-      refetchOnWindowFocus: false,
-    }
+    getImagesByOwnerOptions({ enabled: open })
   );
 
   // Images that the current user owns + those in the passed in value
@@ -170,7 +171,7 @@ const ImageSelectionDialog = ({
                     }
                   }}
                 >
-                  <Check className={classes.check} />
+                  <CheckIcon className={classes.check} />
                 </div>
               </Grid>
             ))}

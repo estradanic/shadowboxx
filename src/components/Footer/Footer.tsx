@@ -1,5 +1,8 @@
 import React, { useState } from "react";
-import { AppBar, Toolbar, Typography, Button } from "@material-ui/core";
+import AppBar from "@material-ui/core/AppBar";
+import Toolbar from "@material-ui/core/Toolbar";
+import Typography from "@material-ui/core/Typography";
+import Button from "@material-ui/core/Button";
 import { makeStyles, Theme } from "@material-ui/core/styles";
 import { Strings } from "../../resources";
 import { useSnackbar } from "../Snackbar";

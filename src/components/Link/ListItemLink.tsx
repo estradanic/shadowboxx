@@ -1,5 +1,6 @@
 import React from "react";
-import { ListItem, ButtonBaseProps } from "@material-ui/core";
+import ListItem from "@material-ui/core/ListItem";
+import { ButtonBaseProps } from "@material-ui/core/ButtonBase";
 import { useNavigate, useLocation } from "react-router-dom";
 
 /**

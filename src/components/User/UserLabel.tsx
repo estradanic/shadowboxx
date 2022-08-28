@@ -1,5 +1,5 @@
 import React, { memo } from "react";
-import { Typography, TypographyProps } from "@material-ui/core";
+import Typography, { TypographyProps } from "@material-ui/core/Typography";
 import { ParseUser } from "../../types";
 import { useRequests } from "../../hooks";
 import { useQuery } from "@tanstack/react-query";
@@ -14,13 +14,15 @@ export interface UserLabelProps extends TypographyProps {
 
 /** Component to display the name of a user */
 const UserLabel = memo(({ email, fetchUser, ...rest }: UserLabelProps) => {
-  const { getUserByEmailFunction, getUserByEmailQueryKey } = useRequests();
+  const {
+    getUserByEmailFunction,
+    getUserByEmailQueryKey,
+    getUserByEmailOptions,
+  } = useRequests();
   const { data: user } = useQuery<ParseUser, Error>(
     getUserByEmailQueryKey(email),
     () => (fetchUser ? fetchUser() : getUserByEmailFunction(email)),
-    {
-      refetchOnWindowFocus: false,
-    }
+    getUserByEmailOptions()
   );
 
   return (

@@ -1,12 +1,8 @@
 import React, { Suspense, useEffect } from "react";
 import { Routes, Route } from "react-router-dom";
-import {
-  CircularProgress,
-  ThemeProvider,
-  unstable_createMuiStrictModeTheme as createMuiTheme,
-} from "@material-ui/core";
-import { Theme } from "@material-ui/core/styles";
-import { DiscFull } from "@material-ui/icons";
+import CircularProgress from "@material-ui/core/CircularProgress";
+import { Theme, ThemeProvider, createTheme } from "@material-ui/core/styles";
+import DiscFullIcon from "@material-ui/icons/DiscFull";
 import Parse from "parse";
 import { useNotificationsContext, useUserContext } from "../contexts";
 import {
@@ -32,7 +28,7 @@ const App = () => {
   const { addNotification } = useNotificationsContext();
 
   const darkTheme = (lightTheme: Theme) =>
-    createMuiTheme(
+    createTheme(
       isUserLoggedIn && getLoggedInUser()?.isDarkThemeEnabled
         ? {
             palette: {
@@ -93,7 +89,7 @@ const App = () => {
 
   useEffect(() => {
     navigator.serviceWorker.register(
-      `/service-worker.js?version=${globalThis.__env__.SERVICE_WORKER_VERSION_NUMBER}`,
+      `service-worker.js?version=${globalThis.__env__.SERVICE_WORKER_VERSION_NUMBER}`,
       { scope: "/" }
     );
     if (window.location.host.match(/^www\./) !== null) {
@@ -126,7 +122,7 @@ const App = () => {
           addNotification({
             title: Strings.notEnoughSpace(),
             detail: Strings.limitedOffline(),
-            icon: <DiscFull />,
+            icon: <DiscFullIcon />,
           });
           navigator.serviceWorker.ready.then((registration) => {
             registration.active?.postMessage({ useCache: false });

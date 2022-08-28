@@ -1,5 +1,5 @@
 import React, { ForwardedRef, forwardRef } from "react";
-import { Avatar, AvatarProps } from "@material-ui/core";
+import Avatar, { AvatarProps } from "@material-ui/core/Avatar";
 import { makeStyles, Theme } from "@material-ui/core/styles";
 import cx from "classnames";
 import { ParseUser, ParseImage } from "../../types";
@@ -33,23 +33,20 @@ const UserAvatar = forwardRef(
     const {
       getUserByEmailFunction,
       getUserByEmailQueryKey,
+      getUserByEmailOptions,
       getImageByIdFunction,
       getImageByIdQueryKey,
+      getImageByIdOptions,
     } = useRequests();
     const { data: user } = useQuery<ParseUser, Error>(
       getUserByEmailQueryKey(email),
       () => (fetchUser ? fetchUser() : getUserByEmailFunction(email)),
-      {
-        refetchOnWindowFocus: false,
-      }
+      getUserByEmailOptions()
     );
     const { data: profilePicture } = useQuery<ParseImage, Error>(
       getImageByIdQueryKey(user?.profilePicture?.id),
       () => getImageByIdFunction(user?.profilePicture?.id),
-      {
-        refetchOnWindowFocus: false,
-        enabled: !!user?.profilePicture?.id,
-      }
+      getImageByIdOptions()
     );
 
     return (

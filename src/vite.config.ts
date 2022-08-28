@@ -1,13 +1,21 @@
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
 import { createHtmlPlugin } from "vite-plugin-html";
-import variables from "./variables.json";
+import variables from "./public/variables.json";
 
 export default defineConfig(({ command }) => ({
+  publicDir: "public",
   build: {
     outDir: "build",
-    manifest: true,
-    target: "es5",
+    target: "es6",
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          material_core: ["@material-ui/core"],
+          parse: ["parse"],
+        },
+      },
+    },
   },
   plugins: [
     react({

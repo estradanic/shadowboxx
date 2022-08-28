@@ -1,10 +1,10 @@
 import React, { ReactNode } from "react";
-import {
-  CircularProgress,
+import CircularProgress, {
   CircularProgressProps,
-  LinearProgress,
+} from "@material-ui/core/CircularProgress";
+import LinearProgress, {
   LinearProgressProps,
-} from "@material-ui/core";
+} from "@material-ui/core/LinearProgress";
 import { makeStyles, Theme } from "@material-ui/core/styles";
 import classNames from "classnames";
 import { opacity } from "../../utils";

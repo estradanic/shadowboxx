@@ -1,7 +1,8 @@
 import React from "react";
 import { BackButton, PageContainer } from "../../components";
 import { useLocation, useParams } from "react-router-dom";
-import { Grid, Typography } from "@material-ui/core";
+import Grid from "@material-ui/core/Grid";
+import Typography from "@material-ui/core/Typography";
 import { makeStyles, Theme } from "@material-ui/core/styles";
 import { Strings } from "../../resources";
 import { ParseImage, ParseAlbum } from "../../types";
@@ -31,20 +32,20 @@ const Album = () => {
   useView("Album");
   const { id } = useParams<{ id: string }>();
   const classes = useStyles();
-  const location = useLocation<{ previousLocation?: Location }>();
+  const location = useLocation() as { state: { previousLocation?: Location } };
   const randomColor = useRandomColor();
   const {
     getAlbumFunction,
     getAlbumQueryKey,
+    getAlbumOptions,
     getImagesByIdFunction,
     getImagesByIdQueryKey,
+    getImagesByIdOptions,
   } = useRequests();
   const { data: album } = useQuery<ParseAlbum, Error>(
     getAlbumQueryKey(id),
     () => getAlbumFunction(id, { showErrorsInSnackbar: true }),
-    {
-      refetchInterval: 5 * 60 * 1000,
-    }
+    getAlbumOptions()
   );
   const { data: images } = useQuery<ParseImage[], Error>(
     getImagesByIdQueryKey(album?.images ?? []),
@@ -52,9 +53,7 @@ const Album = () => {
       getImagesByIdFunction(album?.images ?? [], {
         showErrorsInSnackbar: true,
       }),
-    {
-      initialData: [],
-    }
+    getImagesByIdOptions()
   );
 
   return (

@@ -1,20 +1,20 @@
 import React, { useState, memo, useMemo, ChangeEventHandler } from "react";
-import {
-  InputAdornment,
-  Avatar,
-  Typography,
-  Grid,
-  Menu,
-  MenuItem,
-  IconButton,
-  IconButtonProps,
-} from "@material-ui/core";
-import { Close, AddAPhoto, Link, Check, Cloud } from "@material-ui/icons";
+import InputAdornment from "@material-ui/core/InputAdornment";
+import Avatar from "@material-ui/core/Avatar";
+import Typography from "@material-ui/core/Typography";
+import Grid from "@material-ui/core/Grid";
+import Menu from "@material-ui/core/Menu";
+import MenuItem from "@material-ui/core/MenuItem";
+import IconButton, { IconButtonProps } from "@material-ui/core/IconButton";
+import CloseIcon from "@material-ui/icons/Close";
+import AddAPhotoIcon from "@material-ui/icons/AddAPhoto";
+import LinkIcon from "@material-ui/icons/Link";
+import CheckIcon from "@material-ui/icons/Check";
+import CloudIcon from "@material-ui/icons/Cloud";
 import { makeStyles, Theme } from "@material-ui/core/styles";
 import Parse from "parse";
 import uniqueId from "lodash/uniqueId";
 import classNames from "classnames";
-import { Set } from "immutable";
 import { createHtmlPortalNode, InPortal } from "react-reverse-portal";
 import { readAndCompressImage } from "browser-image-resizer";
 import { elide, makeValidFileName, removeExtension } from "../../utils";
@@ -146,7 +146,7 @@ const ImageField = memo(
     const randomColor = useRandomColor();
 
     const onChange = async (newValue: ParseImage[]) => {
-      await piOnChange(Array.from(Set(newValue)));
+      await piOnChange(Array.from(new Set(newValue)));
     };
 
     const { openPrompt } = useActionDialogContext();
@@ -304,7 +304,7 @@ const ImageField = memo(
                 endAdornment: (
                   <>
                     <InputAdornment position="end" onClick={addFromUrl}>
-                      <Check
+                      <CheckIcon
                         className={classNames(
                           classes.endAdornment,
                           classes.success
@@ -315,7 +315,10 @@ const ImageField = memo(
                       position="end"
                       onClick={() => setShowUrlInput(false)}
                     >
-                      <Close color="error" className={classes.endAdornment} />
+                      <CloseIcon
+                        color="error"
+                        className={classes.endAdornment}
+                      />
                     </InputAdornment>
                   </>
                 ),
@@ -343,7 +346,7 @@ const ImageField = memo(
                       position="end"
                     >
                       <Tooltip title={Strings.addFromUrl()}>
-                        <Link className={classes.endAdornment} />
+                        <LinkIcon className={classes.endAdornment} />
                       </Tooltip>
                     </InputAdornment>
                     <InputAdornment
@@ -360,7 +363,7 @@ const ImageField = memo(
                       }
                     >
                       <Tooltip title={Strings.addFromLibrary()}>
-                        <Cloud className={classes.endAdornment} />
+                        <CloudIcon className={classes.endAdornment} />
                       </Tooltip>
                     </InputAdornment>
                     <InputAdornment
@@ -369,7 +372,7 @@ const ImageField = memo(
                       onClick={() => document.getElementById(inputId)?.click()}
                     >
                       <Tooltip title={Strings.addFromFile()}>
-                        <AddAPhoto className={classes.endAdornment} />
+                        <AddAPhotoIcon className={classes.endAdornment} />
                       </Tooltip>
                     </InputAdornment>
                     {!!value.length && !multiple && (
@@ -502,7 +505,7 @@ const ImageField = memo(
               onClick={(e) => setAnchorEl(e.currentTarget)}
               {...ButtonProps}
             >
-              <AddAPhoto className={classes.endAdornment} />
+              <AddAPhotoIcon className={classes.endAdornment} />
             </IconButton>
           </>
         )}

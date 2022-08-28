@@ -5,8 +5,11 @@ import {
   useSnackbar as notistackUseSnackbar,
 } from "notistack";
 import { makeStyles, Theme } from "@material-ui/core/styles";
-import { Error, Check, Warning, Info } from "@material-ui/icons";
-import { Typography } from "@material-ui/core";
+import ErrorIcon from "@material-ui/icons/Error";
+import CheckIcon from "@material-ui/icons/Check";
+import WarningIcon from "@material-ui/icons/Warning";
+import InfoIcon from "@material-ui/icons/Info";
+import Typography from "@material-ui/core/Typography";
 import { useUserContext } from "../../contexts";
 
 const useStyles = makeStyles((theme: Theme) => ({
@@ -101,10 +104,10 @@ const SnackbarProvider = ({ children, ...rest }: SnackbarProviderProps) => {
       maxSnack={3}
       dense
       iconVariant={{
-        error: <Error />,
-        success: <Check />,
-        warning: <Warning />,
-        info: <Info />,
+        error: <ErrorIcon />,
+        success: <CheckIcon />,
+        warning: <WarningIcon />,
+        info: <InfoIcon />,
       }}
       autoHideDuration={3000}
       {...rest}

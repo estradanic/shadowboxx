@@ -1,6 +1,7 @@
 import Parse from "parse";
 import ParsePointer from "./ParsePointer";
 import ParseObject, { Attributes, ParsifyPointers } from "./ParseObject";
+import ParseUser from "./ParseUser";
 
 /** Interface defining an Album */
 export interface Album extends Attributes {
@@ -38,6 +39,16 @@ export default class ParseAlbum extends ParseObject<Album> {
     collaborators: "collaborators",
     viewers: "viewers",
   };
+
+  static NULL = new ParseAlbum(
+    new Parse.Object<ParsifyPointers<Album>>("Album", {
+      owner: { objectId: "", className: "Album", __type: "" },
+      images: [],
+      name: "",
+      collaborators: [],
+      viewers: [],
+    })
+  );
 
   static query() {
     return new Parse.Query<Parse.Object<ParsifyPointers<Album>>>("Album");

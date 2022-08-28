@@ -1,6 +1,6 @@
 import React, { ImgHTMLAttributes, memo, useRef, useState } from "react";
 import { makeStyles, Theme } from "@material-ui/core/styles";
-import { Popper } from "@material-ui/core";
+import Popper from "@material-ui/core/Popper";
 import classNames from "classnames";
 import { VariableColor, Interdependent } from "../../types";
 import { opacity } from "../../utils";

@@ -35,6 +35,8 @@ export default class ParseObject<A extends Attributes> {
     updatedAt: "updatedAt",
   };
 
+  static NULL = new ParseObject(new Parse.Object());
+
   static query() {
     return new Parse.Query<Parse.Object<ParsifyPointers<Attributes>>>(
       Parse.Object

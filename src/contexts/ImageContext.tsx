@@ -7,7 +7,7 @@ import React, {
 } from "react";
 import Parse from "parse";
 import { useNotificationsContext } from "./NotificationsContext";
-import { Error as MatError } from "@material-ui/icons";
+import ErrorIcon from "@material-ui/icons/Error";
 import { makeStyles, Theme } from "@material-ui/core/styles";
 import { FancyTypography, useSnackbar } from "../components";
 import { Strings } from "../resources";
@@ -173,7 +173,7 @@ export const ImageContextProvider = ({
       }
       addNotification({
         title: Strings.uploadImageError(),
-        icon: <MatError />,
+        icon: <ErrorIcon />,
       });
       throw error;
     }

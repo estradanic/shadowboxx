@@ -5,16 +5,13 @@ import React, {
   useContext,
   useState,
 } from "react";
-import {
-  Button,
-  Dialog,
-  DialogActions,
-  DialogContent,
-  DialogContentText,
-  DialogProps,
-  DialogTitle,
-  Typography,
-} from "@material-ui/core";
+import Button from "@material-ui/core/Button";
+import Dialog, { DialogProps } from "@material-ui/core/Dialog";
+import DialogActions from "@material-ui/core/DialogActions";
+import DialogContent from "@material-ui/core/DialogContent";
+import DialogContentText from "@material-ui/core/DialogContentText";
+import DialogTitle from "@material-ui/core/DialogTitle";
+import Typography from "@material-ui/core/Typography";
 import { HtmlPortalNode, OutPortal } from "react-reverse-portal";
 import { makeStyles, Theme } from "@material-ui/core/styles";
 import { Strings } from "../../resources";

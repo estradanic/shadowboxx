@@ -1,19 +1,15 @@
 import React, { useState } from "react";
-import {
-  IconButton,
-  SwipeableDrawer,
-  List,
-  ListItemIcon,
-  ListItemText,
-  useMediaQuery,
-} from "@material-ui/core";
-import {
-  Home,
-  ExitToApp,
-  Settings,
-  Menu,
-  InsertPhoto,
-} from "@material-ui/icons";
+import IconButton from "@material-ui/core/IconButton";
+import List from "@material-ui/core/List";
+import ListItemIcon from "@material-ui/core/ListItemIcon";
+import ListItemText from "@material-ui/core/ListItemText";
+import useMediaQuery from "@material-ui/core/useMediaQuery";
+import SwipeableDrawer from "@material-ui/core/SwipeableDrawer";
+import HomeIcon from "@material-ui/icons/Home";
+import ExitToAppIcon from "@material-ui/icons/ExitToApp";
+import SettingsIcon from "@material-ui/icons/Settings";
+import MenuIcon from "@material-ui/icons/Menu";
+import InsertPhotoIcon from "@material-ui/icons/InsertPhoto";
 import { makeStyles, Theme, useTheme } from "@material-ui/core/styles";
 import { routes } from "../../app";
 import { Strings } from "../../resources";
@@ -59,19 +55,19 @@ const AppMenuList = ({ collapse = false }: AppMenuListProps) => {
     <List className={collapse ? "" : classes.horizontalList}>
       <ListItemLink to={routes["Home"].path}>
         <ListItemIcon className={classes.listItemIcon}>
-          <Home />
+          <HomeIcon />
         </ListItemIcon>
         <ListItemText primary={Strings.home()} />
       </ListItemLink>
       <ListItemLink to={routes["Images"].path}>
         <ListItemIcon className={classes.listItemIcon}>
-          <InsertPhoto />
+          <InsertPhotoIcon />
         </ListItemIcon>
         <ListItemText primary={Strings.pictures()} />
       </ListItemLink>
       <ListItemLink to={routes["Settings"].path}>
         <ListItemIcon className={classes.listItemIcon}>
-          <Settings />
+          <SettingsIcon />
         </ListItemIcon>
         <ListItemText primary={Strings.settings()} />
       </ListItemLink>
@@ -82,7 +78,7 @@ const AppMenuList = ({ collapse = false }: AppMenuListProps) => {
         to={routes["Login"].path}
       >
         <ListItemIcon className={classes.listItemIcon}>
-          <ExitToApp />
+          <ExitToAppIcon />
         </ListItemIcon>
         <ListItemText primary={Strings.logout()} />
       </ListItemLink>
@@ -105,7 +101,7 @@ const AppMenu = () => {
         color="inherit"
         name="menu"
       >
-        <Menu />
+        <MenuIcon />
       </IconButton>
       <SwipeableDrawer
         classes={{ paper: classes.drawer }}

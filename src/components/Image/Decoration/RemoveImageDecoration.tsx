@@ -1,6 +1,6 @@
 import React from "react";
 import { makeStyles, Theme } from "@material-ui/core/styles";
-import { Remove } from "@material-ui/icons";
+import RemoveIcon from "@material-ui/icons/Remove";
 import classNames from "classnames";
 import { Strings } from "../../../resources";
 import ImageDecoration, { ImageDecorationProps } from "./ImageDecoration";
@@ -32,7 +32,7 @@ const RemoveImageDecoration = ({
   return (
     <ImageDecoration
       corner={corner}
-      IconComponent={Remove}
+      IconComponent={RemoveIcon}
       description={Strings.removeImage()}
       fontSize="large"
       className={classNames(classes.root, userClassName)}

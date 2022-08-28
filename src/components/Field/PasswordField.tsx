@@ -1,7 +1,8 @@
 import React, { useState } from "react";
-import { InputAdornment } from "@material-ui/core";
+import InputAdornment from "@material-ui/core/InputAdornment";
 import { makeStyles, Theme } from "@material-ui/core/styles";
-import { Visibility, VisibilityOff } from "@material-ui/icons";
+import VisibilityIcon from "@material-ui/icons/Visibility";
+import VisibilityOffIcon from "@material-ui/icons/VisibilityOff";
 import TextField, { TextFieldProps } from "./TextField";
 
 const useStyles = makeStyles((theme: Theme) => ({
@@ -48,12 +49,12 @@ const PasswordField = ({
         endAdornment: (
           <InputAdornment position="end">
             {passwordIsMasked ? (
-              <VisibilityOff
+              <VisibilityOffIcon
                 className={classes.endAdornment}
                 onClick={() => setPasswordIsMasked(false)}
               />
             ) : (
-              <Visibility
+              <VisibilityIcon
                 className={classes.endAdornment}
                 onClick={() => setPasswordIsMasked(true)}
               />

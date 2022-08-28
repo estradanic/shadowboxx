@@ -1,6 +1,6 @@
 import React from "react";
 import Svg, { SvgProps } from "./Svg";
-import { useTheme } from "@material-ui/core";
+import { useTheme } from "@material-ui/core/styles";
 
 /** Svg used on the homepage when the user has no albums to show */
 const BlankCanvas = ({ height }: Omit<SvgProps, "children">) => {

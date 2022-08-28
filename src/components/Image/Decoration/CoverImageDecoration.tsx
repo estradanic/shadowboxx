@@ -1,6 +1,6 @@
 import React from "react";
 import { makeStyles, Theme } from "@material-ui/core/styles";
-import { Star } from "@material-ui/icons";
+import StarIcon from "@material-ui/icons/Star";
 import classNames from "classnames";
 import { Strings } from "../../../resources";
 import ImageDecoration, { ImageDecorationProps } from "./ImageDecoration";
@@ -39,7 +39,7 @@ const CoverImageDecoration = ({
   return (
     <ImageDecoration
       corner={corner}
-      IconComponent={Star}
+      IconComponent={StarIcon}
       description={
         checked ? Strings.unsetCoverImage() : Strings.setImageAsCover()
       }

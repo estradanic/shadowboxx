@@ -3,7 +3,7 @@ import {
   LinkProps as RouterLinkProps,
   useLocation,
 } from "react-router-dom";
-import { Link as MatLink, LinkProps as MatLinkProps } from "@material-ui/core";
+import MuiLink, { LinkProps as MuiLinkProps } from "@material-ui/core/Link";
 import { makeStyles, Theme } from "@material-ui/core/styles";
 import { parsePath } from "history";
 
@@ -11,7 +11,7 @@ import { parsePath } from "history";
  * Interface defining props for Link
  */
 export interface LinkProps
-  extends Omit<MatLinkProps, "href">,
+  extends Omit<MuiLinkProps, "href">,
     Pick<RouterLinkProps, "replace"> {
   saveHistory?: boolean;
   to: string;
@@ -49,7 +49,7 @@ const Link = ({
 
   return (
     <RouterLink className={classes.link} to={to} replace={replace}>
-      <MatLink
+      <MuiLink
         variant="h6"
         className={classes.link}
         component="span"
@@ -57,7 +57,7 @@ const Link = ({
         {...rest}
       >
         {children}
-      </MatLink>
+      </MuiLink>
     </RouterLink>
   );
 };

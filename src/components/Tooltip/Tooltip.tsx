@@ -1,9 +1,8 @@
 import React from "react";
 import { makeStyles, Theme } from "@material-ui/core/styles";
-import {
-  Tooltip as MatTooltip,
-  TooltipProps as MatTooltipProps,
-} from "@material-ui/core";
+import MuiTooltip, {
+  TooltipProps as MuiTooltipProps,
+} from "@material-ui/core/Tooltip";
 
 const useStyles = makeStyles((theme: Theme) => ({
   tooltip: {
@@ -18,15 +17,15 @@ const useStyles = makeStyles((theme: Theme) => ({
 }));
 
 /** Interface defining props for the Tooltip component */
-export interface TooltipProps extends Omit<MatTooltipProps, "arrow"> {}
+export interface TooltipProps extends Omit<MuiTooltipProps, "arrow"> {}
 
 /** Component to display helpful information on hover */
 const Tooltip = ({ children, ...rest }: TooltipProps) => {
   const classes = useStyles();
   return (
-    <MatTooltip {...rest} arrow classes={classes}>
+    <MuiTooltip {...rest} arrow classes={classes}>
       {children}
-    </MatTooltip>
+    </MuiTooltip>
   );
 };
 

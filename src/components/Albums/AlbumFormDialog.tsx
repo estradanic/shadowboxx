@@ -1,19 +1,19 @@
 import React, { useCallback, useMemo, useState } from "react";
 import Parse from "parse";
 import { makeStyles, Theme, useTheme } from "@material-ui/core/styles";
-import {
-  Checkbox,
-  FormControl,
-  FormControlLabel,
-  Grid,
-  useMediaQuery,
-} from "@material-ui/core";
-import { Star, StarBorder } from "@material-ui/icons";
-import { Set } from "immutable";
+import Checkbox from "@material-ui/core/Checkbox";
+import FormControl from "@material-ui/core/FormControl";
+import FormControlLabel from "@material-ui/core/FormControlLabel";
+import Grid from "@material-ui/core/Grid";
+import useMediaQuery from "@material-ui/core/useMediaQuery";
+import StarIcon from "@material-ui/icons/Star";
+import StarBorderIcon from "@material-ui/icons/StarBorder";
+import { useQuery } from "@tanstack/react-query";
 import { Strings } from "../../resources";
 import { ErrorState, isNullOrWhitespace } from "../../utils";
 import { ImageContextProvider, useUserContext } from "../../contexts";
 import { ParseUser, ParseImage, Album } from "../../types";
+import { useRequests } from "../../hooks";
 import ActionDialog, {
   ActionDialogProps,
   useActionDialogContext,
@@ -23,8 +23,6 @@ import { useSnackbar } from "../Snackbar/Snackbar";
 import UserField from "../Field/UserField";
 import TextField from "../Field/TextField";
 import Tooltip from "../Tooltip/Tooltip";
-import { useQuery } from "@tanstack/react-query";
-import { useRequests } from "../../hooks";
 
 const useStyles = makeStyles((theme: Theme) => ({
   checkboxLabel: {
@@ -82,14 +80,15 @@ const AlbumFormDialog = ({
   );
   const [viewers, setViewers] = useState<Album["viewers"]>(value.viewers);
 
-  const { getImagesByIdFunction, getImagesByIdQueryKey } = useRequests();
+  const { getImagesByIdFunction, getImagesByIdQueryKey, getImagesByIdOptions } =
+    useRequests();
   const { data: images } = useQuery<ParseImage[], Error>(
     getImagesByIdQueryKey(imageIds),
     () => getImagesByIdFunction(imageIds, { showErrorsInSnackbar: true }),
-    {
+    getImagesByIdOptions({
       refetchOnWindowFocus: false,
-      initialData: [],
-    }
+      enabled: open,
+    })
   );
 
   const { getLoggedInUser } = useUserContext();
@@ -158,7 +157,7 @@ const AlbumFormDialog = ({
 
   const handleConfirm = async () => {
     if (validate()) {
-      const userEmails = Set([...viewers, ...collaborators]);
+      const userEmails = new Set([...viewers, ...collaborators]);
       const signedUpUserCount = await new Parse.Query("User")
         .containedIn(ParseUser.COLUMNS.email, [...viewers, ...collaborators])
         .count();
@@ -244,10 +243,14 @@ const AlbumFormDialog = ({
                     control={
                       <Checkbox
                         disabled={isCollaborator}
-                        icon={<StarBorder className={classes.favoriteIcon} />}
+                        icon={
+                          <StarBorderIcon className={classes.favoriteIcon} />
+                        }
                         checked={!!isFavorite}
                         onChange={(_, checked) => setIsFavorite(checked)}
-                        checkedIcon={<Star className={classes.favoriteIcon} />}
+                        checkedIcon={
+                          <StarIcon className={classes.favoriteIcon} />
+                        }
                       />
                     }
                     label={Strings.favorite()}

@@ -4,6 +4,7 @@ import { useSnackbar } from "../components";
 import { useGlobalLoadingContext, useUserContext } from "../contexts";
 import { Strings } from "../resources";
 import { Interdependent, ParseAlbum, ParseImage, ParseUser } from "../types";
+import { QueryObserverOptions } from "@tanstack/react-query";
 
 export type FunctionOptions = Interdependent<
   {
@@ -14,33 +15,24 @@ export type FunctionOptions = Interdependent<
     useLoader?: boolean;
     startLoader?: () => void;
     stopLoader?: () => void;
-    useGlobalLoaderOnInitialRequest?: boolean;
-    noGlobalLoadingAfterInitialRequest?: boolean;
   },
   "startLoader" | "stopLoader"
 >;
 
-type RequestTracker = { [key: string]: boolean };
-
-type StartLoaderOptions = Pick<
-  FunctionOptions,
-  | "startLoader"
-  | "useLoader"
-  | "useGlobalLoaderOnInitialRequest"
-  | "noGlobalLoadingAfterInitialRequest"
+export type QueryOptions<TData> = Omit<
+  QueryObserverOptions<TData, Error>,
+  "initialData"
 > & {
-  requestKey: string;
+  initialData: TData;
 };
 
-type StopLoaderOptions = Pick<
-  FunctionOptions,
-  | "stopLoader"
-  | "useLoader"
-  | "useGlobalLoaderOnInitialRequest"
-  | "noGlobalLoadingAfterInitialRequest"
-> & {
-  requestKey: string;
-};
+export type QueryOptionsFunction<TData> = (
+  options?: Partial<QueryOptions<TData>>
+) => QueryOptions<TData>;
+
+type StartLoaderOptions = Pick<FunctionOptions, "startLoader" | "useLoader">;
+
+type StopLoaderOptions = Pick<FunctionOptions, "stopLoader" | "useLoader">;
 
 type HandleErrorOptions = Pick<
   FunctionOptions,
@@ -50,27 +42,17 @@ type HandleErrorOptions = Pick<
 const useRequests = () => {
   const { enqueueErrorSnackbar, enqueueSuccessSnackbar } = useSnackbar();
   const { startGlobalLoader, stopGlobalLoader } = useGlobalLoadingContext();
-  const requestTracker = useRef<RequestTracker>({});
   const { getLoggedInUser, profilePicture } = useUserContext();
+
+  // #region Helper methods
 
   const startLoader = ({
     startLoader: piStartLoader,
     useLoader,
-    useGlobalLoaderOnInitialRequest,
-    noGlobalLoadingAfterInitialRequest,
-    requestKey,
   }: StartLoaderOptions) => {
-    if (
-      useLoader &&
-      piStartLoader &&
-      (!useGlobalLoaderOnInitialRequest || requestTracker.current[requestKey])
-    ) {
+    if (useLoader && piStartLoader) {
       piStartLoader();
-    } else if (
-      useLoader &&
-      (!noGlobalLoadingAfterInitialRequest ||
-        !requestTracker.current[requestKey])
-    ) {
+    } else if (useLoader) {
       startGlobalLoader();
     }
   };
@@ -78,21 +60,10 @@ const useRequests = () => {
   const stopLoader = ({
     stopLoader: piStopLoader,
     useLoader,
-    useGlobalLoaderOnInitialRequest,
-    noGlobalLoadingAfterInitialRequest,
-    requestKey,
   }: StopLoaderOptions) => {
-    if (
-      useLoader &&
-      piStopLoader &&
-      (!useGlobalLoaderOnInitialRequest || requestTracker.current[requestKey])
-    ) {
+    if (useLoader && piStopLoader) {
       piStopLoader();
-    } else if (
-      useLoader &&
-      (!noGlobalLoadingAfterInitialRequest ||
-        !requestTracker.current[requestKey])
-    ) {
+    } else if (useLoader) {
       stopGlobalLoader();
     }
   };
@@ -121,7 +92,6 @@ const useRequests = () => {
 
   const runFunctionInTryCatch = async <T>(
     requestFunction: () => Promise<T>,
-    requestKey: string,
     {
       successMessage,
       errorMessage,
@@ -130,17 +100,12 @@ const useRequests = () => {
       showErrorsInSnackbar = false,
       startLoader: piStartLoader,
       stopLoader: piStopLoader,
-      useGlobalLoaderOnInitialRequest = false,
-      noGlobalLoadingAfterInitialRequest = true,
     }: FunctionOptions
   ): Promise<T> => {
     let returnValue;
     startLoader({
       startLoader: piStartLoader,
       useLoader,
-      useGlobalLoaderOnInitialRequest,
-      noGlobalLoadingAfterInitialRequest,
-      requestKey,
     });
     try {
       returnValue = await requestFunction();
@@ -156,16 +121,23 @@ const useRequests = () => {
       stopLoader({
         stopLoader: piStopLoader,
         useLoader,
-        useGlobalLoaderOnInitialRequest,
-        noGlobalLoadingAfterInitialRequest,
-        requestKey,
       });
-      requestTracker.current[requestKey] = true;
     }
     return returnValue;
   };
 
+  // #endregion
+
+  // #region Return values
+
   const getAllAlbumsQueryKey = () => ["GET_ALL_ALBUMS"];
+  const getAllAlbumsOptions: QueryOptionsFunction<ParseAlbum[]> = (
+    options = {}
+  ) => ({
+    initialData: [],
+    refetchInterval: 5 * 60 * 1000,
+    ...options,
+  });
   const getAllAlbumsFunction = async (
     options: FunctionOptions = {}
   ): Promise<ParseAlbum[]> => {
@@ -174,12 +146,18 @@ const useRequests = () => {
         const albums = await ParseAlbum.query().findAll();
         return albums.map((album) => new ParseAlbum(album));
       },
-      JSON.stringify(getAllAlbumsQueryKey()),
       { errorMessage: Strings.noAlbums(), ...options }
     );
   };
 
   const getAllImagesQueryKey = () => ["GET_ALL_IMAGES"];
+  const getAllImagesOptions: QueryOptionsFunction<ParseImage[]> = (
+    options = {}
+  ) => ({
+    initialData: [],
+    refetchInterval: 5 * 60 * 1000,
+    ...options,
+  });
   const getAllImagesFunction = async (
     options: FunctionOptions = {}
   ): Promise<ParseImage[]> => {
@@ -188,22 +166,28 @@ const useRequests = () => {
         const images = await ParseImage.query().findAll();
         return images.map((image) => new ParseImage(image));
       },
-      JSON.stringify(getAllImagesQueryKey()),
       { errorMessage: Strings.noImages(), ...options }
     );
   };
 
-  const getAlbumQueryKey = (albumId: string) => ["GET_ALBUM", albumId];
+  const getAlbumQueryKey = (albumId?: string) => ["GET_ALBUM", albumId];
+  const getAlbumOptions: QueryOptionsFunction<ParseAlbum> = (options = {}) => ({
+    refetchInterval: 5 * 60 * 1000,
+    initialData: ParseAlbum.NULL,
+    ...options,
+  });
   const getAlbumFunction = async (
-    albumId: string,
+    albumId?: string,
     options: FunctionOptions = {}
   ): Promise<ParseAlbum> => {
+    if (!albumId) {
+      throw new Error("albumId must be defined!");
+    }
     return await runFunctionInTryCatch<ParseAlbum>(
       async () => {
         const album = await ParseAlbum.query().get(albumId);
         return new ParseAlbum(album);
       },
-      JSON.stringify(getAlbumQueryKey(albumId)),
       { errorMessage: Strings.albumNotFound(), ...options }
     );
   };
@@ -212,6 +196,12 @@ const useRequests = () => {
     "GET_IMAGES_BY_ID",
     imageIds,
   ];
+  const getImagesByIdOptions: QueryOptionsFunction<ParseImage[]> = (
+    options = {}
+  ) => ({
+    initialData: [],
+    ...options,
+  });
   const getImagesByIdFunction = async (
     imageIds: string[],
     options: FunctionOptions = {}
@@ -223,7 +213,6 @@ const useRequests = () => {
           .findAll();
         return images.map((image) => new ParseImage(image));
       },
-      JSON.stringify(getImagesByIdQueryKey(imageIds)),
       { errorMessage: Strings.getImagesError(), ...options }
     );
   };
@@ -232,6 +221,13 @@ const useRequests = () => {
     "GET_IMAGE_BY_ID",
     imageId,
   ];
+  const getImageByIdOptions: QueryOptionsFunction<ParseImage> = (
+    options = {}
+  ) => ({
+    refetchOnWindowFocus: false,
+    initialData: ParseImage.NULL,
+    ...options,
+  });
   const getImageByIdFunction = async (
     imageId?: string,
     options: FunctionOptions = {}
@@ -249,7 +245,6 @@ const useRequests = () => {
         }
         return new ParseImage(image);
       },
-      JSON.stringify(getImageByIdQueryKey(imageId)),
       { errorMessage: Strings.imageNotFound(), ...options }
     );
   };
@@ -258,6 +253,14 @@ const useRequests = () => {
     "GET_IMAGE_BY_OWNER",
     owner.id,
   ];
+  const getImagesByOwnerOptions: QueryOptionsFunction<ParseImage[]> = (
+    options = {}
+  ) => ({
+    initialData: [],
+    refetchInterval: 5 * 60 * 1000,
+    refetchOnWindowFocus: false,
+    ...options,
+  });
   const getImagesByOwnerFunction = async (
     owner: ParseUser,
     options: FunctionOptions = {}
@@ -269,12 +272,18 @@ const useRequests = () => {
           .findAll();
         return images.map((image) => new ParseImage(image));
       },
-      JSON.stringify(getImagesByOwnerQueryKey(owner)),
       { errorMessage: Strings.getImageError(), ...options }
     );
   };
 
   const getUserByIdQueryKey = (userId: string) => ["GET_USER_BY_ID", userId];
+  const getUserByIdOptions: QueryOptionsFunction<ParseUser> = (
+    options = {}
+  ) => ({
+    refetchOnWindowFocus: false,
+    initialData: ParseUser.NULL,
+    ...options,
+  });
   const getUserByIdFunction = async (
     userId: string,
     options: FunctionOptions = {}
@@ -287,7 +296,6 @@ const useRequests = () => {
         const user = await ParseUser.query().get(userId);
         return new ParseUser(user);
       },
-      JSON.stringify(getUserByIdQueryKey(userId)),
       { errorMessage: Strings.couldNotGetUserInfo(), ...options }
     );
   };
@@ -296,6 +304,13 @@ const useRequests = () => {
     "GET_USERS_BY_EMAIL",
     emails,
   ];
+  const getUsersByEmailOptions: QueryOptionsFunction<ParseUser[]> = (
+    options = {}
+  ) => ({
+    refetchOnWindowFocus: false,
+    initialData: [],
+    ...options,
+  });
   const getUsersByEmailFunction = async (
     emails: string[],
     options: FunctionOptions = {}
@@ -307,7 +322,6 @@ const useRequests = () => {
           .findAll();
         return users.map((user) => new ParseUser(user));
       },
-      JSON.stringify(getUsersByEmailQueryKey(emails)),
       { errorMessage: Strings.couldNotGetUserInfo(), ...options }
     );
   };
@@ -316,6 +330,13 @@ const useRequests = () => {
     "GET_USER_BY_EMAIL",
     email,
   ];
+  const getUserByEmailOptions: QueryOptionsFunction<ParseUser> = (
+    options = {}
+  ) => ({
+    refetchOnWindowFocus: false,
+    initialData: ParseUser.NULL,
+    ...options,
+  });
   const getUserByEmailFunction = async (
     email: string,
     options: FunctionOptions = {}
@@ -333,12 +354,18 @@ const useRequests = () => {
         }
         return new ParseUser(user);
       },
-      JSON.stringify(getUserByEmailQueryKey(email)),
       { errorMessage: Strings.couldNotGetUserInfo(), ...options }
     );
   };
 
   const getRelatedUserEmailsQueryKey = () => ["GET_RELATED_USER_EMAILS"];
+  const getRelatedUserEmailsOptions: QueryOptionsFunction<string[]> = (
+    options = {}
+  ) => ({
+    initialData: [],
+    refetchOnWindowFocus: false,
+    ...options,
+  });
   const getRelatedUserEmailsFunction = async (
     options: FunctionOptions = {}
   ): Promise<string[]> => {
@@ -377,32 +404,43 @@ const useRequests = () => {
           )
         );
       },
-      JSON.stringify(getRelatedUserEmailsQueryKey()),
       { errorMessage: Strings.couldNotGetUserInfo(), ...options }
     );
   };
 
+  // #endregion
+
   return {
     getAllAlbumsFunction,
     getAllAlbumsQueryKey,
+    getAllAlbumsOptions,
     getAllImagesFunction,
     getAllImagesQueryKey,
+    getAllImagesOptions,
     getAlbumFunction,
+    getAlbumOptions,
     getAlbumQueryKey,
     getImagesByIdFunction,
+    getImagesByIdOptions,
     getImagesByIdQueryKey,
+    getImageByIdOptions,
     getImageByIdFunction,
     getImageByIdQueryKey,
     getImagesByOwnerFunction,
+    getImagesByOwnerOptions,
     getImagesByOwnerQueryKey,
     getUserByIdQueryKey,
+    getUserByIdOptions,
     getUserByIdFunction,
     getUsersByEmailFunction,
+    getUsersByEmailOptions,
     getUsersByEmailQueryKey,
     getRelatedUserEmailsQueryKey,
     getRelatedUserEmailsFunction,
     getUserByEmailFunction,
+    getUserByEmailOptions,
     getUserByEmailQueryKey,
+    getRelatedUserEmailsOptions,
   };
 };
 

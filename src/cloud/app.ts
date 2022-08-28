@@ -24,7 +24,8 @@ app.use((req, res, next) => {
 app.use((req, res, next) => {
   const pathParts = req.path.split("/").filter((pathPart) => pathPart !== "");
   const serveIndex =
-    req.method === "GET" && frontendRoutes.includes(pathParts[0]);
+    req.method === "GET" &&
+    (frontendRoutes.includes(pathParts[0]) || pathParts.length === 0);
   if (serveIndex) {
     res.sendFile(path.join(`${__dirname}/public/index.html`));
   } else {

@@ -1,5 +1,6 @@
 import React from "react";
-import { Grid, Typography } from "@material-ui/core";
+import Typography from "@material-ui/core/Typography";
+import Grid from "@material-ui/core/Grid";
 import { makeStyles, Theme } from "@material-ui/core/styles";
 import {
   Empty,
@@ -34,14 +35,12 @@ const Images = () => {
   useView("Images");
   const randomColor = useRandomColor();
   const classes = useStyles();
-  const { getAllImagesFunction, getAllImagesQueryKey } = useRequests();
+  const { getAllImagesFunction, getAllImagesQueryKey, getAllImagesOptions } =
+    useRequests();
   const { data: images } = useQuery<ParseImage[], Error>(
     getAllImagesQueryKey(),
     () => getAllImagesFunction({ showErrorsInSnackbar: true }),
-    {
-      initialData: [],
-      refetchInterval: 5 * 60 * 1000,
-    }
+    getAllImagesOptions()
   );
 
   return (

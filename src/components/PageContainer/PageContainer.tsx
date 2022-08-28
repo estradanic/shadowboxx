@@ -1,5 +1,6 @@
 import React from "react";
-import { Container, ContainerProps, Grid } from "@material-ui/core";
+import Container, { ContainerProps } from "@material-ui/core/Container";
+import Grid from "@material-ui/core/Grid";
 import { makeStyles, Theme } from "@material-ui/core/styles";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import { useGlobalLoadingContext } from "../../contexts";

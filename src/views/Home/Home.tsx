@@ -1,6 +1,8 @@
 import React, { memo, useState } from "react";
-import { Fab, Typography, Grid } from "@material-ui/core";
-import { Add } from "@material-ui/icons";
+import Fab from "@material-ui/core/Fab";
+import Typography from "@material-ui/core/Typography";
+import Grid from "@material-ui/core/Grid";
+import AddIcon from "@material-ui/icons/Add";
 import { makeStyles, Theme } from "@material-ui/core/styles";
 import { useQuery } from "@tanstack/react-query";
 import {
@@ -51,7 +53,8 @@ const Home = memo(() => {
   const classes = useStyles();
   const [addAlbumDialogOpen, setAddAlbumDialogOpen] = useState(false);
   const { enqueueErrorSnackbar, enqueueSuccessSnackbar } = useSnackbar();
-  const { getAllAlbumsFunction, getAllAlbumsQueryKey } = useRequests();
+  const { getAllAlbumsFunction, getAllAlbumsQueryKey, getAllAlbumsOptions } =
+    useRequests();
   const { getLoggedInUser } = useUserContext();
   const { data: albums, refetch: refetchAlbums } = useQuery<
     ParseAlbum[],
@@ -59,10 +62,7 @@ const Home = memo(() => {
   >(
     getAllAlbumsQueryKey(),
     () => getAllAlbumsFunction({ showErrorsInSnackbar: true }),
-    {
-      initialData: [],
-      refetchInterval: 5 * 60 * 1000,
-    }
+    getAllAlbumsOptions()
   );
 
   return (
@@ -107,7 +107,7 @@ const Home = memo(() => {
         onClick={() => setAddAlbumDialogOpen(true)}
         className={classes.fab}
       >
-        <Add />
+        <AddIcon />
         <Typography>{Strings.addAlbum()}</Typography>
       </Fab>
       <AlbumFormDialog

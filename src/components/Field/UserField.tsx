@@ -52,15 +52,15 @@ const UserField = forwardRef(
     const classes = useStyles();
     const [inputValue, setInputValue] = useState<string>("");
 
-    const { getRelatedUserEmailsFunction, getRelatedUserEmailsQueryKey } =
-      useRequests();
+    const {
+      getRelatedUserEmailsFunction,
+      getRelatedUserEmailsQueryKey,
+      getRelatedUserEmailsOptions,
+    } = useRequests();
     const { data: options } = useQuery<string[], Error>(
       getRelatedUserEmailsQueryKey(),
       () => getRelatedUserEmailsFunction(),
-      {
-        refetchOnWindowFocus: false,
-        initialData: [],
-      }
+      getRelatedUserEmailsOptions()
     );
 
     const onKeyDown = (event: KeyboardEvent) => {

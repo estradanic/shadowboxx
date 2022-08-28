@@ -1,8 +1,7 @@
 import React from "react";
-import {
-  TextField as MatTextField,
+import MuiTextField, {
   FilledTextFieldProps,
-} from "@material-ui/core";
+} from "@material-ui/core/TextField";
 import { makeStyles, Theme } from "@material-ui/core/styles";
 
 const useStyles = makeStyles((theme: Theme) => ({
@@ -27,7 +26,7 @@ export interface TextFieldProps
 const TextField = (props: TextFieldProps) => {
   const classes = useStyles();
 
-  return <MatTextField variant="filled" classes={classes} {...props} />;
+  return <MuiTextField variant="filled" classes={classes} {...props} />;
 };
 
 export default TextField;

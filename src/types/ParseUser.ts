@@ -50,6 +50,17 @@ export default class ParseUser {
     username: "username",
   };
 
+  static NULL = new ParseUser(
+    new Parse.User<ParsifyPointers<User>>({
+      username: "",
+      password: "",
+      email: "",
+      lastName: "",
+      firstName: "",
+      isDarkThemeEnabled: false,
+    })
+  );
+
   static query() {
     return new Parse.Query<Parse.User<ParsifyPointers<User>>>("User");
   }
