@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { memo, useEffect, useMemo, useState } from "react";
 import Parse from "parse";
 import Card from "@material-ui/core/Card";
 import Grid from "@material-ui/core/Grid";
@@ -105,7 +105,7 @@ const DefaultErrorState = {
 /**
  * Settings page for the user.
  */
-const Settings = () => {
+const Settings = memo(() => {
   useView("Settings");
   const {
     getLoggedInUser,
@@ -342,6 +342,6 @@ const Settings = () => {
       </Grid>
     </PageContainer>
   );
-};
+});
 
 export default Settings;

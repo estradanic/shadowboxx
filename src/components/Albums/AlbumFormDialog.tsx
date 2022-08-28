@@ -286,7 +286,7 @@ const AlbumFormDialog = ({
             <ImageField
               label={Strings.images()}
               multiple
-              value={images}
+              value={images ?? []}
               onChange={async (newImages) => {
                 const newImageIds = newImages.map((image) => image.id!);
                 setImageIds(newImageIds);

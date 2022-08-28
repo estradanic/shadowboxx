@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { memo, useState } from "react";
 import { makeStyles, Theme } from "@material-ui/core/styles";
 import Typography from "@material-ui/core/Typography";
 import Grid from "@material-ui/core/Grid";
@@ -60,7 +60,7 @@ const DefaultErrorState = {
 /**
  * Signup page for the site
  */
-const Signup = () => {
+const Signup = memo(() => {
   useView("Signup");
 
   const classes = useStyles();
@@ -211,6 +211,6 @@ const Signup = () => {
       </Link>
     </PageContainer>
   );
-};
+});
 
 export default Signup;

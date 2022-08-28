@@ -12,6 +12,7 @@ export * from "./Menu";
 export * from "./NetworkDetector";
 export * from "./Notifications";
 export * from "./PageContainer";
+export * from "./Skeleton";
 export * from "./Snackbar";
 export * from "./Svgs";
 export * from "./Tooltip";

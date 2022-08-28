@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { memo, useState } from "react";
 import { makeStyles, Theme } from "@material-ui/core/styles";
 import Typography from "@material-ui/core/Typography";
 import Grid from "@material-ui/core/Grid";
@@ -47,7 +47,7 @@ const DefaultErrorState = {
 /**
  * Login page for the site
  */
-const Login = () => {
+const Login = memo(() => {
   useView("Login");
 
   const classes = useStyles();
@@ -143,6 +143,6 @@ const Login = () => {
       </Link>
     </PageContainer>
   );
-};
+});
 
 export default Login;

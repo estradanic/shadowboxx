@@ -84,7 +84,7 @@ const ImageSelectionDialog = ({
   } = useRequests();
 
   // Images that the current user owns, not those shared to them.
-  const { data: userOwnedImages } = useQuery<ParseImage[], Error>(
+  const { data: userOwnedImages, status } = useQuery<ParseImage[], Error>(
     getImagesByOwnerQueryKey(getLoggedInUser()),
     () =>
       getImagesByOwnerFunction(getLoggedInUser(), {
@@ -95,7 +95,7 @@ const ImageSelectionDialog = ({
 
   // Images that the current user owns + those in the passed in value
   const images = useMemo(
-    () => dedupeFast([...initialValue, ...userOwnedImages]),
+    () => dedupeFast([...initialValue, ...(userOwnedImages ?? [])]),
     [initialValue, userOwnedImages]
   );
 

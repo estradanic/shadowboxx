@@ -3,7 +3,7 @@ import react from "@vitejs/plugin-react";
 import { createHtmlPlugin } from "vite-plugin-html";
 import variables from "./public/variables.json";
 
-export default defineConfig(({ command }) => ({
+export default defineConfig(({ mode }) => ({
   publicDir: "public",
   build: {
     outDir: "build",
@@ -28,17 +28,17 @@ export default defineConfig(({ command }) => ({
             <script>
               globalThis.__env__ = {
                 PARSE_APPLICATION_ID: "${
-                  command === "build"
+                  mode === "production"
                     ? "aX17fiOL3N1Lklz83UnWMP6oympHLszezxXAXokH"
                     : "GkKaaxNRxTc1XONlpCizJtzVIzkWYI6ZLxrLylT4"
                 }",
                 PARSE_JAVASCRIPT_KEY: "${
-                  command === "build"
+                  mode === "production"
                     ? "otMMK0SVH7LEIL1TbqlIbemXf0jpfEurJ9FQ7gri"
                     : "vX8PThMi1vKelVwPkCRgkoRXDpBB5oDUeMO9PrZ2"
                 }",
                 PARSE_HOST_URL: "${
-                  command === "build"
+                  mode === "production"
                     ? "http://shadowboxx.b4a.io"
                     : "http://shadowboxxdevtest.b4a.io"
                 }",

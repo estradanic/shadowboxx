@@ -19,16 +19,9 @@ export type FunctionOptions = Interdependent<
   "startLoader" | "stopLoader"
 >;
 
-export type QueryOptions<TData> = Omit<
-  QueryObserverOptions<TData, Error>,
-  "initialData"
-> & {
-  initialData: TData;
-};
-
 export type QueryOptionsFunction<TData> = (
-  options?: Partial<QueryOptions<TData>>
-) => QueryOptions<TData>;
+  options?: Partial<QueryObserverOptions<TData, Error>>
+) => QueryObserverOptions<TData, Error>;
 
 type StartLoaderOptions = Pick<FunctionOptions, "startLoader" | "useLoader">;
 
@@ -40,9 +33,14 @@ type HandleErrorOptions = Pick<
 > & { error: any };
 
 const useRequests = () => {
-  const { enqueueErrorSnackbar, enqueueSuccessSnackbar, enqueueWarningSnackbar } = useSnackbar();
+  const {
+    enqueueErrorSnackbar,
+    enqueueSuccessSnackbar,
+    enqueueWarningSnackbar,
+  } = useSnackbar();
   const { startGlobalLoader, stopGlobalLoader } = useGlobalLoadingContext();
-  const { getLoggedInUser, profilePicture, updateLoggedInUser } = useUserContext();
+  const { getLoggedInUser, profilePicture, updateLoggedInUser } =
+    useUserContext();
 
   // #region Helper methods
 
@@ -98,7 +96,7 @@ const useRequests = () => {
     {
       successMessage,
       errorMessage,
-      useLoader = true,
+      useLoader = false,
       showNativeError = false,
       showErrorsInSnackbar = false,
       startLoader: piStartLoader,
@@ -137,7 +135,6 @@ const useRequests = () => {
   const getAllAlbumsOptions: QueryOptionsFunction<ParseAlbum[]> = (
     options = {}
   ) => ({
-    initialData: [],
     refetchInterval: 5 * 60 * 1000,
     ...options,
   });
@@ -157,7 +154,6 @@ const useRequests = () => {
   const getAllImagesOptions: QueryOptionsFunction<ParseImage[]> = (
     options = {}
   ) => ({
-    initialData: [],
     refetchInterval: 5 * 60 * 1000,
     ...options,
   });
@@ -176,7 +172,6 @@ const useRequests = () => {
   const getAlbumQueryKey = (albumId?: string) => ["GET_ALBUM", albumId];
   const getAlbumOptions: QueryOptionsFunction<ParseAlbum> = (options = {}) => ({
     refetchInterval: 5 * 60 * 1000,
-    initialData: ParseAlbum.NULL,
     ...options,
   });
   const getAlbumFunction = async (
@@ -202,7 +197,6 @@ const useRequests = () => {
   const getImagesByIdOptions: QueryOptionsFunction<ParseImage[]> = (
     options = {}
   ) => ({
-    initialData: [],
     ...options,
   });
   const getImagesByIdFunction = async (
@@ -228,7 +222,6 @@ const useRequests = () => {
     options = {}
   ) => ({
     refetchOnWindowFocus: false,
-    initialData: ParseImage.NULL,
     ...options,
   });
   const getImageByIdFunction = async (
@@ -259,7 +252,6 @@ const useRequests = () => {
   const getImagesByOwnerOptions: QueryOptionsFunction<ParseImage[]> = (
     options = {}
   ) => ({
-    initialData: [],
     refetchInterval: 5 * 60 * 1000,
     refetchOnWindowFocus: false,
     ...options,
@@ -284,7 +276,6 @@ const useRequests = () => {
     options = {}
   ) => ({
     refetchOnWindowFocus: false,
-    initialData: ParseUser.NULL,
     ...options,
   });
   const getUserByIdFunction = async (
@@ -311,7 +302,6 @@ const useRequests = () => {
     options = {}
   ) => ({
     refetchOnWindowFocus: false,
-    initialData: [],
     ...options,
   });
   const getUsersByEmailFunction = async (
@@ -337,7 +327,6 @@ const useRequests = () => {
     options = {}
   ) => ({
     refetchOnWindowFocus: false,
-    initialData: ParseUser.NULL,
     ...options,
   });
   const getUserByEmailFunction = async (
@@ -365,7 +354,6 @@ const useRequests = () => {
   const getRelatedUserEmailsOptions: QueryOptionsFunction<string[]> = (
     options = {}
   ) => ({
-    initialData: [],
     refetchOnWindowFocus: false,
     ...options,
   });

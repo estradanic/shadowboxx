@@ -14,10 +14,12 @@ import { makeStyles, Theme, useTheme } from "@material-ui/core/styles";
 import MoreVertIcon from "@material-ui/icons/MoreVert";
 import StarIcon from "@material-ui/icons/Star";
 import { useNavigate, useLocation } from "react-router-dom";
+import { useQuery } from "@tanstack/react-query";
 import { Strings } from "../../resources";
 import { routes } from "../../app";
 import { ParseAlbum } from "../../types";
 import { ImageContextProvider, useUserContext } from "../../contexts";
+import { useRequests } from "../../hooks";
 import UserAvatar from "../User/UserAvatar";
 import Empty from "../Svgs/Empty";
 import { useSnackbar } from "../Snackbar/Snackbar";
@@ -28,8 +30,7 @@ import ParseUser from "../../types/ParseUser";
 import ParseImage from "../../types/ParseImage";
 import ImageField from "../Field/ImageField";
 import Online from "../NetworkDetector/Online";
-import { useRequests } from "../../hooks";
-import { useQuery } from "@tanstack/react-query";
+import AlbumCardSkeleton from "../Skeleton/AlbumCardSkeleton";
 
 const useStyles = makeStyles((theme: Theme) => ({
   card: {
@@ -113,26 +114,49 @@ const AlbumCard = memo(({ value, onChange }: AlbumCardProps) => {
     getUsersByEmailOptions,
     getUsersByEmailQueryKey,
   } = useRequests();
-  const { data: owner } = useQuery<ParseUser, Error>(
+  const { data: owner, status: ownerStatus } = useQuery<ParseUser, Error>(
     getUserByIdQueryKey(value.owner.id),
-    () => getUserByIdFunction(value.owner.id, { useLoader: false }),
+    () => getUserByIdFunction(value.owner.id),
     getUserByIdOptions()
   );
-  const { data: images } = useQuery<ParseImage[], Error>(
+  const { data: images, status: imagesStatus } = useQuery<ParseImage[], Error>(
     getImagesByIdQueryKey(value.images),
-    () => getImagesByIdFunction(value.images, { useLoader: false }),
+    () => getImagesByIdFunction(value.images),
     getImagesByIdOptions({ refetchOnWindowFocus: false })
   );
-  const { data: collaborators } = useQuery<ParseUser[], Error>(
+  const { data: collaborators, status: collaboratorsStatus } = useQuery<
+    ParseUser[],
+    Error
+  >(
     getUsersByEmailQueryKey(value.collaborators),
-    () => getUsersByEmailFunction(value.collaborators, { useLoader: false }),
+    () => getUsersByEmailFunction(value.collaborators),
     getUsersByEmailOptions()
   );
-  const { data: viewers } = useQuery<ParseUser[], Error>(
+  const { data: viewers, status: viewersStatus } = useQuery<ParseUser[], Error>(
     getUsersByEmailQueryKey(value.viewers),
-    () => getUsersByEmailFunction(value.viewers, { useLoader: false }),
+    () => getUsersByEmailFunction(value.viewers),
     getUsersByEmailOptions()
   );
+
+  const status = useMemo(() => {
+    if (
+      ownerStatus === "error" ||
+      imagesStatus === "error" ||
+      collaboratorsStatus === "error" ||
+      viewersStatus === "error"
+    ) {
+      return "error";
+    }
+    if (
+      ownerStatus === "loading" ||
+      imagesStatus === "loading" ||
+      collaboratorsStatus === "loading" ||
+      viewersStatus === "loading"
+    ) {
+      return "loading";
+    }
+    return "success";
+  }, [ownerStatus, imagesStatus, viewersStatus, collaboratorsStatus]);
 
   const { getLoggedInUser } = useUserContext();
   const isViewer = useMemo(
@@ -155,7 +179,7 @@ const AlbumCard = memo(({ value, onChange }: AlbumCardProps) => {
     useState<boolean>(false);
   const navigate = useNavigate();
   const coverImage = useMemo(
-    () => images.find((image) => image.isCoverImage) ?? images[0],
+    () => images?.find((image) => image.isCoverImage) ?? images?.[0],
     [images]
   );
   const coverImageSrc = useMemo(
@@ -201,7 +225,7 @@ const AlbumCard = memo(({ value, onChange }: AlbumCardProps) => {
     }
   };
 
-  return (
+  return status !== "loading" ? (
     <ImageContextProvider>
       <Card className={mobile ? classes.cardMobile : classes.card}>
         <CardHeader
@@ -228,7 +252,7 @@ const AlbumCard = memo(({ value, onChange }: AlbumCardProps) => {
             )
           }
           title={value?.name}
-          subheader={`${Strings.numOfPhotos(images.length ?? 0)} ${
+          subheader={`${Strings.numOfPhotos(images?.length ?? 0)} ${
             value?.description ?? ""
           }`}
         />
@@ -262,9 +286,9 @@ const AlbumCard = memo(({ value, onChange }: AlbumCardProps) => {
                 {Strings.updatedAt(value?.updatedAt)}
               </Typography>
             </Grid>
-            {(!!collaborators.length || !!viewers.length) && (
+            {(!!collaborators?.length || !!viewers?.length) && (
               <Grid className={classes.collaborators} item container xs={12}>
-                {collaborators.map((collaborator) => (
+                {collaborators?.map((collaborator) => (
                   <Grid item key={collaborator?.email}>
                     <Tooltip
                       title={
@@ -282,7 +306,7 @@ const AlbumCard = memo(({ value, onChange }: AlbumCardProps) => {
                     </Tooltip>
                   </Grid>
                 ))}
-                {viewers.map((viewer) => (
+                {viewers?.map((viewer) => (
                   <Grid item key={viewer?.email}>
                     <Tooltip
                       title={
@@ -338,7 +362,7 @@ const AlbumCard = memo(({ value, onChange }: AlbumCardProps) => {
                   multiple
                   ButtonProps={{ className: classes.addImages }}
                   variant="button"
-                  value={images}
+                  value={images ?? []}
                   onChange={async (newImages) => {
                     try {
                       const newValue = await value.update({
@@ -375,6 +399,8 @@ const AlbumCard = memo(({ value, onChange }: AlbumCardProps) => {
         }}
       />
     </ImageContextProvider>
+  ) : (
+    <AlbumCardSkeleton />
   );
 });
 

@@ -111,7 +111,7 @@ export default class ParseUser {
 
   toPointer(): ParsePointer {
     if (this._user.isNew()) {
-      return new ParsePointer({objectId: "", className: "_User", __type: ""});
+      return new ParsePointer({ objectId: "", className: "_User", __type: "" });
     }
     return new ParsePointer(this._user.toPointer());
   }
@@ -122,10 +122,7 @@ export default class ParseUser {
 
   async login(updateLoggedInUser: UpdateLoggedInUser, options?: FullOptions) {
     const loggedInUser = await this._user.logIn(options);
-    await updateLoggedInUser(
-      new ParseUser(loggedInUser),
-      UpdateReason.LOG_IN
-    );
+    await updateLoggedInUser(new ParseUser(loggedInUser), UpdateReason.LOG_IN);
     return new ParseUser(loggedInUser);
   }
 

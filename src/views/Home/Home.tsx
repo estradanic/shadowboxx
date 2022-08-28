@@ -11,6 +11,7 @@ import {
   AlbumFormDialog,
   useSnackbar,
   BlankCanvas,
+  AlbumCardSkeleton,
 } from "../../components";
 import { Strings } from "../../resources";
 import { ParseAlbum } from "../../types";
@@ -56,10 +57,11 @@ const Home = memo(() => {
   const { getAllAlbumsFunction, getAllAlbumsQueryKey, getAllAlbumsOptions } =
     useRequests();
   const { getLoggedInUser } = useUserContext();
-  const { data: albums, refetch: refetchAlbums } = useQuery<
-    ParseAlbum[],
-    Error
-  >(
+  const {
+    data: albums,
+    refetch: refetchAlbums,
+    status,
+  } = useQuery<ParseAlbum[], Error>(
     getAllAlbumsQueryKey(),
     () => getAllAlbumsFunction({ showErrorsInSnackbar: true }),
     getAllAlbumsOptions()
@@ -68,7 +70,7 @@ const Home = memo(() => {
   return (
     <PageContainer>
       <Grid container direction="column">
-        {!!albums.length ? (
+        {status === "success" && !!albums.length ? (
           <Grid item className={classes.albumsContainer}>
             {[...albums]
               .sort((a, b) =>
@@ -89,17 +91,30 @@ const Home = memo(() => {
               ))}
           </Grid>
         ) : (
-          <Grid item className={classes.noAlbumsContainer}>
-            <BlankCanvas height="40vh" />
-            <br />
-            <Typography className={classes.noAlbums} variant="overline">
-              {Strings.noAlbums()}
-            </Typography>
-            <br />
-            <Typography variant="overline">
-              {Strings.tryAddingAlbum()}
-            </Typography>
-          </Grid>
+          <>
+            {status === "success" || status === "error" ? (
+              <Grid item className={classes.noAlbumsContainer}>
+                <BlankCanvas height="40vh" />
+                <br />
+                <Typography className={classes.noAlbums} variant="overline">
+                  {Strings.noAlbums()}
+                </Typography>
+                <br />
+                <Typography variant="overline">
+                  {Strings.tryAddingAlbum()}
+                </Typography>
+              </Grid>
+            ) : (
+              <>
+                <AlbumCardSkeleton />
+                <AlbumCardSkeleton />
+                <AlbumCardSkeleton />
+                <AlbumCardSkeleton />
+                <AlbumCardSkeleton />
+                <AlbumCardSkeleton />
+              </>
+            )}
+          </>
         )}
       </Grid>
       <Fab

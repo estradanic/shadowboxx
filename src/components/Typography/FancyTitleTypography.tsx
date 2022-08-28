@@ -8,7 +8,7 @@ interface UseStylesParams {
   outlineColor: VariableColor;
 }
 
-const useStyles = makeStyles((theme: Theme) => ({
+export const useStyles = makeStyles((theme: Theme) => ({
   corner: {
     position: "absolute",
     backgroundColor: theme.palette.background.default,

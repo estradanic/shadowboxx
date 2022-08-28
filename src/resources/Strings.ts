@@ -186,7 +186,8 @@ const Strings: {
   home: () => "Home",
   imageNotDeleted: (image: string) =>
     `Image not deleted ${JSON.stringify(image)}`,
-  imageNotFound: (imageId) => `${Strings.commonError()} Image not found. Image Id: ${imageId}`,
+  imageNotFound: (imageId) =>
+    `${Strings.commonError()} Image not found. Image Id: ${imageId}`,
   imageNotSaved: () => `${Strings.commonError()} Image not saved`,
   imageNotUpdated: () => `${Strings.commonError()} Image not updated`,
   images: () => "Images",
