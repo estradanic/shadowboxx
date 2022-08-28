@@ -28,13 +28,16 @@ const useStyles = makeStyles((theme: Theme) => ({
 /**
  * Interface defining props for PasswordField
  */
-export interface PasswordFieldProps extends Omit<TextFieldProps, "type"> {}
+export interface PasswordFieldProps extends Omit<TextFieldProps, "type"> {
+  onEnterKey: () => void | Promise<void>;
+}
 
 /**
  * Component for entering passwords and other "hidden" text
  */
 const PasswordField = ({
   InputProps: piInputProps,
+  onEnterKey,
   ...rest
 }: PasswordFieldProps) => {
   const classes = useStyles();
@@ -45,6 +48,11 @@ const PasswordField = ({
       type={passwordIsMasked ? "password" : "text"}
       className={classes.input}
       inputProps={{ className: classes.input }}
+      onKeyUp={(e) => {
+        if (e.key === "Enter") {
+          onEnterKey();
+        }
+      }}
       InputProps={{
         endAdornment: (
           <InputAdornment position="end">

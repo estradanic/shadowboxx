@@ -61,10 +61,6 @@ export const useSnackbar = () => {
     });
   };
   const enqueueErrorSnackbar = (message: string) => {
-    if (message === "Invalid session token") {
-      getLoggedInUser().logout(updateLoggedInUser);
-    }
-    console.error(message);
     enqueueSnackbar(<Typography>{message}</Typography>, {
       variant: "error",
       className: classes.variantError,

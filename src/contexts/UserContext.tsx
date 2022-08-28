@@ -151,7 +151,8 @@ export const UserContextProvider = ({ children }: UserContextProviderProps) => {
     if (loggedInUser) {
       return loggedInUser;
     }
-    throw new Error("User is not logged in!");
+    navigate(routes.Login.path);
+    return ParseUser.NULL;
   };
 
   const value = {

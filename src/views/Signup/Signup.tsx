@@ -187,6 +187,7 @@ const Signup = () => {
                 onChange={(e) => setPassword(e.target.value)}
                 label={Strings.password()}
                 id="password"
+                onEnterKey={signup}
               />
             </Grid>
             <Grid item xs={12}>

@@ -44,9 +44,9 @@ const UserAvatar = forwardRef(
       getUserByEmailOptions()
     );
     const { data: profilePicture } = useQuery<ParseImage, Error>(
-      getImageByIdQueryKey(user?.profilePicture?.id),
-      () => getImageByIdFunction(user?.profilePicture?.id),
-      getImageByIdOptions()
+      getImageByIdQueryKey(user?.profilePicture?.id ?? ""),
+      () => getImageByIdFunction(user?.profilePicture?.id ?? ""),
+      getImageByIdOptions({enabled: !!user?.profilePicture?.id})
     );
 
     return (

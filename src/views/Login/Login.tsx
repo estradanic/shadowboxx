@@ -119,6 +119,7 @@ const Login = () => {
                 id="password"
                 error={errors.password.isError}
                 helperText={errors.password.errorMessage}
+                onEnterKey={login}
               />
             </Grid>
             <Grid item xs={12}>

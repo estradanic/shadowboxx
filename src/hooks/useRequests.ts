@@ -40,9 +40,9 @@ type HandleErrorOptions = Pick<
 > & { error: any };
 
 const useRequests = () => {
-  const { enqueueErrorSnackbar, enqueueSuccessSnackbar } = useSnackbar();
+  const { enqueueErrorSnackbar, enqueueSuccessSnackbar, enqueueWarningSnackbar } = useSnackbar();
   const { startGlobalLoader, stopGlobalLoader } = useGlobalLoadingContext();
-  const { getLoggedInUser, profilePicture } = useUserContext();
+  const { getLoggedInUser, profilePicture, updateLoggedInUser } = useUserContext();
 
   // #region Helper methods
 
@@ -75,7 +75,10 @@ const useRequests = () => {
     showErrorsInSnackbar,
   }: HandleErrorOptions): Error => {
     console.error(error);
-    if (errorMessage && !showNativeError && showErrorsInSnackbar) {
+    if (error?.message === "Invalid session token") {
+      enqueueWarningSnackbar(Strings.sessionExpired());
+      getLoggedInUser().logout(updateLoggedInUser);
+    } else if (errorMessage && !showNativeError && showErrorsInSnackbar) {
       enqueueErrorSnackbar(errorMessage);
       throw new Error(errorMessage);
     } else if (showNativeError && showErrorsInSnackbar) {
@@ -217,7 +220,7 @@ const useRequests = () => {
     );
   };
 
-  const getImageByIdQueryKey = (imageId?: string) => [
+  const getImageByIdQueryKey = (imageId: string) => [
     "GET_IMAGE_BY_ID",
     imageId,
   ];
@@ -229,7 +232,7 @@ const useRequests = () => {
     ...options,
   });
   const getImageByIdFunction = async (
-    imageId?: string,
+    imageId: string,
     options: FunctionOptions = {}
   ): Promise<ParseImage> => {
     return await runFunctionInTryCatch<ParseImage>(
@@ -241,7 +244,7 @@ const useRequests = () => {
           .equalTo(ParseImage.COLUMNS.id, imageId)
           .first();
         if (!image) {
-          throw new Error();
+          throw new Error(Strings.imageNotFound(imageId));
         }
         return new ParseImage(image);
       },

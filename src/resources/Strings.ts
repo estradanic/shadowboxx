@@ -96,6 +96,7 @@ export interface StringEntries {
   removeImageError: string;
   processingImages: string;
   selectImages: string;
+  sessionExpired: string;
   setImageAsCover: string;
   settings: string;
   settingsNotSaved: string;
@@ -185,7 +186,7 @@ const Strings: {
   home: () => "Home",
   imageNotDeleted: (image: string) =>
     `Image not deleted ${JSON.stringify(image)}`,
-  imageNotFound: () => `${Strings.commonError()} Image not found`,
+  imageNotFound: (imageId) => `${Strings.commonError()} Image not found. Image Id: ${imageId}`,
   imageNotSaved: () => `${Strings.commonError()} Image not saved`,
   imageNotUpdated: () => `${Strings.commonError()} Image not updated`,
   images: () => "Images",
@@ -237,6 +238,7 @@ const Strings: {
     `Could not remove image ${fileName} from album.`,
   processingImages: () => "Processing Images...",
   selectImages: () => "Select Images",
+  sessionExpired: () => "Session Expired. Please log in again.",
   setImageAsCover: () => "Set this image as the album cover",
   settings: () => "Settings",
   settingsNotSaved: () => `${Strings.commonError()} Settings not saved.`,
