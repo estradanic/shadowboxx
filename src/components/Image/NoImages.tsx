@@ -1,9 +1,9 @@
 import React from "react";
-import {makeStyles} from "@material-ui/core/styles";
+import { makeStyles } from "@material-ui/core/styles";
 import Grid from "@material-ui/core/Grid";
 import Typography from "@material-ui/core/Typography";
 import Empty from "../Svgs/Empty";
-import {Strings} from "../../resources";
+import { Strings } from "../../resources";
 
 const useStyles = makeStyles(() => ({
   svgContainer: {
@@ -15,10 +15,10 @@ const useStyles = makeStyles(() => ({
 }));
 
 export type NoImagesProps = {
-  text?: string,
+  text?: string;
 };
 
-const NoImages = ({text = Strings.noImages()}) => {
+const NoImages = ({ text = Strings.noImages() }) => {
   const classes = useStyles();
 
   return (

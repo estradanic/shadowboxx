@@ -3,7 +3,7 @@ import Grid from "@material-ui/core/Grid";
 import {
   FancyTitleTypography,
   PageContainer,
-  Images as ImagesComponent
+  Images as ImagesComponent,
 } from "../../components";
 import { useRandomColor, useRequests } from "../../hooks";
 import { Strings } from "../../resources";
@@ -32,7 +32,11 @@ const Images = memo(() => {
           {Strings.pictures()}
         </FancyTitleTypography>
       </Grid>
-      <ImagesComponent status={status} images={images} outlineColor={randomColor} />
+      <ImagesComponent
+        status={status}
+        images={images}
+        outlineColor={randomColor}
+      />
     </PageContainer>
   );
 });

@@ -1,24 +1,21 @@
 import React from "react";
 import Grid from "@material-ui/core/Grid";
 import { ParseImage, VariableColor } from "../../types";
-import ImagesSkeleton, {useStyles} from "../Skeleton/ImagesSkeleton";
+import ImagesSkeleton, { useStyles } from "../Skeleton/ImagesSkeleton";
 import Image from "./Image";
 import NoImages from "./NoImages";
 
-
 export type ImagesProps = {
-  images?: ParseImage[],
-  status: "success" | "loading" | "error",
-  outlineColor: VariableColor,
+  images?: ParseImage[];
+  status: "success" | "loading" | "error";
+  outlineColor: VariableColor;
 };
 
-const Images = ({images, status, outlineColor}: ImagesProps) => {
+const Images = ({ images, status, outlineColor }: ImagesProps) => {
   const classes = useStyles();
 
   if (status === "loading" || (!images && status !== "error")) {
-    return (
-      <ImagesSkeleton />
-    );
+    return <ImagesSkeleton />;
   } else if (status === "error" || !images?.length) {
     return <NoImages />;
   } else {
@@ -36,8 +33,7 @@ const Images = ({images, status, outlineColor}: ImagesProps) => {
                 showFullResolutionOnClick
               />
             </Grid>
-          ))
-        }
+          ))}
       </Grid>
     );
   }

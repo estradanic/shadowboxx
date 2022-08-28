@@ -1,5 +1,10 @@
 import React, { memo } from "react";
-import { BackButton, FancyTitleTypographySkeleton, ImagesSkeleton, PageContainer } from "../../components";
+import {
+  BackButton,
+  FancyTitleTypographySkeleton,
+  ImagesSkeleton,
+  PageContainer,
+} from "../../components";
 import { useLocation, useParams } from "react-router-dom";
 import Grid from "@material-ui/core/Grid";
 import Typography from "@material-ui/core/Typography";
@@ -58,14 +63,18 @@ const Album = memo(() => {
           <FancyTitleTypographySkeleton outlineColor={randomColor} />
           <ImagesSkeleton />
         </>
-      ) : (albumStatus === "success" && album) ? (
+      ) : albumStatus === "success" && album ? (
         <>
           <Grid item sm={8}>
             <FancyTitleTypography outlineColor={randomColor}>
               {album.name}
             </FancyTitleTypography>
           </Grid>
-          <Images status={imagesStatus} images={images} outlineColor={randomColor} />
+          <Images
+            status={imagesStatus}
+            images={images}
+            outlineColor={randomColor}
+          />
         </>
       ) : (
         <Grid item className={classes.svgContainer}>
