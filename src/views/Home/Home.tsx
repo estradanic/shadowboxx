@@ -35,10 +35,8 @@ const useStyles = makeStyles((theme: Theme) => ({
   },
   albumsContainer: {
     display: "flex",
-    flexWrap: "wrap",
-    paddingBottom: theme.spacing(20),
-    alignSelf: "center",
-    maxWidth: "100%",
+    flexDirection: "row",
+    justifyContent: "center",
   },
   noAlbumsContainer: {
     textAlign: "center",
@@ -69,9 +67,9 @@ const Home = memo(() => {
 
   return (
     <PageContainer>
-      <Grid container direction="column">
+      <>
         {status === "success" && !!albums.length ? (
-          <Grid item className={classes.albumsContainer}>
+          <Grid item spacing={2} container className={classes.albumsContainer}>
             {[...albums]
               .sort((a, b) =>
                 a.isFavorite && b.isFavorite
@@ -80,14 +78,15 @@ const Home = memo(() => {
                   ? -1
                   : 1
               )
-              .map((album, index) => (
-                <AlbumCard
-                  onChange={async (_) => {
-                    await refetchAlbums();
-                  }}
-                  value={album}
-                  key={album?.name}
-                />
+              .map((album) => (
+                <Grid key={album?.name} item xs={12} md={6} lg={4} xl={3}>
+                  <AlbumCard
+                    onChange={async (_) => {
+                      await refetchAlbums();
+                    }}
+                    value={album}
+                  />
+                </Grid>
               ))}
           </Grid>
         ) : (
@@ -116,7 +115,7 @@ const Home = memo(() => {
             )}
           </>
         )}
-      </Grid>
+      </>
       <Fab
         variant="extended"
         onClick={() => setAddAlbumDialogOpen(true)}

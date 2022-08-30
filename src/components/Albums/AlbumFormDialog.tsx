@@ -68,6 +68,9 @@ const AlbumFormDialog = ({
   resetOnConfirm = true,
 }: AlbumFormDialogProps) => {
   const [imageIds, setImageIds] = useState<Album["images"]>(value.images);
+  const [coverImage, setCoverImage] = useState<Album["coverImage"]>(
+    value.coverImage
+  );
   const [name, setName] = useState<Album["name"]>(value.name);
   const [description, setDescription] = useState<Album["description"]>(
     value.description
@@ -182,6 +185,7 @@ const AlbumFormDialog = ({
           isFavorite,
           collaborators,
           viewers,
+          coverImage,
         });
       }
       if (resetOnConfirm) {
@@ -284,6 +288,8 @@ const AlbumFormDialog = ({
         <Grid item xs={12}>
           <ImageContextProvider>
             <ImageField
+              coverImage={coverImage}
+              setCoverImage={setCoverImage}
               label={Strings.images()}
               multiple
               value={images ?? []}

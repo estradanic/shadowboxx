@@ -86,7 +86,7 @@
     "preDeploy": "yarn build && yarn compileCloud && rm -rf ../public/* && cp -r ./build/* ../public",
     "preDeploy:prod": "yarn build:prod && yarn compileCloud && rm -rf ../public/* && cp -r ./build/* ../public",
     "deploy": "yarn preDeploy && b4a deploy ShadowboxxDevTest",
-    "deploy:prod": "yarn preDeploy && b4a deploy Shadowboxx"
+    "deploy:prod": "yarn preDeploy:prod && b4a deploy Shadowboxx"
   },
   "eslintConfig": {
     "extends": [

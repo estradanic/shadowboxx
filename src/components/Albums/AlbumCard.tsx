@@ -9,7 +9,6 @@ import CardActions from "@material-ui/core/CardActions";
 import Grid from "@material-ui/core/Grid";
 import Menu from "@material-ui/core/Menu";
 import MenuItem from "@material-ui/core/MenuItem";
-import useMediaQuery from "@material-ui/core/useMediaQuery";
 import { makeStyles, Theme, useTheme } from "@material-ui/core/styles";
 import MoreVertIcon from "@material-ui/icons/MoreVert";
 import StarIcon from "@material-ui/icons/Star";
@@ -35,12 +34,8 @@ import AlbumCardSkeleton from "../Skeleton/AlbumCardSkeleton";
 const useStyles = makeStyles((theme: Theme) => ({
   card: {
     maxWidth: theme.spacing(50),
-    minWidth: theme.spacing(50),
-    margin: theme.spacing(2),
-  },
-  cardMobile: {
-    width: `calc(100vw - ${theme.spacing(4)}px)`,
-    margin: theme.spacing(2),
+    width: "100%",
+    margin: "auto",
   },
   media: {
     cursor: "pointer",
@@ -103,6 +98,10 @@ export interface AlbumCardProps {
 
 /** Component for displaying basic information about an album */
 const AlbumCard = memo(({ value, onChange }: AlbumCardProps) => {
+  const [anchorEl, setAnchorEl] = useState<Element>();
+  const [editAlbumDialogOpen, setEditAlbumDialogOpen] =
+    useState<boolean>(false);
+
   const {
     getUserByIdQueryKey,
     getUserByIdFunction,
@@ -113,16 +112,27 @@ const AlbumCard = memo(({ value, onChange }: AlbumCardProps) => {
     getUsersByEmailFunction,
     getUsersByEmailOptions,
     getUsersByEmailQueryKey,
+    getImageByIdQueryKey,
+    getImageByIdFunction,
+    getImageByIdOptions,
   } = useRequests();
   const { data: owner, status: ownerStatus } = useQuery<ParseUser, Error>(
     getUserByIdQueryKey(value.owner.id),
     () => getUserByIdFunction(value.owner.id),
     getUserByIdOptions()
   );
-  const { data: images, status: imagesStatus } = useQuery<ParseImage[], Error>(
+  const { data: images } = useQuery<ParseImage[], Error>(
     getImagesByIdQueryKey(value.images),
     () => getImagesByIdFunction(value.images),
-    getImagesByIdOptions({ refetchOnWindowFocus: false })
+    getImagesByIdOptions({ enabled: editAlbumDialogOpen })
+  );
+  const { data: coverImage, status: coverImageStatus } = useQuery<
+    ParseImage,
+    Error
+  >(
+    getImageByIdQueryKey(value.coverImage.id),
+    () => getImageByIdFunction(value.coverImage.id),
+    getImageByIdOptions()
   );
   const { data: collaborators, status: collaboratorsStatus } = useQuery<
     ParseUser[],
@@ -141,22 +151,22 @@ const AlbumCard = memo(({ value, onChange }: AlbumCardProps) => {
   const status = useMemo(() => {
     if (
       ownerStatus === "error" ||
-      imagesStatus === "error" ||
       collaboratorsStatus === "error" ||
-      viewersStatus === "error"
+      viewersStatus === "error" ||
+      coverImageStatus === "error"
     ) {
       return "error";
     }
     if (
       ownerStatus === "loading" ||
-      imagesStatus === "loading" ||
       collaboratorsStatus === "loading" ||
-      viewersStatus === "loading"
+      viewersStatus === "loading" ||
+      coverImageStatus === "loading"
     ) {
       return "loading";
     }
     return "success";
-  }, [ownerStatus, imagesStatus, viewersStatus, collaboratorsStatus]);
+  }, [ownerStatus, viewersStatus, collaboratorsStatus, coverImageStatus]);
 
   const { getLoggedInUser } = useUserContext();
   const isViewer = useMemo(
@@ -174,22 +184,13 @@ const AlbumCard = memo(({ value, onChange }: AlbumCardProps) => {
   const location = useLocation();
 
   const { enqueueErrorSnackbar, enqueueSuccessSnackbar } = useSnackbar();
-  const [anchorEl, setAnchorEl] = useState<Element>();
-  const [editAlbumDialogOpen, setEditAlbumDialogOpen] =
-    useState<boolean>(false);
   const navigate = useNavigate();
-  const coverImage = useMemo(
-    () => images?.find((image) => image.isCoverImage) ?? images?.[0],
-    [images]
-  );
   const coverImageSrc = useMemo(
     () => coverImage?.mobileFile.url(),
     [coverImage]
   );
 
   const classes = useStyles();
-  const theme = useTheme();
-  const mobile = useMediaQuery(theme.breakpoints.down("sm"));
   const { openConfirm } = useActionDialogContext();
 
   const deleteAlbum = () => {
@@ -227,7 +228,7 @@ const AlbumCard = memo(({ value, onChange }: AlbumCardProps) => {
 
   return status !== "loading" ? (
     <ImageContextProvider>
-      <Card className={mobile ? classes.cardMobile : classes.card}>
+      <Card className={classes.card}>
         <CardHeader
           classes={{ title: classes.title, subheader: classes.subheader }}
           avatar={<UserAvatar email={owner?.email!} fetchUser={() => owner!} />}
@@ -257,7 +258,7 @@ const AlbumCard = memo(({ value, onChange }: AlbumCardProps) => {
             )
           }
           title={value?.name}
-          subheader={`${Strings.numOfPhotos(images?.length ?? 0)} ${
+          subheader={`${Strings.numOfPhotos(value.images.length)} ${
             value?.description ?? ""
           }`}
         />

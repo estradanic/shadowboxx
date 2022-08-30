@@ -1,5 +1,7 @@
 import Parse from "parse";
 
+export type ClassName = "Album" | "Image" | "_User" | "_Role" | null;
+
 /**
  * Class wrapping the Parse.Pointer class and providing convenience methods/properties
  */
@@ -10,8 +12,8 @@ export default class ParsePointer {
     this._pointer = pointer;
   }
 
-  get className(): string {
-    return this._pointer?.className ?? "";
+  get className(): ClassName {
+    return (this._pointer?.className ?? null) as ClassName;
   }
 
   get exists(): boolean {

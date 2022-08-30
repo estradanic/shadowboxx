@@ -1,7 +1,6 @@
 import Parse from "parse";
 import ParsePointer from "./ParsePointer";
 import ParseObject, { Attributes, ParsifyPointers } from "./ParseObject";
-import ParseUser from "./ParseUser";
 
 /** Interface defining an Album */
 export interface Album extends Attributes {
@@ -19,6 +18,8 @@ export interface Album extends Attributes {
   collaborators: string[];
   /** Collaborators with "view" access */
   viewers: string[];
+  /** First image in album, or user selected cover image */
+  coverImage: ParsePointer;
   /** Last edited date */
   updatedAt?: Date;
   /** Created date */
@@ -38,15 +39,17 @@ export default class ParseAlbum extends ParseObject<Album> {
     isFavorite: "isFavorite",
     collaborators: "collaborators",
     viewers: "viewers",
+    coverImage: "coverImage",
   };
 
   static NULL = new ParseAlbum(
     new Parse.Object<ParsifyPointers<Album>>("Album", {
-      owner: { objectId: "", className: "Album", __type: "" },
+      owner: { objectId: "", className: "_User", __type: "" },
       images: [],
       name: "",
       collaborators: [],
       viewers: [],
+      coverImage: { objectId: "", className: "Image", __type: "" },
     })
   );
 
@@ -58,6 +61,7 @@ export default class ParseAlbum extends ParseObject<Album> {
     const newAttributes: ParsifyPointers<Album> = {
       ...attributes,
       owner: attributes.owner._pointer,
+      coverImage: attributes.coverImage._pointer,
     };
     return new ParseAlbum(
       new Parse.Object<ParsifyPointers<Album>>("Album", newAttributes)
@@ -76,7 +80,12 @@ export default class ParseAlbum extends ParseObject<Album> {
   }
 
   async update(attributes: Album) {
-    this._album.set(attributes);
+    const newAttributes: ParsifyPointers<Album> = {
+      ...attributes,
+      owner: attributes.owner._pointer,
+      coverImage: attributes.coverImage._pointer,
+    };
+    this._album.set(newAttributes);
     return this.save();
   }
 
@@ -138,5 +147,13 @@ export default class ParseAlbum extends ParseObject<Album> {
 
   set viewers(viewers) {
     this._album.set(ParseAlbum.COLUMNS.viewers, viewers);
+  }
+
+  get coverImage(): Album["coverImage"] {
+    return new ParsePointer(this._album.get(ParseAlbum.COLUMNS.coverImage));
+  }
+
+  set coverImage(coverImage) {
+    this._album.set(ParseAlbum.COLUMNS.coverImage, coverImage._pointer);
   }
 }

@@ -8,8 +8,6 @@ import ParseUser from "./ParseUser";
 export interface Image extends Attributes {
   /** The actual saved file */
   file: Parse.File;
-  /** Whether the image is the selected cover image for the album */
-  isCoverImage: boolean;
   /** User that owns this picture */
   owner: ParsePointer;
   /** Name of the image */
@@ -34,20 +32,33 @@ export default class ParseImage extends ParseObject<Image> {
   static NULL = new ParseImage(
     new Parse.Object<ParsifyPointers<Image>>("Image", {
       file: new Parse.File("", []),
-      isCoverImage: false,
       owner: { objectId: "", className: "Image", __type: "" },
       name: "",
     })
   );
 
-  static query() {
+  static query(): Parse.Query<Parse.Object<ParsifyPointers<Image>>> {
     return new Parse.Query<Parse.Object<ParsifyPointers<Image>>>("Image");
+  }
+
+  static sort(images: ParseImage[], coverImage?: ParsePointer): ParseImage[] {
+    if (coverImage) {
+      return [...images].sort((a, b) => {
+        if (a.id === coverImage.id) {
+          return -1;
+        }
+        if (b.id === coverImage.id) {
+          return 1;
+        }
+        return a.compareTo(b);
+      });
+    }
+    return [...images].sort((a, b) => a.compareTo(b));
   }
 
   static COLUMNS: { [key: string]: string } = {
     ...ParseObject.COLUMNS,
     file: "file",
-    isCoverImage: "isCoverImage",
     owner: "owner",
     name: "name",
     thumbnail: "fileThumb",
@@ -62,11 +73,7 @@ export default class ParseImage extends ParseObject<Image> {
   }
 
   compareTo(that: ParseImage): number {
-    if (this.isCoverImage) {
-      return -1;
-    } else if (that.isCoverImage) {
-      return 1;
-    } else if (this.createdAt! > that.createdAt!) {
+    if (this.createdAt! > that.createdAt!) {
       return -1;
     } else if (this.createdAt! < that.createdAt!) {
       return 1;
@@ -106,14 +113,6 @@ export default class ParseImage extends ParseObject<Image> {
 
   get mobileFile(): Parse.File {
     return this._image.get(ParseImage.COLUMNS.mobileFile) ?? this.file;
-  }
-
-  get isCoverImage(): boolean {
-    return this._image.get(ParseImage.COLUMNS.isCoverImage);
-  }
-
-  set isCoverImage(isCoverImage) {
-    this._image.set(ParseImage.COLUMNS.isCoverImage, isCoverImage);
   }
 
   get owner(): Image["owner"] {

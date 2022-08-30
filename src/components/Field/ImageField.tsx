@@ -19,7 +19,7 @@ import { createHtmlPortalNode, InPortal } from "react-reverse-portal";
 import { readAndCompressImage } from "browser-image-resizer";
 import { elide, makeValidFileName, removeExtension } from "../../utils";
 import { Strings } from "../../resources";
-import { ParseImage } from "../../types";
+import { Album, Interdependent, ParseImage, ParsePointer } from "../../types";
 import { useRandomColor, useRefState } from "../../hooks";
 import TextField, { TextFieldProps } from "../Field/TextField";
 import Tooltip from "../Tooltip/Tooltip";
@@ -97,21 +97,31 @@ const useStyles = makeStyles((theme: Theme) => ({
 }));
 
 /** Interface defining props for ImageField */
-export interface ImageFieldProps
-  extends Omit<TextFieldProps, "value" | "onChange" | "variant"> {
-  /** Value of the field, array of Images */
-  value: ParseImage[];
-  /** Function to run when the value changes */
-  onChange: (value: ParseImage[]) => Promise<void>;
-  /** Whether multiple images can be selected or not */
-  multiple?: boolean;
-  /** ACL to save new images with after upload */
-  acl?: Parse.ACL;
-  /** Variant for how to display the field */
-  variant?: "button" | "field";
-  /** Props to pass to the IconButton when variant=="button" */
-  ButtonProps?: IconButtonProps;
-}
+export type ImageFieldProps = Omit<
+  TextFieldProps,
+  "value" | "onChange" | "variant"
+> &
+  Interdependent<
+    {
+      /** Value of the field, array of Images */
+      value: ParseImage[];
+      /** Function to run when the value changes */
+      onChange: (value: ParseImage[]) => Promise<void>;
+      /** Whether multiple images can be selected or not */
+      multiple?: boolean;
+      /** ACL to save new images with after upload */
+      acl?: Parse.ACL;
+      /** Variant for how to display the field */
+      variant?: "button" | "field";
+      /** Props to pass to the IconButton when variant=="button" */
+      ButtonProps?: IconButtonProps;
+      /** Cover image for the album */
+      coverImage?: ParsePointer;
+      /** Function to set coverImage */
+      setCoverImage?: (newCoverImage: ParsePointer) => void;
+    },
+    "coverImage" | "setCoverImage"
+  >;
 
 /** Component to input images from the filesystem or online */
 const ImageField = memo(
@@ -124,6 +134,8 @@ const ImageField = memo(
     variant = "field",
     ButtonProps = {},
     disabled,
+    coverImage,
+    setCoverImage,
     ...rest
   }: ImageFieldProps) => {
     const classes = useStyles();
@@ -195,7 +207,6 @@ const ImageField = memo(
             uploadImage(
               {
                 file: parseFile,
-                isCoverImage: false,
                 owner: getLoggedInUser().toPointer(),
                 name: removeExtension(fileName),
               },
@@ -244,45 +255,12 @@ const ImageField = memo(
       document.getElementById(urlInputId)?.focus();
     };
 
-    const setCoverImage = async (image: ParseImage, index: number) => {
-      const newValue = [...value];
-      const currentCoverImageIndex = value.findIndex((i) => i.isCoverImage);
-      image.isCoverImage = true;
-      try {
-        if (currentCoverImageIndex !== -1) {
-          value[currentCoverImageIndex].isCoverImage = false;
-          newValue[currentCoverImageIndex] = await value[
-            currentCoverImageIndex
-          ].save();
-        }
-        newValue[index] = await image.save();
-        await onChange(newValue);
-      } catch (error: any) {
-        enqueueErrorSnackbar(error?.message ?? Strings.commonError());
-        image.isCoverImage = false;
-        if (currentCoverImageIndex !== -1) {
-          value[currentCoverImageIndex].isCoverImage = true;
-        }
-      }
-    };
-
-    const unsetCoverImage = async (image: ParseImage, index: number) => {
-      const newValue = [...value];
-      image.isCoverImage = false;
-      try {
-        newValue[index] = await image.save();
-        await onChange(newValue);
-      } catch (error: any) {
-        enqueueErrorSnackbar(error?.message ?? Strings.commonError());
-        image.isCoverImage = true;
-      }
-    };
-
     const dialogImageUrlInputPortalNode = useMemo(
       () => createHtmlPortalNode(),
       []
     );
 
+    const sortedValue = ParseImage.sort(value, coverImage);
     return (
       <>
         {variant === "field" ? (
@@ -405,46 +383,50 @@ const ImageField = memo(
             />
             {multiple && !!value.length && (
               <Grid container className={classes.multiImageContainer}>
-                {[...value.sort((a, b) => a.compareTo(b))].map(
-                  (image: ParseImage, index) => {
-                    return (
-                      <Grid
-                        xs={12}
-                        md={6}
-                        lg={4}
-                        item
-                        className={classes.imageWrapper}
-                        key={image.id}
-                      >
-                        <Image
-                          borderColor={randomColor}
-                          src={image.mobileFile.url()}
-                          alt={image.name}
-                          decorations={[
-                            <RemoveImageDecoration
-                              onClick={async () => {
-                                const newValue = value.filter(
-                                  (valueImage) => image.id !== valueImage.id
-                                );
-                                await onChange(newValue);
-                              }}
-                            />,
-                            <CoverImageDecoration
-                              checked={image.isCoverImage}
-                              onClick={async () => {
-                                if (image.isCoverImage) {
-                                  await unsetCoverImage(image, index);
-                                } else {
-                                  await setCoverImage(image, index);
-                                }
-                              }}
-                            />,
-                          ]}
-                        />
-                      </Grid>
+                {sortedValue.map((image: ParseImage) => {
+                  const imageDecorations = [
+                    <RemoveImageDecoration
+                      onClick={async () => {
+                        const newValue = value.filter(
+                          (valueImage) => image.id !== valueImage.id
+                        );
+                        await onChange(newValue);
+                      }}
+                    />,
+                  ];
+                  if (coverImage) {
+                    const checked = coverImage.id === image.id;
+                    imageDecorations.push(
+                      <CoverImageDecoration
+                        checked={checked}
+                        onClick={() => {
+                          if (checked) {
+                            setCoverImage?.(sortedValue[0].toPointer());
+                          } else {
+                            setCoverImage?.(image.toPointer());
+                          }
+                        }}
+                      />
                     );
                   }
-                )}
+                  return (
+                    <Grid
+                      xs={12}
+                      md={6}
+                      lg={4}
+                      item
+                      className={classes.imageWrapper}
+                      key={image.id}
+                    >
+                      <Image
+                        borderColor={randomColor}
+                        src={image.mobileFile.url()}
+                        alt={image.name}
+                        decorations={imageDecorations}
+                      />
+                    </Grid>
+                  );
+                })}
               </Grid>
             )}
           </>
