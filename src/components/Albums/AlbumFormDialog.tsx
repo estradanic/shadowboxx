@@ -75,9 +75,6 @@ const AlbumFormDialog = ({
   const [description, setDescription] = useState<Album["description"]>(
     value.description
   );
-  const [isFavorite, setIsFavorite] = useState<Album["isFavorite"]>(
-    value.isFavorite
-  );
   const [collaborators, setCollaborators] = useState<Album["collaborators"]>(
     value.collaborators
   );
@@ -114,14 +111,12 @@ const AlbumFormDialog = ({
   const reinitialize = useCallback(() => {
     setName(value.name);
     setDescription(value.description);
-    setIsFavorite(value.isFavorite);
     setCollaborators(value.collaborators);
     setViewers(value.viewers);
     setErrors(defaultErrors);
   }, [
     setName,
     setDescription,
-    setIsFavorite,
     setCollaborators,
     setViewers,
     setErrors,
@@ -171,7 +166,6 @@ const AlbumFormDialog = ({
             images: imageIds,
             name,
             description,
-            isFavorite,
             collaborators,
             viewers,
           });
@@ -182,7 +176,6 @@ const AlbumFormDialog = ({
           images: imageIds,
           name,
           description,
-          isFavorite,
           collaborators,
           viewers,
           coverImage,
@@ -240,31 +233,6 @@ const AlbumFormDialog = ({
         </Grid>
         {!isCollaborator && (
           <>
-            <Grid item xs={12}>
-              <Tooltip title={Strings.favoriteTooltip()}>
-                <FormControl fullWidth className={classes.checkbox}>
-                  <FormControlLabel
-                    control={
-                      <Checkbox
-                        disabled={isCollaborator}
-                        icon={
-                          <StarBorderIcon className={classes.favoriteIcon} />
-                        }
-                        checked={!!isFavorite}
-                        onChange={(_, checked) => setIsFavorite(checked)}
-                        checkedIcon={
-                          <StarIcon className={classes.favoriteIcon} />
-                        }
-                      />
-                    }
-                    label={Strings.favorite()}
-                    labelPlacement="start"
-                    className={classes.checkboxLabel}
-                  />
-                </FormControl>
-              </Tooltip>
-            </Grid>
-
             <Grid item xs={12}>
               <Tooltip title={Strings.collaboratorsTooltip()}>
                 <UserField

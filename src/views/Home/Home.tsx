@@ -14,7 +14,7 @@ import {
   AlbumCardSkeleton,
 } from "../../components";
 import { Strings } from "../../resources";
-import { ParseAlbum } from "../../types";
+import { ParseAlbum, ParsePointer } from "../../types";
 import { useUserContext } from "../../contexts";
 import { useView } from "../View";
 import { useRequests } from "../../hooks";
@@ -70,15 +70,8 @@ const Home = memo(() => {
       <>
         {status === "success" && !!albums.length ? (
           <Grid item spacing={2} container className={classes.albumsContainer}>
-            {[...albums]
-              .sort((a, b) =>
-                a.isFavorite && b.isFavorite
-                  ? a.name.localeCompare(b.name)
-                  : a.isFavorite && !b.isFavorite
-                  ? -1
-                  : 1
-              )
-              .map((album) => (
+            {ParseAlbum.sort(albums, getLoggedInUser().favoriteAlbums).map(
+              (album) => (
                 <Grid key={album?.name} item xs={12} md={6} lg={4} xl={3}>
                   <AlbumCard
                     onChange={async (_) => {
@@ -87,7 +80,8 @@ const Home = memo(() => {
                     value={album}
                   />
                 </Grid>
-              ))}
+              )
+            )}
           </Grid>
         ) : (
           <>
@@ -132,6 +126,7 @@ const Home = memo(() => {
           name: Strings.untitledAlbum(),
           collaborators: [],
           viewers: [],
+          coverImage: ParsePointer.NULL,
         }}
         open={addAlbumDialogOpen}
         handleCancel={() => setAddAlbumDialogOpen(false)}

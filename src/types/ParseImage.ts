@@ -32,7 +32,7 @@ export default class ParseImage extends ParseObject<Image> {
   static NULL = new ParseImage(
     new Parse.Object<ParsifyPointers<Image>>("Image", {
       file: new Parse.File("", []),
-      owner: { objectId: "", className: "Image", __type: "" },
+      owner: ParsePointer.NATIVE_NULL,
       name: "",
     })
   );

@@ -168,7 +168,7 @@ const AlbumCard = memo(({ value, onChange }: AlbumCardProps) => {
     return "success";
   }, [ownerStatus, viewersStatus, collaboratorsStatus, coverImageStatus]);
 
-  const { getLoggedInUser } = useUserContext();
+  const { getLoggedInUser, updateLoggedInUser } = useUserContext();
   const isViewer = useMemo(
     () =>
       getLoggedInUser().id !== value.owner.id &&
@@ -225,6 +225,10 @@ const AlbumCard = memo(({ value, onChange }: AlbumCardProps) => {
       });
     }
   };
+
+  const [isFavorite, setIsFavorite] = useState(
+    !!value.id && getLoggedInUser().favoriteAlbums.includes(value.id)
+  );
 
   return status !== "loading" ? (
     <ImageContextProvider>
@@ -341,23 +345,28 @@ const AlbumCard = memo(({ value, onChange }: AlbumCardProps) => {
                 <IconButton
                   name="favorite"
                   onClick={async () => {
-                    try {
-                      const newValue = await value.update({
-                        ...value.attributes,
-                        isFavorite: !value.isFavorite,
-                      });
-                      await onChange(newValue);
-                    } catch (error: any) {
-                      enqueueErrorSnackbar(
-                        error?.message ?? Strings.editAlbumError()
-                      );
+                    if (!value.id) {
+                      return;
                     }
+                    if (isFavorite) {
+                      getLoggedInUser().favoriteAlbums.splice(
+                        getLoggedInUser().favoriteAlbums.indexOf(value.id),
+                        1
+                      );
+                    } else {
+                      getLoggedInUser().favoriteAlbums.push(value.id);
+                    }
+                    getLoggedInUser().update(async (loggedInUser, reason) => {
+                      await updateLoggedInUser(loggedInUser, reason);
+                      setIsFavorite(
+                        !!value.id &&
+                          loggedInUser.favoriteAlbums.includes(value.id)
+                      );
+                    });
                   }}
                 >
                   <StarIcon
-                    className={
-                      value.isFavorite ? classes.favorite : classes.icon
-                    }
+                    className={isFavorite ? classes.favorite : classes.icon}
                   />
                 </IconButton>
               </Online>

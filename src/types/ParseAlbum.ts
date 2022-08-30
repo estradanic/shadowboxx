@@ -12,8 +12,6 @@ export interface Album extends Attributes {
   name: string;
   /** Description of the album */
   description?: string;
-  /** Whether the album is "favorite" or not */
-  isFavorite?: boolean;
   /** Collaborators with "put" access */
   collaborators: string[];
   /** Collaborators with "view" access */
@@ -36,7 +34,6 @@ export default class ParseAlbum extends ParseObject<Album> {
     images: "images",
     name: "name",
     description: "description",
-    isFavorite: "isFavorite",
     collaborators: "collaborators",
     viewers: "viewers",
     coverImage: "coverImage",
@@ -44,14 +41,27 @@ export default class ParseAlbum extends ParseObject<Album> {
 
   static NULL = new ParseAlbum(
     new Parse.Object<ParsifyPointers<Album>>("Album", {
-      owner: { objectId: "", className: "_User", __type: "" },
+      owner: ParsePointer.NATIVE_NULL,
       images: [],
       name: "",
       collaborators: [],
       viewers: [],
-      coverImage: { objectId: "", className: "Image", __type: "" },
+      coverImage: ParsePointer.NATIVE_NULL,
     })
   );
+
+  static sort(albums: ParseAlbum[], favoriteAlbums?: string[]) {
+    return [...albums].sort((a, b) => {
+      if (favoriteAlbums) {
+        if (a.id && favoriteAlbums.includes(a.id)) {
+          return -1;
+        } else if (b.id && favoriteAlbums.includes(b.id)) {
+          return 1;
+        }
+      }
+      return a.compareTo(b);
+    });
+  }
 
   static query() {
     return new Parse.Query<Parse.Object<ParsifyPointers<Album>>>("Album");
@@ -73,6 +83,10 @@ export default class ParseAlbum extends ParseObject<Album> {
   constructor(album: Parse.Object<ParsifyPointers<Album>>) {
     super(album);
     this._album = album;
+  }
+
+  compareTo(that: ParseAlbum): number {
+    return this.name.localeCompare(that.name);
   }
 
   async save() {
@@ -123,14 +137,6 @@ export default class ParseAlbum extends ParseObject<Album> {
 
   set description(description) {
     this._album.set(ParseAlbum.COLUMNS.description, description);
-  }
-
-  get isFavorite(): Album["isFavorite"] {
-    return this._album.get(ParseAlbum.COLUMNS.isFavorite);
-  }
-
-  set isFavorite(isFavorite) {
-    this._album.set(ParseAlbum.COLUMNS.isFavorite, isFavorite);
   }
 
   get collaborators(): Album["collaborators"] {

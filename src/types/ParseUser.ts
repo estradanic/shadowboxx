@@ -20,6 +20,8 @@ export interface User extends Attributes {
   isDarkThemeEnabled: boolean;
   /** Pointer to Image record for profile picture */
   profilePicture?: ParsePointer;
+  /** List of favorited album ids */
+  favoriteAlbums: string[];
 }
 
 export type UpdateLoggedInUser = (
@@ -48,6 +50,7 @@ export default class ParseUser {
     isDarkThemeEnabled: "isDarkThemeEnabled",
     profilePicture: "profilePicture",
     username: "username",
+    favoriteAlbums: "favoriteAlbums",
   };
 
   static NULL = new ParseUser(
@@ -58,6 +61,7 @@ export default class ParseUser {
       lastName: "",
       firstName: "",
       isDarkThemeEnabled: false,
+      favoriteAlbums: [],
     })
   );
 
@@ -75,6 +79,7 @@ export default class ParseUser {
         attributes.firstName ?? attributes.email ?? attributes.username ?? "",
       lastName: attributes.lastName ?? "",
       profilePicture: attributes.profilePicture?._pointer,
+      favoriteAlbums: attributes.favoriteAlbums ?? [],
     };
     const newParseUser = new ParseUser(
       new Parse.User<ParsifyPointers<User>>(fullAttributes)
@@ -111,7 +116,7 @@ export default class ParseUser {
 
   toPointer(): ParsePointer {
     if (this._user.isNew()) {
-      return new ParsePointer({ objectId: "", className: "_User", __type: "" });
+      return ParsePointer.NULL;
     }
     return new ParsePointer(this._user.toPointer());
   }
@@ -260,5 +265,13 @@ export default class ParseUser {
 
   set profilePicture(profilePicture) {
     this._user.set(ParseUser.COLUMNS.profilePicture, profilePicture?._pointer);
+  }
+
+  get favoriteAlbums(): string[] {
+    return this._user.get(ParseUser.COLUMNS.favoriteAlbums);
+  }
+
+  set favoriteAlbums(favoriteAlbums) {
+    this._user.set(ParseUser.COLUMNS.favoriteAlbums, favoriteAlbums);
   }
 }
