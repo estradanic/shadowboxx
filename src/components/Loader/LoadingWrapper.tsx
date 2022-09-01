@@ -10,10 +10,6 @@ import classNames from "classnames";
 import { opacity } from "../../utils";
 
 const useStyles = makeStyles((theme: Theme) => ({
-  root: {
-    display: "block",
-    position: "relative",
-  },
   wrapper: {
     pointerEvents: ({ loading }: any) => (loading ? "none" : "auto"),
   },
@@ -40,7 +36,7 @@ const useStyles = makeStyles((theme: Theme) => ({
     width: "50vw",
   },
   centerPositionLoader: {
-    top: "30vh",
+    top: `calc(50vh - 16rem)`,
   },
   topPositionLoader: {
     top: theme.spacing(1),
@@ -95,7 +91,7 @@ const LoadingWrapper = ({
   const classes = useStyles({ loading, backgroundColor });
 
   return (
-    <div className={classNames(classes.root, className)}>
+    <div className={className}>
       <div className={classes.wrapper}>{children}</div>
       {loading && (
         <div className={classes.loaderWrapper}>
