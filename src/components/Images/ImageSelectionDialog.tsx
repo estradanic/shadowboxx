@@ -1,9 +1,10 @@
-import React, { useCallback, useMemo, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import Grid from "@material-ui/core/Grid";
 import Typography from "@material-ui/core/Typography";
 import useMediaQuery from "@material-ui/core/useMediaQuery";
 import { makeStyles, Theme, useTheme } from "@material-ui/core/styles";
 import classNames from "classnames";
+import { useQuery } from "@tanstack/react-query";
 import { dedupeFast } from "../../utils";
 import { Strings } from "../../resources";
 import { useUserContext } from "../../contexts";
@@ -13,7 +14,7 @@ import ActionDialog, { ActionDialogProps } from "../Dialog/ActionDialog";
 import Image from "../Image/Image";
 import Empty from "../Svgs/Empty";
 import CheckIcon from "@material-ui/icons/Check";
-import { useQuery } from "@tanstack/react-query";
+import ImagesSkeleton from "../Skeleton/ImagesSkeleton";
 
 const useStyles = makeStyles((theme: Theme) => ({
   svgContainer: {
@@ -83,6 +84,10 @@ const ImageSelectionDialog = ({
     getImagesByOwnerOptions,
   } = useRequests();
 
+  useEffect(() => {
+    setValue((prev) => dedupeFast([...initialValue, ...prev]));
+  }, [initialValue]);
+
   // Images that the current user owns, not those shared to them.
   const { data: userOwnedImages, status } = useQuery<ParseImage[], Error>(
     getImagesByOwnerQueryKey(getLoggedInUser()),
@@ -131,7 +136,7 @@ const ImageSelectionDialog = ({
       type="prompt"
       confirmButtonColor="success"
     >
-      {images.length ? (
+      {status === "success" && images.length ? (
         <Grid container className={classes.imageContainer}>
           {[...images]
             .sort((a, b) => a.compareTo(b))
@@ -176,6 +181,8 @@ const ImageSelectionDialog = ({
               </Grid>
             ))}
         </Grid>
+      ) : status === "loading" ? (
+        <ImagesSkeleton />
       ) : (
         <Grid item className={classes.svgContainer}>
           <Empty height="40vh" />

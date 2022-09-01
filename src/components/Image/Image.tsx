@@ -1,6 +1,7 @@
 import React, { ImgHTMLAttributes, memo, useRef, useState } from "react";
 import { makeStyles, Theme } from "@material-ui/core/styles";
 import Popper from "@material-ui/core/Popper";
+import Skeleton from "@material-ui/lab/Skeleton";
 import classNames from "classnames";
 import { VariableColor, Interdependent } from "../../types";
 import { opacity } from "../../utils";
@@ -47,6 +48,9 @@ const useStyles = makeStyles((theme: Theme) => ({
     maxWidth: "90vw",
     maxHeight: "90vh",
   },
+  displayNone: {
+    display: "none",
+  },
 }));
 
 export type ImageProps = ImgHTMLAttributes<HTMLImageElement> &
@@ -83,21 +87,29 @@ const Image = memo(
     ...rest
   }: ImageProps) => {
     const classes = useStyles({ borderColor });
-    const [fullResolutionOpen, setFullResolutionOpen] =
-      useState<boolean>(false);
+    const [fullResolutionOpen, setFullResolutionOpen] = useState(false);
     const ref = useRef(null);
+    const [isLoaded, setIsLoaded] = useState(false);
+    const [isFullResolutionLoaded, setIsFullResolutionLoaded] = useState(false);
 
     return (
       <div className={classNames(className, classes.root)} key={key} ref={ref}>
         <Tooltip title={alt}>
-          <img
-            className={classNames(classes.image, {
-              [classes.pointer]: showFullResolutionOnClick,
-            })}
-            alt={alt}
-            {...rest}
-            onClick={() => setFullResolutionOpen(true)}
-          />
+          <>
+            <img
+              className={classNames(classes.image, {
+                [classes.pointer]: showFullResolutionOnClick,
+                [classes.displayNone]: !isLoaded,
+              })}
+              onLoad={() => setIsLoaded(true)}
+              alt={alt}
+              {...rest}
+              onClick={() => setFullResolutionOpen(true)}
+            />
+            {!isLoaded && (
+              <Skeleton variant="rect" width="100%" height="700px" />
+            )}
+          </>
         </Tooltip>
         {decorations?.map((decoration, index) =>
           React.cloneElement(decoration, { key: `decoration${index}` })
@@ -110,10 +122,21 @@ const Image = memo(
             anchorEl={ref.current}
           >
             <img
-              className={classes.fullResolutionImage}
+              className={classNames(classes.fullResolutionImage, {
+                [classes.displayNone]: !isFullResolutionLoaded,
+              })}
               alt={alt}
+              onLoad={() => setIsFullResolutionLoaded(true)}
               src={fullResolutionSrc}
             />
+            {!isFullResolutionLoaded && (
+              <Skeleton
+                variant="rect"
+                width="100%"
+                height="700px"
+                className={classes.fullResolutionImage}
+              />
+            )}
           </Popper>
         )}
       </div>

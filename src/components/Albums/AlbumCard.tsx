@@ -9,7 +9,7 @@ import CardActions from "@material-ui/core/CardActions";
 import Grid from "@material-ui/core/Grid";
 import Menu from "@material-ui/core/Menu";
 import MenuItem from "@material-ui/core/MenuItem";
-import { makeStyles, Theme, useTheme } from "@material-ui/core/styles";
+import { makeStyles, Theme } from "@material-ui/core/styles";
 import MoreVertIcon from "@material-ui/icons/MoreVert";
 import StarIcon from "@material-ui/icons/Star";
 import { useNavigate, useLocation } from "react-router-dom";
@@ -124,7 +124,7 @@ const AlbumCard = memo(({ value, onChange }: AlbumCardProps) => {
   const { data: images } = useQuery<ParseImage[], Error>(
     getImagesByIdQueryKey(value.images),
     () => getImagesByIdFunction(value.images),
-    getImagesByIdOptions({ enabled: editAlbumDialogOpen })
+    getImagesByIdOptions()
   );
   const { data: coverImage, status: coverImageStatus } = useQuery<
     ParseImage,

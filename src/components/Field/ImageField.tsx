@@ -1,4 +1,10 @@
-import React, { useState, memo, useMemo, ChangeEventHandler } from "react";
+import React, {
+  useState,
+  memo,
+  useMemo,
+  ChangeEventHandler,
+  useCallback,
+} from "react";
 import InputAdornment from "@material-ui/core/InputAdornment";
 import Avatar from "@material-ui/core/Avatar";
 import Typography from "@material-ui/core/Typography";
@@ -19,7 +25,7 @@ import { createHtmlPortalNode, InPortal } from "react-reverse-portal";
 import { readAndCompressImage } from "browser-image-resizer";
 import { elide, makeValidFileName, removeExtension } from "../../utils";
 import { Strings } from "../../resources";
-import { Album, Interdependent, ParseImage, ParsePointer } from "../../types";
+import { Interdependent, ParseImage, ParsePointer } from "../../types";
 import { useRandomColor, useRefState } from "../../hooks";
 import TextField, { TextFieldProps } from "../Field/TextField";
 import Tooltip from "../Tooltip/Tooltip";
@@ -162,6 +168,14 @@ const ImageField = memo(
     };
 
     const { openPrompt } = useActionDialogContext();
+
+    const selectFromLibrary = useCallback(() => {
+      promptImageSelectionDialog({
+        handleConfirm: async (newValue) =>
+          await onChange(multiple ? [...value, ...newValue] : newValue),
+        value,
+      });
+    }, [promptImageSelectionDialog, value, onChange, multiple]);
 
     const addFromFile: ChangeEventHandler<HTMLInputElement> = async (event) => {
       if (event.target.files?.[0]) {
@@ -330,15 +344,7 @@ const ImageField = memo(
                     <InputAdornment
                       disablePointerEvents={disabled}
                       position="end"
-                      onClick={() =>
-                        promptImageSelectionDialog({
-                          handleConfirm: async (newValue) =>
-                            await onChange(
-                              multiple ? [...value, ...newValue] : newValue
-                            ),
-                          value,
-                        })
-                      }
+                      onClick={selectFromLibrary}
                     >
                       <Tooltip title={Strings.addFromLibrary()}>
                         <CloudIcon className={classes.endAdornment} />
@@ -448,17 +454,7 @@ const ImageField = memo(
               multiple={multiple}
             />
             <Menu open={!!anchorEl} anchorEl={anchorEl} onClose={closeMenu}>
-              <MenuItem
-                onClick={() =>
-                  promptImageSelectionDialog({
-                    handleConfirm: async (newValue) =>
-                      await onChange(
-                        multiple ? [...value, ...newValue] : newValue
-                      ),
-                    value,
-                  })
-                }
-              >
+              <MenuItem onClick={selectFromLibrary}>
                 {Strings.addFromLibrary()}
               </MenuItem>
               <MenuItem
