@@ -24,9 +24,12 @@ export default defineConfig(({ mode }) => ({
     createHtmlPlugin({
       inject: {
         data: {
+          preconnectBack4App: `<link rel="preconnect" href="${mode === "production"
+            ? "http://shadowboxx.b4a.io"
+            : "http://shadowboxxdevtest.b4a.io"}" />`,
           injectVariables: `
             <script>
-              globalThis.__env__ = {
+              window.__env__ = {
                 PARSE_APPLICATION_ID: "${
                   mode === "production"
                     ? "aX17fiOL3N1Lklz83UnWMP6oympHLszezxXAXokH"

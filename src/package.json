@@ -83,8 +83,8 @@
     "compileCloud": "cd ./cloud && tsc && cd ..",
     "format": "prettier --write '{@types,app,cloud,components,contexts,hooks,resources,types,utils,views}/**/*.{ts,tsx,js,json,jsx}' && prettier --write '*.{ts,tsx,js,json,jsx}'",
     "analyze": "source-map-explorer 'build/assets/*.js'",
-    "preDeploy": "yarn build && yarn compileCloud && rm -rf ../public/* && cp -r ./build/* ../public",
-    "preDeploy:prod": "yarn build:prod && yarn compileCloud && rm -rf ../public/* && cp -r ./build/* ../public",
+    "preDeploy": "yarn install && yarn build && yarn compileCloud && rm -rf ../public/* && cp -r ./build/* ../public",
+    "preDeploy:prod": "yarn install && yarn build:prod && yarn compileCloud && rm -rf ../public/* && cp -r ./build/* ../public",
     "deploy": "yarn preDeploy && b4a deploy ShadowboxxDevTest",
     "deploy:prod": "yarn preDeploy:prod && b4a deploy Shadowboxx"
   },

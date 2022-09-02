@@ -12,12 +12,11 @@ import {
 } from "../components";
 import { Strings } from "../resources";
 import routes from "./routes";
-declare const globalThis: any;
 
-Parse.serverURL = globalThis.__env__?.PARSE_HOST_URL;
+Parse.serverURL = window.__env__?.PARSE_HOST_URL;
 Parse.initialize(
-  globalThis.__env__?.PARSE_APPLICATION_ID,
-  globalThis.__env__?.PARSE_JAVASCRIPT_KEY
+  window.__env__?.PARSE_APPLICATION_ID,
+  window.__env__?.PARSE_JAVASCRIPT_KEY
 );
 
 // @ts-ignore: TODO remove this comment when the types are actually correct again
@@ -88,14 +87,14 @@ const App = () => {
     );
 
   useEffect(() => {
-    navigator.serviceWorker.register(
-      `service-worker.js?version=${globalThis.__env__.SERVICE_WORKER_VERSION_NUMBER}`,
+    navigator?.serviceWorker?.register(
+      `service-worker.js?version=${window.__env__.SERVICE_WORKER_VERSION_NUMBER}`,
       { scope: "/" }
     );
     if (window.location.host.match(/^www\./) !== null) {
       window.location.host = window.location.host.substring(4);
     }
-    navigator.storage.persisted().then((initialIsPersisted) => {
+    navigator?.storage?.persisted()?.then((initialIsPersisted) => {
       if (!initialIsPersisted) {
         navigator.storage
           .persist()
@@ -109,7 +108,7 @@ const App = () => {
         console.log("Storage persisted!");
       }
     });
-    navigator.storage.estimate().then((estimate) => {
+    navigator?.storage?.estimate()?.then((estimate) => {
       if (
         estimate &&
         estimate.quota !== undefined &&
@@ -124,7 +123,7 @@ const App = () => {
             detail: Strings.limitedOffline(),
             icon: <DiscFullIcon />,
           });
-          navigator.serviceWorker.ready.then((registration) => {
+          navigator?.serviceWorker?.ready?.then((registration) => {
             registration.active?.postMessage({ useCache: false });
           });
         }
