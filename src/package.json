@@ -75,10 +75,11 @@
     "web-vitals": "^1.0.1"
   },
   "scripts": {
-    "build": "vite build --mode development",
-    "build:prod": "vite build",
-    "start": "vite serve",
-    "iterate": "vite",
+    "preBuild": "cd service-worker && tsc && cd ..",
+    "build": "yarn preBuild && vite build --mode development",
+    "build:prod": "yarn preBuild && vite build",
+    "start": "yarn preBuild && vite serve",
+    "iterate": "yarn preBuild && vite",
     "preview": "vite preview",
     "compileCloud": "cd ./cloud && tsc && cd ..",
     "format": "prettier --write '{@types,app,cloud,components,contexts,hooks,resources,types,utils,views}/**/*.{ts,tsx,js,json,jsx}' && prettier --write '*.{ts,tsx,js,json,jsx}'",

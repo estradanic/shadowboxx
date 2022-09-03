@@ -1,5 +1,6 @@
+declare const self: ServiceWorkerGlobalScope;
+
 let CACHE_NAME = "BAD_VERSION";
-const self = this;
 
 const frontendRoutes = [
   "/home",
@@ -9,10 +10,6 @@ const frontendRoutes = [
   "/signup",
   "/",
 ];
-
-// Import idb-keyval library: https://github.com/jakearchibald/idb-keyval#all-bundles
-// Idb-keyval creates a IndexedDB database with simple operations such as `get` and `set`
-self.importScripts("https://cdn.jsdelivr.net/npm/idb-keyval@6/dist/umd.js");
 
 // Install SW
 self.addEventListener("install", async (event) => {
@@ -32,14 +29,14 @@ let useCache = true;
 
 // Activate the SW
 self.addEventListener("activate", (event) => {
-  const cacheWhitelist = [];
+  const cacheWhitelist: string[] = [];
   cacheWhitelist.push(CACHE_NAME);
   event.waitUntil(
     caches.keys().then((cacheNames) =>
       Promise.all(
         cacheNames.map((cacheName) => {
           if (!cacheWhitelist.includes(cacheName)) {
-            return caches.delete(cacheName).then(self.clients.claim());
+            return caches.delete(cacheName).then(self.clients.claim);
           }
         })
       )
@@ -49,16 +46,17 @@ self.addEventListener("activate", (event) => {
 
 // Middleware for fetches (caching vs. online)
 self.addEventListener("fetch", (event) => {
+  const url = new URL(event.request.url);
   // Don't bother managing non-http requests or requests to httpbin.org,
   // which are used for determining online status
   if (
-    !event.request.url.startsWith("http") ||
-    event.request.url.includes("httpbin.org")
+    (url.protocol !== "http" && url.protocol !== "https") ||
+    url.host === "httpbin.org"
   ) {
     return;
   }
-  if (event.request.url.includes("parsefiles.back4app.com")) {
-    // Respond with online only if cached doesn't exist
+  if (url.host === "parsefiles.back4app.com") {
+    // For images, respond with online only if cached doesn't exist
     event.respondWith(
       caches.open(CACHE_NAME).then((cache) =>
         cache.match(event.request).then((cacheResponse) => {
@@ -82,43 +80,33 @@ self.addEventListener("fetch", (event) => {
       caches.open(CACHE_NAME).then((cache) =>
         fetch(event.request)
           .then((response) => {
-            if (!!response) {
-              if (useCache) {
-                cache
-                  .put(event.request, response.clone())
-                  .catch((e) => console.error(e, "Request:", event.request));
-              }
+            if (response && useCache) {
+              cache
+                .put(event.request, response.clone())
+                .catch((e) => console.error(e, "Request:", event.request));
+            }
+            if (response) {
               return response;
             }
             const cacheKey = frontendRoutes.includes(event.request.url)
               ? "/index.html"
               : event.request;
-            return cache.match(cacheKey).then((response) => {
-              console.warn(
-                "Could not get network response. Returning from the cache.",
-                e,
-                "Request:",
-                event.request,
-                "Response:",
-                response
-              );
-              return response;
+            return cache.match(cacheKey).then((cacheResponse) => {
+              if (cacheResponse) {
+                return cacheResponse;
+              }
+              throw new Error(`Fetch Failed for request: ${event.request}`);
             });
           })
           .catch((e) => {
             const cacheKey = frontendRoutes.includes(event.request.url)
               ? "/index.html"
               : event.request;
-            return cache.match(cacheKey).then((response) => {
-              console.warn(
-                "Could not get network response. Returning from the cache.",
-                e,
-                "Request:",
-                event.request,
-                "Response:",
-                response
-              );
-              return response;
+            return cache.match(cacheKey).then((cacheResponse) => {
+              if (cacheResponse) {
+                return cacheResponse;
+              }
+              throw new Error(`Fetch failed for request: ${event.request}`);
             });
           })
       )
@@ -131,3 +119,5 @@ self.addEventListener("message", (event) => {
     useCache = event.data.useCache;
   }
 });
+
+export default null;

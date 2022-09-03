@@ -19,7 +19,11 @@ build/Release
 
 # Compiled distribution files
 /cloud/**/*.js
+/src/public/service-worker.js
 
 # Yarn Integrity file
 **/.yarn-integrity
 
+# Deployment config files
+.parse.local
+.parse.project
