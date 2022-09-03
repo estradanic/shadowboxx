@@ -88,7 +88,7 @@ const App = () => {
 
   useEffect(() => {
     navigator?.serviceWorker?.register(
-      `service-worker.js?version=${window.__env__.SERVICE_WORKER_VERSION_NUMBER}`,
+      `/service-worker.js?version=${window.__env__.SERVICE_WORKER_VERSION_NUMBER}`,
       { scope: "/" }
     );
     if (window.location.host.match(/^www\./) !== null) {
