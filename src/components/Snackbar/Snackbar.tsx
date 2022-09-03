@@ -10,7 +10,6 @@ import CheckIcon from "@material-ui/icons/Check";
 import WarningIcon from "@material-ui/icons/Warning";
 import InfoIcon from "@material-ui/icons/Info";
 import Typography from "@material-ui/core/Typography";
-import { useUserContext } from "../../contexts";
 
 const useStyles = makeStyles((theme: Theme) => ({
   variantSuccess: {
@@ -40,7 +39,6 @@ const useStyles = makeStyles((theme: Theme) => ({
 export const useSnackbar = () => {
   const { enqueueSnackbar } = notistackUseSnackbar();
   const classes = useStyles();
-  const { getLoggedInUser, updateLoggedInUser } = useUserContext();
 
   const enqueueSuccessSnackbar = (message: string) => {
     enqueueSnackbar(<Typography>{message}</Typography>, {
