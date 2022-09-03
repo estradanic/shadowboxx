@@ -1,5 +1,7 @@
 import Strings from "../resources/Strings";
 
+const MAX_ALLOWED_FILE_NAME_LENGTH = 24;
+
 /**
  * Helper function to check if a string is null or whitespace
  */
@@ -24,12 +26,16 @@ export const elide = (
 };
 
 /**
- * Parse only allows mostly alphanumeric characters in file names
+ * Parse only allows mostly alphanumeric characters in file names.
+ * It also rejects file names that are too long.
  */
 export const makeValidFileName = (input: string): string => {
-  const fileName = input?.replaceAll(/[^A-Z0-9a-z_. ]/g, "");
+  let fileName = input?.replaceAll(/[^A-Z0-9a-z_. ]/g, "");
   if (isNullOrWhitespace(fileName)) {
     throw new Error(Strings.invalidEmptyFilename());
+  }
+  if (fileName.length > MAX_ALLOWED_FILE_NAME_LENGTH) {
+    fileName = fileName.substring(0, MAX_ALLOWED_FILE_NAME_LENGTH);
   }
   return fileName;
 };
