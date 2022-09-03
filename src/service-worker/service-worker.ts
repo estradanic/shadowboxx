@@ -1,6 +1,6 @@
-declare const self: ServiceWorkerGlobalScope;
-
 let CACHE_NAME = "BAD_VERSION";
+
+const sw = this as unknown as ServiceWorkerGlobalScope;
 
 const frontendRoutes = [
   "/home",
@@ -12,7 +12,7 @@ const frontendRoutes = [
 ];
 
 // Install SW
-self.addEventListener("install", async (event) => {
+sw.addEventListener("install", async (event) => {
   event.waitUntil(
     fetch("variables.json").then((variablesResponse) =>
       variablesResponse.json().then((variables) => {
@@ -28,7 +28,7 @@ self.addEventListener("install", async (event) => {
 let useCache = true;
 
 // Activate the SW
-self.addEventListener("activate", (event) => {
+sw.addEventListener("activate", (event) => {
   const cacheWhitelist: string[] = [];
   cacheWhitelist.push(CACHE_NAME);
   event.waitUntil(
@@ -36,7 +36,7 @@ self.addEventListener("activate", (event) => {
       Promise.all(
         cacheNames.map((cacheName) => {
           if (!cacheWhitelist.includes(cacheName)) {
-            return caches.delete(cacheName).then(self.clients.claim);
+            return caches.delete(cacheName).then(() => sw.clients.claim());
           }
         })
       )
@@ -45,7 +45,7 @@ self.addEventListener("activate", (event) => {
 });
 
 // Middleware for fetches (caching vs. online)
-self.addEventListener("fetch", (event) => {
+sw.addEventListener("fetch", (event) => {
   const url = new URL(event.request.url);
   // Don't bother managing non-http requests or requests to httpbin.org,
   // which are used for determining online status
@@ -114,10 +114,8 @@ self.addEventListener("fetch", (event) => {
   }
 });
 
-self.addEventListener("message", (event) => {
+sw.addEventListener("message", (event) => {
   if (event.data.useCache !== undefined) {
     useCache = event.data.useCache;
   }
 });
-
-export default null;
