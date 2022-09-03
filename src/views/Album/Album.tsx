@@ -13,7 +13,7 @@ import { useQuery } from "@tanstack/react-query";
 import { Strings } from "../../resources";
 import { ParseImage, ParseAlbum } from "../../types";
 import { FancyTitleTypography, Void, Images } from "../../components";
-import { useRandomColor, useRequests } from "../../hooks";
+import { useRandomColor, useQueryConfigs } from "../../hooks";
 import { useView } from "../View";
 
 const useStyles = makeStyles(() => ({
@@ -41,7 +41,7 @@ const Album = memo(() => {
     getImagesByIdFunction,
     getImagesByIdQueryKey,
     getImagesByIdOptions,
-  } = useRequests();
+  } = useQueryConfigs();
   const { data: album, status: albumStatus } = useQuery<ParseAlbum, Error>(
     getAlbumQueryKey(id),
     () => getAlbumFunction(id, { showErrorsInSnackbar: true }),

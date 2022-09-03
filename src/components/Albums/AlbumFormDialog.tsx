@@ -13,7 +13,7 @@ import { Strings } from "../../resources";
 import { ErrorState, isNullOrWhitespace } from "../../utils";
 import { ImageContextProvider, useUserContext } from "../../contexts";
 import { ParseUser, ParseImage, Album } from "../../types";
-import { useRequests } from "../../hooks";
+import { useQueryConfigs } from "../../hooks";
 import ActionDialog, {
   ActionDialogProps,
   useActionDialogContext,
@@ -81,7 +81,7 @@ const AlbumFormDialog = ({
   const [viewers, setViewers] = useState<Album["viewers"]>(value.viewers);
 
   const { getImagesByIdFunction, getImagesByIdQueryKey, getImagesByIdOptions } =
-    useRequests();
+    useQueryConfigs();
   const { data: images } = useQuery<ParseImage[], Error>(
     getImagesByIdQueryKey(imageIds),
     () => getImagesByIdFunction(imageIds, { showErrorsInSnackbar: true }),

@@ -5,7 +5,7 @@ import {
   PageContainer,
   Images as ImagesComponent,
 } from "../../components";
-import { useRandomColor, useRequests } from "../../hooks";
+import { useRandomColor, useQueryConfigs } from "../../hooks";
 import { Strings } from "../../resources";
 import { ParseImage } from "../../types";
 import { useView } from "../View";
@@ -18,7 +18,7 @@ const Images = memo(() => {
   useView("Images");
   const randomColor = useRandomColor();
   const { getAllImagesFunction, getAllImagesQueryKey, getAllImagesOptions } =
-    useRequests();
+    useQueryConfigs();
   const { data: images, status } = useQuery<ParseImage[], Error>(
     getAllImagesQueryKey(),
     () => getAllImagesFunction({ showErrorsInSnackbar: true }),

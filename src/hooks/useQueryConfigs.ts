@@ -32,7 +32,7 @@ type HandleErrorOptions = Pick<
   "errorMessage" | "showNativeError" | "showErrorsInSnackbar"
 > & { error: any };
 
-const useRequests = () => {
+const useQueryConfigs = () => {
   const {
     enqueueErrorSnackbar,
     enqueueSuccessSnackbar,
@@ -435,4 +435,4 @@ const useRequests = () => {
   };
 };
 
-export default useRequests;
+export default useQueryConfigs;

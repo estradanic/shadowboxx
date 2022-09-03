@@ -18,7 +18,7 @@ import { Strings } from "../../resources";
 import { routes } from "../../app";
 import { ParseAlbum } from "../../types";
 import { ImageContextProvider, useUserContext } from "../../contexts";
-import { useRequests } from "../../hooks";
+import { useQueryConfigs } from "../../hooks";
 import UserAvatar from "../User/UserAvatar";
 import Empty from "../Svgs/Empty";
 import { useSnackbar } from "../Snackbar/Snackbar";
@@ -115,7 +115,7 @@ const AlbumCard = memo(({ value, onChange }: AlbumCardProps) => {
     getImageByIdQueryKey,
     getImageByIdFunction,
     getImageByIdOptions,
-  } = useRequests();
+  } = useQueryConfigs();
   const { data: owner, status: ownerStatus } = useQuery<ParseUser, Error>(
     getUserByIdQueryKey(value.owner.id),
     () => getUserByIdFunction(value.owner.id),

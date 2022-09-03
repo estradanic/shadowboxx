@@ -17,7 +17,7 @@ import { Strings } from "../../resources";
 import { ParseAlbum, ParsePointer } from "../../types";
 import { useUserContext } from "../../contexts";
 import { useView } from "../View";
-import { useRequests } from "../../hooks";
+import { useQueryConfigs } from "../../hooks";
 
 const useStyles = makeStyles((theme: Theme) => ({
   fab: {
@@ -53,7 +53,7 @@ const Home = memo(() => {
   const [addAlbumDialogOpen, setAddAlbumDialogOpen] = useState(false);
   const { enqueueErrorSnackbar, enqueueSuccessSnackbar } = useSnackbar();
   const { getAllAlbumsFunction, getAllAlbumsQueryKey, getAllAlbumsOptions } =
-    useRequests();
+    useQueryConfigs();
   const { getLoggedInUser } = useUserContext();
   const {
     data: albums,

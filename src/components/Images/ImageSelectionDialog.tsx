@@ -8,7 +8,7 @@ import { useQuery } from "@tanstack/react-query";
 import { dedupeFast } from "../../utils";
 import { Strings } from "../../resources";
 import { useUserContext } from "../../contexts";
-import { useRandomColor, useRequests } from "../../hooks";
+import { useRandomColor, useQueryConfigs } from "../../hooks";
 import { ParseImage } from "../../types";
 import ActionDialog, { ActionDialogProps } from "../Dialog/ActionDialog";
 import Image from "../Image/Image";
@@ -82,7 +82,7 @@ const ImageSelectionDialog = ({
     getImagesByOwnerFunction,
     getImagesByOwnerQueryKey,
     getImagesByOwnerOptions,
-  } = useRequests();
+  } = useQueryConfigs();
 
   useEffect(() => {
     setValue((prev) => dedupeFast([...initialValue, ...prev]));

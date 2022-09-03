@@ -5,7 +5,7 @@ import cx from "classnames";
 import { ParseUser, ParseImage } from "../../types";
 import { Strings } from "../../resources";
 import { useQuery } from "@tanstack/react-query";
-import { useRequests } from "../../hooks";
+import { useQueryConfigs } from "../../hooks";
 
 const useStyles = makeStyles((theme: Theme) => ({
   avatar: {
@@ -37,7 +37,7 @@ const UserAvatar = forwardRef(
       getImageByIdFunction,
       getImageByIdQueryKey,
       getImageByIdOptions,
-    } = useRequests();
+    } = useQueryConfigs();
     const { data: user } = useQuery<ParseUser, Error>(
       getUserByEmailQueryKey(email),
       () => (fetchUser ? fetchUser() : getUserByEmailFunction(email)),

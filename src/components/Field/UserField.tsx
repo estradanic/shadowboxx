@@ -9,7 +9,7 @@ import UserChip from "../User/UserChip";
 import TextField from "../Field/TextField";
 import { makeStyles, Theme } from "@material-ui/core/styles";
 import { useQuery } from "@tanstack/react-query";
-import { useRequests } from "../../hooks";
+import { useQueryConfigs } from "../../hooks";
 
 const useStyles = makeStyles((theme: Theme) => ({
   endAdornment: {
@@ -56,7 +56,7 @@ const UserField = forwardRef(
       getRelatedUserEmailsFunction,
       getRelatedUserEmailsQueryKey,
       getRelatedUserEmailsOptions,
-    } = useRequests();
+    } = useQueryConfigs();
     const { data: options } = useQuery<string[], Error>(
       getRelatedUserEmailsQueryKey(),
       () => getRelatedUserEmailsFunction(),
