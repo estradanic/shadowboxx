@@ -1,4 +1,5 @@
 import Parse from "parse";
+import difference from "lodash/difference";
 import ParsePointer from "./ParsePointer";
 import ParseObject, { Attributes, ParsifyPointers } from "./ParseObject";
 
@@ -22,6 +23,21 @@ export interface Album extends Attributes {
   updatedAt?: Date;
   /** Created date */
   createdAt?: Date;
+}
+
+export interface AlbumSaveContext {
+  /** Array of image ids removed from the album */
+  removedImages?: string[];
+  /** Array of image ids added to the album */
+  addedImages?: string[];
+  /** Array of collaborator emails removed from the album */
+  removedCollaborators?: string[];
+  /** Array of collaborator emails added to the album */
+  addedCollaborators?: string[];
+  /** Array of viewer emails added to the album */
+  removedViewers?: string[];
+  /** Array of viewer emails removed from the album */
+  addedViewers?: string[];
 }
 
 /**
@@ -89,8 +105,12 @@ export default class ParseAlbum extends ParseObject<Album> {
     return this.name.localeCompare(that.name);
   }
 
-  async save() {
-    return new ParseAlbum(await this._album.save());
+  async save(context: AlbumSaveContext) {
+    return new ParseAlbum(await this._album.save(null, { context }));
+  }
+
+  async saveNew() {
+    return this.save({});
   }
 
   async update(attributes: Album) {
@@ -99,8 +119,22 @@ export default class ParseAlbum extends ParseObject<Album> {
       owner: attributes.owner._pointer,
       coverImage: attributes.coverImage._pointer,
     };
+    const context: AlbumSaveContext = {
+      removedImages: difference(this.images, newAttributes.images),
+      addedImages: difference(newAttributes.images, this.images),
+      removedCollaborators: difference(
+        this.collaborators,
+        newAttributes.collaborators
+      ),
+      addedCollaborators: difference(
+        newAttributes.collaborators,
+        this.collaborators
+      ),
+      removedViewers: difference(this.viewers, newAttributes.viewers),
+      addedViewers: difference(newAttributes.viewers, this.viewers),
+    };
     this._album.set(newAttributes);
-    return this.save();
+    return this.save(context);
   }
 
   async destroy() {

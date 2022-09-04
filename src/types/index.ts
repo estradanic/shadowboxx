@@ -1,6 +1,6 @@
 export type { ParsifyPointers } from "./ParseObject";
 export { default as ParseAlbum } from "./ParseAlbum";
-export type { Album } from "./ParseAlbum";
+export type { Album, AlbumSaveContext } from "./ParseAlbum";
 export { default as ParseImage } from "./ParseImage";
 export type { Image } from "./ParseImage";
 export { default as ParseObject } from "./ParseObject";

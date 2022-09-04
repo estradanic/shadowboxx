@@ -133,7 +133,9 @@ const Home = memo(() => {
         handleConfirm={async (attributes) => {
           setAddAlbumDialogOpen(false);
           try {
-            const response = await ParseAlbum.fromAttributes(attributes).save();
+            const response = await ParseAlbum.fromAttributes(
+              attributes
+            ).saveNew();
             await refetchAlbums();
             enqueueSuccessSnackbar(Strings.addAlbumSuccess(response?.name));
           } catch (error: any) {
