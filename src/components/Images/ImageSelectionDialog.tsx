@@ -8,7 +8,11 @@ import { useInfiniteQuery } from "@tanstack/react-query";
 import { dedupeFast } from "../../utils";
 import { Strings } from "../../resources";
 import { useUserContext } from "../../contexts";
-import { useRandomColor, useQueryConfigs, useInfiniteScroll } from "../../hooks";
+import {
+  useRandomColor,
+  useQueryConfigs,
+  useInfiniteScroll,
+} from "../../hooks";
 import { ParseImage } from "../../types";
 import ActionDialog, { ActionDialogProps } from "../Dialog/ActionDialog";
 import Image from "../Image/Image";
@@ -90,9 +94,12 @@ const ImageSelectionDialog = ({
   }, [initialValue]);
 
   // Images that the current user owns, not those shared to them.
-  const { data, status, fetchNextPage, isFetchingNextPage } = useInfiniteQuery<ParseImage[], Error>(
+  const { data, status, fetchNextPage, isFetchingNextPage } = useInfiniteQuery<
+    ParseImage[],
+    Error
+  >(
     getImagesByOwnerQueryKey(getLoggedInUser()),
-    ({pageParam: page = 0}) =>
+    ({ pageParam: page = 0 }) =>
       getImagesByOwnerFunction(getLoggedInUser(), {
         showErrorsInSnackbar: true,
         page,
@@ -101,8 +108,14 @@ const ImageSelectionDialog = ({
     getImagesByOwnerInfiniteOptions({ enabled: open })
   );
   const SCROLLABLE_ELEMENT_ID = "image-selection-dialog-content";
-  useInfiniteScroll(fetchNextPage, {canExecute: !isFetchingNextPage && open, elementQuerySelector: `#${SCROLLABLE_ELEMENT_ID}`});
-  const userOwnedImages = useMemo(() => data?.pages?.flatMap((page) => page), [data?.pages]);
+  useInfiniteScroll(fetchNextPage, {
+    canExecute: !isFetchingNextPage && open,
+    elementQuerySelector: `#${SCROLLABLE_ELEMENT_ID}`,
+  });
+  const userOwnedImages = useMemo(
+    () => data?.pages?.flatMap((page) => page),
+    [data?.pages]
+  );
 
   // Images that the current user owns + those in the passed in value
   const images = useMemo(
@@ -141,51 +154,50 @@ const ImageSelectionDialog = ({
       handleCancel={handleCancel}
       type="prompt"
       confirmButtonColor="success"
-      DialogContentProps={{id: SCROLLABLE_ELEMENT_ID}}
+      DialogContentProps={{ id: SCROLLABLE_ELEMENT_ID }}
     >
       {status === "success" && images.length ? (
         <Grid container className={classes.imageContainer}>
-          {images
-            ?.map((image) => (
-              <Grid
-                key={image.id}
-                item
-                xs={12}
-                md={6}
-                lg={4}
-                xl={3}
-                className={classes.imageWrapper}
-              >
-                <Image
-                  borderColor={randomColor}
-                  src={image.mobileFile.url()}
-                  alt={image.name}
-                />
-                <div
-                  className={classNames({
-                    [classes.selected]: isSelected(image.id),
-                    [classes.imageOverlay]: true,
-                  })}
-                  onClick={() => {
-                    if (multiple) {
-                      if (isSelected(image.id)) {
-                        setValue((prev) =>
-                          prev.filter(
-                            (selectedImage) => selectedImage.id !== image.id
-                          )
-                        );
-                      } else {
-                        setValue((prev) => [...prev, image]);
-                      }
+          {images?.map((image) => (
+            <Grid
+              key={image.id}
+              item
+              xs={12}
+              md={6}
+              lg={4}
+              xl={3}
+              className={classes.imageWrapper}
+            >
+              <Image
+                borderColor={randomColor}
+                src={image.mobileFile.url()}
+                alt={image.name}
+              />
+              <div
+                className={classNames({
+                  [classes.selected]: isSelected(image.id),
+                  [classes.imageOverlay]: true,
+                })}
+                onClick={() => {
+                  if (multiple) {
+                    if (isSelected(image.id)) {
+                      setValue((prev) =>
+                        prev.filter(
+                          (selectedImage) => selectedImage.id !== image.id
+                        )
+                      );
                     } else {
-                      setValue([image]);
+                      setValue((prev) => [...prev, image]);
                     }
-                  }}
-                >
-                  <CheckIcon className={classes.check} />
-                </div>
-              </Grid>
-            ))}
+                  } else {
+                    setValue([image]);
+                  }
+                }}
+              >
+                <CheckIcon className={classes.check} />
+              </div>
+            </Grid>
+          ))}
         </Grid>
       ) : status === "loading" ? (
         <ImagesSkeleton />

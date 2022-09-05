@@ -42,13 +42,22 @@ export const useScrollPositionContext = () => {
     throw new Error("No ScrollPositionContextProvider found!");
   }
 
-  const pushScrollPosition = useCallback((path: string, scrollPosition: number) => {
-    context.setScrollPositions((prev) => ({ ...prev, [path]: scrollPosition }));
-  }, [context]);
+  const pushScrollPosition = useCallback(
+    (path: string, scrollPosition: number) => {
+      context.setScrollPositions((prev) => ({
+        ...prev,
+        [path]: scrollPosition,
+      }));
+    },
+    [context]
+  );
 
-  const getScrollPosition = useCallback((path: string) => {
-    return context.scrollPositions[path] ?? 0;
-  }, [context]);
+  const getScrollPosition = useCallback(
+    (path: string) => {
+      return context.scrollPositions[path] ?? 0;
+    },
+    [context]
+  );
 
   return { pushScrollPosition, getScrollPosition };
 };

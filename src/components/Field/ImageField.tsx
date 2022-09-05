@@ -163,9 +163,12 @@ const ImageField = memo(
 
     const randomColor = useRandomColor();
 
-    const onChange = useCallback(async (newValue: ParseImage[]) => {
-      await piOnChange(Array.from(new Set(newValue)));
-    }, [piOnChange]);
+    const onChange = useCallback(
+      async (newValue: ParseImage[]) => {
+        await piOnChange(Array.from(new Set(newValue)));
+      },
+      [piOnChange]
+    );
 
     const { openPrompt } = useActionDialogContext();
 

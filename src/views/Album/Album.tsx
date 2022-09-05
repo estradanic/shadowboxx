@@ -69,7 +69,10 @@ const Album = memo(() => {
   );
   useInfiniteScroll(fetchNextPage, { canExecute: !isFetchingNextPage });
 
-  const images = useMemo(() => data?.pages?.flatMap((page) => page), [data?.pages]);
+  const images = useMemo(
+    () => data?.pages?.flatMap((page) => page),
+    [data?.pages]
+  );
 
   return (
     <PageContainer>

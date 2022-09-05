@@ -166,7 +166,9 @@ const useQueryConfigs = () => {
     refetchInterval: 5 * 60 * 1000,
     ...options,
   });
-  const getAllImagesInfiniteOptions: InfiniteQueryOptionsFunction<ParseImage[]> = (options = {}) => ({
+  const getAllImagesInfiniteOptions: InfiniteQueryOptionsFunction<
+    ParseImage[]
+  > = (options = {}) => ({
     getNextPageParam: (lastPage, allPages) => {
       if (lastPage.length > 0) {
         return allPages.length;
@@ -182,14 +184,13 @@ const useQueryConfigs = () => {
       async () => {
         let images;
         if (options.pageSize === undefined) {
-          images = await ParseImage.query()
-            .findAll()
+          images = await ParseImage.query().findAll();
         } else {
           images = await ParseImage.query()
             .descending(ParseImage.COLUMNS.createdAt)
             .limit(options.pageSize)
             .skip(options.page * options.pageSize)
-            .find()
+            .find();
         }
         return images.map((image) => new ParseImage(image));
       },
@@ -305,9 +306,9 @@ const useQueryConfigs = () => {
     refetchOnWindowFocus: false,
     ...options,
   });
-  const getImagesByOwnerInfiniteOptions: InfiniteQueryOptionsFunction<ParseImage[]> = (
-    options = {}
-  ) => ({
+  const getImagesByOwnerInfiniteOptions: InfiniteQueryOptionsFunction<
+    ParseImage[]
+  > = (options = {}) => ({
     refetchOnWindowFocus: false,
     getNextPageParam: (lastPage, allPages) => {
       if (lastPage.length > 0) {

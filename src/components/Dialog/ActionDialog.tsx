@@ -8,7 +8,9 @@ import React, {
 import Button from "@material-ui/core/Button";
 import Dialog, { DialogProps } from "@material-ui/core/Dialog";
 import DialogActions from "@material-ui/core/DialogActions";
-import DialogContent, { DialogContentProps } from "@material-ui/core/DialogContent";
+import DialogContent, {
+  DialogContentProps,
+} from "@material-ui/core/DialogContent";
 import DialogContentText from "@material-ui/core/DialogContentText";
 import DialogTitle from "@material-ui/core/DialogTitle";
 import Typography from "@material-ui/core/Typography";
@@ -61,7 +63,7 @@ export interface ActionDialogProps extends DialogProps {
   /** Color of the confirm button */
   confirmButtonColor?: "error" | "warning" | "success" | "default";
   /** Props to be passed to the DialogContent component */
-  DialogContentProps?: Omit<DialogContentProps, "children">,
+  DialogContentProps?: Omit<DialogContentProps, "children">;
 }
 
 /** ActionDialogProps overridable by a function call from the context */
@@ -203,7 +205,8 @@ export const ActionDialogContextProvider = ({
 export const useActionDialogContext = () => useContext(ActionDialogContext);
 
 interface ActionDialogContentProps
-  extends Pick<ActionDialogProps, "message" | "type" | "children">, Omit<DialogContentProps, "children"> {}
+  extends Pick<ActionDialogProps, "message" | "type" | "children">,
+    Omit<DialogContentProps, "children"> {}
 
 // This is broken into a separate component and memoized to prevent rerenders
 // when handleCancel, handleConfirm, and handleClose change.
@@ -240,7 +243,11 @@ const ActionDialog = ({
           {title}
         </Typography>
       </DialogTitle>
-      <ActionDialogContent message={message} type={type} {...DialogContentProps}>
+      <ActionDialogContent
+        message={message}
+        type={type}
+        {...DialogContentProps}
+      >
         {children}
       </ActionDialogContent>
       <DialogActions>

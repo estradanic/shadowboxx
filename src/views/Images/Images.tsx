@@ -5,7 +5,11 @@ import {
   PageContainer,
   Images as ImagesComponent,
 } from "../../components";
-import { useRandomColor, useQueryConfigs, useInfiniteScroll } from "../../hooks";
+import {
+  useRandomColor,
+  useQueryConfigs,
+  useInfiniteScroll,
+} from "../../hooks";
 import { Strings } from "../../resources";
 import { ParseImage } from "../../types";
 import { useView } from "../View";
@@ -18,15 +22,29 @@ import { IMAGES_PAGE_SIZE } from "../../constants";
 const Images = memo(() => {
   useView("Images");
   const randomColor = useRandomColor();
-  const { getAllImagesFunction, getAllImagesQueryKey, getAllImagesInfiniteOptions } =
-    useQueryConfigs();
-  const { data, status, fetchNextPage, isFetchingNextPage } = useInfiniteQuery<ParseImage[], Error>(
+  const {
+    getAllImagesFunction,
+    getAllImagesQueryKey,
+    getAllImagesInfiniteOptions,
+  } = useQueryConfigs();
+  const { data, status, fetchNextPage, isFetchingNextPage } = useInfiniteQuery<
+    ParseImage[],
+    Error
+  >(
     getAllImagesQueryKey(),
-    ({pageParam: page = 0}) => getAllImagesFunction({ showErrorsInSnackbar: true, page, pageSize: IMAGES_PAGE_SIZE }),
+    ({ pageParam: page = 0 }) =>
+      getAllImagesFunction({
+        showErrorsInSnackbar: true,
+        page,
+        pageSize: IMAGES_PAGE_SIZE,
+      }),
     getAllImagesInfiniteOptions()
   );
-  useInfiniteScroll(fetchNextPage, {canExecute: !isFetchingNextPage});
-  const images = useMemo(() => data?.pages?.flatMap((page) => page), [data?.pages]);
+  useInfiniteScroll(fetchNextPage, { canExecute: !isFetchingNextPage });
+  const images = useMemo(
+    () => data?.pages?.flatMap((page) => page),
+    [data?.pages]
+  );
 
   return (
     <PageContainer>

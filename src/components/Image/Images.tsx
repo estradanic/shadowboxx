@@ -21,18 +21,17 @@ const Images = ({ images, status, outlineColor }: ImagesProps) => {
   } else {
     return (
       <Grid item container className={classes.imageContainer} xs={12}>
-        {images
-          ?.map((image) => (
-            <Grid key={image.id} item xs={12} md={6} lg={4} xl={3}>
-              <Image
-                borderColor={outlineColor}
-                src={image.mobileFile.url()}
-                alt={image.name}
-                fullResolutionSrc={image.file.url()}
-                showFullResolutionOnClick
-              />
-            </Grid>
-          ))}
+        {images?.map((image) => (
+          <Grid key={image.id} item xs={12} md={6} lg={4} xl={3}>
+            <Image
+              borderColor={outlineColor}
+              src={image.mobileFile.url()}
+              alt={image.name}
+              fullResolutionSrc={image.file.url()}
+              showFullResolutionOnClick
+            />
+          </Grid>
+        ))}
       </Grid>
     );
   }
