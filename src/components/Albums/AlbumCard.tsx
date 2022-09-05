@@ -338,37 +338,35 @@ const AlbumCard = memo(({ value, onChange }: AlbumCardProps) => {
         </CardContent>
         <CardActions disableSpacing>
           <>
-            {isOwner && (
-              <Online>
-                <IconButton
-                  name="favorite"
-                  onClick={async () => {
-                    if (!value.id) {
-                      return;
-                    }
-                    if (isFavorite) {
-                      getLoggedInUser().favoriteAlbums.splice(
-                        getLoggedInUser().favoriteAlbums.indexOf(value.id),
-                        1
-                      );
-                    } else {
-                      getLoggedInUser().favoriteAlbums.push(value.id);
-                    }
-                    getLoggedInUser().update(async (loggedInUser, reason) => {
-                      await updateLoggedInUser(loggedInUser, reason);
-                      setIsFavorite(
-                        !!value.id &&
-                          loggedInUser.favoriteAlbums.includes(value.id)
-                      );
-                    });
-                  }}
-                >
-                  <StarIcon
-                    className={isFavorite ? classes.favorite : classes.icon}
-                  />
-                </IconButton>
-              </Online>
-            )}
+            <Online>
+              <IconButton
+                name="favorite"
+                onClick={async () => {
+                  if (!value.id) {
+                    return;
+                  }
+                  if (isFavorite) {
+                    getLoggedInUser().favoriteAlbums.splice(
+                      getLoggedInUser().favoriteAlbums.indexOf(value.id),
+                      1
+                    );
+                  } else {
+                    getLoggedInUser().favoriteAlbums.push(value.id);
+                  }
+                  getLoggedInUser().update(async (loggedInUser, reason) => {
+                    await updateLoggedInUser(loggedInUser, reason);
+                    setIsFavorite(
+                      !!value.id &&
+                        loggedInUser.favoriteAlbums.includes(value.id)
+                    );
+                  });
+                }}
+              >
+                <StarIcon
+                  className={isFavorite ? classes.favorite : classes.icon}
+                />
+              </IconButton>
+            </Online>
             {!isViewer && (
               <Online>
                 <ImageField
