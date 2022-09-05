@@ -13,3 +13,7 @@ export {
 } from "./NotificationsContext";
 export type { Notification } from "./NotificationsContext";
 export { UserContextProvider, useUserContext } from "./UserContext";
+export {
+  ScrollPositionContextProvider,
+  useScrollPositionContext,
+} from "./ScrollPositionContext";

@@ -12,13 +12,13 @@ import MenuItem from "@material-ui/core/MenuItem";
 import { makeStyles, Theme } from "@material-ui/core/styles";
 import MoreVertIcon from "@material-ui/icons/MoreVert";
 import StarIcon from "@material-ui/icons/Star";
-import { useNavigate, useLocation } from "react-router-dom";
+import { useLocation } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { Strings } from "../../resources";
 import { routes } from "../../app";
 import { ParseAlbum } from "../../types";
 import { ImageContextProvider, useUserContext } from "../../contexts";
-import { useQueryConfigs } from "../../hooks";
+import { useQueryConfigs, useNavigate } from "../../hooks";
 import UserAvatar from "../User/UserAvatar";
 import Empty from "../Svgs/Empty";
 import { useSnackbar } from "../Snackbar/Snackbar";
@@ -220,9 +220,7 @@ const AlbumCard = memo(({ value, onChange }: AlbumCardProps) => {
 
   const navigateToAlbum = () => {
     if (value?.id) {
-      navigate(routes["Album"].path.replace(":id", value.id), {
-        state: { previousLocation: location },
-      });
+      navigate(routes.Album.path.replace(":id", value.id), location);
     }
   };
 

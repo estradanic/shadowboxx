@@ -1,7 +1,8 @@
 import React from "react";
 import ListItem from "@material-ui/core/ListItem";
 import { ButtonBaseProps } from "@material-ui/core/ButtonBase";
-import { useNavigate, useLocation } from "react-router-dom";
+import { useLocation } from "react-router-dom";
+import { useNavigate } from "../../hooks";
 
 /**
  * Interface defining props for ListItemLink
@@ -22,15 +23,9 @@ const ListItemLink = ({
 }: ListItemLinkProps) => {
   const navigate = useNavigate();
   const location = useLocation();
-  const state = saveHistory
-    ? {
-        previousLocation: location,
-      }
-    : undefined;
-
   const onClick = (event: any) => {
     piOnClick?.(event);
-    navigate(to, { state });
+    navigate(to, saveHistory ? location : undefined);
   };
 
   return (

@@ -1,8 +1,9 @@
 import React from "react";
 import Button, { ButtonProps } from "@material-ui/core/Button";
-import { useNavigate, useLocation, Location } from "react-router-dom";
+import { useLocation, Location } from "react-router-dom";
 import ArrowBackIcon from "@material-ui/icons/ArrowBack";
 import { Strings } from "../../resources";
+import { useNavigate } from "../../hooks";
 
 /** Interface defining props for BackButton */
 interface BackButtonProps

@@ -11,6 +11,7 @@ import {
   NotificationsContextProvider,
   GlobalLoadingContextProvider,
   NetworkDetectionContextProvider,
+  ScrollPositionContextProvider,
 } from "./contexts";
 import App from "./app/App";
 
@@ -79,9 +80,11 @@ ReactDOM.render(
           <QueryClientProvider client={queryClient}>
             <NotificationsContextProvider>
               <BrowserRouter>
-                <UserContextProvider>
-                  <App />
-                </UserContextProvider>
+                <ScrollPositionContextProvider>
+                  <UserContextProvider>
+                    <App />
+                  </UserContextProvider>
+                </ScrollPositionContextProvider>
               </BrowserRouter>
             </NotificationsContextProvider>
           </QueryClientProvider>

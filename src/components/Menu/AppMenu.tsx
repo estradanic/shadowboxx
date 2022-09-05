@@ -53,19 +53,19 @@ const AppMenuList = ({ collapse = false }: AppMenuListProps) => {
 
   return (
     <List className={collapse ? "" : classes.horizontalList}>
-      <ListItemLink to={routes["Home"].path}>
+      <ListItemLink to={routes.Home.path}>
         <ListItemIcon className={classes.listItemIcon}>
           <HomeIcon />
         </ListItemIcon>
         <ListItemText primary={Strings.home()} />
       </ListItemLink>
-      <ListItemLink to={routes["Images"].path}>
+      <ListItemLink to={routes.Images.path}>
         <ListItemIcon className={classes.listItemIcon}>
           <InsertPhotoIcon />
         </ListItemIcon>
         <ListItemText primary={Strings.pictures()} />
       </ListItemLink>
-      <ListItemLink to={routes["Settings"].path}>
+      <ListItemLink to={routes.Settings.path}>
         <ListItemIcon className={classes.listItemIcon}>
           <SettingsIcon />
         </ListItemIcon>
@@ -75,7 +75,7 @@ const AppMenuList = ({ collapse = false }: AppMenuListProps) => {
         onClick={() => {
           getLoggedInUser().logout(updateLoggedInUser);
         }}
-        to={routes["Login"].path}
+        to={routes.Login.path}
       >
         <ListItemIcon className={classes.listItemIcon}>
           <ExitToAppIcon />

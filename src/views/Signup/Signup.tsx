@@ -4,7 +4,7 @@ import Typography from "@material-ui/core/Typography";
 import Grid from "@material-ui/core/Grid";
 import Card from "@material-ui/core/Card";
 import Button from "@material-ui/core/Button";
-import { useNavigate } from "react-router-dom";
+import { useNavigate } from "../../hooks";
 import { Strings } from "../../resources";
 import {
   PasswordField,
@@ -125,7 +125,7 @@ const Signup = memo(() => {
       });
       try {
         await user.signup(updateLoggedInUser);
-        navigate(routes["Home"].path);
+        navigate(routes.Home.path);
       } catch (error: any) {
         enqueueErrorSnackbar(error?.message ?? Strings.signupError());
       } finally {

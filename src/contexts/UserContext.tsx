@@ -7,7 +7,7 @@ import React, {
   useState,
 } from "react";
 import Parse from "parse";
-import { useNavigate, useLocation } from "react-router-dom";
+import { useLocation } from "react-router-dom";
 import {
   ParseUser,
   UpdateLoggedInUser,
@@ -17,6 +17,7 @@ import {
 } from "../types";
 import { Strings } from "../resources";
 import { routes } from "../app";
+import { useNavigate } from "../hooks";
 
 /**
  * Interface defining the return value of the UserContext
@@ -73,7 +74,7 @@ export const UserContextProvider = ({ children }: UserContextProviderProps) => {
       if (reason === UpdateReason.LOG_OUT) {
         setLoggedInUser(undefined);
         setProfilePicture(undefined);
-        navigate(routes["Login"].path);
+        navigate(routes.Login.path);
       } else if (
         !loggedInUser ||
         newLoggedInUser.username === loggedInUser.username
@@ -93,10 +94,10 @@ export const UserContextProvider = ({ children }: UserContextProviderProps) => {
             navigate(redirectPath);
             setRedirectPath(undefined);
           } else if (
-            location.pathname === routes["Login"].path ||
-            location.pathname === routes["Signup"].path
+            location.pathname === routes.Login.path ||
+            location.pathname === routes.Signup.path
           ) {
-            navigate(routes["Home"].path);
+            navigate(routes.Home.path);
           }
         }
         if (
