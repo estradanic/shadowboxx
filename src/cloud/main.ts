@@ -19,10 +19,7 @@ Parse.Cloud.beforeSave("Image", async (request) => {
 });
 
 Parse.Cloud.beforeSave("Album", async (request) => {
-  await mergeAlbumChanges(
-    request.object,
-    request.context,
-  );
+  await mergeAlbumChanges(request.object, request.context);
 });
 
 Parse.Cloud.beforeDelete("Album", async (request) => {

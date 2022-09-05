@@ -1,6 +1,6 @@
 const mergeAlbumChanges = async (
   album: Parse.Object,
-  context: Record<string, any>,
+  context: Record<string, any>
 ) => {
   if (
     (await album.isNew()) ||
@@ -11,7 +11,7 @@ const mergeAlbumChanges = async (
     return;
   }
 
-  await album.fetch();
+  await album.fetch({ useMasterKey: true });
 
   const images = album.get("images");
   const collaborators = album.get("collaborators");
@@ -23,7 +23,9 @@ const mergeAlbumChanges = async (
   if (context.removedImages) {
     for (let i = 0; i < context.removedImages.length; i++) {
       images.splice(
-        images.findIndex((image: string) => image === context.removedImages?.[i]),
+        images.findIndex(
+          (image: string) => image === context.removedImages?.[i]
+        ),
         1
       );
     }
@@ -35,7 +37,8 @@ const mergeAlbumChanges = async (
     for (let i = 0; i < context.removedCollaborators.length; i++) {
       collaborators.splice(
         collaborators.findIndex(
-          (collaborator: string) => collaborator === context.removedCollaborators?.[i]
+          (collaborator: string) =>
+            collaborator === context.removedCollaborators?.[i]
         ),
         1
       );
@@ -47,7 +50,9 @@ const mergeAlbumChanges = async (
   if (context.removedViewers) {
     for (let i = 0; i < context.removedViewers.length; i++) {
       viewers.splice(
-        viewers.findIndex((viewer: string) => viewer === context.removedViewers?.[i]),
+        viewers.findIndex(
+          (viewer: string) => viewer === context.removedViewers?.[i]
+        ),
         1
       );
     }

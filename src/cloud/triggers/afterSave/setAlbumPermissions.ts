@@ -1,3 +1,45 @@
+const getAllImages = async (album: Parse.Object) => {
+  const images = [];
+  let exhausted = false;
+  let offset = 0;
+  const limit = 1000;
+  while (!exhausted) {
+    const partialImages = await new Parse.Query("Image")
+      .containedIn("objectId", album.get("images"))
+      .limit(limit)
+      .skip(offset)
+      .find({ useMasterKey: true });
+    if (partialImages.length === 0) {
+      exhausted = true;
+    } else {
+      images.push(...partialImages);
+      offset += limit;
+    }
+  }
+  return images;
+};
+
+const getAllUsersByEmails = async (emails: string[]) => {
+  const users = [];
+  let exhausted = false;
+  let offset = 0;
+  const limit = 1000;
+  while (!exhausted) {
+    const partialUsers = await new Parse.Query(Parse.User)
+      .containedIn("email", emails)
+      .limit(limit)
+      .skip(offset)
+      .find({ useMasterKey: true });
+    if (partialUsers.length === 0) {
+      exhausted = true;
+    } else {
+      users.push(...partialUsers);
+      offset += limit;
+    }
+  }
+  return users;
+};
+
 const setAlbumPermissions = async (album: Parse.Object) => {
   const owner = await new Parse.Query(Parse.User)
     .equalTo("objectId", album.get("owner").id)
@@ -18,15 +60,11 @@ const setAlbumPermissions = async (album: Parse.Object) => {
   }
 
   if (album.get("viewers").length > 0) {
-    const viewers = await new Parse.Query(Parse.User)
-      .containedIn("email", album.get("viewers"))
-      .find({ useMasterKey: true });
+    const viewers = await getAllUsersByEmails(album.get("viewers"));
     readRole.getUsers().add(viewers);
   }
   if (album.get("collaborators").length > 0) {
-    const collaborators = await new Parse.Query(Parse.User)
-      .containedIn("email", album.get("collaborators"))
-      .find({ useMasterKey: true });
+    const collaborators = await getAllUsersByEmails(album.get("collaborators"));
     readWriteRole.getUsers().add(collaborators);
   }
 
@@ -35,9 +73,7 @@ const setAlbumPermissions = async (album: Parse.Object) => {
   await readWriteRole.save(null, { useMasterKey: true });
 
   if (album.get("images").length > 0) {
-    const images = await new Parse.Query("Image")
-      .containedIn("objectId", album.get("images"))
-      .find({ useMasterKey: true });
+    const images = await getAllImages(album);
     images.forEach((image) => {
       let imageACL = image.getACL() ?? new Parse.ACL();
       imageACL.setReadAccess(owner!, true);
