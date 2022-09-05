@@ -1,13 +1,8 @@
 import React, { useCallback, useMemo, useState } from "react";
 import Parse from "parse";
-import { makeStyles, Theme, useTheme } from "@material-ui/core/styles";
-import Checkbox from "@material-ui/core/Checkbox";
-import FormControl from "@material-ui/core/FormControl";
-import FormControlLabel from "@material-ui/core/FormControlLabel";
+import { useTheme } from "@material-ui/core/styles";
 import Grid from "@material-ui/core/Grid";
 import useMediaQuery from "@material-ui/core/useMediaQuery";
-import StarIcon from "@material-ui/icons/Star";
-import StarBorderIcon from "@material-ui/icons/StarBorder";
 import { useQuery } from "@tanstack/react-query";
 import { Strings } from "../../resources";
 import { ErrorState, isNullOrWhitespace } from "../../utils";
@@ -23,30 +18,6 @@ import { useSnackbar } from "../Snackbar/Snackbar";
 import UserField from "../Field/UserField";
 import TextField from "../Field/TextField";
 import Tooltip from "../Tooltip/Tooltip";
-
-const useStyles = makeStyles((theme: Theme) => ({
-  checkboxLabel: {
-    marginTop: theme.spacing(1),
-    marginLeft: theme.spacing(1.5),
-    width: "100%",
-    "& > span:nth-child(2)": {
-      marginRight: "auto",
-    },
-  },
-  checkbox: {
-    height: theme.spacing(7),
-    borderBottom: "1px solid rgba(0, 0, 0, 0.42)",
-    "&:hover": {
-      borderBottom: `1px solid ${theme.palette.text.primary}`,
-    },
-  },
-  favoriteIcon: {
-    marginLeft: "auto",
-    marginRight: theme.spacing(1.5),
-    color: theme.palette.warning.main,
-    borderColor: theme.palette.warning.main,
-  },
-}));
 
 /** Interface defining props for AlbumFormDialog */
 export interface AlbumFormDialogProps
@@ -125,7 +96,6 @@ const AlbumFormDialog = ({
   ]);
   const { enqueueErrorSnackbar } = useSnackbar();
 
-  const classes = useStyles();
   const theme = useTheme();
   const sm = useMediaQuery(theme.breakpoints.down("sm"));
   const { openConfirm } = useActionDialogContext();

@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState } from "react";
+import React, { createContext, useCallback, useContext, useState } from "react";
 
 interface ScrollPositionContextValue {
   /** Scroll positions of the PageContainers across pages */
@@ -42,13 +42,13 @@ export const useScrollPositionContext = () => {
     throw new Error("No ScrollPositionContextProvider found!");
   }
 
-  const pushScrollPosition = (path: string, scrollPosition: number) => {
+  const pushScrollPosition = useCallback((path: string, scrollPosition: number) => {
     context.setScrollPositions((prev) => ({ ...prev, [path]: scrollPosition }));
-  };
+  }, [context]);
 
-  const getScrollPosition = (path: string) => {
+  const getScrollPosition = useCallback((path: string) => {
     return context.scrollPositions[path] ?? 0;
-  };
+  }, [context]);
 
   return { pushScrollPosition, getScrollPosition };
 };

@@ -4,17 +4,18 @@ import Typography from "@material-ui/core/Typography";
 import useMediaQuery from "@material-ui/core/useMediaQuery";
 import { makeStyles, Theme, useTheme } from "@material-ui/core/styles";
 import classNames from "classnames";
-import { useQuery } from "@tanstack/react-query";
+import { useInfiniteQuery } from "@tanstack/react-query";
 import { dedupeFast } from "../../utils";
 import { Strings } from "../../resources";
 import { useUserContext } from "../../contexts";
-import { useRandomColor, useQueryConfigs } from "../../hooks";
+import { useRandomColor, useQueryConfigs, useInfiniteScroll } from "../../hooks";
 import { ParseImage } from "../../types";
 import ActionDialog, { ActionDialogProps } from "../Dialog/ActionDialog";
 import Image from "../Image/Image";
 import Empty from "../Svgs/Empty";
 import CheckIcon from "@material-ui/icons/Check";
 import ImagesSkeleton from "../Skeleton/ImagesSkeleton";
+import { IMAGES_PAGE_SIZE } from "../../constants";
 
 const useStyles = makeStyles((theme: Theme) => ({
   svgContainer: {
@@ -81,7 +82,7 @@ const ImageSelectionDialog = ({
   const {
     getImagesByOwnerFunction,
     getImagesByOwnerQueryKey,
-    getImagesByOwnerOptions,
+    getImagesByOwnerInfiniteOptions,
   } = useQueryConfigs();
 
   useEffect(() => {
@@ -89,14 +90,19 @@ const ImageSelectionDialog = ({
   }, [initialValue]);
 
   // Images that the current user owns, not those shared to them.
-  const { data: userOwnedImages, status } = useQuery<ParseImage[], Error>(
+  const { data, status, fetchNextPage, isFetchingNextPage } = useInfiniteQuery<ParseImage[], Error>(
     getImagesByOwnerQueryKey(getLoggedInUser()),
-    () =>
+    ({pageParam: page = 0}) =>
       getImagesByOwnerFunction(getLoggedInUser(), {
         showErrorsInSnackbar: true,
+        page,
+        pageSize: IMAGES_PAGE_SIZE,
       }),
-    getImagesByOwnerOptions({ enabled: open })
+    getImagesByOwnerInfiniteOptions({ enabled: open })
   );
+  const SCROLLABLE_ELEMENT_ID = "image-selection-dialog-content";
+  useInfiniteScroll(fetchNextPage, {canExecute: !isFetchingNextPage && open, elementQuerySelector: `#${SCROLLABLE_ELEMENT_ID}`});
+  const userOwnedImages = useMemo(() => data?.pages?.flatMap((page) => page), [data?.pages]);
 
   // Images that the current user owns + those in the passed in value
   const images = useMemo(
@@ -135,11 +141,11 @@ const ImageSelectionDialog = ({
       handleCancel={handleCancel}
       type="prompt"
       confirmButtonColor="success"
+      DialogContentProps={{id: SCROLLABLE_ELEMENT_ID}}
     >
       {status === "success" && images.length ? (
         <Grid container className={classes.imageContainer}>
-          {[...images]
-            .sort((a, b) => a.compareTo(b))
+          {images
             ?.map((image) => (
               <Grid
                 key={image.id}

@@ -163,9 +163,9 @@ const ImageField = memo(
 
     const randomColor = useRandomColor();
 
-    const onChange = async (newValue: ParseImage[]) => {
+    const onChange = useCallback(async (newValue: ParseImage[]) => {
       await piOnChange(Array.from(new Set(newValue)));
-    };
+    }, [piOnChange]);
 
     const { openPrompt } = useActionDialogContext();
 
@@ -274,7 +274,6 @@ const ImageField = memo(
       []
     );
 
-    const sortedValue = ParseImage.sort(value, coverImage);
     return (
       <>
         {variant === "field" ? (
@@ -389,7 +388,7 @@ const ImageField = memo(
             />
             {multiple && !!value.length && (
               <Grid container className={classes.multiImageContainer}>
-                {sortedValue.map((image: ParseImage) => {
+                {value?.map((image: ParseImage) => {
                   const imageDecorations = [
                     <RemoveImageDecoration
                       onClick={async () => {
@@ -407,7 +406,7 @@ const ImageField = memo(
                         checked={checked}
                         onClick={() => {
                           if (checked) {
-                            setCoverImage?.(sortedValue[0].toPointer());
+                            setCoverImage?.(value[0].toPointer());
                           } else {
                             setCoverImage?.(image.toPointer());
                           }

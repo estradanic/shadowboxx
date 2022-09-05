@@ -1,6 +1,7 @@
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
 import { createHtmlPlugin } from "vite-plugin-html";
+import eslint from "vite-plugin-eslint";
 import variables from "./public/variables.json";
 
 export default defineConfig(({ mode }) => ({
@@ -54,5 +55,6 @@ export default defineConfig(({ mode }) => ({
         },
       },
     }),
+    eslint(),
   ],
 }));

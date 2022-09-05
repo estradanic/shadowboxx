@@ -34,6 +34,7 @@
     "@types/uuid": "^8.3.3",
     "bfj": "^7.0.2",
     "browser-image-resizer": "^2.2.1",
+    "browserslist": "^4",
     "camelcase": "^7.0.0",
     "classnames": "^2.2.6",
     "cssnano": "^5.1.13",
@@ -70,6 +71,7 @@
     "ts-pnp": "1.2.0",
     "typescript": "^4.8.2",
     "universal-cookie": "^4.0.4",
+    "use-debounce": "^8.0.4",
     "uuid": "^8.3.2",
     "watchpack-chokidar2": "^2.0.1",
     "web-vitals": "^1.0.1"
@@ -108,7 +110,10 @@
   },
   "devDependencies": {
     "@vitejs/plugin-react": "^2.1.0",
+    "eslint": "^8.23.0",
+    "eslint-config-react-app": "^7.0.1",
     "vite": "^3.0.9",
+    "vite-plugin-eslint": "^1.8.1",
     "vite-plugin-html": "^3.2.0"
   }
 }

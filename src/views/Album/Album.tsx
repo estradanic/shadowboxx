@@ -1,4 +1,4 @@
-import React, { memo } from "react";
+import React, { memo, useMemo } from "react";
 import {
   BackButton,
   FancyTitleTypographySkeleton,
@@ -9,11 +9,16 @@ import { useLocation, useParams } from "react-router-dom";
 import Grid from "@material-ui/core/Grid";
 import Typography from "@material-ui/core/Typography";
 import { makeStyles } from "@material-ui/core/styles";
-import { useQuery } from "@tanstack/react-query";
+import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
 import { Strings } from "../../resources";
 import { ParseImage, ParseAlbum } from "../../types";
 import { FancyTitleTypography, Void, Images } from "../../components";
-import { useRandomColor, useQueryConfigs } from "../../hooks";
+import { IMAGES_PAGE_SIZE } from "../../constants";
+import {
+  useRandomColor,
+  useQueryConfigs,
+  useInfiniteScroll,
+} from "../../hooks";
 import { useView } from "../View";
 
 const useStyles = makeStyles(() => ({
@@ -40,21 +45,31 @@ const Album = memo(() => {
     getAlbumOptions,
     getImagesByIdFunction,
     getImagesByIdQueryKey,
-    getImagesByIdOptions,
+    getImagesByIdInfiniteOptions,
   } = useQueryConfigs();
   const { data: album, status: albumStatus } = useQuery<ParseAlbum, Error>(
     getAlbumQueryKey(id),
     () => getAlbumFunction(id, { showErrorsInSnackbar: true }),
     getAlbumOptions()
   );
-  const { data: images, status: imagesStatus } = useQuery<ParseImage[], Error>(
+  const {
+    data,
+    status: imagesStatus,
+    fetchNextPage,
+    isFetchingNextPage,
+  } = useInfiniteQuery<ParseImage[], Error>(
     getImagesByIdQueryKey(album?.images ?? []),
-    () =>
+    ({ pageParam: page = 0 }) =>
       getImagesByIdFunction(album?.images ?? [], {
         showErrorsInSnackbar: true,
+        page,
+        pageSize: IMAGES_PAGE_SIZE,
       }),
-    getImagesByIdOptions({ enabled: !!album?.images })
+    getImagesByIdInfiniteOptions({ enabled: !!album?.images })
   );
+  useInfiniteScroll(fetchNextPage, { canExecute: !isFetchingNextPage });
+
+  const images = useMemo(() => data?.pages?.flatMap((page) => page), [data?.pages]);
 
   return (
     <PageContainer>

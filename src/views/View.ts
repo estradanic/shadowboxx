@@ -22,7 +22,7 @@ export const useView = (currentViewId: string) => {
       setRedirectPath(createPath(location));
       navigate(loginRoute.path);
     }
-  }, [currentRoute, setRedirectPath, history]);
+  }, [currentRoute, setRedirectPath, navigate, location]);
 
   useLayoutEffect(() => {
     if (!isUserLoggedIn && currentRoute.tryAuthenticate) {
@@ -34,5 +34,5 @@ export const useView = (currentViewId: string) => {
     document
       .querySelector(`#${PAGE_CONTAINER_ID}`)
       ?.scrollTo(0, getScrollPosition(location.pathname));
-  }, []);
+  }, [location.pathname, getScrollPosition]);
 };

@@ -120,9 +120,9 @@ export const UserContextProvider = ({ children }: UserContextProviderProps) => {
       setProfilePicture,
       loggedInUser,
       profilePicture?.id,
-      history,
       redirectPath,
       location.pathname,
+      navigate,
     ]
   );
 

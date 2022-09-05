@@ -21,9 +21,8 @@ const Images = ({ images, status, outlineColor }: ImagesProps) => {
   } else {
     return (
       <Grid item container className={classes.imageContainer} xs={12}>
-        {[...images]
-          .sort((a, b) => a.compareTo(b))
-          .map((image) => (
+        {images
+          ?.map((image) => (
             <Grid key={image.id} item xs={12} md={6} lg={4} xl={3}>
               <Image
                 borderColor={outlineColor}

@@ -3,7 +3,10 @@ import { useSnackbar } from "../components";
 import { useGlobalLoadingContext, useUserContext } from "../contexts";
 import { Strings } from "../resources";
 import { Interdependent, ParseAlbum, ParseImage, ParseUser } from "../types";
-import { QueryObserverOptions } from "@tanstack/react-query";
+import {
+  InfiniteQueryObserverOptions,
+  QueryObserverOptions,
+} from "@tanstack/react-query";
 
 export type FunctionOptions = Interdependent<
   {
@@ -14,13 +17,20 @@ export type FunctionOptions = Interdependent<
     useLoader?: boolean;
     startLoader?: () => void;
     stopLoader?: () => void;
+    pageSize?: number;
+    page?: number;
   },
-  "startLoader" | "stopLoader"
+  "startLoader" | "stopLoader",
+  "page" | "pageSize"
 >;
 
 export type QueryOptionsFunction<TData> = (
   options?: Partial<QueryObserverOptions<TData, Error>>
 ) => QueryObserverOptions<TData, Error>;
+
+export type InfiniteQueryOptionsFunction<TData> = (
+  options?: Partial<InfiniteQueryObserverOptions<TData, Error>>
+) => InfiniteQueryObserverOptions<TData, Error>;
 
 type StartLoaderOptions = Pick<FunctionOptions, "startLoader" | "useLoader">;
 
@@ -156,12 +166,31 @@ const useQueryConfigs = () => {
     refetchInterval: 5 * 60 * 1000,
     ...options,
   });
+  const getAllImagesInfiniteOptions: InfiniteQueryOptionsFunction<ParseImage[]> = (options = {}) => ({
+    getNextPageParam: (lastPage, allPages) => {
+      if (lastPage.length > 0) {
+        return allPages.length;
+      }
+      return undefined;
+    },
+    ...options,
+  });
   const getAllImagesFunction = async (
     options: FunctionOptions = {}
   ): Promise<ParseImage[]> => {
     return await runFunctionInTryCatch<ParseImage[]>(
       async () => {
-        const images = await ParseImage.query().findAll();
+        let images;
+        if (options.pageSize === undefined) {
+          images = await ParseImage.query()
+            .findAll()
+        } else {
+          images = await ParseImage.query()
+            .descending(ParseImage.COLUMNS.createdAt)
+            .limit(options.pageSize)
+            .skip(options.page * options.pageSize)
+            .find()
+        }
         return images.map((image) => new ParseImage(image));
       },
       { errorMessage: Strings.noImages(), ...options }
@@ -198,15 +227,36 @@ const useQueryConfigs = () => {
   ) => ({
     ...options,
   });
+  const getImagesByIdInfiniteOptions: InfiniteQueryOptionsFunction<
+    ParseImage[]
+  > = (options = {}) => ({
+    getNextPageParam: (lastPage, allPages) => {
+      if (lastPage.length > 0) {
+        return allPages.length;
+      }
+      return undefined;
+    },
+    ...options,
+  });
   const getImagesByIdFunction = async (
     imageIds: string[],
     options: FunctionOptions = {}
   ): Promise<ParseImage[]> => {
     return await runFunctionInTryCatch<ParseImage[]>(
       async () => {
-        const images = await ParseImage.query()
-          .containedIn(ParseImage.COLUMNS.id, imageIds)
-          .findAll();
+        let images;
+        if (options.pageSize === undefined) {
+          images = await ParseImage.query()
+            .containedIn(ParseImage.COLUMNS.id, imageIds)
+            .findAll();
+        } else {
+          images = await ParseImage.query()
+            .containedIn(ParseImage.COLUMNS.id, imageIds)
+            .descending(ParseImage.COLUMNS.createdAt)
+            .limit(options.pageSize)
+            .skip(options.page * options.pageSize)
+            .find();
+        }
         return images.map((image) => new ParseImage(image));
       },
       { errorMessage: Strings.getImagesError(), ...options }
@@ -255,15 +305,36 @@ const useQueryConfigs = () => {
     refetchOnWindowFocus: false,
     ...options,
   });
+  const getImagesByOwnerInfiniteOptions: InfiniteQueryOptionsFunction<ParseImage[]> = (
+    options = {}
+  ) => ({
+    refetchOnWindowFocus: false,
+    getNextPageParam: (lastPage, allPages) => {
+      if (lastPage.length > 0) {
+        return allPages.length;
+      }
+      return undefined;
+    },
+  });
   const getImagesByOwnerFunction = async (
     owner: ParseUser,
     options: FunctionOptions = {}
   ): Promise<ParseImage[]> => {
     return await runFunctionInTryCatch<ParseImage[]>(
       async () => {
-        const images = await ParseImage.query()
-          .equalTo(ParseImage.COLUMNS.owner, owner.toNativePointer())
-          .findAll();
+        let images;
+        if (options.pageSize === undefined) {
+          images = await ParseImage.query()
+            .equalTo(ParseImage.COLUMNS.owner, owner.toNativePointer())
+            .findAll();
+        } else {
+          images = await ParseImage.query()
+            .equalTo(ParseImage.COLUMNS.owner, owner.toNativePointer())
+            .descending(ParseImage.COLUMNS.createdAt)
+            .limit(options.pageSize)
+            .skip(options.page * options.pageSize)
+            .find();
+        }
         return images.map((image) => new ParseImage(image));
       },
       { errorMessage: Strings.getImageError(), ...options }
@@ -407,17 +478,20 @@ const useQueryConfigs = () => {
     getAllImagesFunction,
     getAllImagesQueryKey,
     getAllImagesOptions,
+    getAllImagesInfiniteOptions,
     getAlbumFunction,
     getAlbumOptions,
     getAlbumQueryKey,
     getImagesByIdFunction,
     getImagesByIdOptions,
+    getImagesByIdInfiniteOptions,
     getImagesByIdQueryKey,
     getImageByIdOptions,
     getImageByIdFunction,
     getImageByIdQueryKey,
     getImagesByOwnerFunction,
     getImagesByOwnerOptions,
+    getImagesByOwnerInfiniteOptions,
     getImagesByOwnerQueryKey,
     getUserByIdQueryKey,
     getUserByIdOptions,
