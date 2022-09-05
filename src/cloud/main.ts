@@ -1,4 +1,3 @@
-import { Image, Album, User, AlbumSaveContext } from "../types";
 import {
   deleteRoles,
   mergeAlbumChanges,
@@ -8,25 +7,24 @@ import {
 } from "./triggers";
 
 Parse.Cloud.afterSave("Album", async (request) => {
-  await setAlbumPermissions(request.object as Parse.Object<Album>);
+  await setAlbumPermissions(request.object);
 });
 
 Parse.Cloud.afterSave(Parse.User, async (request) => {
-  await setUserPermissions(request.object as Parse.User<User>);
+  await setUserPermissions(request.object);
 });
 
 Parse.Cloud.beforeSave("Image", async (request) => {
-  await resizeImage(request.object as Parse.Object<Image>);
+  await resizeImage(request.object);
 });
 
 Parse.Cloud.beforeSave("Album", async (request) => {
   await mergeAlbumChanges(
-    request.object as Parse.Object<Album>,
-    request.original as Parse.Object<Album>,
-    request.context as AlbumSaveContext
+    request.object,
+    request.context,
   );
 });
 
 Parse.Cloud.beforeDelete("Album", async (request) => {
-  await deleteRoles(request.object as Parse.Object<Album>);
+  await deleteRoles(request.object);
 });

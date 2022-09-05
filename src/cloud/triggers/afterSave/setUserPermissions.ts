@@ -1,6 +1,4 @@
-import { User } from "../../../types";
-
-const setUserPermissions = async (user: Parse.User<User>) => {
+const setUserPermissions = async (user: Parse.User) => {
   if (!user.existed()) {
     const collaboratorAlbums = await new Parse.Query("Album")
       .containsAll("collaborators", [user.getEmail()])

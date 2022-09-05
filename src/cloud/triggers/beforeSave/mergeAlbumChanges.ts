@@ -1,9 +1,6 @@
-import { Album, AlbumSaveContext } from "../../../types";
-
 const mergeAlbumChanges = async (
-  album: Parse.Object<Album>,
-  oldAlbum: Parse.Object<Album>,
-  context: AlbumSaveContext
+  album: Parse.Object,
+  context: Record<string, any>,
 ) => {
   if (
     (await album.isNew()) ||
@@ -26,7 +23,7 @@ const mergeAlbumChanges = async (
   if (context.removedImages) {
     for (let i = 0; i < context.removedImages.length; i++) {
       images.splice(
-        images.findIndex((image) => image === context.removedImages?.[i]),
+        images.findIndex((image: string) => image === context.removedImages?.[i]),
         1
       );
     }
@@ -38,7 +35,7 @@ const mergeAlbumChanges = async (
     for (let i = 0; i < context.removedCollaborators.length; i++) {
       collaborators.splice(
         collaborators.findIndex(
-          (collaborator) => collaborator === context.removedCollaborators?.[i]
+          (collaborator: string) => collaborator === context.removedCollaborators?.[i]
         ),
         1
       );
@@ -50,7 +47,7 @@ const mergeAlbumChanges = async (
   if (context.removedViewers) {
     for (let i = 0; i < context.removedViewers.length; i++) {
       viewers.splice(
-        viewers.findIndex((viewer) => viewer === context.removedViewers?.[i]),
+        viewers.findIndex((viewer: string) => viewer === context.removedViewers?.[i]),
         1
       );
     }

@@ -1,6 +1,4 @@
-import { Album } from "../../../types";
-
-const setAlbumPermissions = async (album: Parse.Object<Album>) => {
+const setAlbumPermissions = async (album: Parse.Object) => {
   const owner = await new Parse.Query(Parse.User)
     .equalTo("objectId", album.get("owner").id)
     .first({ useMasterKey: true });

@@ -1,6 +1,4 @@
-import { Album } from "../../../types";
-
-const deleteRoles = async (album: Parse.Object<Album>) => {
+const deleteRoles = async (album: Parse.Object) => {
   const readRole = await new Parse.Query(Parse.Role)
     .equalTo("name", `${album.id}_r`)
     .first({ useMasterKey: true });

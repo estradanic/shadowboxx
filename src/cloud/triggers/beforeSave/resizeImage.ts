@@ -1,7 +1,6 @@
 import sharp from "sharp";
-import { Image } from "../../../types";
 
-const resizeImage = async (image: Parse.Object<Image>) => {
+const resizeImage = async (image: Parse.Object) => {
   if (
     !!image.get("file") &&
     (image.dirty("file") || !image.get("fileThumb") || !image.get("fileMobile"))
