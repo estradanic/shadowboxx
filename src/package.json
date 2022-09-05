@@ -38,7 +38,7 @@
     "classnames": "^2.2.6",
     "cssnano": "^5.1.13",
     "cssnano-preset-default": "^5.2.12",
-    "dotenv": "16.0.1",
+    "dotenv": "16.0.2",
     "dotenv-expand": "8.0.3",
     "events": "^3.3.0",
     "fs-extra": "^10.1.0",
