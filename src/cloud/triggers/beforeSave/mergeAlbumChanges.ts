@@ -11,6 +11,8 @@ const mergeAlbumChanges = async (
     return;
   }
 
+  const attributes = album.attributes;
+
   await album.fetch({ useMasterKey: true });
 
   const images = album.get("images");
@@ -58,9 +60,7 @@ const mergeAlbumChanges = async (
     }
   }
 
-  album.set("images", images);
-  album.set("collaborators", collaborators);
-  album.set("viewers", viewers);
+  album.set({...attributes, images, collaborators, viewers});
 };
 
 export default mergeAlbumChanges;

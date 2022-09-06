@@ -1,14 +1,15 @@
 import React, { useCallback, useMemo, useState } from "react";
 import Parse from "parse";
+import uniqueId from "lodash/uniqueId";
 import { useTheme } from "@material-ui/core/styles";
 import Grid from "@material-ui/core/Grid";
 import useMediaQuery from "@material-ui/core/useMediaQuery";
-import { useQuery } from "@tanstack/react-query";
+import { useInfiniteQuery } from "@tanstack/react-query";
 import { Strings } from "../../resources";
 import { ErrorState, isNullOrWhitespace } from "../../utils";
 import { ImageContextProvider, useUserContext } from "../../contexts";
 import { ParseUser, ParseImage, Album } from "../../types";
-import { useQueryConfigs } from "../../hooks";
+import { useInfiniteScroll, useQueryConfigs } from "../../hooks";
 import ActionDialog, {
   ActionDialogProps,
   useActionDialogContext,
@@ -18,6 +19,7 @@ import { useSnackbar } from "../Snackbar/Snackbar";
 import UserField from "../Field/UserField";
 import TextField from "../Field/TextField";
 import Tooltip from "../Tooltip/Tooltip";
+import { IMAGES_PAGE_SIZE } from "../../constants";
 
 /** Interface defining props for AlbumFormDialog */
 export interface AlbumFormDialogProps
@@ -38,6 +40,7 @@ const AlbumFormDialog = ({
   handleConfirm: piHandleConfirm,
   resetOnConfirm = true,
 }: AlbumFormDialogProps) => {
+  const id = uniqueId("album-form-dialog-content");
   const [imageIds, setImageIds] = useState<Album["images"]>(value.images);
   const [coverImage, setCoverImage] = useState<Album["coverImage"]>(
     value.coverImage
@@ -51,15 +54,34 @@ const AlbumFormDialog = ({
   );
   const [viewers, setViewers] = useState<Album["viewers"]>(value.viewers);
 
-  const { getImagesByIdFunction, getImagesByIdQueryKey, getImagesByIdOptions } =
-    useQueryConfigs();
-  const { data: images } = useQuery<ParseImage[], Error>(
+  const {
+    getImagesByIdFunction,
+    getImagesByIdQueryKey,
+    getImagesByIdInfiniteOptions,
+  } = useQueryConfigs();
+  const { data, isFetchingNextPage, fetchNextPage } = useInfiniteQuery<
+    ParseImage[],
+    Error
+  >(
     getImagesByIdQueryKey(imageIds),
-    () => getImagesByIdFunction(imageIds, { showErrorsInSnackbar: true }),
-    getImagesByIdOptions({
+    ({ pageParam: page = 0 }) =>
+      getImagesByIdFunction(imageIds, {
+        showErrorsInSnackbar: true,
+        page,
+        pageSize: IMAGES_PAGE_SIZE,
+      }),
+    getImagesByIdInfiniteOptions({
       refetchOnWindowFocus: false,
       enabled: open,
     })
+  );
+  useInfiniteScroll(fetchNextPage, {
+    canExecute: !isFetchingNextPage && open,
+    elementQuerySelector: `#${id}`,
+  });
+  const images = useMemo(
+    () => data?.pages?.flatMap((page) => page),
+    [data?.pages]
   );
 
   const { getLoggedInUser } = useUserContext();
@@ -138,6 +160,7 @@ const AlbumFormDialog = ({
             description,
             collaborators,
             viewers,
+            coverImage,
           });
         });
       } else {
@@ -174,6 +197,7 @@ const AlbumFormDialog = ({
       handleCancel={handleCancel}
       type="prompt"
       confirmButtonColor="success"
+      DialogContentProps={{ id }}
     >
       <Grid container direction="row">
         <Grid item xs={12}>
