@@ -30,7 +30,7 @@ const useStyles = makeStyles((theme: Theme) => ({
   cardTitle: {
     "& *": {
       color: theme.palette.primary.contrastText,
-      width: "fit-content",
+      width: "max-content",
       margin: "auto",
     },
     backgroundColor: theme.palette.primary.main,
@@ -87,10 +87,6 @@ const useStyles = makeStyles((theme: Theme) => ({
   },
   darkTheme: {
     height: theme.spacing(7),
-    borderBottom: "1px solid rgba(0, 0, 0, 0.42)",
-    "&:hover": {
-      borderBottom: `1px solid ${theme.palette.text.primary}`,
-    },
   },
 }));
 

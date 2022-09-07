@@ -18,6 +18,15 @@ import App from "./app/App";
 const queryClient = new QueryClient();
 
 const theme = createMuiTheme({
+  overrides: {
+    MuiFilledInput: {
+      underline: {
+        "&::before,&:hover::before": {
+          borderBottom: "none",
+        },
+      },
+    },
+  },
   palette: {
     primary: {
       main: "#01579B",

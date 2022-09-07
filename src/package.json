@@ -60,6 +60,7 @@
     "prompts": "2.4.2",
     "react": "^17.0.1",
     "react-app-polyfill": "^3.0.0",
+    "react-cropper-image-editor": "^1.0.10",
     "react-detect-offline": "^2.4.5",
     "react-dom": "^17.0.1",
     "react-reverse-portal": "^2.1.0",
@@ -109,6 +110,9 @@
     ]
   },
   "devDependencies": {
+    "@babel/core": "^7.19.0",
+    "@babel/plugin-syntax-flow": "^7.18.6",
+    "@babel/plugin-transform-react-jsx": "^7.19.0",
     "@vitejs/plugin-react": "^2.1.0",
     "eslint": "^8.23.0",
     "eslint-config-react-app": "^7.0.1",

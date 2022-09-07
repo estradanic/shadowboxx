@@ -98,9 +98,6 @@ const Header = ({ viewId, ...rest }: HeaderProps) => {
         {isUserLoggedIn && (
           <>
             <Notifications className={classes.notifications} />
-            <Typography variant="overline">{`${getLoggedInUser().firstName} ${
-              getLoggedInUser().lastName
-            }`}</Typography>
             {!!profilePicture?.thumbnail?.url() && (
               <UserAvatar
                 email={getLoggedInUser().email}
