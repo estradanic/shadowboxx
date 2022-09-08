@@ -60,7 +60,6 @@
     "prompts": "2.4.2",
     "react": "^17.0.1",
     "react-app-polyfill": "^3.0.0",
-    "react-cropper-image-editor": "^1.0.10",
     "react-detect-offline": "^2.4.5",
     "react-dom": "^17.0.1",
     "react-reverse-portal": "^2.1.0",
@@ -75,7 +74,8 @@
     "use-debounce": "^8.0.4",
     "uuid": "^8.3.2",
     "watchpack-chokidar2": "^2.0.1",
-    "web-vitals": "^1.0.1"
+    "web-vitals": "^1.0.1",
+    "webp-hero": "^0.0.2"
   },
   "scripts": {
     "preBuild": "cd service-worker && tsc && cd ..",

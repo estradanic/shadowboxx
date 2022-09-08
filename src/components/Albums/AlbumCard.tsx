@@ -39,13 +39,6 @@ const useStyles = makeStyles((theme: Theme) => ({
   },
   media: {
     cursor: "pointer",
-    height: 0,
-    paddingTop: "60%",
-    backgroundSize: "contain",
-    borderLeft: `${theme.spacing(1)}px solid ${theme.palette.background.paper}`,
-    borderRight: `${theme.spacing(1)}px solid ${
-      theme.palette.background.paper
-    }`,
   },
   favorite: {
     color: theme.palette.warning.light,
@@ -267,7 +260,8 @@ const AlbumCard = memo(({ value, onChange }: AlbumCardProps) => {
         {coverImageSrc ? (
           <CardMedia
             className={classes.media}
-            image={coverImageSrc}
+            src={coverImageSrc}
+            component="img"
             title={coverImage?.name}
             onClick={navigateToAlbum}
           />
