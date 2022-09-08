@@ -23,8 +23,9 @@ Parse.initialize(
 // @ts-ignore: TODO remove this comment when the types are actually correct again
 Parse.enableLocalDatastore(false);
 
-const webpMachine = new WebpMachine();
-webpMachine.polyfillDocument();
+const webpMachine = new WebpMachine({webpSupport: false});
+const observer = new MutationObserver(() => webpMachine.polyfillDocument());
+observer.observe(document, {childList: true, subtree: true});
 
 const App = () => {
   const { getLoggedInUser, isUserLoggedIn } = useUserContext();
