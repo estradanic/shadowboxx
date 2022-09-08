@@ -74,8 +74,7 @@
     "use-debounce": "^8.0.4",
     "uuid": "^8.3.2",
     "watchpack-chokidar2": "^2.0.1",
-    "web-vitals": "^1.0.1",
-    "webp-hero": "^0.0.2"
+    "web-vitals": "^1.0.1"
   },
   "scripts": {
     "preBuild": "cd service-worker && tsc && cd ..",

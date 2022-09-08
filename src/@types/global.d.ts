@@ -7,6 +7,10 @@ declare global {
       SERVICE_WORKER_VERSION_NUMBER: string;
     };
   }
+
+  namespace Parse {
+    const enableLocalDatastore: (poll?: boolean) => void;
+  }
 }
 
 export {};

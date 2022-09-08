@@ -1,6 +1,5 @@
 import React, { Suspense, useEffect } from "react";
 import { Routes, Route } from "react-router-dom";
-import {WebpMachine} from "webp-hero";
 import CircularProgress from "@material-ui/core/CircularProgress";
 import { Theme, ThemeProvider, unstable_createMuiStrictModeTheme as createTheme } from "@material-ui/core/styles";
 import DiscFullIcon from "@material-ui/icons/DiscFull";
@@ -19,13 +18,7 @@ Parse.initialize(
   window.__env__?.PARSE_APPLICATION_ID,
   window.__env__?.PARSE_JAVASCRIPT_KEY
 );
-
-// @ts-ignore: TODO remove this comment when the types are actually correct again
 Parse.enableLocalDatastore(false);
-
-const webpMachine = new WebpMachine({webpSupport: false});
-const observer = new MutationObserver(() => webpMachine.polyfillDocument());
-observer.observe(document, {childList: true, subtree: true});
 
 const App = () => {
   const { getLoggedInUser, isUserLoggedIn } = useUserContext();
