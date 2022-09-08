@@ -119,7 +119,7 @@ const ImageSelectionDialog = ({
 
   // Images that the current user owns + those in the passed in value
   const images = useMemo(
-    () => dedupeFast([...initialValue, ...(userOwnedImages ?? [])]),
+    () => dedupeFast([...(initialValue ?? []), ...(userOwnedImages ?? [])]),
     [initialValue, userOwnedImages]
   );
 
