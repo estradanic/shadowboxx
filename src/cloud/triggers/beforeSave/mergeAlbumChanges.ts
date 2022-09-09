@@ -60,7 +60,7 @@ const mergeAlbumChanges = async (
     }
   }
 
-  album.set({...attributes, images, collaborators, viewers});
+  album.set({ ...attributes, images, collaborators, viewers });
 };
 
 export default mergeAlbumChanges;

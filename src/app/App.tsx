@@ -1,7 +1,11 @@
 import React, { Suspense, useEffect } from "react";
 import { Routes, Route } from "react-router-dom";
 import CircularProgress from "@material-ui/core/CircularProgress";
-import { Theme, ThemeProvider, unstable_createMuiStrictModeTheme as createTheme } from "@material-ui/core/styles";
+import {
+  Theme,
+  ThemeProvider,
+  unstable_createMuiStrictModeTheme as createTheme,
+} from "@material-ui/core/styles";
 import DiscFullIcon from "@material-ui/icons/DiscFull";
 import Parse from "parse";
 import { useNotificationsContext, useUserContext } from "../contexts";

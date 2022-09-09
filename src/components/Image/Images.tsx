@@ -25,9 +25,7 @@ const Images = ({ images, status, outlineColor }: ImagesProps) => {
           <Grid key={image.id} item xs={12} md={6} lg={4} xl={3}>
             <Image
               borderColor={outlineColor}
-              src={image.mobileFile.url()}
-              alt={image.name}
-              fullResolutionSrc={image.file.url()}
+              parseImage={image}
               showFullResolutionOnClick
             />
           </Grid>

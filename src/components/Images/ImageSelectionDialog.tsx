@@ -168,11 +168,7 @@ const ImageSelectionDialog = ({
               xl={3}
               className={classes.imageWrapper}
             >
-              <Image
-                borderColor={randomColor}
-                src={image.mobileFile.url()}
-                alt={image.name}
-              />
+              <Image borderColor={randomColor} parseImage={image} />
               <div
                 className={classNames({
                   [classes.selected]: isSelected(image.id),

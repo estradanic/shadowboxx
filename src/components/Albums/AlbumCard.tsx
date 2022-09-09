@@ -30,6 +30,7 @@ import ParseImage from "../../types/ParseImage";
 import ImageField from "../Field/ImageField";
 import Online from "../NetworkDetector/Online";
 import AlbumCardSkeleton from "../Skeleton/AlbumCardSkeleton";
+import Image from "../Image/Image";
 
 const useStyles = makeStyles((theme: Theme) => ({
   card: {
@@ -178,10 +179,6 @@ const AlbumCard = memo(({ value, onChange }: AlbumCardProps) => {
 
   const { enqueueErrorSnackbar, enqueueSuccessSnackbar } = useSnackbar();
   const navigate = useNavigate();
-  const coverImageSrc = useMemo(
-    () => coverImage?.mobileFile.url(),
-    [coverImage]
-  );
 
   const classes = useStyles();
   const { openConfirm } = useActionDialogContext();
@@ -257,11 +254,12 @@ const AlbumCard = memo(({ value, onChange }: AlbumCardProps) => {
             value?.description ?? ""
           }`}
         />
-        {coverImageSrc ? (
+        {coverImage ? (
           <CardMedia
             className={classes.media}
-            src={coverImageSrc}
-            component="img"
+            parseImage={coverImage}
+            variant="contained"
+            component={Image}
             title={coverImage?.name}
             onClick={navigateToAlbum}
           />

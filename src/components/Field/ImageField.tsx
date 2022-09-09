@@ -368,7 +368,7 @@ const ImageField = memo(
                       >
                         <Avatar
                           className={classes.endAdornmentAvatar}
-                          src={value[0].thumbnail.url()}
+                          src={value[0].fileThumb.url()}
                           alt={value[0].name}
                         />
                       </InputAdornment>
@@ -428,8 +428,7 @@ const ImageField = memo(
                     >
                       <Image
                         borderColor={randomColor}
-                        src={image.mobileFile.url()}
-                        alt={image.name}
+                        parseImage={image}
                         decorations={imageDecorations}
                       />
                     </Grid>

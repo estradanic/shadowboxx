@@ -3,7 +3,7 @@ import { makeStyles, Theme } from "@material-ui/core/styles";
 import Popper from "@material-ui/core/Popper";
 import Skeleton from "@material-ui/lab/Skeleton";
 import classNames from "classnames";
-import { VariableColor, Interdependent } from "../../types";
+import { VariableColor, ParseImage } from "../../types";
 import { opacity } from "../../utils";
 import Tooltip from "../Tooltip/Tooltip";
 import { ImageDecorationProps } from "./Decoration/ImageDecoration";
@@ -25,6 +25,8 @@ const useStyles = makeStyles((theme: Theme) => ({
       `2px solid ${theme.palette[borderColor].dark}`,
     marginTop: "auto",
     marginBottom: "auto",
+  },
+  width100: {
     width: "100%",
   },
   pointer: {
@@ -53,40 +55,39 @@ const useStyles = makeStyles((theme: Theme) => ({
   },
 }));
 
-export type ImageProps = ImgHTMLAttributes<HTMLImageElement> &
-  Interdependent<
-    {
-      /** React key passed to parent div */
-      key?: string;
-      /** Html img alt attribute */
-      alt: string;
-      /** Html img src attribute */
-      src: string;
-      /** Array of ImageDecorations */
-      decorations?: React.ReactElement<ImageDecorationProps>[];
-      /** CSS border color */
-      borderColor?: VariableColor;
-      /** Html img src attribute for the full resolution image */
-      fullResolutionSrc: string;
-      /** Whether to show full resolution popup when the image is clicked */
-      showFullResolutionOnClick: boolean;
-    },
-    "fullResolutionSrc" | "showFullResolutionOnClick"
-  >;
+export type ImageProps = ImgHTMLAttributes<HTMLImageElement> & {
+  /** React key passed to parent div */
+  key?: string;
+  /** Image to display */
+  parseImage: ParseImage;
+  /** Array of ImageDecorations */
+  decorations?: React.ReactElement<ImageDecorationProps>[];
+  /** CSS border color */
+  borderColor?: VariableColor;
+  /** Whether to show full resolution popup when the image is clicked */
+  showFullResolutionOnClick?: boolean;
+  /** Style variant */
+  variant?: "bordered" | "contained";
+};
 
 /** Component showing an image in a pretty and functional way */
 const Image = memo(
   ({
     className,
     key,
-    alt,
     decorations,
     borderColor = "primary",
-    fullResolutionSrc,
     showFullResolutionOnClick,
+    parseImage,
+    variant = "bordered",
     ...rest
   }: ImageProps) => {
     const classes = useStyles({ borderColor });
+    if (variant === "contained") {
+      classes.image = "";
+      classes.pointer = "";
+      classes.root = "";
+    }
     const [fullResolutionOpen, setFullResolutionOpen] = useState(false);
     const ref = useRef(null);
     const [isLoaded, setIsLoaded] = useState(false);
@@ -94,18 +95,23 @@ const Image = memo(
 
     return (
       <div className={classNames(className, classes.root)} key={key} ref={ref}>
-        <Tooltip title={alt}>
+        <Tooltip title={parseImage.name}>
           <>
-            <img
-              className={classNames(classes.image, {
-                [classes.pointer]: showFullResolutionOnClick,
-                [classes.displayNone]: !isLoaded,
-              })}
-              onLoad={() => setIsLoaded(true)}
-              alt={alt}
-              {...rest}
-              onClick={() => setFullResolutionOpen(true)}
-            />
+            <picture>
+              <source srcSet={parseImage.fileMobile.url()} type="image/webp" />
+              <source srcSet={parseImage.fileLegacy.url()} type="image/png" />
+              <img
+                className={classNames(classes.image, classes.width100, {
+                  [classes.pointer]: showFullResolutionOnClick,
+                  [classes.displayNone]: !isLoaded,
+                })}
+                onLoad={() => setIsLoaded(true)}
+                alt={parseImage.name}
+                src={parseImage.fileLegacy.url()}
+                {...rest}
+                onClick={() => setFullResolutionOpen(true)}
+              />
+            </picture>
             {!isLoaded && (
               <Skeleton variant="rect" width="100%" height="700px" />
             )}
@@ -121,14 +127,18 @@ const Image = memo(
             onClick={() => setFullResolutionOpen(false)}
             anchorEl={ref.current}
           >
-            <img
-              className={classNames(classes.fullResolutionImage, {
-                [classes.displayNone]: !isFullResolutionLoaded,
-              })}
-              alt={alt}
-              onLoad={() => setIsFullResolutionLoaded(true)}
-              src={fullResolutionSrc}
-            />
+            <picture>
+              <source srcSet={parseImage.file.url()} type="image/webp" />
+              <source srcSet={parseImage.fileLegacy.url()} type="image/png" />
+              <img
+                className={classNames(classes.fullResolutionImage, {
+                  [classes.displayNone]: !isFullResolutionLoaded,
+                })}
+                alt={parseImage.name}
+                onLoad={() => setIsFullResolutionLoaded(true)}
+                src={parseImage.fileLegacy.url()}
+              />
+            </picture>
             {!isFullResolutionLoaded && (
               <Skeleton
                 variant="rect"

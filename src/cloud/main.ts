@@ -6,6 +6,8 @@ import {
   setUserPermissions,
 } from "./triggers";
 
+import { convertImages } from "./jobs";
+
 Parse.Cloud.afterSave("Album", async (request) => {
   await setAlbumPermissions(request.object);
 });
@@ -24,4 +26,8 @@ Parse.Cloud.beforeSave("Album", async (request) => {
 
 Parse.Cloud.beforeDelete("Album", async (request) => {
   await deleteRoles(request.object);
+});
+
+Parse.Cloud.job("convertImages", async () => {
+  await convertImages();
 });
