@@ -5,23 +5,20 @@ import CardContent from "@material-ui/core/CardContent";
 import CardActions from "@material-ui/core/CardActions";
 import IconButton from "@material-ui/core/IconButton";
 import Skeleton from "@material-ui/lab/Skeleton";
-import useMediaQuery from "@material-ui/core/useMediaQuery";
 import MoreVertIcon from "@material-ui/icons/MoreVert";
-import { makeStyles, Theme, useTheme } from "@material-ui/core/styles";
+import { makeStyles, Theme } from "@material-ui/core/styles";
 import Grid from "@material-ui/core/Grid";
 import AddAPhotoIcon from "@material-ui/icons/AddAPhoto";
 import StarIcon from "@material-ui/icons/Star";
 import classNames from "classnames";
+import AvatarSkeleton from "./AvatarSkeleton";
+import { CardMedia } from "@material-ui/core";
 
 const useStyles = makeStyles((theme: Theme) => ({
   card: {
     maxWidth: theme.spacing(50),
-    minWidth: theme.spacing(50),
-    margin: theme.spacing(2),
-  },
-  cardMobile: {
-    width: `calc(100vw - ${theme.spacing(4)}px)`,
-    margin: theme.spacing(2),
+    width: "100%",
+    margin: "auto",
   },
   addImages: {
     marginLeft: "auto",
@@ -38,44 +35,51 @@ const useStyles = makeStyles((theme: Theme) => ({
   collaborators: {
     marginTop: theme.spacing(1),
   },
+  title: {
+    marginLeft: "auto",
+    marginRight: "auto",
+    width: theme.spacing(14)
+  },
 }));
 
 /** Component for displaying a placeholder for the AlbumCard component */
 const AlbumCardSkeleton = () => {
   const classes = useStyles();
-  const theme = useTheme();
-  const mobile = useMediaQuery(theme.breakpoints.down("sm"));
 
   return (
-    <Card className={mobile ? classes.cardMobile : classes.card}>
+    <Card className={classes.card}>
       <CardHeader
-        avatar={<Skeleton variant="circle" />}
+        avatar={<AvatarSkeleton />}
         action={
           <IconButton>
             <MoreVertIcon className={classes.icon} />
           </IconButton>
         }
-        title={<Skeleton variant="text" />}
+        title={<Skeleton className={classes.title} variant="text" />}
         subheader={<Skeleton variant="text" />}
       />
-      <Skeleton variant="rect" height={300} />
+      <CardMedia
+        component={Skeleton}
+        variant="rect"
+        height={300}
+      />
       <CardContent className={classes.cardContent}>
-        <Grid container>
+        <Grid container spacing={2}>
           <Grid item xs={6}>
             <Skeleton variant="text" />
           </Grid>
           <Grid item xs={6}>
             <Skeleton variant="text" />
           </Grid>
-          <Grid className={classes.collaborators} item container xs={12}>
+          <Grid className={classes.collaborators} item container xs={12} spacing={1}>
             <Grid item>
-              <Skeleton variant="circle" />
+              <AvatarSkeleton />
             </Grid>
             <Grid item>
-              <Skeleton variant="circle" />
+            <AvatarSkeleton />
             </Grid>
             <Grid item>
-              <Skeleton variant="circle" />
+            <AvatarSkeleton />
             </Grid>
           </Grid>
         </Grid>

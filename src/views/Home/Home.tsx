@@ -24,8 +24,8 @@ const useStyles = makeStyles((theme: Theme) => ({
     backgroundColor: theme.palette.success.main,
     color: theme.palette.success.contrastText,
     position: "absolute",
-    bottom: theme.spacing(5),
-    right: theme.spacing(5),
+    bottom: theme.spacing(7),
+    right: theme.spacing(4),
     "&:hover, &:focus, &:active": {
       backgroundColor: theme.palette.success.dark,
     },
