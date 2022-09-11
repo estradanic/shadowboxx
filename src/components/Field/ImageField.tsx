@@ -25,7 +25,7 @@ import { createHtmlPortalNode, InPortal } from "react-reverse-portal";
 import { readAndCompressImage } from "browser-image-resizer";
 import { elide, makeValidFileName, removeExtension } from "../../utils";
 import { Strings } from "../../resources";
-import { Interdependent, ParseImage, ParsePointer } from "../../types";
+import { ParseImage, ParsePointer } from "../../types";
 import { useRandomColor, useRefState } from "../../hooks";
 import TextField, { TextFieldProps } from "../Field/TextField";
 import Tooltip from "../Tooltip/Tooltip";
@@ -106,28 +106,24 @@ const useStyles = makeStyles((theme: Theme) => ({
 export type ImageFieldProps = Omit<
   TextFieldProps,
   "value" | "onChange" | "variant"
-> &
-  Interdependent<
-    {
-      /** Value of the field, array of Images */
-      value: ParseImage[];
-      /** Function to run when the value changes */
-      onChange: (value: ParseImage[]) => Promise<void>;
-      /** Whether multiple images can be selected or not */
-      multiple?: boolean;
-      /** ACL to save new images with after upload */
-      acl?: Parse.ACL;
-      /** Variant for how to display the field */
-      variant?: "button" | "field";
-      /** Props to pass to the IconButton when variant=="button" */
-      ButtonProps?: IconButtonProps;
-      /** Cover image for the album */
-      coverImage?: ParsePointer;
-      /** Function to set coverImage */
-      setCoverImage?: (newCoverImage: ParsePointer) => void;
-    },
-    "coverImage" | "setCoverImage"
-  >;
+> & {
+  /** Value of the field, array of Images */
+  value: ParseImage[];
+  /** Function to run when the value changes */
+  onChange: (value: ParseImage[]) => Promise<void>;
+  /** Whether multiple images can be selected or not */
+  multiple?: boolean;
+  /** ACL to save new images with after upload */
+  acl?: Parse.ACL;
+  /** Variant for how to display the field */
+  variant?: "button" | "field";
+  /** Props to pass to the IconButton when variant=="button" */
+  ButtonProps?: IconButtonProps;
+  /** Cover image for the album */
+  coverImage?: ParsePointer;
+  /** Function to set coverImage */
+  setCoverImage?: (newCoverImage: ParsePointer) => void;
+};
 
 /** Component to input images from the filesystem or online */
 const ImageField = memo(

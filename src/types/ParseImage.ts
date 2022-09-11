@@ -29,14 +29,6 @@ export default class ParseImage extends ParseObject<Image> {
     );
   }
 
-  static NULL = new ParseImage(
-    new Parse.Object<ParsifyPointers<Image>>("Image", {
-      file: new Parse.File("", []),
-      owner: ParsePointer.NATIVE_NULL,
-      name: "",
-    })
-  );
-
   static query(): Parse.Query<Parse.Object<ParsifyPointers<Image>>> {
     return new Parse.Query<Parse.Object<ParsifyPointers<Image>>>("Image");
   }

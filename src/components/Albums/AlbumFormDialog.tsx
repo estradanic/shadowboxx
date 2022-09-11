@@ -250,7 +250,7 @@ const AlbumFormDialog = ({
         <Grid item xs={12}>
           <ImageContextProvider>
             <ImageField
-              coverImage={coverImage}
+              coverImage={coverImage ?? images?.[0]?.toPointer()}
               setCoverImage={setCoverImage}
               label={Strings.images()}
               multiple

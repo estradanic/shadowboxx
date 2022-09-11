@@ -6,9 +6,6 @@ export type ClassName = "Album" | "Image" | "_User" | "_Role" | null;
  * Class wrapping the Parse.Pointer class and providing convenience methods/properties
  */
 export default class ParsePointer {
-  static NATIVE_NULL = { objectId: "", className: "", __type: "" };
-  static NULL = new ParsePointer(ParsePointer.NATIVE_NULL);
-
   _pointer: Parse.Pointer;
 
   constructor(pointer: Parse.Pointer) {
