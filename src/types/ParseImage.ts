@@ -116,7 +116,7 @@ export default class ParseImage extends ParseObject<Image> {
     return this._image.get(ParseImage.COLUMNS.fileMobile) ?? this.file;
   }
 
-  get fileLegacy(): Parse.File {
+  get fileLegacy(): Parse.File | undefined {
     return this._image.get(ParseImage.COLUMNS.fileLegacy);
   }
 

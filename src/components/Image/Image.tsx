@@ -80,6 +80,7 @@ const Image = memo(
     showFullResolutionOnClick,
     parseImage,
     variant = "bordered",
+    onClick: piOnClick,
     ...rest
   }: ImageProps) => {
     const classes = useStyles({ borderColor });
@@ -93,23 +94,27 @@ const Image = memo(
     const [isLoaded, setIsLoaded] = useState(false);
     const [isFullResolutionLoaded, setIsFullResolutionLoaded] = useState(false);
 
+    const onClick = showFullResolutionOnClick ? () => setFullResolutionOpen(true) : piOnClick;
+
     return (
       <div className={classNames(className, classes.root)} key={key} ref={ref}>
         <Tooltip title={parseImage.name}>
           <>
-            <picture>
+            <picture
+              className={classNames(classes.image, classes.width100, {
+                [classes.pointer]: showFullResolutionOnClick,
+                [classes.displayNone]: !isLoaded,
+              })}
+            >
               <source srcSet={parseImage.fileMobile.url()} type="image/webp" />
-              <source srcSet={parseImage.fileLegacy.url()} type="image/png" />
+              <source srcSet={parseImage.fileLegacy?.url()} type="image/png" />
               <img
-                className={classNames(classes.image, classes.width100, {
-                  [classes.pointer]: showFullResolutionOnClick,
-                  [classes.displayNone]: !isLoaded,
-                })}
+                className={classes.width100}
                 onLoad={() => setIsLoaded(true)}
                 alt={parseImage.name}
-                src={parseImage.fileLegacy.url()}
+                src={parseImage.fileLegacy?.url()}
+                onClick={onClick}
                 {...rest}
-                onClick={() => setFullResolutionOpen(true)}
               />
             </picture>
             {!isLoaded && (
@@ -127,16 +132,17 @@ const Image = memo(
             onClick={() => setFullResolutionOpen(false)}
             anchorEl={ref.current}
           >
-            <picture>
+            <picture
+              className={classNames(classes.fullResolutionImage, {
+                [classes.displayNone]: !isFullResolutionLoaded,
+              })}
+            >
               <source srcSet={parseImage.file.url()} type="image/webp" />
-              <source srcSet={parseImage.fileLegacy.url()} type="image/png" />
+              <source srcSet={parseImage.fileLegacy?.url()} type="image/png" />
               <img
-                className={classNames(classes.fullResolutionImage, {
-                  [classes.displayNone]: !isFullResolutionLoaded,
-                })}
                 alt={parseImage.name}
                 onLoad={() => setIsFullResolutionLoaded(true)}
-                src={parseImage.fileLegacy.url()}
+                src={parseImage.fileLegacy?.url()}
               />
             </picture>
             {!isFullResolutionLoaded && (
