@@ -53,18 +53,6 @@ export default class ParseUser {
     favoriteAlbums: "favoriteAlbums",
   };
 
-  static NULL = new ParseUser(
-    new Parse.User<ParsifyPointers<User>>({
-      username: "",
-      password: "",
-      email: "",
-      lastName: "",
-      firstName: "",
-      isDarkThemeEnabled: false,
-      favoriteAlbums: [],
-    })
-  );
-
   static query() {
     return new Parse.Query<Parse.User<ParsifyPointers<User>>>("User");
   }
@@ -115,9 +103,6 @@ export default class ParseUser {
   }
 
   toPointer(): ParsePointer {
-    if (this._user.isNew()) {
-      return ParsePointer.NULL;
-    }
     return new ParsePointer(this._user.toPointer());
   }
 

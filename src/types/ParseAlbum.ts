@@ -18,7 +18,7 @@ export interface Album extends Attributes {
   /** Collaborators with "view" access */
   viewers: string[];
   /** First image in album, or user selected cover image */
-  coverImage: ParsePointer;
+  coverImage?: ParsePointer;
   /** Last edited date */
   updatedAt?: Date;
   /** Created date */
@@ -55,17 +55,6 @@ export default class ParseAlbum extends ParseObject<Album> {
     coverImage: "coverImage",
   };
 
-  static NULL = new ParseAlbum(
-    new Parse.Object<ParsifyPointers<Album>>("Album", {
-      owner: ParsePointer.NATIVE_NULL,
-      images: [],
-      name: "",
-      collaborators: [],
-      viewers: [],
-      coverImage: ParsePointer.NATIVE_NULL,
-    })
-  );
-
   static sort(albums: ParseAlbum[], favoriteAlbums?: string[]) {
     return [...albums].sort((a, b) => {
       if (favoriteAlbums) {
@@ -87,7 +76,7 @@ export default class ParseAlbum extends ParseObject<Album> {
     const newAttributes: ParsifyPointers<Album> = {
       ...attributes,
       owner: attributes.owner._pointer,
-      coverImage: attributes.coverImage._pointer,
+      coverImage: attributes.coverImage?._pointer,
     };
     return new ParseAlbum(
       new Parse.Object<ParsifyPointers<Album>>("Album", newAttributes)
@@ -117,7 +106,7 @@ export default class ParseAlbum extends ParseObject<Album> {
     const newAttributes: ParsifyPointers<Album> = {
       ...attributes,
       owner: attributes.owner._pointer,
-      coverImage: attributes.coverImage._pointer,
+      coverImage: attributes.coverImage?._pointer,
     };
     const context: AlbumSaveContext = {
       removedImages: difference(this.images, newAttributes.images),
@@ -190,10 +179,13 @@ export default class ParseAlbum extends ParseObject<Album> {
   }
 
   get coverImage(): Album["coverImage"] {
-    return new ParsePointer(this._album.get(ParseAlbum.COLUMNS.coverImage));
+    if (this._album.get(ParseAlbum.COLUMNS.coverImage)) {
+      return new ParsePointer(this._album.get(ParseAlbum.COLUMNS.coverImage));
+    }
+    return new ParsePointer({objectId: this.images[0], className: "Image", __type: "Object"});
   }
 
   set coverImage(coverImage) {
-    this._album.set(ParseAlbum.COLUMNS.coverImage, coverImage._pointer);
+    this._album.set(ParseAlbum.COLUMNS.coverImage, coverImage?._pointer);
   }
 }

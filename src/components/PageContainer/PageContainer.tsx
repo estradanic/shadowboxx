@@ -16,7 +16,7 @@ const useStyles = makeStyles((theme: Theme) => ({
     overflowX: "hidden",
   },
   grid: {
-    paddingTop: theme.spacing(10),
+    paddingTop: theme.spacing(6),
     paddingBottom: theme.spacing(6),
   },
 }));

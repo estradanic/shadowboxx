@@ -60,7 +60,12 @@ const mergeAlbumChanges = async (
     }
   }
 
-  album.set({ ...attributes, images, collaborators, viewers });
+  let coverImage = album.get("coverImage");
+  if (!coverImage && images?.length) {
+    coverImage = images[0].toPointer();
+  }
+
+  album.set({...attributes, images, collaborators, viewers, coverImage});
 };
 
 export default mergeAlbumChanges;

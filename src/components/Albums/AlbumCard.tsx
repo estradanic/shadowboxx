@@ -132,9 +132,9 @@ const AlbumCard = memo(({ value, onChange, borderColor }: AlbumCardProps) => {
     ParseImage,
     Error
   >(
-    getImageByIdQueryKey(value.coverImage.id),
-    () => getImageByIdFunction(value.coverImage.id),
-    getImageByIdOptions()
+    getImageByIdQueryKey(value.coverImage?.id ?? ""),
+    () => getImageByIdFunction(value.coverImage?.id ?? ""),
+    getImageByIdOptions({ enabled: !!value.coverImage?.id })
   );
   const { data: collaborators, status: collaboratorsStatus } = useQuery<
     ParseUser[],
@@ -163,12 +163,12 @@ const AlbumCard = memo(({ value, onChange, borderColor }: AlbumCardProps) => {
       ownerStatus === "loading" ||
       collaboratorsStatus === "loading" ||
       viewersStatus === "loading" ||
-      coverImageStatus === "loading"
+      (value.coverImage?.id && coverImageStatus === "loading")
     ) {
       return "loading";
     }
     return "success";
-  }, [ownerStatus, viewersStatus, collaboratorsStatus, coverImageStatus]);
+  }, [ownerStatus, viewersStatus, collaboratorsStatus, coverImageStatus, value.coverImage?.id]);
 
   const { getLoggedInUser, updateLoggedInUser } = useUserContext();
   const isViewer = useMemo(
