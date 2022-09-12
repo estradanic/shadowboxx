@@ -168,7 +168,13 @@ const AlbumCard = memo(({ value, onChange, borderColor }: AlbumCardProps) => {
       return "loading";
     }
     return "success";
-  }, [ownerStatus, viewersStatus, collaboratorsStatus, coverImageStatus, value.coverImage?.id]);
+  }, [
+    ownerStatus,
+    viewersStatus,
+    collaboratorsStatus,
+    coverImageStatus,
+    value.coverImage?.id,
+  ]);
 
   const { getLoggedInUser, updateLoggedInUser } = useUserContext();
   const isViewer = useMemo(
