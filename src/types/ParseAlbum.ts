@@ -182,7 +182,11 @@ export default class ParseAlbum extends ParseObject<Album> {
     if (this._album.get(ParseAlbum.COLUMNS.coverImage)) {
       return new ParsePointer(this._album.get(ParseAlbum.COLUMNS.coverImage));
     }
-    return new ParsePointer({objectId: this.images[0], className: "Image", __type: "Object"});
+    return new ParsePointer({
+      objectId: this.images[0],
+      className: "Image",
+      __type: "Object",
+    });
   }
 
   set coverImage(coverImage) {

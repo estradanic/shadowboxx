@@ -38,7 +38,7 @@ const useStyles = makeStyles((theme: Theme) => ({
   title: {
     marginLeft: "auto",
     marginRight: "auto",
-    width: theme.spacing(14)
+    width: theme.spacing(14),
   },
 }));
 
@@ -58,11 +58,7 @@ const AlbumCardSkeleton = () => {
         title={<Skeleton className={classes.title} variant="text" />}
         subheader={<Skeleton variant="text" />}
       />
-      <CardMedia
-        component={Skeleton}
-        variant="rect"
-        height={300}
-      />
+      <CardMedia component={Skeleton} variant="rect" height={300} />
       <CardContent className={classes.cardContent}>
         <Grid container spacing={2}>
           <Grid item xs={6}>
@@ -71,15 +67,21 @@ const AlbumCardSkeleton = () => {
           <Grid item xs={6}>
             <Skeleton variant="text" />
           </Grid>
-          <Grid className={classes.collaborators} item container xs={12} spacing={1}>
+          <Grid
+            className={classes.collaborators}
+            item
+            container
+            xs={12}
+            spacing={1}
+          >
             <Grid item>
               <AvatarSkeleton />
             </Grid>
             <Grid item>
-            <AvatarSkeleton />
+              <AvatarSkeleton />
             </Grid>
             <Grid item>
-            <AvatarSkeleton />
+              <AvatarSkeleton />
             </Grid>
           </Grid>
         </Grid>
