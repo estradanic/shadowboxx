@@ -27,6 +27,7 @@
     "resources",
     "types",
     "utils",
-    "views"
+    "views",
+    "classes"
   ]
 }

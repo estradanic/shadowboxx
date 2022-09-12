@@ -16,7 +16,7 @@ import { useLocation } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { Strings } from "../../resources";
 import { routes } from "../../app";
-import { ParseAlbum } from "../../types";
+import { ParseAlbum, ParseUser, ParseImage } from "../../classes";
 import { ImageContextProvider, useUserContext } from "../../contexts";
 import { useQueryConfigs, useNavigate } from "../../hooks";
 import UserAvatar from "../User/UserAvatar";
@@ -25,8 +25,6 @@ import { useSnackbar } from "../Snackbar/Snackbar";
 import AlbumFormDialog from "./AlbumFormDialog";
 import Tooltip from "../Tooltip/Tooltip";
 import { useActionDialogContext } from "../Dialog/ActionDialog";
-import ParseUser from "../../types/ParseUser";
-import ParseImage from "../../types/ParseImage";
 import ImageField from "../Field/ImageField";
 import Online from "../NetworkDetector/Online";
 import AlbumCardSkeleton from "../Skeleton/AlbumCardSkeleton";
@@ -166,7 +164,13 @@ const AlbumCard = memo(({ value, onChange }: AlbumCardProps) => {
       return "loading";
     }
     return "success";
-  }, [ownerStatus, viewersStatus, collaboratorsStatus, coverImageStatus, value.coverImage?.id]);
+  }, [
+    ownerStatus,
+    viewersStatus,
+    collaboratorsStatus,
+    coverImageStatus,
+    value.coverImage?.id,
+  ]);
 
   const { getLoggedInUser, updateLoggedInUser } = useUserContext();
   const isViewer = useMemo(
@@ -186,7 +190,7 @@ const AlbumCard = memo(({ value, onChange }: AlbumCardProps) => {
   const { enqueueErrorSnackbar, enqueueSuccessSnackbar } = useSnackbar();
   const navigate = useNavigate();
   const coverImageSrc = useMemo(
-    () => coverImage?.mobileFile.url(),
+    () => coverImage?.fileMobile.url(),
     [coverImage]
   );
 

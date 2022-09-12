@@ -5,7 +5,9 @@ import {
   MuiThemeProvider,
   unstable_createMuiStrictModeTheme as createMuiTheme,
 } from "@material-ui/core/styles";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { QueryClient } from "@tanstack/react-query";
+import { PersistQueryClientProvider } from "@tanstack/react-query-persist-client";
+import { createAsyncStoragePersister } from "@tanstack/query-async-storage-persister";
 import {
   UserContextProvider,
   NotificationsContextProvider,
@@ -13,9 +15,20 @@ import {
   NetworkDetectionContextProvider,
   ScrollPositionContextProvider,
 } from "./contexts";
+import { IdbKeyvalStorage } from "./classes";
 import App from "./app/App";
 
-const queryClient = new QueryClient();
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      cacheTime: Infinity, // never expire the cache
+    },
+  },
+});
+
+const asyncStoragePersister = createAsyncStoragePersister({
+  storage: new IdbKeyvalStorage(),
+});
 
 const theme = createMuiTheme({
   overrides: {
@@ -86,7 +99,10 @@ ReactDOM.render(
     <MuiThemeProvider theme={theme}>
       <NetworkDetectionContextProvider>
         <GlobalLoadingContextProvider>
-          <QueryClientProvider client={queryClient}>
+          <PersistQueryClientProvider
+            client={queryClient}
+            persistOptions={{ persister: asyncStoragePersister }}
+          >
             <NotificationsContextProvider>
               <BrowserRouter>
                 <ScrollPositionContextProvider>
@@ -96,7 +112,7 @@ ReactDOM.render(
                 </ScrollPositionContextProvider>
               </BrowserRouter>
             </NotificationsContextProvider>
-          </QueryClientProvider>
+          </PersistQueryClientProvider>
         </GlobalLoadingContextProvider>
       </NetworkDetectionContextProvider>
     </MuiThemeProvider>

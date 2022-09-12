@@ -25,7 +25,7 @@ import { createHtmlPortalNode, InPortal } from "react-reverse-portal";
 import { readAndCompressImage } from "browser-image-resizer";
 import { elide, makeValidFileName, removeExtension } from "../../utils";
 import { Strings } from "../../resources";
-import { ParseImage, ParsePointer } from "../../types";
+import { ParseImage, ParsePointer } from "../../classes";
 import { useRandomColor, useRefState } from "../../hooks";
 import TextField, { TextFieldProps } from "../Field/TextField";
 import Tooltip from "../Tooltip/Tooltip";
@@ -364,7 +364,7 @@ const ImageField = memo(
                       >
                         <Avatar
                           className={classes.endAdornmentAvatar}
-                          src={value[0].thumbnail.url()}
+                          src={value[0].fileThumb.url()}
                           alt={value[0].name}
                         />
                       </InputAdornment>
@@ -424,7 +424,7 @@ const ImageField = memo(
                     >
                       <Image
                         borderColor={randomColor}
-                        src={image.mobileFile.url()}
+                        src={image.fileThumb.url()}
                         alt={image.name}
                         decorations={imageDecorations}
                       />

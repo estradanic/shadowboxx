@@ -14,7 +14,8 @@ import {
   UpdateReason,
   User,
   ParseImage,
-} from "../types";
+  ParsifyPointers,
+} from "../classes";
 import { Strings } from "../resources";
 import { routes } from "../app";
 import { useNavigate } from "../hooks";
@@ -153,7 +154,17 @@ export const UserContextProvider = ({ children }: UserContextProviderProps) => {
       return loggedInUser;
     }
     navigate(routes.Login.path);
-    return ParseUser.NULL;
+    return new ParseUser(
+      new Parse.User<ParsifyPointers<User>>({
+        username: "",
+        email: "",
+        firstName: "",
+        lastName: "",
+        password: "",
+        favoriteAlbums: [],
+        isDarkThemeEnabled: false,
+      })
+    );
   };
 
   const value = {

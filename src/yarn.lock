@@ -1322,10 +1322,17 @@
   dependencies:
     remove-accents "0.4.2"
 
-"@tanstack/query-core@4.2.3":
-  version "4.2.3"
-  resolved "https://registry.yarnpkg.com/@tanstack/query-core/-/query-core-4.2.3.tgz#52d75430c9662cc85c160761c1421de483c7791f"
-  integrity sha512-zdt5lYWs1dZaA3IxJbCgtAfHZJScRZONpiLL7YkeOkrme5MfjQqTpjq7LYbzpyuwPOh2Jx68le0PLl57JFv5hQ==
+"@tanstack/query-async-storage-persister@^4.3.4":
+  version "4.3.4"
+  resolved "https://registry.yarnpkg.com/@tanstack/query-async-storage-persister/-/query-async-storage-persister-4.3.4.tgz#0fdd8dee4a9dcedf115ca257c0e170ca5c996427"
+  integrity sha512-iG1jXk9H7aaIwS1qjZrdRdKWOHt0XF8lzqfRN5nk+Xo5BwP0/bloABCCpymr703TeNUA48Ma/1nqG7EcVF6SdA==
+  dependencies:
+    "@tanstack/react-query-persist-client" "4.3.4"
+
+"@tanstack/query-core@4.3.4":
+  version "4.3.4"
+  resolved "https://registry.yarnpkg.com/@tanstack/query-core/-/query-core-4.3.4.tgz#b93da17232fda91ec08ef14d2ca1d8326fc599f2"
+  integrity sha512-NLAe3j5Vk1yYEtoPP5fPGPjRzkZPx67KUM3f14L3InziJZJ0wVecCh7uKfgYkbRKJSeq6PlbND7iuCGdTplN6Q==
 
 "@tanstack/react-query-devtools@^4.2.1":
   version "4.2.1"
@@ -1336,13 +1343,20 @@
     "@types/use-sync-external-store" "^0.0.3"
     use-sync-external-store "^1.2.0"
 
-"@tanstack/react-query@^4.2.3":
-  version "4.2.3"
-  resolved "https://registry.yarnpkg.com/@tanstack/react-query/-/react-query-4.2.3.tgz#782fd0f84553ba6219f1137a12ea28ab8cd3a3f3"
-  integrity sha512-JLaMOxoJTkiAu7QpevRCt2uI/0vd3E8K/rSlCuRgWlcW5DeJDFpDS5kfzmLO5MOcD97fgsJRrDbxDORxR1FdJA==
+"@tanstack/react-query-persist-client@4.3.4", "@tanstack/react-query-persist-client@^4.3.4":
+  version "4.3.4"
+  resolved "https://registry.yarnpkg.com/@tanstack/react-query-persist-client/-/react-query-persist-client-4.3.4.tgz#42275ee33e924f83eec44135e5790158994e02fc"
+  integrity sha512-Bj4IX1r12teGnMIASymHoa5RI5D2omKklJ8+RPbWalgYsfD/OOGO2KQiFZGfsfbnj2xtkrgSq4dGxLOBmgdxXw==
   dependencies:
-    "@tanstack/query-core" "4.2.3"
-    "@types/use-sync-external-store" "^0.0.3"
+    "@tanstack/query-core" "4.3.4"
+    "@tanstack/react-query" "4.3.4"
+
+"@tanstack/react-query@4.3.4", "@tanstack/react-query@^4.2.3":
+  version "4.3.4"
+  resolved "https://registry.yarnpkg.com/@tanstack/react-query/-/react-query-4.3.4.tgz#91a4232a967de04a0662d63d53b18ecc3e11c7e2"
+  integrity sha512-IiAo+B8bxphEpO7xwLQaCptd2rY4Ef3pW1q9J3pT66G+J/st4QpGQ+cSm9iESp9ccRy1YNUk3klk/hQtWewl6g==
+  dependencies:
+    "@tanstack/query-core" "4.3.4"
     use-sync-external-store "^1.2.0"
 
 "@trysound/sax@0.2.0":
@@ -3493,6 +3507,13 @@ idb-keyval@6.0.3:
   version "6.0.3"
   resolved "https://registry.yarnpkg.com/idb-keyval/-/idb-keyval-6.0.3.tgz#e47246a15e55d0fff9fa204fd9ca06f90ff30c52"
   integrity sha512-yh8V7CnE6EQMu9YDwQXhRxwZh4nv+8xm/HV4ZqK4IiYFJBWYGjJuykADJbSP+F/GDXUBwCSSNn/14IpGL81TuA==
+  dependencies:
+    safari-14-idb-fix "^3.0.0"
+
+idb-keyval@^6.2.0:
+  version "6.2.0"
+  resolved "https://registry.yarnpkg.com/idb-keyval/-/idb-keyval-6.2.0.tgz#3af94a3cc0689d6ee0bc9e045d2a3340ea897173"
+  integrity sha512-uw+MIyQn2jl3+hroD7hF8J7PUviBU7BPKWw4f/ISf32D4LoGu98yHjrzWWJDASu9QNrX10tCJqk9YY0ClWm8Ng==
   dependencies:
     safari-14-idb-fix "^3.0.0"
 

@@ -2,7 +2,8 @@ import Parse from "parse";
 import { useSnackbar } from "../components";
 import { useGlobalLoadingContext, useUserContext } from "../contexts";
 import { Strings } from "../resources";
-import { Interdependent, ParseAlbum, ParseImage, ParseUser } from "../types";
+import { ParseAlbum, ParseImage, ParseUser } from "../classes";
+import { Interdependent } from "../types";
 import {
   InfiniteQueryObserverOptions,
   QueryObserverOptions,
