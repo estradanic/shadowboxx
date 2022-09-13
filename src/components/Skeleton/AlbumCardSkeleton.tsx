@@ -10,7 +10,6 @@ import { makeStyles, Theme } from "@material-ui/core/styles";
 import Grid from "@material-ui/core/Grid";
 import AddAPhotoIcon from "@material-ui/icons/AddAPhoto";
 import StarIcon from "@material-ui/icons/Star";
-import classNames from "classnames";
 import AvatarSkeleton from "./AvatarSkeleton";
 import { CardMedia } from "@material-ui/core";
 
@@ -90,9 +89,9 @@ const AlbumCardSkeleton = () => {
         <IconButton>
           <StarIcon className={classes.icon} />
         </IconButton>
-        <IconButton>
+        <IconButton className={classes.addImages}>
           <AddAPhotoIcon
-            className={classNames(classes.icon, classes.addImages)}
+            className={classes.icon}
           />
         </IconButton>
       </CardActions>

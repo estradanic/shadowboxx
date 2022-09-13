@@ -12,13 +12,13 @@ const resizeImage = async (image: Parse.Object) => {
       url: image.get("file").url(),
     });
     const thumbnail = (
-      await sharp(buffer).resize(64).webp().toBuffer()
+      await sharp(buffer).rotate().resize(64).webp().toBuffer()
     ).toString("base64");
-    const mobile = (await sharp(buffer).resize(900).webp().toBuffer()).toString(
+    const mobile = (await sharp(buffer).rotate().resize(900).webp().toBuffer()).toString(
       "base64"
     );
-    const original = (await sharp(buffer).webp().toBuffer()).toString("base64");
-    const legacy = (await sharp(buffer).resize(900).png().toBuffer()).toString(
+    const original = (await sharp(buffer).rotate().webp().toBuffer()).toString("base64");
+    const legacy = (await sharp(buffer).rotate().resize(900).png().toBuffer()).toString(
       "base64"
     );
     image.set(
