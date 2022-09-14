@@ -90,9 +90,7 @@ const AlbumCardSkeleton = () => {
           <StarIcon className={classes.icon} />
         </IconButton>
         <IconButton className={classes.addImages}>
-          <AddAPhotoIcon
-            className={classes.icon}
-          />
+          <AddAPhotoIcon className={classes.icon} />
         </IconButton>
       </CardActions>
     </Card>

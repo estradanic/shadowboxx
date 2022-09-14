@@ -60,7 +60,7 @@ export const UserContextProvider = ({ children }: UserContextProviderProps) => {
   const [redirectPath, setRedirectPath] = useState<string>();
   const navigate = useNavigate();
   const location = useLocation();
-  const {online} = useNetworkDetectionContext();
+  const { online } = useNetworkDetectionContext();
 
   const [loggedInUser, setLoggedInUser] = useState<ParseUser | undefined>(
     Parse.User.current() ? new ParseUser(Parse.User.current()!) : undefined

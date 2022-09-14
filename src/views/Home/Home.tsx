@@ -98,7 +98,12 @@ const Home = memo(() => {
                 </Typography>
               </Grid>
             ) : (
-              <Grid item spacing={2} container className={classes.albumsContainer}>
+              <Grid
+                item
+                spacing={2}
+                container
+                className={classes.albumsContainer}
+              >
                 {[1, 2, 3, 4, 5].map((i) => (
                   <Grid key={i} item xs={12} md={6} lg={4} xl={3}>
                     <AlbumCardSkeleton />

@@ -1,6 +1,10 @@
 import Parse from "parse";
 import { useSnackbar } from "../components";
-import { useGlobalLoadingContext, useNetworkDetectionContext, useUserContext } from "../contexts";
+import {
+  useGlobalLoadingContext,
+  useNetworkDetectionContext,
+  useUserContext,
+} from "../contexts";
 import { Strings } from "../resources";
 import { ParseAlbum, ParseImage, ParseUser } from "../classes";
 import { Interdependent } from "../types";
@@ -51,7 +55,7 @@ const useQueryConfigs = () => {
   const { startGlobalLoader, stopGlobalLoader } = useGlobalLoadingContext();
   const { getLoggedInUser, profilePicture, updateLoggedInUser } =
     useUserContext();
-  const {online} = useNetworkDetectionContext()
+  const { online } = useNetworkDetectionContext();
 
   // #region Helper methods
 
@@ -87,7 +91,12 @@ const useQueryConfigs = () => {
     if (error?.message === "Invalid session token") {
       enqueueWarningSnackbar(Strings.sessionExpired());
       getLoggedInUser().logout(updateLoggedInUser);
-    } else if (errorMessage && !showNativeError && showErrorsInSnackbar && online) {
+    } else if (
+      errorMessage &&
+      !showNativeError &&
+      showErrorsInSnackbar &&
+      online
+    ) {
       enqueueErrorSnackbar(errorMessage);
       throw new Error(errorMessage);
     } else if (showNativeError && showErrorsInSnackbar && online) {
@@ -443,9 +452,10 @@ const useQueryConfigs = () => {
             ParseAlbum.COLUMNS.owner,
             getLoggedInUser().toNativePointer()
           ),
-          ParseAlbum.query(online).containsAll(ParseAlbum.COLUMNS.collaborators, [
-            getLoggedInUser().email,
-          ]),
+          ParseAlbum.query(online).containsAll(
+            ParseAlbum.COLUMNS.collaborators,
+            [getLoggedInUser().email]
+          ),
           ParseAlbum.query(online).containsAll(ParseAlbum.COLUMNS.viewers, [
             getLoggedInUser().email,
           ])

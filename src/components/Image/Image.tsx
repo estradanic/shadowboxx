@@ -111,9 +111,7 @@ const Image = ({
               onClick={() => setFullResolutionOpen(true)}
             />
           </picture>
-          {!isLoaded && (
-            <Skeleton variant="rect" width="100%" height="700px" />
-          )}
+          {!isLoaded && <Skeleton variant="rect" width="100%" height="700px" />}
         </>
       </Tooltip>
       {decorations?.map((decoration, index) =>
