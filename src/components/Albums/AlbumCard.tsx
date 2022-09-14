@@ -190,7 +190,7 @@ const AlbumCard = memo(({ value, onChange }: AlbumCardProps) => {
   const { enqueueErrorSnackbar, enqueueSuccessSnackbar } = useSnackbar();
   const navigate = useNavigate();
   const coverImageSrc = useMemo(
-    () => coverImage?.fileMobile.url(),
+    () => coverImage?.fileMobile?.url(),
     [coverImage]
   );
 

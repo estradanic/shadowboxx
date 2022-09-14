@@ -63,7 +63,6 @@
     "prompts": "2.4.2",
     "react": "^17.0.1",
     "react-app-polyfill": "^3.0.0",
-    "react-cropper-image-editor": "^1.0.10",
     "react-detect-offline": "^2.4.5",
     "react-dom": "^17.0.1",
     "react-reverse-portal": "^2.1.0",

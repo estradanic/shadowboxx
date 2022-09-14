@@ -5,9 +5,7 @@ import {
   MuiThemeProvider,
   unstable_createMuiStrictModeTheme as createMuiTheme,
 } from "@material-ui/core/styles";
-import { QueryClient } from "@tanstack/react-query";
-import { PersistedClient, PersistQueryClientProvider } from "@tanstack/react-query-persist-client";
-import { createAsyncStoragePersister } from "@tanstack/query-async-storage-persister";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import {
   UserContextProvider,
   NotificationsContextProvider,
@@ -15,52 +13,14 @@ import {
   NetworkDetectionContextProvider,
   ScrollPositionContextProvider,
 } from "./contexts";
-import { IdbKeyvalStorage, ParseAlbum, ParseImage, ParseObject, ParsePointer, ParseUser } from "./classes";
 import App from "./app/App";
 
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
-      cacheTime: Infinity, // never expire the cache
+      networkMode: "always",
+      refetchOnReconnect: true,
     },
-  },
-});
-
-const initializeParseObject = (data: any): any => {
-  if (data.pages) {
-    data.pages = data.pages.map((object) => initializeParseObject(object));
-    return data;
-  }
-  if (data.map && typeof data.map === "function") {
-    return data.map((object) => initializeParseObject(object));
-  }
-  if (data._album) {
-    return new ParseAlbum(data._album);
-  }
-  if (data._image) {
-    return new ParseImage(data._image);
-  }
-  if (data._user) {
-    return new ParseUser(data._user);
-  }
-  if (data._pointer) {
-    return new ParsePointer(data._pointer);
-  }
-  if (data._object) {
-    return new ParseObject(data._object);
-  }
-  return data;
-}
-
-const asyncStoragePersister = createAsyncStoragePersister({
-  storage: new IdbKeyvalStorage(),
-  deserialize: (cachedString) => {
-    const persistedClient: PersistedClient = JSON.parse(cachedString);
-    persistedClient.clientState.queries = persistedClient.clientState.queries.map((query) => {
-      query.state.data = initializeParseObject(query.state.data);
-      return query;
-    });
-    return persistedClient;
   },
 });
 
@@ -133,10 +93,7 @@ ReactDOM.render(
     <MuiThemeProvider theme={theme}>
       <NetworkDetectionContextProvider>
         <GlobalLoadingContextProvider>
-          <PersistQueryClientProvider
-            client={queryClient}
-            persistOptions={{ persister: asyncStoragePersister }}
-          >
+          <QueryClientProvider client={queryClient}>
             <NotificationsContextProvider>
               <BrowserRouter>
                 <ScrollPositionContextProvider>
@@ -146,7 +103,7 @@ ReactDOM.render(
                 </ScrollPositionContextProvider>
               </BrowserRouter>
             </NotificationsContextProvider>
-          </PersistQueryClientProvider>
+          </QueryClientProvider>
         </GlobalLoadingContextProvider>
       </NetworkDetectionContextProvider>
     </MuiThemeProvider>

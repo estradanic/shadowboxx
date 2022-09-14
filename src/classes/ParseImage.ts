@@ -29,8 +29,11 @@ export default class ParseImage extends ParseObject<Image> {
     );
   }
 
-  static query(): Parse.Query<Parse.Object<ParsifyPointers<Image>>> {
-    return new Parse.Query<Parse.Object<ParsifyPointers<Image>>>("Image");
+  static query(online = true) {
+    if (online) {
+      return new Parse.Query<Parse.Object<ParsifyPointers<Image>>>("Image");
+    }
+    return new Parse.Query<Parse.Object<ParsifyPointers<Image>>>("Image").fromLocalDatastore();
   }
 
   static sort(images: ParseImage[], coverImage?: ParsePointer): ParseImage[] {

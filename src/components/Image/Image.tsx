@@ -1,4 +1,4 @@
-import React, { ImgHTMLAttributes, memo, useRef, useState } from "react";
+import React, { ImgHTMLAttributes, useRef, useState } from "react";
 import { makeStyles, Theme } from "@material-ui/core/styles";
 import Popper from "@material-ui/core/Popper";
 import Skeleton from "@material-ui/lab/Skeleton";
@@ -56,8 +56,6 @@ const useStyles = makeStyles((theme: Theme) => ({
 export type ImageProps = ImgHTMLAttributes<HTMLImageElement> &
   Interdependent<
     {
-      /** React key passed to parent div */
-      key?: string;
       /** Html img alt attribute */
       alt: string;
       /** Html img src attribute */
@@ -75,73 +73,70 @@ export type ImageProps = ImgHTMLAttributes<HTMLImageElement> &
   >;
 
 /** Component showing an image in a pretty and functional way */
-const Image = memo(
-  ({
-    className,
-    key,
-    alt,
-    decorations,
-    borderColor = "primary",
-    fullResolutionSrc,
-    showFullResolutionOnClick,
-    ...rest
-  }: ImageProps) => {
-    const classes = useStyles({ borderColor });
-    const [fullResolutionOpen, setFullResolutionOpen] = useState(false);
-    const ref = useRef(null);
-    const [isLoaded, setIsLoaded] = useState(false);
-    const [isFullResolutionLoaded, setIsFullResolutionLoaded] = useState(false);
+const Image = ({
+  className,
+  alt,
+  decorations,
+  borderColor = "primary",
+  fullResolutionSrc,
+  showFullResolutionOnClick,
+  ...rest
+}: ImageProps) => {
+  const classes = useStyles({ borderColor });
+  const [fullResolutionOpen, setFullResolutionOpen] = useState(false);
+  const ref = useRef(null);
+  const [isLoaded, setIsLoaded] = useState(false);
+  const [isFullResolutionLoaded, setIsFullResolutionLoaded] = useState(false);
 
-    return (
-      <div className={classNames(className, classes.root)} key={key} ref={ref}>
-        <Tooltip title={alt}>
-          <>
-            <img
-              className={classNames(classes.image, {
-                [classes.pointer]: showFullResolutionOnClick,
-                [classes.displayNone]: !isLoaded,
-              })}
-              onLoad={() => setIsLoaded(true)}
-              alt={alt}
-              {...rest}
-              onClick={() => setFullResolutionOpen(true)}
+  return (
+    <div className={classNames(className, classes.root)} ref={ref}>
+      <Tooltip title={alt}>
+        <>
+          <img
+            className={classNames(classes.image, {
+              [classes.pointer]: showFullResolutionOnClick,
+              [classes.displayNone]: !isLoaded,
+            })}
+            onLoad={() => setIsLoaded(true)}
+            alt={alt}
+            {...rest}
+            onClick={() => setFullResolutionOpen(true)}
+          />
+          {!isLoaded && (
+            <Skeleton variant="rect" width="100%" height="700px" />
+          )}
+        </>
+      </Tooltip>
+      {decorations?.map((decoration, index) =>
+        React.cloneElement(decoration, { key: `decoration${index}` })
+      )}
+      {showFullResolutionOnClick && (
+        <Popper
+          open={fullResolutionOpen}
+          className={classes.fullResolution}
+          onClick={() => setFullResolutionOpen(false)}
+          anchorEl={ref.current}
+        >
+          <img
+            className={classNames(classes.fullResolutionImage, {
+              [classes.displayNone]: !isFullResolutionLoaded,
+            })}
+            alt={alt}
+            onLoad={() => setIsFullResolutionLoaded(true)}
+            src={fullResolutionSrc}
+          />
+          {!isFullResolutionLoaded && (
+            <Skeleton
+              variant="rect"
+              width="100%"
+              height="700px"
+              className={classes.fullResolutionImage}
             />
-            {!isLoaded && (
-              <Skeleton variant="rect" width="100%" height="700px" />
-            )}
-          </>
-        </Tooltip>
-        {decorations?.map((decoration, index) =>
-          React.cloneElement(decoration, { key: `decoration${index}` })
-        )}
-        {showFullResolutionOnClick && (
-          <Popper
-            open={fullResolutionOpen}
-            className={classes.fullResolution}
-            onClick={() => setFullResolutionOpen(false)}
-            anchorEl={ref.current}
-          >
-            <img
-              className={classNames(classes.fullResolutionImage, {
-                [classes.displayNone]: !isFullResolutionLoaded,
-              })}
-              alt={alt}
-              onLoad={() => setIsFullResolutionLoaded(true)}
-              src={fullResolutionSrc}
-            />
-            {!isFullResolutionLoaded && (
-              <Skeleton
-                variant="rect"
-                width="100%"
-                height="700px"
-                className={classes.fullResolutionImage}
-              />
-            )}
-          </Popper>
-        )}
-      </div>
-    );
-  }
-);
+          )}
+        </Popper>
+      )}
+    </div>
+  );
+};
 
 export default Image;

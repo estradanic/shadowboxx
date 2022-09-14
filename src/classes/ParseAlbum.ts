@@ -68,8 +68,11 @@ export default class ParseAlbum extends ParseObject<Album> {
     });
   }
 
-  static query() {
-    return new Parse.Query<Parse.Object<ParsifyPointers<Album>>>("Album");
+  static query(online = true) {
+    if (online) {
+      return new Parse.Query<Parse.Object<ParsifyPointers<Album>>>("Album");
+    }
+    return new Parse.Query<Parse.Object<ParsifyPointers<Album>>>("Album").fromLocalDatastore();
   }
 
   static fromAttributes(attributes: Album): ParseAlbum {
