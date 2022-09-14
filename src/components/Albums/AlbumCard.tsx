@@ -16,7 +16,8 @@ import { useLocation } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { Strings } from "../../resources";
 import { routes } from "../../app";
-import { ParseAlbum, ParseUser, ParseImage } from "../../classes";
+import { VariableColor } from "../../types";
+import { ParseImage, ParseUser, ParseAlbum } from "../../classes";
 import { ImageContextProvider, useUserContext } from "../../contexts";
 import { useQueryConfigs, useNavigate } from "../../hooks";
 import UserAvatar from "../User/UserAvatar";
@@ -30,11 +31,17 @@ import Online from "../NetworkDetector/Online";
 import AlbumCardSkeleton from "../Skeleton/AlbumCardSkeleton";
 import Image from "../Image/Image";
 
+interface UseStylesParams {
+  borderColor: VariableColor;
+}
+
 const useStyles = makeStyles((theme: Theme) => ({
   card: {
     maxWidth: theme.spacing(50),
     width: "100%",
     margin: "auto",
+    border: ({ borderColor }: UseStylesParams) =>
+      `2px solid ${theme.palette[borderColor].dark}`,
   },
   media: {
     cursor: "pointer",
@@ -86,10 +93,12 @@ export interface AlbumCardProps {
    * Returns null if album was deleted.
    */
   onChange: (value: ParseAlbum | null) => Promise<void>;
+  /** Border color for the card */
+  borderColor: VariableColor;
 }
 
 /** Component for displaying basic information about an album */
-const AlbumCard = memo(({ value, onChange }: AlbumCardProps) => {
+const AlbumCard = memo(({ value, onChange, borderColor }: AlbumCardProps) => {
   const [anchorEl, setAnchorEl] = useState<Element>();
   const [editAlbumDialogOpen, setEditAlbumDialogOpen] =
     useState<boolean>(false);
@@ -184,7 +193,7 @@ const AlbumCard = memo(({ value, onChange }: AlbumCardProps) => {
   const { enqueueErrorSnackbar, enqueueSuccessSnackbar } = useSnackbar();
   const navigate = useNavigate();
 
-  const classes = useStyles();
+  const classes = useStyles({ borderColor });
   const { openConfirm } = useActionDialogContext();
 
   const deleteAlbum = () => {

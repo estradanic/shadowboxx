@@ -17,7 +17,7 @@ import { Strings } from "../../resources";
 import { ParseAlbum } from "../../classes";
 import { useUserContext } from "../../contexts";
 import { useView } from "../View";
-import { useQueryConfigs } from "../../hooks";
+import { useQueryConfigs, useRandomColor } from "../../hooks";
 
 const useStyles = makeStyles((theme: Theme) => ({
   fab: {
@@ -64,6 +64,7 @@ const Home = memo(() => {
     () => getAllAlbumsFunction({ showErrorsInSnackbar: true }),
     getAllAlbumsOptions()
   );
+  const randomColor = useRandomColor();
 
   return (
     <PageContainer>
@@ -74,6 +75,7 @@ const Home = memo(() => {
               (album) => (
                 <Grid key={album?.name} item xs={12} md={6} lg={4} xl={3}>
                   <AlbumCard
+                    borderColor={randomColor}
                     onChange={async (_) => {
                       await refetchAlbums();
                     }}

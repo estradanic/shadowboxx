@@ -3,7 +3,8 @@ import { makeStyles, Theme } from "@material-ui/core/styles";
 import Popper from "@material-ui/core/Popper";
 import Skeleton from "@material-ui/lab/Skeleton";
 import classNames from "classnames";
-import { VariableColor, ParseImage } from "../../types";
+import { VariableColor } from "../../types";
+import { ParseImage } from "../../classes";
 import { opacity } from "../../utils";
 import Tooltip from "../Tooltip/Tooltip";
 import { ImageDecorationProps } from "./Decoration/ImageDecoration";
@@ -46,9 +47,11 @@ const useStyles = makeStyles((theme: Theme) => ({
     overflow: "hidden",
     border: ({ borderColor }: UseStylesParams) =>
       `2px solid ${theme.palette[borderColor].dark}`,
-    margin: "auto",
     maxWidth: "90vw",
     maxHeight: "90vh",
+  },
+  fullResolutionPicture: {
+    margin: "auto",
   },
   displayNone: {
     display: "none",
@@ -79,6 +82,7 @@ const Image = ({
   showFullResolutionOnClick,
   parseImage,
   variant = "bordered",
+  onClick: piOnClick,
   ...rest
 }: ImageProps) => {
   const classes = useStyles({ borderColor });
@@ -92,23 +96,29 @@ const Image = ({
   const [isLoaded, setIsLoaded] = useState(false);
   const [isFullResolutionLoaded, setIsFullResolutionLoaded] = useState(false);
 
+  const onClick = showFullResolutionOnClick
+    ? () => setFullResolutionOpen(true)
+    : piOnClick;
+
   return (
     <div className={classNames(className, classes.root)} key={key} ref={ref}>
       <Tooltip title={parseImage.name}>
         <>
-          <picture>
+          <picture
+            className={classNames(classes.image, classes.width100, {
+              [classes.pointer]: showFullResolutionOnClick,
+              [classes.displayNone]: !isLoaded,
+            })}
+          >
             <source srcSet={parseImage.fileMobile.url()} type="image/webp" />
-            <source srcSet={parseImage.fileLegacy.url()} type="image/png" />
+            <source srcSet={parseImage.fileLegacy?.url()} type="image/png" />
             <img
-              className={classNames(classes.image, classes.width100, {
-                [classes.pointer]: showFullResolutionOnClick,
-                [classes.displayNone]: !isLoaded,
-              })}
+              className={classes.width100}
               onLoad={() => setIsLoaded(true)}
               alt={parseImage.name}
-              src={parseImage.fileLegacy.url()}
+              src={parseImage.fileLegacy?.url()}
+              onClick={onClick}
               {...rest}
-              onClick={() => setFullResolutionOpen(true)}
             />
           </picture>
           {!isLoaded && <Skeleton variant="rect" width="100%" height="700px" />}
@@ -124,16 +134,16 @@ const Image = ({
           onClick={() => setFullResolutionOpen(false)}
           anchorEl={ref.current}
         >
-          <picture>
+          <picture className={classes.fullResolutionPicture}>
             <source srcSet={parseImage.file.url()} type="image/webp" />
-            <source srcSet={parseImage.fileLegacy.url()} type="image/png" />
+            <source srcSet={parseImage.fileLegacy?.url()} type="image/png" />
             <img
               className={classNames(classes.fullResolutionImage, {
                 [classes.displayNone]: !isFullResolutionLoaded,
               })}
               alt={parseImage.name}
               onLoad={() => setIsFullResolutionLoaded(true)}
-              src={parseImage.fileLegacy.url()}
+              src={parseImage.fileLegacy?.url()}
             />
           </picture>
           {!isFullResolutionLoaded && (
@@ -141,7 +151,10 @@ const Image = ({
               variant="rect"
               width="100%"
               height="700px"
-              className={classes.fullResolutionImage}
+              className={classNames(
+                classes.fullResolutionImage,
+                classes.fullResolutionPicture
+              )}
             />
           )}
         </Popper>
