@@ -2,7 +2,7 @@ import React, { ForwardedRef, forwardRef } from "react";
 import Avatar, { AvatarProps } from "@material-ui/core/Avatar";
 import { makeStyles, Theme } from "@material-ui/core/styles";
 import cx from "classnames";
-import { ParseUser, ParseImage } from "../../types";
+import { ParseUser, ParseImage } from "../../classes";
 import { Strings } from "../../resources";
 import { useQuery } from "@tanstack/react-query";
 import { useQueryConfigs } from "../../hooks";
@@ -54,7 +54,7 @@ const UserAvatar = forwardRef(
         ref={ref}
         alt={user?.name ?? Strings.profilePicture()}
         className={cx(classes.avatar, piClassName)}
-        src={profilePicture?.thumbnail?.url()}
+        src={profilePicture?.fileThumb?.url()}
         {...rest}
       />
     );

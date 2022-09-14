@@ -14,7 +14,7 @@ import {
   AlbumCardSkeleton,
 } from "../../components";
 import { Strings } from "../../resources";
-import { ParseAlbum, ParsePointer } from "../../types";
+import { ParseAlbum } from "../../classes";
 import { useUserContext } from "../../contexts";
 import { useView } from "../View";
 import { useQueryConfigs } from "../../hooks";
@@ -125,7 +125,6 @@ const Home = memo(() => {
           name: Strings.untitledAlbum(),
           collaborators: [],
           viewers: [],
-          coverImage: ParsePointer.NULL,
         }}
         open={addAlbumDialogOpen}
         handleCancel={() => setAddAlbumDialogOpen(false)}

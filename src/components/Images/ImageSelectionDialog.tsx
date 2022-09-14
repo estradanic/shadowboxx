@@ -13,7 +13,7 @@ import {
   useQueryConfigs,
   useInfiniteScroll,
 } from "../../hooks";
-import { ParseImage } from "../../types";
+import { ParseImage } from "../../classes";
 import ActionDialog, { ActionDialogProps } from "../Dialog/ActionDialog";
 import Image from "../Image/Image";
 import Empty from "../Svgs/Empty";

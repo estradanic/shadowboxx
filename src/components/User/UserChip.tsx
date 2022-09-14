@@ -3,7 +3,7 @@ import UserLabel from "./UserLabel";
 import UserAvatar from "./UserAvatar";
 import Chip, { ChipProps } from "@material-ui/core/Chip";
 import { makeStyles, Theme } from "@material-ui/core/styles";
-import { ParseUser } from "../../types";
+import { ParseUser } from "../../classes";
 
 const useStyles = makeStyles((theme: Theme) => ({
   root: {

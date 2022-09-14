@@ -1,4 +1,4 @@
-import React, { ImgHTMLAttributes, memo, useRef, useState } from "react";
+import React, { ImgHTMLAttributes, useRef, useState } from "react";
 import { makeStyles, Theme } from "@material-ui/core/styles";
 import Popper from "@material-ui/core/Popper";
 import Skeleton from "@material-ui/lab/Skeleton";
@@ -71,87 +71,85 @@ export type ImageProps = ImgHTMLAttributes<HTMLImageElement> & {
 };
 
 /** Component showing an image in a pretty and functional way */
-const Image = memo(
-  ({
-    className,
-    key,
-    decorations,
-    borderColor = "primary",
-    showFullResolutionOnClick,
-    parseImage,
-    variant = "bordered",
-    ...rest
-  }: ImageProps) => {
-    const classes = useStyles({ borderColor });
-    if (variant === "contained") {
-      classes.image = "";
-      classes.pointer = "";
-      classes.root = "";
-    }
-    const [fullResolutionOpen, setFullResolutionOpen] = useState(false);
-    const ref = useRef(null);
-    const [isLoaded, setIsLoaded] = useState(false);
-    const [isFullResolutionLoaded, setIsFullResolutionLoaded] = useState(false);
-
-    return (
-      <div className={classNames(className, classes.root)} key={key} ref={ref}>
-        <Tooltip title={parseImage.name}>
-          <>
-            <picture>
-              <source srcSet={parseImage.fileMobile.url()} type="image/webp" />
-              <source srcSet={parseImage.fileLegacy.url()} type="image/png" />
-              <img
-                className={classNames(classes.image, classes.width100, {
-                  [classes.pointer]: showFullResolutionOnClick,
-                  [classes.displayNone]: !isLoaded,
-                })}
-                onLoad={() => setIsLoaded(true)}
-                alt={parseImage.name}
-                src={parseImage.fileLegacy.url()}
-                {...rest}
-                onClick={() => setFullResolutionOpen(true)}
-              />
-            </picture>
-            {!isLoaded && (
-              <Skeleton variant="rect" width="100%" height="700px" />
-            )}
-          </>
-        </Tooltip>
-        {decorations?.map((decoration, index) =>
-          React.cloneElement(decoration, { key: `decoration${index}` })
-        )}
-        {showFullResolutionOnClick && (
-          <Popper
-            open={fullResolutionOpen}
-            className={classes.fullResolution}
-            onClick={() => setFullResolutionOpen(false)}
-            anchorEl={ref.current}
-          >
-            <picture>
-              <source srcSet={parseImage.file.url()} type="image/webp" />
-              <source srcSet={parseImage.fileLegacy.url()} type="image/png" />
-              <img
-                className={classNames(classes.fullResolutionImage, {
-                  [classes.displayNone]: !isFullResolutionLoaded,
-                })}
-                alt={parseImage.name}
-                onLoad={() => setIsFullResolutionLoaded(true)}
-                src={parseImage.fileLegacy.url()}
-              />
-            </picture>
-            {!isFullResolutionLoaded && (
-              <Skeleton
-                variant="rect"
-                width="100%"
-                height="700px"
-                className={classes.fullResolutionImage}
-              />
-            )}
-          </Popper>
-        )}
-      </div>
-    );
+const Image = ({
+  className,
+  key,
+  decorations,
+  borderColor = "primary",
+  showFullResolutionOnClick,
+  parseImage,
+  variant = "bordered",
+  ...rest
+}: ImageProps) => {
+  const classes = useStyles({ borderColor });
+  if (variant === "contained") {
+    classes.image = "";
+    classes.pointer = "";
+    classes.root = "";
   }
-);
+  const [fullResolutionOpen, setFullResolutionOpen] = useState(false);
+  const ref = useRef(null);
+  const [isLoaded, setIsLoaded] = useState(false);
+  const [isFullResolutionLoaded, setIsFullResolutionLoaded] = useState(false);
+
+  return (
+    <div className={classNames(className, classes.root)} key={key} ref={ref}>
+      <Tooltip title={parseImage.name}>
+        <>
+          <picture>
+            <source srcSet={parseImage.fileMobile.url()} type="image/webp" />
+            <source srcSet={parseImage.fileLegacy.url()} type="image/png" />
+            <img
+              className={classNames(classes.image, classes.width100, {
+                [classes.pointer]: showFullResolutionOnClick,
+                [classes.displayNone]: !isLoaded,
+              })}
+              onLoad={() => setIsLoaded(true)}
+              alt={parseImage.name}
+              src={parseImage.fileLegacy.url()}
+              {...rest}
+              onClick={() => setFullResolutionOpen(true)}
+            />
+          </picture>
+          {!isLoaded && (
+            <Skeleton variant="rect" width="100%" height="700px" />
+          )}
+        </>
+      </Tooltip>
+      {decorations?.map((decoration, index) =>
+        React.cloneElement(decoration, { key: `decoration${index}` })
+      )}
+      {showFullResolutionOnClick && (
+        <Popper
+          open={fullResolutionOpen}
+          className={classes.fullResolution}
+          onClick={() => setFullResolutionOpen(false)}
+          anchorEl={ref.current}
+        >
+          <picture>
+            <source srcSet={parseImage.file.url()} type="image/webp" />
+            <source srcSet={parseImage.fileLegacy.url()} type="image/png" />
+            <img
+              className={classNames(classes.fullResolutionImage, {
+                [classes.displayNone]: !isFullResolutionLoaded,
+              })}
+              alt={parseImage.name}
+              onLoad={() => setIsFullResolutionLoaded(true)}
+              src={parseImage.fileLegacy.url()}
+            />
+          </picture>
+          {!isFullResolutionLoaded && (
+            <Skeleton
+              variant="rect"
+              width="100%"
+              height="700px"
+              className={classes.fullResolutionImage}
+            />
+          )}
+        </Popper>
+      )}
+    </div>
+  );
+};
 
 export default Image;

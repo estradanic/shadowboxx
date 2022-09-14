@@ -11,7 +11,7 @@ import ErrorIcon from "@material-ui/icons/Error";
 import { makeStyles, Theme } from "@material-ui/core/styles";
 import { FancyTypography, useSnackbar } from "../components";
 import { Strings } from "../resources";
-import { ParseImage, Image } from "../types";
+import { ParseImage, Image } from "../classes";
 import { useGlobalLoadingContext } from "./GlobalLoadingContext";
 import { isNullOrWhitespace } from "../utils";
 import { ImageSelectionDialog } from "../components/Images";

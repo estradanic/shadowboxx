@@ -1,6 +1,7 @@
 import React from "react";
 import Grid from "@material-ui/core/Grid";
-import { ParseImage, VariableColor } from "../../types";
+import { VariableColor } from "../../types";
+import { ParseImage } from "../../classes";
 import ImagesSkeleton, { useStyles } from "../Skeleton/ImagesSkeleton";
 import Image from "./Image";
 import NoImages from "./NoImages";

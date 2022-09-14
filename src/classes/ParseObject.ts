@@ -35,18 +35,22 @@ export default class ParseObject<A extends Attributes> {
     updatedAt: "updatedAt",
   };
 
-  static NULL = new ParseObject(new Parse.Object());
-
-  static query() {
+  static query(online = true) {
+    if (online) {
+      return new Parse.Query<Parse.Object<ParsifyPointers<Attributes>>>(
+        Parse.Object
+      );
+    }
     return new Parse.Query<Parse.Object<ParsifyPointers<Attributes>>>(
       Parse.Object
-    );
+    ).fromLocalDatastore();
   }
 
   _object: Parse.Object<ParsifyPointers<A>>;
 
   constructor(object: Parse.Object<ParsifyPointers<A>>) {
     this._object = object;
+    object.pin()
   }
 
   toPointer(): ParsePointer {

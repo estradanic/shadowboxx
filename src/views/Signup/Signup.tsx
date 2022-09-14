@@ -20,7 +20,7 @@ import {
   isNullOrWhitespace,
 } from "../../utils";
 import { routes } from "../../app";
-import { ParseUser } from "../../types";
+import { ParseUser } from "../../classes";
 import { useUserContext, useGlobalLoadingContext } from "../../contexts";
 import { useView } from "../View";
 

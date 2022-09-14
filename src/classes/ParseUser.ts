@@ -1,6 +1,6 @@
 import Parse, { FullOptions } from "parse";
 import { Strings } from "../resources";
-import { Attributes, ParsifyPointers, isPointer } from "./ParseObject";
+import ParseObject, { Attributes, ParsifyPointers, isPointer } from "./ParseObject";
 import ParsePointer from "./ParsePointer";
 
 export interface User extends Attributes {
@@ -39,7 +39,7 @@ export enum UpdateReason {
 /**
  * Class wrapping the Parse.User class and providing convenience methods/properties
  */
-export default class ParseUser {
+export default class ParseUser extends ParseObject<User> {
   static COLUMNS: { [key: string]: string } = {
     id: "objectId",
     emailVerified: "emailVerified",
@@ -53,8 +53,11 @@ export default class ParseUser {
     favoriteAlbums: "favoriteAlbums",
   };
 
-  static query() {
-    return new Parse.Query<Parse.User<ParsifyPointers<User>>>("User");
+  static query(online = true) {
+    if (online) {
+      return new Parse.Query<Parse.User<ParsifyPointers<User>>>("User");
+    }
+    return new Parse.Query<Parse.User<ParsifyPointers<User>>>("User").fromLocalDatastore();
   }
 
   static fromAttributes = (attributes: Partial<User>): ParseUser => {
@@ -81,6 +84,7 @@ export default class ParseUser {
   _user: Parse.User<ParsifyPointers<User>>;
 
   constructor(user: Parse.User<ParsifyPointers<User>>) {
+    super(user);
     this._user = user;
   }
 
