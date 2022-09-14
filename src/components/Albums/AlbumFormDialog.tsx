@@ -8,7 +8,7 @@ import { useInfiniteQuery } from "@tanstack/react-query";
 import { Strings } from "../../resources";
 import { ErrorState, isNullOrWhitespace } from "../../utils";
 import { ImageContextProvider, useUserContext } from "../../contexts";
-import { ParseUser, ParseImage, Album } from "../../types";
+import { ParseUser, ParseImage, Album } from "../../classes";
 import { useInfiniteScroll, useQueryConfigs } from "../../hooks";
 import ActionDialog, {
   ActionDialogProps,

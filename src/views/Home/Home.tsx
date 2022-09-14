@@ -14,10 +14,10 @@ import {
   AlbumCardSkeleton,
 } from "../../components";
 import { Strings } from "../../resources";
-import { ParseAlbum, ParsePointer } from "../../types";
+import { ParseAlbum } from "../../classes";
 import { useUserContext } from "../../contexts";
 import { useView } from "../View";
-import { useQueryConfigs } from "../../hooks";
+import { useQueryConfigs, useRandomColor } from "../../hooks";
 
 const useStyles = makeStyles((theme: Theme) => ({
   fab: {
@@ -64,6 +64,7 @@ const Home = memo(() => {
     () => getAllAlbumsFunction({ showErrorsInSnackbar: true }),
     getAllAlbumsOptions()
   );
+  const randomColor = useRandomColor();
 
   return (
     <PageContainer>
@@ -74,6 +75,7 @@ const Home = memo(() => {
               (album) => (
                 <Grid key={album?.name} item xs={12} md={6} lg={4} xl={3}>
                   <AlbumCard
+                    borderColor={randomColor}
                     onChange={async (_) => {
                       await refetchAlbums();
                     }}
@@ -98,14 +100,18 @@ const Home = memo(() => {
                 </Typography>
               </Grid>
             ) : (
-              <>
-                <AlbumCardSkeleton />
-                <AlbumCardSkeleton />
-                <AlbumCardSkeleton />
-                <AlbumCardSkeleton />
-                <AlbumCardSkeleton />
-                <AlbumCardSkeleton />
-              </>
+              <Grid
+                item
+                spacing={2}
+                container
+                className={classes.albumsContainer}
+              >
+                {[1, 2, 3, 4, 5].map((i) => (
+                  <Grid key={i} item xs={12} md={6} lg={4} xl={3}>
+                    <AlbumCardSkeleton />
+                  </Grid>
+                ))}
+              </Grid>
             )}
           </>
         )}
@@ -126,7 +132,6 @@ const Home = memo(() => {
           name: Strings.untitledAlbum(),
           collaborators: [],
           viewers: [],
-          coverImage: ParsePointer.NULL,
         }}
         open={addAlbumDialogOpen}
         handleCancel={() => setAddAlbumDialogOpen(false)}

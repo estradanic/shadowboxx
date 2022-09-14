@@ -15,7 +15,14 @@ import {
 } from "./contexts";
 import App from "./app/App";
 
-const queryClient = new QueryClient();
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      networkMode: "always",
+      refetchOnReconnect: true,
+    },
+  },
+});
 
 const theme = createMuiTheme({
   overrides: {

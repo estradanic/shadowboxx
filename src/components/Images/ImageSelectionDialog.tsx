@@ -13,7 +13,7 @@ import {
   useQueryConfigs,
   useInfiniteScroll,
 } from "../../hooks";
-import { ParseImage } from "../../types";
+import { ParseImage } from "../../classes";
 import ActionDialog, { ActionDialogProps } from "../Dialog/ActionDialog";
 import Image from "../Image/Image";
 import Empty from "../Svgs/Empty";
@@ -119,7 +119,7 @@ const ImageSelectionDialog = ({
 
   // Images that the current user owns + those in the passed in value
   const images = useMemo(
-    () => dedupeFast([...initialValue, ...(userOwnedImages ?? [])]),
+    () => dedupeFast([...(initialValue ?? []), ...(userOwnedImages ?? [])]),
     [initialValue, userOwnedImages]
   );
 
@@ -168,11 +168,7 @@ const ImageSelectionDialog = ({
               xl={3}
               className={classes.imageWrapper}
             >
-              <Image
-                borderColor={randomColor}
-                src={image.mobileFile.url()}
-                alt={image.name}
-              />
+              <Image borderColor={randomColor} parseImage={image} />
               <div
                 className={classNames({
                   [classes.selected]: isSelected(image.id),

@@ -1,6 +1,6 @@
 import React, { memo } from "react";
 import Typography, { TypographyProps } from "@material-ui/core/Typography";
-import { ParseUser } from "../../types";
+import { ParseUser } from "../../classes";
 import { useQueryConfigs } from "../../hooks";
 import { useQuery } from "@tanstack/react-query";
 

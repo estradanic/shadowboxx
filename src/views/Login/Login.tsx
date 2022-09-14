@@ -14,7 +14,7 @@ import {
   useSnackbar,
 } from "../../components";
 import { useView } from "../View";
-import { ParseUser } from "../../types";
+import { ParseUser } from "../../classes";
 import { useUserContext, useGlobalLoadingContext } from "../../contexts";
 
 const useStyles = makeStyles((theme: Theme) => ({

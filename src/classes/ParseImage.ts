@@ -29,8 +29,11 @@ export default class ParseImage extends ParseObject<Image> {
     );
   }
 
-  static query(): Parse.Query<Parse.Object<ParsifyPointers<Image>>> {
-    return new Parse.Query<Parse.Object<ParsifyPointers<Image>>>("Image");
+  static query(online = true) {
+    if (online) {
+      return new Parse.Query<Parse.Object<ParsifyPointers<Image>>>("Image");
+    }
+    return new Parse.Query<Parse.Object<ParsifyPointers<Image>>>("Image").fromLocalDatastore();
   }
 
   static sort(images: ParseImage[], coverImage?: ParsePointer): ParseImage[] {
@@ -53,8 +56,9 @@ export default class ParseImage extends ParseObject<Image> {
     file: "file",
     owner: "owner",
     name: "name",
-    thumbnail: "fileThumb",
-    mobileFile: "fileMobile",
+    fileThumb: "fileThumb",
+    fileMobile: "fileMobile",
+    fileLegacy: "fileLegacy",
   };
 
   _image: Parse.Object<ParsifyPointers<Image>>;
@@ -95,16 +99,20 @@ export default class ParseImage extends ParseObject<Image> {
     this._image.set(ParseImage.COLUMNS.file, file);
   }
 
-  get thumbnail(): Parse.File {
+  get fileThumb(): Parse.File {
     return (
-      this._image.get(ParseImage.COLUMNS.thumbnail) ??
-      this.mobileFile ??
+      this._image.get(ParseImage.COLUMNS.fileThumb) ??
+      this.fileMobile ??
       this.file
     );
   }
 
-  get mobileFile(): Parse.File {
-    return this._image.get(ParseImage.COLUMNS.mobileFile) ?? this.file;
+  get fileMobile(): Parse.File {
+    return this._image.get(ParseImage.COLUMNS.fileMobile) ?? this.file;
+  }
+
+  get fileLegacy(): Parse.File | undefined {
+    return this._image.get(ParseImage.COLUMNS.fileLegacy);
   }
 
   get owner(): Image["owner"] {

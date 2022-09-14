@@ -22,8 +22,6 @@ Parse.initialize(
   window.__env__?.PARSE_APPLICATION_ID,
   window.__env__?.PARSE_JAVASCRIPT_KEY
 );
-
-// @ts-ignore: TODO remove this comment when the types are actually correct again
 Parse.enableLocalDatastore(false);
 
 const App = () => {

@@ -14,10 +14,12 @@ import {
   UpdateReason,
   User,
   ParseImage,
-} from "../types";
+  ParsifyPointers,
+} from "../classes";
 import { Strings } from "../resources";
 import { routes } from "../app";
 import { useNavigate } from "../hooks";
+import { useNetworkDetectionContext } from "./NetworkDetectionContext";
 
 /**
  * Interface defining the return value of the UserContext
@@ -58,6 +60,7 @@ export const UserContextProvider = ({ children }: UserContextProviderProps) => {
   const [redirectPath, setRedirectPath] = useState<string>();
   const navigate = useNavigate();
   const location = useLocation();
+  const { online } = useNetworkDetectionContext();
 
   const [loggedInUser, setLoggedInUser] = useState<ParseUser | undefined>(
     Parse.User.current() ? new ParseUser(Parse.User.current()!) : undefined
@@ -106,7 +109,7 @@ export const UserContextProvider = ({ children }: UserContextProviderProps) => {
             reason === UpdateReason.SIGN_UP ||
             newLoggedInUser.profilePicture?.id !== profilePicture?.id)
         ) {
-          const profilePictureResponse = await ParseImage.query()
+          const profilePictureResponse = await ParseImage.query(online)
             .equalTo("objectId", newLoggedInUser.profilePicture.id)
             .first();
           if (profilePictureResponse) {
@@ -123,6 +126,7 @@ export const UserContextProvider = ({ children }: UserContextProviderProps) => {
       redirectPath,
       location.pathname,
       navigate,
+      online,
     ]
   );
 
@@ -153,7 +157,17 @@ export const UserContextProvider = ({ children }: UserContextProviderProps) => {
       return loggedInUser;
     }
     navigate(routes.Login.path);
-    return ParseUser.NULL;
+    return new ParseUser(
+      new Parse.User<ParsifyPointers<User>>({
+        username: "",
+        email: "",
+        firstName: "",
+        lastName: "",
+        password: "",
+        favoriteAlbums: [],
+        isDarkThemeEnabled: false,
+      })
+    );
   };
 
   const value = {

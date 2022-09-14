@@ -1,8 +1,13 @@
 import Parse from "parse";
 import { useSnackbar } from "../components";
-import { useGlobalLoadingContext, useUserContext } from "../contexts";
+import {
+  useGlobalLoadingContext,
+  useNetworkDetectionContext,
+  useUserContext,
+} from "../contexts";
 import { Strings } from "../resources";
-import { Interdependent, ParseAlbum, ParseImage, ParseUser } from "../types";
+import { ParseAlbum, ParseImage, ParseUser } from "../classes";
+import { Interdependent } from "../types";
 import {
   InfiniteQueryObserverOptions,
   QueryObserverOptions,
@@ -50,6 +55,7 @@ const useQueryConfigs = () => {
   const { startGlobalLoader, stopGlobalLoader } = useGlobalLoadingContext();
   const { getLoggedInUser, profilePicture, updateLoggedInUser } =
     useUserContext();
+  const { online } = useNetworkDetectionContext();
 
   // #region Helper methods
 
@@ -85,10 +91,15 @@ const useQueryConfigs = () => {
     if (error?.message === "Invalid session token") {
       enqueueWarningSnackbar(Strings.sessionExpired());
       getLoggedInUser().logout(updateLoggedInUser);
-    } else if (errorMessage && !showNativeError && showErrorsInSnackbar) {
+    } else if (
+      errorMessage &&
+      !showNativeError &&
+      showErrorsInSnackbar &&
+      online
+    ) {
       enqueueErrorSnackbar(errorMessage);
       throw new Error(errorMessage);
-    } else if (showNativeError && showErrorsInSnackbar) {
+    } else if (showNativeError && showErrorsInSnackbar && online) {
       enqueueErrorSnackbar(error?.message);
     }
     throw new Error(error?.message ?? errorMessage);
@@ -152,7 +163,7 @@ const useQueryConfigs = () => {
   ): Promise<ParseAlbum[]> => {
     return await runFunctionInTryCatch<ParseAlbum[]>(
       async () => {
-        const albums = await ParseAlbum.query().findAll();
+        const albums = await ParseAlbum.query(online).limit(1000).find();
         return albums.map((album) => new ParseAlbum(album));
       },
       { errorMessage: Strings.noAlbums(), ...options }
@@ -184,9 +195,9 @@ const useQueryConfigs = () => {
       async () => {
         let images;
         if (options.pageSize === undefined) {
-          images = await ParseImage.query().findAll();
+          images = await ParseImage.query(online).limit(1000).find();
         } else {
-          images = await ParseImage.query()
+          images = await ParseImage.query(online)
             .descending(ParseImage.COLUMNS.createdAt)
             .limit(options.pageSize)
             .skip(options.page * options.pageSize)
@@ -212,7 +223,7 @@ const useQueryConfigs = () => {
     }
     return await runFunctionInTryCatch<ParseAlbum>(
       async () => {
-        const album = await ParseAlbum.query().get(albumId);
+        const album = await ParseAlbum.query(online).get(albumId);
         return new ParseAlbum(album);
       },
       { errorMessage: Strings.albumNotFound(), ...options }
@@ -247,11 +258,12 @@ const useQueryConfigs = () => {
       async () => {
         let images;
         if (options.pageSize === undefined) {
-          images = await ParseImage.query()
+          images = await ParseImage.query(online)
             .containedIn(ParseImage.COLUMNS.id, imageIds)
-            .findAll();
+            .limit(1000)
+            .find();
         } else {
-          images = await ParseImage.query()
+          images = await ParseImage.query(online)
             .containedIn(ParseImage.COLUMNS.id, imageIds)
             .descending(ParseImage.COLUMNS.createdAt)
             .limit(options.pageSize)
@@ -283,7 +295,7 @@ const useQueryConfigs = () => {
         if (profilePicture && imageId === profilePicture?.id) {
           return profilePicture;
         }
-        const image = await ParseImage.query()
+        const image = await ParseImage.query(online)
           .equalTo(ParseImage.COLUMNS.id, imageId)
           .first();
         if (!image) {
@@ -325,11 +337,12 @@ const useQueryConfigs = () => {
       async () => {
         let images;
         if (options.pageSize === undefined) {
-          images = await ParseImage.query()
+          images = await ParseImage.query(online)
             .equalTo(ParseImage.COLUMNS.owner, owner.toNativePointer())
-            .findAll();
+            .limit(1000)
+            .find();
         } else {
-          images = await ParseImage.query()
+          images = await ParseImage.query(online)
             .equalTo(ParseImage.COLUMNS.owner, owner.toNativePointer())
             .descending(ParseImage.COLUMNS.createdAt)
             .limit(options.pageSize)
@@ -358,7 +371,7 @@ const useQueryConfigs = () => {
         if (userId === getLoggedInUser().id) {
           return getLoggedInUser();
         }
-        const user = await ParseUser.query().get(userId);
+        const user = await ParseUser.query(online).get(userId);
         return new ParseUser(user);
       },
       { errorMessage: Strings.couldNotGetUserInfo(), ...options }
@@ -381,9 +394,10 @@ const useQueryConfigs = () => {
   ): Promise<ParseUser[]> => {
     return await runFunctionInTryCatch<ParseUser[]>(
       async () => {
-        const users = await ParseUser.query()
+        const users = await ParseUser.query(online)
           .containedIn(ParseUser.COLUMNS.email, emails)
-          .findAll();
+          .limit(1000)
+          .find();
         return users.map((user) => new ParseUser(user));
       },
       { errorMessage: Strings.couldNotGetUserInfo(), ...options }
@@ -409,7 +423,7 @@ const useQueryConfigs = () => {
         if (email === getLoggedInUser().email) {
           return getLoggedInUser();
         }
-        const user = await ParseUser.query()
+        const user = await ParseUser.query(online)
           .equalTo(ParseUser.COLUMNS.email, email)
           .first();
         if (!user) {
@@ -433,18 +447,23 @@ const useQueryConfigs = () => {
   ): Promise<string[]> => {
     return await runFunctionInTryCatch<string[]>(
       async () => {
-        const albums = await Parse.Query.or(
-          ParseAlbum.query().equalTo(
+        const query = Parse.Query.or(
+          ParseAlbum.query(online).equalTo(
             ParseAlbum.COLUMNS.owner,
             getLoggedInUser().toNativePointer()
           ),
-          ParseAlbum.query().containsAll(ParseAlbum.COLUMNS.collaborators, [
-            getLoggedInUser().email,
-          ]),
-          ParseAlbum.query().containsAll(ParseAlbum.COLUMNS.viewers, [
+          ParseAlbum.query(online).containsAll(
+            ParseAlbum.COLUMNS.collaborators,
+            [getLoggedInUser().email]
+          ),
+          ParseAlbum.query(online).containsAll(ParseAlbum.COLUMNS.viewers, [
             getLoggedInUser().email,
           ])
-        ).findAll();
+        );
+        if (!online) {
+          query.fromLocalDatastore();
+        }
+        const albums = await query.limit(1000).find();
         const relatedEmails = [];
         const gotUsers: { [key: string]: ParseUser } = {};
         for (const albumResponse of albums) {

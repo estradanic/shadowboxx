@@ -16,7 +16,8 @@ import { useLocation } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { Strings } from "../../resources";
 import { routes } from "../../app";
-import { ParseAlbum } from "../../types";
+import { VariableColor } from "../../types";
+import { ParseImage, ParseUser, ParseAlbum } from "../../classes";
 import { ImageContextProvider, useUserContext } from "../../contexts";
 import { useQueryConfigs, useNavigate } from "../../hooks";
 import UserAvatar from "../User/UserAvatar";
@@ -25,27 +26,25 @@ import { useSnackbar } from "../Snackbar/Snackbar";
 import AlbumFormDialog from "./AlbumFormDialog";
 import Tooltip from "../Tooltip/Tooltip";
 import { useActionDialogContext } from "../Dialog/ActionDialog";
-import ParseUser from "../../types/ParseUser";
-import ParseImage from "../../types/ParseImage";
 import ImageField from "../Field/ImageField";
 import Online from "../NetworkDetector/Online";
 import AlbumCardSkeleton from "../Skeleton/AlbumCardSkeleton";
+import Image from "../Image/Image";
+
+interface UseStylesParams {
+  borderColor: VariableColor;
+}
 
 const useStyles = makeStyles((theme: Theme) => ({
   card: {
     maxWidth: theme.spacing(50),
     width: "100%",
     margin: "auto",
+    border: ({ borderColor }: UseStylesParams) =>
+      `2px solid ${theme.palette[borderColor].dark}`,
   },
   media: {
     cursor: "pointer",
-    height: 0,
-    paddingTop: "60%",
-    backgroundSize: "contain",
-    borderLeft: `${theme.spacing(1)}px solid ${theme.palette.background.paper}`,
-    borderRight: `${theme.spacing(1)}px solid ${
-      theme.palette.background.paper
-    }`,
   },
   favorite: {
     color: theme.palette.warning.light,
@@ -94,10 +93,12 @@ export interface AlbumCardProps {
    * Returns null if album was deleted.
    */
   onChange: (value: ParseAlbum | null) => Promise<void>;
+  /** Border color for the card */
+  borderColor: VariableColor;
 }
 
 /** Component for displaying basic information about an album */
-const AlbumCard = memo(({ value, onChange }: AlbumCardProps) => {
+const AlbumCard = memo(({ value, onChange, borderColor }: AlbumCardProps) => {
   const [anchorEl, setAnchorEl] = useState<Element>();
   const [editAlbumDialogOpen, setEditAlbumDialogOpen] =
     useState<boolean>(false);
@@ -191,12 +192,8 @@ const AlbumCard = memo(({ value, onChange }: AlbumCardProps) => {
 
   const { enqueueErrorSnackbar, enqueueSuccessSnackbar } = useSnackbar();
   const navigate = useNavigate();
-  const coverImageSrc = useMemo(
-    () => coverImage?.mobileFile.url(),
-    [coverImage]
-  );
 
-  const classes = useStyles();
+  const classes = useStyles({ borderColor });
   const { openConfirm } = useActionDialogContext();
 
   const deleteAlbum = () => {
@@ -270,10 +267,12 @@ const AlbumCard = memo(({ value, onChange }: AlbumCardProps) => {
             value?.description ?? ""
           }`}
         />
-        {coverImageSrc ? (
+        {coverImage ? (
           <CardMedia
             className={classes.media}
-            image={coverImageSrc}
+            parseImage={coverImage}
+            variant="contained"
+            component={Image}
             title={coverImage?.name}
             onClick={navigateToAlbum}
           />

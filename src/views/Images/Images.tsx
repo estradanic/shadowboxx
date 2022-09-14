@@ -11,7 +11,7 @@ import {
   useInfiniteScroll,
 } from "../../hooks";
 import { Strings } from "../../resources";
-import { ParseImage } from "../../types";
+import { ParseImage } from "../../classes";
 import { useView } from "../View";
 import { useInfiniteQuery } from "@tanstack/react-query";
 import { IMAGES_PAGE_SIZE } from "../../constants";
