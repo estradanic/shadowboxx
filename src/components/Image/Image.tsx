@@ -1,13 +1,14 @@
 import React, { ImgHTMLAttributes, useRef, useState } from "react";
 import { makeStyles, Theme } from "@material-ui/core/styles";
 import Popper from "@material-ui/core/Popper";
-import Skeleton from "@material-ui/lab/Skeleton";
 import classNames from "classnames";
 import { VariableColor } from "../../types";
 import { ParseImage } from "../../classes";
 import { opacity } from "../../utils";
 import Tooltip from "../Tooltip/Tooltip";
 import { ImageDecorationProps } from "./Decoration/ImageDecoration";
+import Skeleton from "../Skeleton/Skeleton";
+import { IMAGE_SKELETON_HEIGHT } from "../Skeleton/ImageSkeleton";
 
 interface UseStylesParams {
   borderColor: VariableColor;
@@ -52,6 +53,11 @@ const useStyles = makeStyles((theme: Theme) => ({
   },
   fullResolutionPicture: {
     margin: "auto",
+  },
+  fullResolutionSkeleton: {
+    "&&": {
+      maxWidth: "600px"
+    }
   },
   displayNone: {
     display: "none",
@@ -121,7 +127,13 @@ const Image = ({
               {...rest}
             />
           </picture>
-          {!isLoaded && <Skeleton variant="rect" width="100%" height="700px" />}
+          {!isLoaded && (
+            <Skeleton
+              variant="rect"
+              width="100%"
+              height={IMAGE_SKELETON_HEIGHT}
+            />
+          )}
         </>
       </Tooltip>
       {decorations?.map((decoration, index) =>
@@ -134,13 +146,15 @@ const Image = ({
           onClick={() => setFullResolutionOpen(false)}
           anchorEl={ref.current}
         >
-          <picture className={classes.fullResolutionPicture}>
+          <picture
+            className={classNames(classes.fullResolutionPicture, {
+              [classes.displayNone]: !isFullResolutionLoaded,
+            })}
+          >
             <source srcSet={parseImage.file.url()} type="image/webp" />
             <source srcSet={parseImage.fileLegacy?.url()} type="image/png" />
             <img
-              className={classNames(classes.fullResolutionImage, {
-                [classes.displayNone]: !isFullResolutionLoaded,
-              })}
+              className={classes.fullResolutionImage}
               alt={parseImage.name}
               onLoad={() => setIsFullResolutionLoaded(true)}
               src={parseImage.fileLegacy?.url()}
@@ -149,11 +163,12 @@ const Image = ({
           {!isFullResolutionLoaded && (
             <Skeleton
               variant="rect"
-              width="100%"
-              height="700px"
+              width="90vw"
+              height="90vh"
               className={classNames(
                 classes.fullResolutionImage,
-                classes.fullResolutionPicture
+                classes.fullResolutionPicture,
+                classes.fullResolutionSkeleton,
               )}
             />
           )}

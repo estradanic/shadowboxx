@@ -78,6 +78,7 @@ const theme = createMuiTheme({
     },
     grey: {
       50: "#EEEEEE",
+      200: "#CCCCCC",
     },
     text: {
       primary: "#000000",

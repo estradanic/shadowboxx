@@ -1,5 +1,5 @@
 import React from "react";
-import Skeleton, { SkeletonProps } from "@material-ui/lab/Skeleton";
+import Skeleton, { SkeletonProps } from "./Skeleton";
 
 export type AvatarSkeletonProps = Omit<
   SkeletonProps,

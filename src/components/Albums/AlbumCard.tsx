@@ -41,7 +41,7 @@ const useStyles = makeStyles((theme: Theme) => ({
     width: "100%",
     margin: "auto",
     border: ({ borderColor }: UseStylesParams) =>
-      `2px solid ${theme.palette[borderColor].dark}`,
+      `2px solid ${theme.palette[borderColor ?? "primary"].dark}`,
   },
   media: {
     cursor: "pointer",

@@ -4,7 +4,6 @@ import CardHeader from "@material-ui/core/CardHeader";
 import CardContent from "@material-ui/core/CardContent";
 import CardActions from "@material-ui/core/CardActions";
 import IconButton from "@material-ui/core/IconButton";
-import Skeleton from "@material-ui/lab/Skeleton";
 import MoreVertIcon from "@material-ui/icons/MoreVert";
 import { makeStyles, Theme } from "@material-ui/core/styles";
 import Grid from "@material-ui/core/Grid";
@@ -12,6 +11,7 @@ import AddAPhotoIcon from "@material-ui/icons/AddAPhoto";
 import StarIcon from "@material-ui/icons/Star";
 import AvatarSkeleton from "./AvatarSkeleton";
 import { CardMedia } from "@material-ui/core";
+import Skeleton from "./Skeleton";
 
 const useStyles = makeStyles((theme: Theme) => ({
   card: {
