@@ -14,6 +14,7 @@ const useStyles = makeStyles((theme: Theme) => ({
     color: theme.palette.primary.contrastText,
     overflowY: "auto",
     overflowX: "hidden",
+    WebkitOverflowScrolling: "touch",
   },
   grid: {
     paddingTop: theme.spacing(6),
