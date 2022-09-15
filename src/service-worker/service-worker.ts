@@ -21,7 +21,7 @@ let useCache = true;
 
 // Activate the SW
 sw.addEventListener("activate", () => {
-  return sw.clients.claim()
+  return sw.clients.claim();
 });
 
 // Middleware for fetches (caching vs. online)
