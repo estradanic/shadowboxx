@@ -87,7 +87,7 @@ const Footer = () => {
 
   return (
     <AppBar
-      position="fixed"
+      position="absolute"
       color="primary"
       component="footer"
       className={classes.appBar}
