@@ -7,7 +7,7 @@ import {
 } from "../../components";
 import {
   useRandomColor,
-  useQueryConfigs,
+  useInfiniteQueryConfigs,
   useInfiniteScroll,
 } from "../../hooks";
 import { Strings } from "../../resources";
@@ -23,17 +23,17 @@ const Images = memo(() => {
   useView("Images");
   const randomColor = useRandomColor();
   const {
-    getAllImagesFunction,
-    getAllImagesQueryKey,
+    getAllImagesInfiniteFunction,
+    getAllImagesInfiniteQueryKey,
     getAllImagesInfiniteOptions,
-  } = useQueryConfigs();
+  } = useInfiniteQueryConfigs();
   const { data, status, fetchNextPage, isFetchingNextPage } = useInfiniteQuery<
     ParseImage[],
     Error
   >(
-    getAllImagesQueryKey(),
+    getAllImagesInfiniteQueryKey(),
     ({ pageParam: page = 0 }) =>
-      getAllImagesFunction({
+      getAllImagesInfiniteFunction({
         showErrorsInSnackbar: true,
         page,
         pageSize: IMAGES_PAGE_SIZE,

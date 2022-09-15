@@ -15,3 +15,7 @@ export type KeysOfType<T, Keys> = keyof {
 /** Wrapping type to "Optionalize" only specific fields */
 export type Optional<T, Keys extends keyof T> = Omit<T, Keys> &
   Partial<Pick<T, Keys>>;
+
+/** Wrapping type to Require only specific fields */
+export type Require<T, Keys extends keyof T> = Omit<T, Keys> &
+  Required<Pick<T, Keys>>;

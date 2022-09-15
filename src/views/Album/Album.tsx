@@ -17,6 +17,7 @@ import { IMAGES_PAGE_SIZE } from "../../constants";
 import {
   useRandomColor,
   useQueryConfigs,
+  useInfiniteQueryConfigs,
   useInfiniteScroll,
 } from "../../hooks";
 import { useView } from "../View";
@@ -39,14 +40,13 @@ const Album = memo(() => {
   const classes = useStyles();
   const location = useLocation() as { state: { previousLocation?: Location } };
   const randomColor = useRandomColor();
+  const { getAlbumFunction, getAlbumQueryKey, getAlbumOptions } =
+    useQueryConfigs();
   const {
-    getAlbumFunction,
-    getAlbumQueryKey,
-    getAlbumOptions,
-    getImagesByIdFunction,
-    getImagesByIdQueryKey,
+    getImagesByIdInfiniteFunction,
+    getImagesByIdInfiniteQueryKey,
     getImagesByIdInfiniteOptions,
-  } = useQueryConfigs();
+  } = useInfiniteQueryConfigs();
   const { data: album, status: albumStatus } = useQuery<ParseAlbum, Error>(
     getAlbumQueryKey(id),
     () => getAlbumFunction(id, { showErrorsInSnackbar: true }),
@@ -58,9 +58,9 @@ const Album = memo(() => {
     fetchNextPage,
     isFetchingNextPage,
   } = useInfiniteQuery<ParseImage[], Error>(
-    getImagesByIdQueryKey(album?.images ?? []),
+    getImagesByIdInfiniteQueryKey(album?.images ?? []),
     ({ pageParam: page = 0 }) =>
-      getImagesByIdFunction(album?.images ?? [], {
+      getImagesByIdInfiniteFunction(album?.images ?? [], {
         showErrorsInSnackbar: true,
         page,
         pageSize: IMAGES_PAGE_SIZE,

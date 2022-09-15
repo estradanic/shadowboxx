@@ -10,7 +10,7 @@ import { Strings } from "../../resources";
 import { useUserContext } from "../../contexts";
 import {
   useRandomColor,
-  useQueryConfigs,
+  useInfiniteQueryConfigs,
   useInfiniteScroll,
 } from "../../hooks";
 import { ParseImage } from "../../classes";
@@ -84,10 +84,10 @@ const ImageSelectionDialog = ({
   const theme = useTheme();
   const sm = useMediaQuery(theme.breakpoints.down("sm"));
   const {
-    getImagesByOwnerFunction,
-    getImagesByOwnerQueryKey,
+    getImagesByOwnerInfiniteFunction,
+    getImagesByOwnerInfiniteQueryKey,
     getImagesByOwnerInfiniteOptions,
-  } = useQueryConfigs();
+  } = useInfiniteQueryConfigs();
 
   useEffect(() => {
     setValue((prev) => dedupeFast([...initialValue, ...prev]));
@@ -98,9 +98,9 @@ const ImageSelectionDialog = ({
     ParseImage[],
     Error
   >(
-    getImagesByOwnerQueryKey(getLoggedInUser()),
+    getImagesByOwnerInfiniteQueryKey(getLoggedInUser()),
     ({ pageParam: page = 0 }) =>
-      getImagesByOwnerFunction(getLoggedInUser(), {
+      getImagesByOwnerInfiniteFunction(getLoggedInUser(), {
         showErrorsInSnackbar: true,
         page,
         pageSize: IMAGES_PAGE_SIZE,

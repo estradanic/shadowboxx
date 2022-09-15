@@ -3,11 +3,20 @@ import { useDebounce } from "use-debounce";
 import { PAGE_CONTAINER_ID } from "../constants";
 
 export type UseInfiniteScrollOptions = {
+  /** CSS selector for the element to attach the event listener to */
   elementQuerySelector?: string;
+  /** Number of pixels from the bottom to run onThresholdReached */
   scrollThreshold?: number;
+  /**
+   * Whether the function can execute or not.
+   * Allows dynamic enabling/disabling
+   */
   canExecute?: boolean;
 };
 
+/**
+ * Hook to run a function when a certain scroll threshold is reached
+ */
 const useInfiniteScroll = (
   piOnThresholdReached: () => any | Promise<any>,
   {

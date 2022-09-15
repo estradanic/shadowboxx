@@ -1,4 +1,4 @@
-let CACHE_NAME = "BAD_VERSION";
+const CACHE_NAME = "Shadowboxx";
 
 const sw = this as unknown as ServiceWorkerGlobalScope;
 
@@ -13,35 +13,15 @@ const frontendRoutes = [
 
 // Install SW
 sw.addEventListener("install", async (event) => {
-  event.waitUntil(
-    fetch("variables.json").then((variablesResponse) =>
-      variablesResponse.json().then((variables) => {
-        CACHE_NAME = "version-" + variables.version;
-        console.log("Version:", CACHE_NAME);
-        return Promise.resolve();
-      })
-    )
-  );
+  return sw.skipWaiting();
 });
 
 // Whether to put new cache entries.
 let useCache = true;
 
 // Activate the SW
-sw.addEventListener("activate", (event) => {
-  const cacheWhitelist: string[] = [];
-  cacheWhitelist.push(CACHE_NAME);
-  event.waitUntil(
-    caches.keys().then((cacheNames) =>
-      Promise.all(
-        cacheNames.map((cacheName) => {
-          if (!cacheWhitelist.includes(cacheName)) {
-            return caches.delete(cacheName).then(() => sw.clients.claim());
-          }
-        })
-      )
-    )
-  );
+sw.addEventListener("activate", () => {
+  return sw.clients.claim()
 });
 
 // Middleware for fetches (caching vs. online)
@@ -50,7 +30,7 @@ sw.addEventListener("fetch", (event) => {
   // Don't bother managing non-http requests or requests to httpbin.org,
   // which are used for determining online status
   if (
-    (url.protocol !== "http" && url.protocol !== "https") ||
+    (url.protocol !== "http:" && url.protocol !== "https:") ||
     url.host === "httpbin.org"
   ) {
     return;

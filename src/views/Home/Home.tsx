@@ -1,10 +1,10 @@
-import React, { memo, useState } from "react";
+import React, { memo, useMemo, useState } from "react";
 import Fab from "@material-ui/core/Fab";
 import Typography from "@material-ui/core/Typography";
 import Grid from "@material-ui/core/Grid";
 import AddIcon from "@material-ui/icons/Add";
 import { makeStyles, Theme } from "@material-ui/core/styles";
-import { useQuery } from "@tanstack/react-query";
+import { useInfiniteQuery } from "@tanstack/react-query";
 import {
   PageContainer,
   AlbumCard,
@@ -17,7 +17,11 @@ import { Strings } from "../../resources";
 import { ParseAlbum } from "../../classes";
 import { useUserContext } from "../../contexts";
 import { useView } from "../View";
-import { useQueryConfigs, useRandomColor } from "../../hooks";
+import {
+  useInfiniteQueryConfigs,
+  useInfiniteScroll,
+  useRandomColor,
+} from "../../hooks";
 
 const useStyles = makeStyles((theme: Theme) => ({
   fab: {
@@ -52,18 +56,34 @@ const Home = memo(() => {
   const classes = useStyles();
   const [addAlbumDialogOpen, setAddAlbumDialogOpen] = useState(false);
   const { enqueueErrorSnackbar, enqueueSuccessSnackbar } = useSnackbar();
-  const { getAllAlbumsFunction, getAllAlbumsQueryKey, getAllAlbumsOptions } =
-    useQueryConfigs();
-  const { getLoggedInUser } = useUserContext();
   const {
-    data: albums,
-    refetch: refetchAlbums,
+    getAllAlbumsInfiniteFunction,
+    getAllAlbumsInfiniteQueryKey,
+    getAllAlbumsInfiniteOptions,
+  } = useInfiniteQueryConfigs();
+  const {
+    data,
     status,
-  } = useQuery<ParseAlbum[], Error>(
-    getAllAlbumsQueryKey(),
-    () => getAllAlbumsFunction({ showErrorsInSnackbar: true }),
-    getAllAlbumsOptions()
+    fetchNextPage,
+    isFetchingNextPage,
+    refetch: refetchAlbums,
+  } = useInfiniteQuery<ParseAlbum[], Error>(
+    getAllAlbumsInfiniteQueryKey(),
+    ({ pageParam: page = 0 }) =>
+      getAllAlbumsInfiniteFunction({
+        showErrorsInSnackbar: true,
+        page,
+        pageSize: 10,
+      }),
+    getAllAlbumsInfiniteOptions()
   );
+  useInfiniteScroll(fetchNextPage, { canExecute: !isFetchingNextPage });
+  const albums = useMemo(
+    () => data?.pages?.flatMap((page) => page) ?? [],
+    [data?.pages]
+  );
+
+  const { getLoggedInUser } = useUserContext();
   const randomColor = useRandomColor();
 
   return (

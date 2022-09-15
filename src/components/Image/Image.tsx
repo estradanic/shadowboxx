@@ -56,8 +56,8 @@ const useStyles = makeStyles((theme: Theme) => ({
   },
   fullResolutionSkeleton: {
     "&&": {
-      maxWidth: "600px"
-    }
+      maxWidth: "600px",
+    },
   },
   displayNone: {
     display: "none",
@@ -168,7 +168,7 @@ const Image = ({
               className={classNames(
                 classes.fullResolutionImage,
                 classes.fullResolutionPicture,
-                classes.fullResolutionSkeleton,
+                classes.fullResolutionSkeleton
               )}
             />
           )}

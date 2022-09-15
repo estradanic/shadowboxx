@@ -9,7 +9,7 @@ import { Strings } from "../../resources";
 import { ErrorState, isNullOrWhitespace } from "../../utils";
 import { ImageContextProvider, useUserContext } from "../../contexts";
 import { ParseUser, ParseImage, Album } from "../../classes";
-import { useInfiniteScroll, useQueryConfigs } from "../../hooks";
+import { useInfiniteScroll, useInfiniteQueryConfigs } from "../../hooks";
 import ActionDialog, {
   ActionDialogProps,
   useActionDialogContext,
@@ -55,17 +55,17 @@ const AlbumFormDialog = ({
   const [viewers, setViewers] = useState<Album["viewers"]>(value.viewers);
 
   const {
-    getImagesByIdFunction,
-    getImagesByIdQueryKey,
     getImagesByIdInfiniteOptions,
-  } = useQueryConfigs();
+    getImagesByIdInfiniteFunction,
+    getImagesByIdInfiniteQueryKey,
+  } = useInfiniteQueryConfigs();
   const { data, isFetchingNextPage, fetchNextPage } = useInfiniteQuery<
     ParseImage[],
     Error
   >(
-    getImagesByIdQueryKey(imageIds),
+    getImagesByIdInfiniteQueryKey(imageIds),
     ({ pageParam: page = 0 }) =>
-      getImagesByIdFunction(imageIds, {
+      getImagesByIdInfiniteFunction(imageIds, {
         showErrorsInSnackbar: true,
         page,
         pageSize: IMAGES_PAGE_SIZE,
