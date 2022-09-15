@@ -60,7 +60,7 @@ const mergeAlbumChanges = async (
     }
   }
 
-  let coverImage = album.get("coverImage");
+  let coverImage = attributes.coverImage;
   if (!coverImage && images?.length) {
     coverImage = images[0].toPointer();
   }

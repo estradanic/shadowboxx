@@ -84,7 +84,7 @@ const UserField = forwardRef(
       <Autocomplete<string, true, false, true>
         ref={ref}
         classes={classes}
-        options={options}
+        options={options ?? []}
         value={value}
         fullWidth
         multiple

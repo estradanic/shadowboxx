@@ -86,8 +86,8 @@ const AlbumFormDialog = ({
 
   const { getLoggedInUser } = useUserContext();
   const isCollaborator = useMemo(
-    () => getLoggedInUser().id !== value.owner.id,
-    [getLoggedInUser, value.owner.id]
+    () => getLoggedInUser().id !== value.owner?.id,
+    [getLoggedInUser, value.owner?.id]
   );
 
   const defaultErrors = useMemo(

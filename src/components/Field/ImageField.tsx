@@ -246,7 +246,6 @@ const ImageField = memo(
         const newImage = await uploadImage(
           {
             file: parseFile,
-            isCoverImage: false,
             owner: getLoggedInUser().toPointer(),
             name: removeExtension(fileName),
           },
