@@ -73,7 +73,7 @@ const Home = memo(() => {
       getAllAlbumsInfiniteFunction({
         showErrorsInSnackbar: true,
         page,
-        pageSize: 10,
+        pageSize: 25,
       }),
     getAllAlbumsInfiniteOptions()
   );
