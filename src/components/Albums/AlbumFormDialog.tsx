@@ -19,7 +19,7 @@ import { useSnackbar } from "../Snackbar/Snackbar";
 import UserField from "../Field/UserField";
 import TextField from "../Field/TextField";
 import Tooltip from "../Tooltip/Tooltip";
-import { IMAGES_PAGE_SIZE } from "../../constants";
+import { DEFAULT_PAGE_SIZE } from "../../constants";
 
 /** Interface defining props for AlbumFormDialog */
 export interface AlbumFormDialogProps
@@ -68,7 +68,7 @@ const AlbumFormDialog = ({
       getImagesByIdInfiniteFunction(imageIds, {
         showErrorsInSnackbar: true,
         page,
-        pageSize: IMAGES_PAGE_SIZE,
+        pageSize: DEFAULT_PAGE_SIZE,
       }),
     getImagesByIdInfiniteOptions({
       refetchOnWindowFocus: false,

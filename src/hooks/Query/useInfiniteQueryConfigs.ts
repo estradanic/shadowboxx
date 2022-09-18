@@ -7,6 +7,7 @@ import useQueryConfigs from "./useQueryConfigs";
 import useQueryConfigHelpers, {
   FunctionOptions,
 } from "./useQueryConfigHelpers";
+import { DEFAULT_PAGE_SIZE } from "../../constants";
 
 export type InfiniteFunctionOptions = FunctionOptions & {
   /** Page index */
@@ -32,7 +33,7 @@ const DEFAULT_OPTIONS: Pick<
 };
 
 const DEFAULT_FUNCTION_OPTIONS: InfiniteFunctionOptions = {
-  pageSize: 25,
+  pageSize: DEFAULT_PAGE_SIZE,
   page: 0,
 };
 

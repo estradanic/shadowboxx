@@ -19,7 +19,7 @@ import Image from "../Image/Image";
 import Empty from "../Svgs/Empty";
 import CheckIcon from "@material-ui/icons/Check";
 import ImagesSkeleton from "../Skeleton/ImagesSkeleton";
-import { IMAGES_PAGE_SIZE } from "../../constants";
+import { DEFAULT_PAGE_SIZE } from "../../constants";
 
 const useStyles = makeStyles((theme: Theme) => ({
   svgContainer: {
@@ -103,7 +103,7 @@ const ImageSelectionDialog = ({
       getImagesByOwnerInfiniteFunction(getLoggedInUser(), {
         showErrorsInSnackbar: true,
         page,
-        pageSize: IMAGES_PAGE_SIZE,
+        pageSize: DEFAULT_PAGE_SIZE,
       }),
     getImagesByOwnerInfiniteOptions({ enabled: open })
   );

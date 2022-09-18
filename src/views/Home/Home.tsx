@@ -22,6 +22,7 @@ import {
   useInfiniteScroll,
   useRandomColor,
 } from "../../hooks";
+import { DEFAULT_PAGE_SIZE } from "../../constants";
 
 const useStyles = makeStyles((theme: Theme) => ({
   fab: {
@@ -73,7 +74,7 @@ const Home = memo(() => {
       getAllAlbumsInfiniteFunction({
         showErrorsInSnackbar: true,
         page,
-        pageSize: 10,
+        pageSize: DEFAULT_PAGE_SIZE,
       }),
     getAllAlbumsInfiniteOptions()
   );

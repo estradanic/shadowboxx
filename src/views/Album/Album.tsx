@@ -13,7 +13,7 @@ import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
 import { Strings } from "../../resources";
 import { ParseImage, ParseAlbum } from "../../classes";
 import { FancyTitleTypography, Void, Images } from "../../components";
-import { IMAGES_PAGE_SIZE } from "../../constants";
+import { DEFAULT_PAGE_SIZE } from "../../constants";
 import {
   useRandomColor,
   useQueryConfigs,
@@ -63,7 +63,7 @@ const Album = memo(() => {
       getImagesByIdInfiniteFunction(album?.images ?? [], {
         showErrorsInSnackbar: true,
         page,
-        pageSize: IMAGES_PAGE_SIZE,
+        pageSize: DEFAULT_PAGE_SIZE,
       }),
     getImagesByIdInfiniteOptions({ enabled: !!album?.images })
   );
