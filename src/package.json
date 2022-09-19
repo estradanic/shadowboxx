@@ -53,7 +53,7 @@
     "postcss": "^8.2.15",
     "postcss-flexbugs-fixes": "5.0.2",
     "postcss-normalize": "9.0.0",
-    "postcss-preset-env": "7.8.1",
+    "postcss-preset-env": "7.8.2",
     "postcss-safe-parser": "6.0.0",
     "postcss-svgo": "^5.1.0",
     "prettier": "^2.2.1",
