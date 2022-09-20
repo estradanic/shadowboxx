@@ -102,6 +102,8 @@ const useStyles = makeStyles((theme: Theme) => ({
   },
 }));
 
+export type ImageFieldOnChangeReason = "REMOVE" | "ADD";
+
 /** Interface defining props for ImageField */
 export type ImageFieldProps = Omit<
   TextFieldProps,
@@ -110,7 +112,7 @@ export type ImageFieldProps = Omit<
   /** Value of the field, array of Images */
   value: ParseImage[];
   /** Function to run when the value changes */
-  onChange: (value: ParseImage[]) => Promise<void>;
+  onChange: (value: ParseImage[], reason: ImageFieldOnChangeReason) => Promise<void>;
   /** Whether multiple images can be selected or not */
   multiple?: boolean;
   /** ACL to save new images with after upload */
@@ -160,8 +162,8 @@ const ImageField = memo(
     const randomColor = useRandomColor();
 
     const onChange = useCallback(
-      async (newValue: ParseImage[]) => {
-        await piOnChange(Array.from(new Set(newValue)));
+      async (newValue: ParseImage[], reason: ImageFieldOnChangeReason) => {
+        await piOnChange(Array.from(new Set(newValue)), reason);
       },
       [piOnChange]
     );
@@ -171,7 +173,7 @@ const ImageField = memo(
     const selectFromLibrary = useCallback(() => {
       promptImageSelectionDialog({
         handleConfirm: async (newValue) =>
-          await onChange(multiple ? [...value, ...newValue] : newValue),
+          await onChange(multiple ? [...value, ...newValue] : newValue, "ADD"),
         value,
       });
     }, [promptImageSelectionDialog, value, onChange, multiple]);
@@ -230,7 +232,7 @@ const ImageField = memo(
         try {
           const newImages = await Promise.all(newImagePromises);
           const newValue = multiple ? [...value, ...newImages] : newImages;
-          await onChange(newValue);
+          await onChange(newValue, "ADD");
         } catch (error: any) {
           enqueueErrorSnackbar(error?.message ?? Strings.uploadImageError());
         }
@@ -252,7 +254,7 @@ const ImageField = memo(
           acl
         );
         const newValue = multiple ? [...value, newImage] : [newImage];
-        await onChange(newValue);
+        await onChange(newValue, "ADD");
       } catch (error: any) {
         enqueueErrorSnackbar(
           error?.message ?? Strings.uploadImageError(fileName)
@@ -393,7 +395,7 @@ const ImageField = memo(
                         const newValue = value.filter(
                           (valueImage) => image.id !== valueImage.id
                         );
-                        await onChange(newValue);
+                        await onChange(newValue, "REMOVE");
                       }}
                     />,
                   ];
