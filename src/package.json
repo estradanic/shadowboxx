@@ -30,7 +30,7 @@
     "@types/react-detect-offline": "^2.4.1",
     "@types/react-dom": "^18.0.6",
     "@types/react-router-dom": "^5.3.3",
-    "@types/sharp": "^0.30.5",
+    "@types/sharp": "^0.31.0",
     "@types/uuid": "^8.3.3",
     "bfj": "^7.0.2",
     "browser-image-resizer": "^2.2.1",
