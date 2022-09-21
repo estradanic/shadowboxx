@@ -46,9 +46,7 @@ const useInfiniteScroll = (
       element.current.removeEventListener("scroll", onScroll);
     }
     requestAnimationFrame(() => {
-      element.current = document.querySelector(
-        elementQuerySelector ?? "body"
-      );
+      element.current = document.querySelector(elementQuerySelector ?? "body");
       if (element.current) {
         element.current.addEventListener("scroll", onScroll);
       }

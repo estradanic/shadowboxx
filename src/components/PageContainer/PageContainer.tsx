@@ -40,11 +40,7 @@ const PageContainer = ({ children, ...rest }: PageContainerProps) => {
       progress={globalProgress}
       content={globalLoaderContent}
     >
-      <Container
-        maxWidth={false}
-        className={classes.container}
-        {...rest}
-      >
+      <Container maxWidth={false} className={classes.container} {...rest}>
         <Grid
           container
           direction="column"
