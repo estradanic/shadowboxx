@@ -1,6 +1,5 @@
 import { useCallback, useEffect, useRef } from "react";
 import { useDebounce } from "use-debounce";
-import { PAGE_CONTAINER_ID } from "../constants";
 
 export type UseInfiniteScrollOptions = {
   /** CSS selector for the element to attach the event listener to */
@@ -48,7 +47,7 @@ const useInfiniteScroll = (
     }
     requestAnimationFrame(() => {
       element.current = document.querySelector(
-        elementQuerySelector ?? `#${PAGE_CONTAINER_ID}`
+        elementQuerySelector ?? "body"
       );
       if (element.current) {
         element.current.addEventListener("scroll", onScroll);

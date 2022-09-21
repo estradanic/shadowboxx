@@ -3,7 +3,6 @@ import { useLocation, createPath } from "react-router-dom";
 import { useUserContext } from "../contexts";
 import { routes } from "../app";
 import { useScrollPositionContext } from "../contexts";
-import { PAGE_CONTAINER_ID } from "../constants";
 import { useNavigate } from "../hooks";
 
 /**
@@ -31,8 +30,6 @@ export const useView = (currentViewId: string) => {
   }, [currentRoute, redirectToLogin, isUserLoggedIn]);
 
   useEffect(() => {
-    document
-      .querySelector(`#${PAGE_CONTAINER_ID}`)
-      ?.scrollTo(0, getScrollPosition(location.pathname));
+    document.body.scrollTo(0, getScrollPosition(location.pathname));
   }, [location.pathname, getScrollPosition]);
 };
