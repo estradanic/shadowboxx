@@ -8,7 +8,7 @@ import Footer from "../Footer/Footer";
  */
 const DefaultLayout = ({ viewId, children }: LayoutProps) => (
   <>
-    <Header viewId={viewId} position="sticky" />
+    <Header viewId={viewId} />
     <div>{children}</div>
     <Footer />
   </>

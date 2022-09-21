@@ -1,4 +1,4 @@
-import React, { useLayoutEffect, useState } from "react";
+import React from "react";
 import AppBar, { AppBarProps } from "@material-ui/core/AppBar";
 import Toolbar from "@material-ui/core/Toolbar";
 import Button from "@material-ui/core/Button";
@@ -9,7 +9,7 @@ import { useLocation, Location } from "react-router-dom";
 import { routes } from "../../app";
 import { Strings } from "../../resources";
 import { useUserContext } from "../../contexts";
-import { useNavigate } from "../../hooks";
+import { useNavigate, useHideOnScroll } from "../../hooks";
 import Link from "../Link/Link";
 import BackButton from "../Button/BackButton";
 import AppMenu from "../Menu/AppMenu";
@@ -29,7 +29,7 @@ const useStyles = makeStyles((theme: Theme) => ({
     top: 0,
   },
   hidden: {
-    top: ({ xs }: UseStylesParams) => theme.spacing(xs ? -6.5 : -8.5),
+    top: ({ xs }: UseStylesParams) => theme.spacing(xs ? -6.5 : -9),
   },
   backButton: {
     marginRight: theme.spacing(3),
@@ -77,25 +77,11 @@ const Header = ({ viewId, className, ...rest }: HeaderProps) => {
   const navigate = useNavigate();
   const location = useLocation() as { state: { previousLocation?: Location } };
   const { isUserLoggedIn, getLoggedInUser, profilePicture } = useUserContext();
-  const [visible, setVisible] = useState<boolean>(true);
-  const scrollTopRef = React.useRef<number>(0);
-
-  // Set the header invisible when it's scrolled down
-  // Set it visible again when scrolled up
-  useLayoutEffect(() => {
-    const handleScroll = (e: Event) => {
-      const target = e.target as HTMLElement;
-      const scrollTop = target.scrollTop;
-      setVisible(scrollTopRef.current >= scrollTop);
-      scrollTopRef.current = scrollTop;
-    };
-    document.body.addEventListener("scroll", handleScroll);
-    return () => document.body.removeEventListener("scroll", handleScroll);
-  });
+  const visible = useHideOnScroll();
 
   return (
     <AppBar
-      {...rest}
+      position="sticky"
       className={classNames(className, classes.header, {
         [classes.visible]: visible,
         [classes.hidden]: !visible,

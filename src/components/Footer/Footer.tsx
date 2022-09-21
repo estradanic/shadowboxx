@@ -1,4 +1,4 @@
-import React, { useLayoutEffect, useState } from "react";
+import React, { useState } from "react";
 import AppBar from "@material-ui/core/AppBar";
 import Toolbar from "@material-ui/core/Toolbar";
 import Typography from "@material-ui/core/Typography";
@@ -7,6 +7,7 @@ import { makeStyles, Theme } from "@material-ui/core/styles";
 import classNames from "classnames";
 import { Strings } from "../../resources";
 import { useSnackbar } from "../Snackbar";
+import { useHideOnScroll } from "../../hooks";
 import Offline from "../NetworkDetector/Offline";
 import Online from "../NetworkDetector/Online";
 
@@ -69,21 +70,7 @@ const Footer = () => {
   const [installPrompt, setInstallPrompt] =
     useState<BeforeInstallPromptEvent>();
   const [showInstallPrompt, setShowInstallPrompt] = useState<boolean>();
-  const [visible, setVisible] = useState<boolean>(true);
-  const scrollTopRef = React.useRef<number>(0);
-
-  // Set the footer invisible when it's scrolled down
-  // Set it visible again when scrolled up
-  useLayoutEffect(() => {
-    const handleScroll = (e: Event) => {
-      const target = e.target as HTMLElement;
-      const scrollTop = target.scrollTop;
-      setVisible(scrollTopRef.current >= scrollTop);
-      scrollTopRef.current = scrollTop;
-    };
-    document.body.addEventListener("scroll", handleScroll);
-    return () => document.body.removeEventListener("scroll", handleScroll);
-  });
+  const visible = useHideOnScroll();
 
   const { enqueueSuccessSnackbar, enqueueErrorSnackbar } = useSnackbar();
 
