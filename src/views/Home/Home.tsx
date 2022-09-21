@@ -2,9 +2,9 @@ import React, { memo, useMemo, useState } from "react";
 import Fab from "@material-ui/core/Fab";
 import Typography from "@material-ui/core/Typography";
 import Grid from "@material-ui/core/Grid";
-import AddIcon from "@material-ui/icons/Add";
 import { makeStyles, Theme } from "@material-ui/core/styles";
 import { useInfiniteQuery } from "@tanstack/react-query";
+import classNames from "classnames";
 import {
   PageContainer,
   AlbumCard,
@@ -18,6 +18,7 @@ import { ParseAlbum } from "../../classes";
 import { useUserContext } from "../../contexts";
 import { useView } from "../View";
 import {
+  useHideOnScroll,
   useInfiniteQueryConfigs,
   useInfiniteScroll,
   useRandomColor,
@@ -29,11 +30,17 @@ const useStyles = makeStyles((theme: Theme) => ({
     backgroundColor: theme.palette.success.main,
     color: theme.palette.success.contrastText,
     position: "absolute",
-    bottom: theme.spacing(7),
     right: theme.spacing(4),
     "&:hover, &:focus, &:active": {
       backgroundColor: theme.palette.success.dark,
     },
+    transition: theme.transitions.create("bottom"),
+  },
+  fabVisible: {
+    bottom: theme.spacing(7),
+  },
+  fabHidden: {
+    bottom: theme.spacing(-10),
   },
   title: {
     marginRight: "auto",
@@ -86,6 +93,7 @@ const Home = memo(() => {
 
   const { getLoggedInUser } = useUserContext();
   const randomColor = useRandomColor();
+  const fabVisible = useHideOnScroll();
 
   return (
     <PageContainer>
@@ -140,9 +148,11 @@ const Home = memo(() => {
       <Fab
         variant="extended"
         onClick={() => setAddAlbumDialogOpen(true)}
-        className={classes.fab}
+        className={classNames(classes.fab, {
+          [classes.fabVisible]: fabVisible,
+          [classes.fabHidden]: !fabVisible,
+        })}
       >
-        <AddIcon />
         <Typography>{Strings.addAlbum()}</Typography>
       </Fab>
       <AlbumFormDialog
