@@ -1,6 +1,6 @@
 
 <!DOCTYPE html>
-<html lang="en" style="overflow:hidden">
+<html lang="en">
   <head>
     <meta charset="UTF-8" />
     <link rel="icon" href="/favicon.ico" />
@@ -48,6 +48,14 @@
       }
       * {
         overscroll-behavior: none;
+      }
+      body {
+        overflow-y: auto;
+        height: 100%;
+      }
+      html {
+        height: 100vh;
+        overflow: hidden;
       }
     </style>
     <script type="module" src="/index.tsx"></script>

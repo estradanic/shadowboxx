@@ -1,6 +1,6 @@
 import Parse, { FullOptions } from "parse";
 import { Strings } from "../resources";
-import ParseObject, { Attributes, ParsifyPointers, isPointer } from "./ParseObject";
+import ParseObject, { Attributes, ParsifyPointers } from "./ParseObject";
 import ParsePointer from "./ParsePointer";
 
 export interface User extends Attributes {
@@ -40,8 +40,11 @@ export enum UpdateReason {
  * Class wrapping the Parse.User class and providing convenience methods/properties
  */
 export default class ParseUser extends ParseObject<User> {
+  /**
+   * Columns for the Parse.User ("User") class
+   */
   static COLUMNS: { [key: string]: string } = {
-    id: "objectId",
+    ...ParseObject.COLUMNS,
     emailVerified: "emailVerified",
     password: "password",
     email: "email",
@@ -53,6 +56,11 @@ export default class ParseUser extends ParseObject<User> {
     favoriteAlbums: "favoriteAlbums",
   };
 
+  /**
+   * Gets a Parse.Query for the Parse.User ("User") class
+   * @param online Whether to query online or not
+   * @returns A Parse.Query for the Parse.User ("User") class
+   */
   static query(online = true) {
     if (online) {
       return new Parse.Query<Parse.User<ParsifyPointers<User>>>("User");
@@ -60,6 +68,11 @@ export default class ParseUser extends ParseObject<User> {
     return new Parse.Query<Parse.User<ParsifyPointers<User>>>("User").fromLocalDatastore();
   }
 
+  /**
+   * Creates a new ParseUser from attributes
+   * @param attributes Attributes to create the ParseUser from
+   * @returns A new ParseUser
+   */
   static fromAttributes = (attributes: Partial<User>): ParseUser => {
     const fullAttributes: ParsifyPointers<User> = {
       username: attributes.username ?? attributes.email ?? "",
@@ -88,6 +101,11 @@ export default class ParseUser extends ParseObject<User> {
     this._user = user;
   }
 
+  /**
+   * Checks to see if that ParseUser is equal to this one
+   * @param that The other ParseUser to compare to
+   * @returns Whether the two ParseUsers are equal or not
+   */
   equals(that: ParseUser): boolean {
     return (
       this.email === that.email &&
@@ -98,28 +116,40 @@ export default class ParseUser extends ParseObject<User> {
     );
   }
 
+  /**
+   * Get the hashstring for this ParseUser
+   * @returns Hashstring of the ParseUser
+   */
   hashString(): string {
     return this.id ?? `${this.firstName}${this.lastName}${this.email}`;
   }
 
+  /**
+   * Fetches the ParseUser from the server
+   * @returns The fetched ParseUser
+   */
   async fetch() {
     return new ParseUser(await this._user.fetch());
   }
 
-  toPointer(): ParsePointer {
-    return new ParsePointer(this._user.toPointer());
-  }
-
-  toNativePointer(): Parse.Pointer {
-    return this._user.toPointer();
-  }
-
+  /**
+   * Logs in the ParseUser
+   * @param updateLoggedInUser Callback function to update the logged in user
+   * @param options Options to pass to the Parse login function
+   * @returns The logged in ParseUser
+   */
   async login(updateLoggedInUser: UpdateLoggedInUser, options?: FullOptions) {
     const loggedInUser = await this._user.logIn(options);
     await updateLoggedInUser(new ParseUser(loggedInUser), UpdateReason.LOG_IN);
     return new ParseUser(loggedInUser);
   }
 
+  /**
+   * Signs up the ParseUser
+   * @param updateLoggedInUser Callback function to update the logged in user
+   * @param options Options to pass to the Parse signUp function
+   * @returns The signed up ParseUser
+   */
   async signup(updateLoggedInUser: UpdateLoggedInUser, options?: FullOptions) {
     try {
       const loggedInUser = await this._user.signUp(undefined, options);
@@ -133,6 +163,12 @@ export default class ParseUser extends ParseObject<User> {
     }
   }
 
+  /**
+   * Updates and saves the ParseUser
+   * @param updateLoggedInUser Callback function to update the logged in user
+   * @param options Options to pass to the Parse save function
+   * @returns The saved ParseUser
+   */
   async update(
     updateLoggedInUser: UpdateLoggedInUser,
     options?: Parse.Object.SaveOptions
@@ -149,6 +185,11 @@ export default class ParseUser extends ParseObject<User> {
     }
   }
 
+  /**
+   * Log out the ParseUser
+   * @param updateLoggedInUser Callback function to update the logged in user
+   * @returns The logged out ParseUser
+   */
   async logout(updateLoggedInUser: UpdateLoggedInUser) {
     try {
       const loggedOutUser = await Parse.User.logOut<
@@ -165,26 +206,7 @@ export default class ParseUser extends ParseObject<User> {
     }
   }
 
-  get exists(): boolean {
-    return !!this._user;
-  }
-
-  get attributes(): User {
-    const attributes: any = {};
-    for (const key in this._user.attributes) {
-      if (isPointer(this._user.attributes[key])) {
-        attributes[key] = new ParsePointer(this._user.attributes[key]);
-      } else {
-        attributes[key] = this._user.attributes[key];
-      }
-    }
-    return attributes;
-  }
-
-  get id(): string | undefined {
-    return this._user.get(ParseUser.COLUMNS.id) ?? this._user.id;
-  }
-
+  /** Whether this user's email has been verified */
   get emailVerified(): boolean | undefined {
     return this._user.get(ParseUser.COLUMNS.emailVerified);
   }
@@ -193,6 +215,7 @@ export default class ParseUser extends ParseObject<User> {
     this._user.set(ParseUser.COLUMNS.emailVerified, emailVerified);
   }
 
+  /** This user's username */
   get username(): string {
     return this._user.get(ParseUser.COLUMNS.username);
   }
@@ -205,6 +228,7 @@ export default class ParseUser extends ParseObject<User> {
     this._user.setPassword(password);
   }
 
+  /** This user's email */
   get email(): string {
     return (
       this._user.get(ParseUser.COLUMNS.email) ??
@@ -217,6 +241,7 @@ export default class ParseUser extends ParseObject<User> {
     this._user.setEmail(email);
   }
 
+  /** This user's last name */
   get lastName(): string {
     return this._user.get(ParseUser.COLUMNS.lastName);
   }
@@ -225,6 +250,7 @@ export default class ParseUser extends ParseObject<User> {
     this._user.set(ParseUser.COLUMNS.lastName, lastName);
   }
 
+  /** This user's first name */
   get firstName(): string {
     return this._user.get(ParseUser.COLUMNS.firstName);
   }
@@ -233,6 +259,7 @@ export default class ParseUser extends ParseObject<User> {
     this._user.set(ParseUser.COLUMNS.firstName, firstName);
   }
 
+  /** This user's full name */
   get name(): string {
     if (this.firstName && this.lastName) {
       return `${this.firstName} ${this.lastName}`;
@@ -240,6 +267,7 @@ export default class ParseUser extends ParseObject<User> {
     return this.email;
   }
 
+  /** Whether the user has dark theme enabled */
   get isDarkThemeEnabled(): boolean {
     return this._user.get(ParseUser.COLUMNS.isDarkThemeEnabled);
   }
@@ -248,6 +276,7 @@ export default class ParseUser extends ParseObject<User> {
     this._user.set(ParseUser.COLUMNS.isDarkThemeEnabled, isDarkThemeEnabled);
   }
 
+  /** This user's profile picture, if it exists */
   get profilePicture(): ParsePointer | undefined {
     return new ParsePointer(this._user.get(ParseUser.COLUMNS.profilePicture));
   }
@@ -256,6 +285,7 @@ export default class ParseUser extends ParseObject<User> {
     this._user.set(ParseUser.COLUMNS.profilePicture, profilePicture?._pointer);
   }
 
+  /** This user's list of favorited albums */
   get favoriteAlbums(): string[] {
     return this._user.get(ParseUser.COLUMNS.favoriteAlbums);
   }

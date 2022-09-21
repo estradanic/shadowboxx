@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useLayoutEffect, useState } from "react";
 import AppBar, { AppBarProps } from "@material-ui/core/AppBar";
 import Toolbar from "@material-ui/core/Toolbar";
 import Button from "@material-ui/core/Button";
@@ -15,8 +15,22 @@ import BackButton from "../Button/BackButton";
 import AppMenu from "../Menu/AppMenu";
 import UserAvatar from "../User/UserAvatar";
 import Notifications from "../Notifications/Notifications";
+import classNames from "classnames";
+
+type UseStylesParams = {
+  xs: boolean;
+};
 
 const useStyles = makeStyles((theme: Theme) => ({
+  header: {
+    transition: theme.transitions.create("top"),
+  },
+  visible: {
+    top: 0,
+  },
+  hidden: {
+    top: ({xs}: UseStylesParams) => theme.spacing(xs ? -6.5 : -8.5),
+  },
   backButton: {
     marginRight: theme.spacing(3),
   },
@@ -26,7 +40,7 @@ const useStyles = makeStyles((theme: Theme) => ({
   },
   logo: {
     fontFamily: "Alex Brush",
-    fontSize: ({ xs }: any) => (xs ? "xx-large" : "xxx-large"),
+    fontSize: ({ xs }: UseStylesParams) => (xs ? "xx-large" : "xxx-large"),
     marginRight: theme.spacing(3),
     "&:hover": {
       textDecoration: "none",
@@ -56,16 +70,34 @@ export interface HeaderProps extends AppBarProps {
 /**
  * Component to provide navigation and user info and functionality at the top of a page
  */
-const Header = ({ viewId, ...rest }: HeaderProps) => {
+const Header = ({ viewId, className, ...rest }: HeaderProps) => {
   const theme = useTheme();
   const xs = useMediaQuery(theme.breakpoints.down("xs"));
   const classes = useStyles({ xs });
   const navigate = useNavigate();
   const location = useLocation() as { state: { previousLocation?: Location } };
   const { isUserLoggedIn, getLoggedInUser, profilePicture } = useUserContext();
+  const [visible, setVisible] = useState<boolean>(true);
+  const scrollTopRef = React.useRef<number>(0);
+
+  // Set the header invisible when it's scrolled down
+  // Set it visible again when scrolled up
+  useLayoutEffect(() => {
+    const handleScroll = (e: Event) => {
+      const target = e.target as HTMLElement;
+      const scrollTop = target.scrollTop;
+      setVisible(scrollTopRef.current >= scrollTop);
+      scrollTopRef.current = scrollTop;
+    };
+    document.body.addEventListener("scroll", handleScroll);
+    return () => document.body.removeEventListener("scroll", handleScroll);
+  });
 
   return (
-    <AppBar {...rest}>
+    <AppBar
+      {...rest}
+      className={classNames(className, classes.header, {[classes.visible]: visible, [classes.hidden]: !visible})}
+    >
       <Toolbar className={classes.toolbar}>
         <Link className={classes.logo} to="/" color="inherit">
           {Strings.appName()}
@@ -98,7 +130,7 @@ const Header = ({ viewId, ...rest }: HeaderProps) => {
         {isUserLoggedIn && (
           <>
             <Notifications className={classes.notifications} />
-            {!!profilePicture?.thumbnail?.url() && (
+            {!!profilePicture?.fileThumb?.url() && (
               <UserAvatar
                 email={getLoggedInUser().email}
                 className={classes.profile}

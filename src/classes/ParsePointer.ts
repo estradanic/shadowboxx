@@ -12,14 +12,12 @@ export default class ParsePointer {
     this._pointer = pointer;
   }
 
+  /** The class that this pointer points to */
   get className(): ClassName {
     return (this._pointer?.className ?? null) as ClassName;
   }
 
-  get exists(): boolean {
-    return !!this._pointer;
-  }
-
+  /** The objectId of the object that this pointer points to */
   get id(): string {
     // The type for Pointer in the parse npm module isn't reliable.
     // Check for either objectId or id here.

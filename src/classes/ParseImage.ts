@@ -18,6 +18,12 @@ export interface Image extends Attributes {
  * Class wrapping the Parse.Image class and providing convenience methods/properties
  */
 export default class ParseImage extends ParseObject<Image> {
+
+  /**
+   * Create a new image from attributes
+   * @param attributes Attributes to create the image with
+   * @returns The created image
+   */
   static fromAttributes(attributes: Image): ParseImage {
     const newAttributes: ParsifyPointers<Image> = {
       ...attributes,
@@ -29,6 +35,11 @@ export default class ParseImage extends ParseObject<Image> {
     );
   }
 
+  /**
+   * Get a Parse.Query for the "Image" class
+   * @param online Whether to query online or not, defaults to true
+   * @returns Parse.Query for the "Image" class
+   */
   static query(online = true) {
     if (online) {
       return new Parse.Query<Parse.Object<ParsifyPointers<Image>>>("Image");
@@ -36,6 +47,12 @@ export default class ParseImage extends ParseObject<Image> {
     return new Parse.Query<Parse.Object<ParsifyPointers<Image>>>("Image").fromLocalDatastore();
   }
 
+  /**
+   * Sort a list of images by default compareTo or coverImage if given
+   * @param images List of images to sort
+   * @param coverImage Image to sort to the top
+   * @returns Sorted list of images
+   */
   static sort(images: ParseImage[], coverImage?: ParsePointer): ParseImage[] {
     if (coverImage) {
       return [...images].sort((a, b) => {
@@ -51,6 +68,9 @@ export default class ParseImage extends ParseObject<Image> {
     return [...images].sort((a, b) => a.compareTo(b));
   }
 
+  /**
+   * Columns for the "Image" class
+   */
   static COLUMNS: { [key: string]: string } = {
     ...ParseObject.COLUMNS,
     file: "file",
@@ -68,6 +88,11 @@ export default class ParseImage extends ParseObject<Image> {
     this._image = image;
   }
 
+  /**
+   * Compare to another image
+   * @param image Image to compare to
+   * @returns 0 if equal, -1 if this image is less than the other, 1 if this image is greater than the other
+   */
   compareTo(that: ParseImage): number {
     if (this.createdAt! > that.createdAt!) {
       return -1;
@@ -78,6 +103,11 @@ export default class ParseImage extends ParseObject<Image> {
     }
   }
 
+  /**
+   * Save the image
+   * @param options Options to pass to Parse.Object.save
+   * @returns The saved image
+   */
   async save() {
     if (!this._image.getACL()) {
       const owner = await ParseUser.query().get(this.owner.id);
@@ -87,10 +117,7 @@ export default class ParseImage extends ParseObject<Image> {
     return new ParseImage(await this._image.save());
   }
 
-  async destroy() {
-    return await this._image.destroy();
-  }
-
+  /** The actual saved file */
   get file(): Parse.File {
     return this._image.get(ParseImage.COLUMNS.file);
   }
@@ -99,6 +126,7 @@ export default class ParseImage extends ParseObject<Image> {
     this._image.set(ParseImage.COLUMNS.file, file);
   }
 
+  /** Thumbnail size of the file */
   get fileThumb(): Parse.File {
     return (
       this._image.get(ParseImage.COLUMNS.fileThumb) ??
@@ -107,14 +135,17 @@ export default class ParseImage extends ParseObject<Image> {
     );
   }
 
+  /** Mobile size of the file (700px max edge) */
   get fileMobile(): Parse.File {
     return this._image.get(ParseImage.COLUMNS.fileMobile) ?? this.file;
   }
 
+  /** PNG version of the file for mobile Safari and IE */
   get fileLegacy(): Parse.File | undefined {
     return this._image.get(ParseImage.COLUMNS.fileLegacy);
   }
 
+  /** Pointer to user who owns the image */
   get owner(): Image["owner"] {
     return new ParsePointer(this._image.get(ParseImage.COLUMNS.owner));
   }
@@ -123,6 +154,7 @@ export default class ParseImage extends ParseObject<Image> {
     this._image.set(ParseImage.COLUMNS.owner, owner._pointer);
   }
 
+  /** Image name */
   get name(): Image["name"] {
     return (
       this._image.get(ParseImage.COLUMNS.name) ??

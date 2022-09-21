@@ -10,11 +10,10 @@ import LoadingWrapper from "../Loader/LoadingWrapper";
 const useStyles = makeStyles((theme: Theme) => ({
   container: {
     backgroundColor: theme.palette.background.default,
-    height: `calc(100vh - ${theme.spacing(19)}px)`,
     color: theme.palette.primary.contrastText,
-    overflowY: "auto",
+    overflowY: "hidden",
     overflowX: "hidden",
-    WebkitOverflowScrolling: "touch",
+    minHeight: `calc(100vh - 8rem)`,
   },
   grid: {
     paddingTop: theme.spacing(6),

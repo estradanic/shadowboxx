@@ -1,18 +1,24 @@
-import React, { useState } from "react";
+import React, { useLayoutEffect, useState } from "react";
 import AppBar from "@material-ui/core/AppBar";
 import Toolbar from "@material-ui/core/Toolbar";
 import Typography from "@material-ui/core/Typography";
 import Button from "@material-ui/core/Button";
 import { makeStyles, Theme } from "@material-ui/core/styles";
+import classNames from "classnames";
 import { Strings } from "../../resources";
 import { useSnackbar } from "../Snackbar";
 import Offline from "../NetworkDetector/Offline";
 import Online from "../NetworkDetector/Online";
 
 const useStyles = makeStyles((theme: Theme) => ({
-  appBar: {
-    top: "auto",
+  footer: {
+    transition: theme.transitions.create("bottom"),
+  },
+  visible: {
     bottom: 0,
+  },
+  hidden: {
+    bottom: theme.spacing(-8),
   },
   centeredText: {
     margin: "auto",
@@ -63,6 +69,21 @@ const Footer = () => {
   const [installPrompt, setInstallPrompt] =
     useState<BeforeInstallPromptEvent>();
   const [showInstallPrompt, setShowInstallPrompt] = useState<boolean>();
+  const [visible, setVisible] = useState<boolean>(true);
+  const scrollTopRef = React.useRef<number>(0);
+
+  // Set the footer invisible when it's scrolled down
+  // Set it visible again when scrolled up
+  useLayoutEffect(() => {
+    const handleScroll = (e: Event) => {
+      const target = e.target as HTMLElement;
+      const scrollTop = target.scrollTop;
+      setVisible(scrollTopRef.current >= scrollTop);
+      scrollTopRef.current = scrollTop;
+    };
+    document.body.addEventListener("scroll", handleScroll);
+    return () => document.body.removeEventListener("scroll", handleScroll);
+  });
 
   const { enqueueSuccessSnackbar, enqueueErrorSnackbar } = useSnackbar();
 
@@ -87,10 +108,10 @@ const Footer = () => {
 
   return (
     <AppBar
-      position="absolute"
+      position="sticky"
       color="primary"
       component="footer"
-      className={classes.appBar}
+      className={classNames(classes.footer, {[classes.visible]: visible, [classes.hidden]: !visible})}
     >
       <Online>
         <Toolbar variant="dense">

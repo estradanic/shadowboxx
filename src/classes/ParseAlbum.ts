@@ -129,10 +129,7 @@ export default class ParseAlbum extends ParseObject<Album> {
     return this.save(context);
   }
 
-  async destroy() {
-    return await this._album.destroy();
-  }
-
+  /** Pointer to the owner of this album */
   get owner(): Album["owner"] {
     return new ParsePointer(this._album.get(ParseAlbum.COLUMNS.owner));
   }
@@ -141,6 +138,7 @@ export default class ParseAlbum extends ParseObject<Album> {
     this._album.set(ParseAlbum.COLUMNS.owner, owner._pointer);
   }
 
+  /** List of image ids */
   get images(): Album["images"] {
     return this._album.get(ParseAlbum.COLUMNS.images);
   }
@@ -149,6 +147,7 @@ export default class ParseAlbum extends ParseObject<Album> {
     this._album.set(ParseAlbum.COLUMNS.images, images);
   }
 
+  /** Name of the album */
   get name(): Album["name"] {
     return this._album.get(ParseAlbum.COLUMNS.name);
   }
@@ -157,6 +156,7 @@ export default class ParseAlbum extends ParseObject<Album> {
     this._album.set(ParseAlbum.COLUMNS.name, name);
   }
 
+  /** Description for this album */
   get description(): Album["description"] {
     return this._album.get(ParseAlbum.COLUMNS.description);
   }
@@ -165,6 +165,7 @@ export default class ParseAlbum extends ParseObject<Album> {
     this._album.set(ParseAlbum.COLUMNS.description, description);
   }
 
+  /** List of collaborator emails */
   get collaborators(): Album["collaborators"] {
     return this._album.get(ParseAlbum.COLUMNS.collaborators);
   }
@@ -173,6 +174,7 @@ export default class ParseAlbum extends ParseObject<Album> {
     this._album.set(ParseAlbum.COLUMNS.collaborators, collaborators);
   }
 
+  /** List of viewer emails */
   get viewers(): Album["viewers"] {
     return this._album.get(ParseAlbum.COLUMNS.viewers);
   }
@@ -181,6 +183,7 @@ export default class ParseAlbum extends ParseObject<Album> {
     this._album.set(ParseAlbum.COLUMNS.viewers, viewers);
   }
 
+  /** Pointer to the cover image for this album */
   get coverImage(): Album["coverImage"] {
     if (this._album.get(ParseAlbum.COLUMNS.coverImage)) {
       return new ParsePointer(this._album.get(ParseAlbum.COLUMNS.coverImage));
@@ -194,5 +197,14 @@ export default class ParseAlbum extends ParseObject<Album> {
 
   set coverImage(coverImage) {
     this._album.set(ParseAlbum.COLUMNS.coverImage, coverImage?._pointer);
+  }
+
+  /** Attributes for this album */
+  get attributes(): Album {
+    return {
+      ...this._album.attributes,
+      owner: this.owner,
+      coverImage: this.coverImage,
+    };
   }
 }
