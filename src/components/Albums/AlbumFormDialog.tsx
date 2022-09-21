@@ -259,11 +259,27 @@ const AlbumFormDialog = ({
                 let newImageIds = imageIds;
                 switch (reason) {
                   case "ADD":
-                    newImageIds = dedupeFast<string>([...imageIds, ...(value.filter((newImage) => !!newImage.id).map((newImage) => newImage.id!))]);
+                    newImageIds = dedupeFast<string>([
+                      ...imageIds,
+                      ...value
+                        .filter((newImage) => !!newImage.id)
+                        .map((newImage) => newImage.id!),
+                    ]);
                     break;
                   case "REMOVE":
-                    const removedImages = images?.filter((image) => !value.map((newImage) => newImage.id).includes(image.id)) ?? [];
-                    newImageIds = imageIds.filter((imageId) => !removedImages.map((removedImage) => removedImage.id).includes(imageId));
+                    const removedImages =
+                      images?.filter(
+                        (image) =>
+                          !value
+                            .map((newImage) => newImage.id)
+                            .includes(image.id)
+                      ) ?? [];
+                    newImageIds = imageIds.filter(
+                      (imageId) =>
+                        !removedImages
+                          .map((removedImage) => removedImage.id)
+                          .includes(imageId)
+                    );
                 }
                 setImageIds(newImageIds);
               }}

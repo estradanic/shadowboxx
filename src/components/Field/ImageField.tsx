@@ -112,7 +112,10 @@ export type ImageFieldProps = Omit<
   /** Value of the field, array of Images */
   value: ParseImage[];
   /** Function to run when the value changes */
-  onChange: (value: ParseImage[], reason: ImageFieldOnChangeReason) => Promise<void>;
+  onChange: (
+    value: ParseImage[],
+    reason: ImageFieldOnChangeReason
+  ) => Promise<void>;
   /** Whether multiple images can be selected or not */
   multiple?: boolean;
   /** ACL to save new images with after upload */

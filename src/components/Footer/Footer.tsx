@@ -111,7 +111,10 @@ const Footer = () => {
       position="sticky"
       color="primary"
       component="footer"
-      className={classNames(classes.footer, {[classes.visible]: visible, [classes.hidden]: !visible})}
+      className={classNames(classes.footer, {
+        [classes.visible]: visible,
+        [classes.hidden]: !visible,
+      })}
     >
       <Online>
         <Toolbar variant="dense">

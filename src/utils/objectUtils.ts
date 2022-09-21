@@ -15,7 +15,7 @@ export const dedupeFast = <T extends Hashable | string>(
       return entry;
     }
     return entry.hashString();
-  }
+  };
 
   for (const entry of Array.from(collection)) {
     deduped.set(hashString(entry), entry);

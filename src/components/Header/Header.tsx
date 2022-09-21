@@ -29,7 +29,7 @@ const useStyles = makeStyles((theme: Theme) => ({
     top: 0,
   },
   hidden: {
-    top: ({xs}: UseStylesParams) => theme.spacing(xs ? -6.5 : -8.5),
+    top: ({ xs }: UseStylesParams) => theme.spacing(xs ? -6.5 : -8.5),
   },
   backButton: {
     marginRight: theme.spacing(3),
@@ -96,7 +96,10 @@ const Header = ({ viewId, className, ...rest }: HeaderProps) => {
   return (
     <AppBar
       {...rest}
-      className={classNames(className, classes.header, {[classes.visible]: visible, [classes.hidden]: !visible})}
+      className={classNames(className, classes.header, {
+        [classes.visible]: visible,
+        [classes.hidden]: !visible,
+      })}
     >
       <Toolbar className={classes.toolbar}>
         <Link className={classes.logo} to="/" color="inherit">
