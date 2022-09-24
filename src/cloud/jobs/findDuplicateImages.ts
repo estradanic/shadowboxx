@@ -18,23 +18,23 @@ const findDuplicateImages = async () => {
   let userSkip = 0;
   let user: Parse.User;
   do {
-    [user] = await new Parse.Query(Parse.User)
+    user = (await new Parse.Query(Parse.User)
       .ascending("createdAt")
       .limit(1)
       .skip(userSkip++)
-      .find({ useMasterKey: true });
+      .find({ useMasterKey: true }))?.[0];
     console.log("Checking images for user", user.get("email"));
 
     // Loop over all images for this user, one at a time
     let imageSkip = 0;
     let image: Parse.Object;
     do {
-      [image] = await new Parse.Query("Image")
-        .equalTo("owner", user.toPointer())
+      image = (await new Parse.Query("Image")
+        .equalTo("owner", user?.toPointer())
         .ascending("objectId")
         .limit(1)
         .skip(imageSkip++)
-        .find({ useMasterKey: true });
+        .find({ useMasterKey: true }))?.[0];
       if (image?.get("hash")) {
         console.log("Checking duplicates for image", image.get("name"));
         let page = 0;
@@ -43,8 +43,8 @@ const findDuplicateImages = async () => {
         while (!exhausted) {
           console.log(`Getting batch ${page} for image ${image.get("name")}`);
           const otherImages = await new Parse.Query("Image")
-            .equalTo("owner", user.id)
-            .notEqualTo("objectId", image.id)
+            .equalTo("owner", user.toPointer())
+            .notEqualTo("objectId", image.toPointer())
             .ascending("createdAt")
             .limit(pageSize)
             .skip(page * pageSize)
