@@ -33,10 +33,12 @@ Parse.Cloud.beforeDelete("Album", async (request) => {
   await deleteRoles(request.object);
 });
 
-Parse.Cloud.job("findDuplicates", async () => {
+Parse.Cloud.job("findDuplicates", async (request) => {
   await findDuplicateImages();
+  request.message("Done");
 });
 
-Parse.Cloud.job("hashImages", async () => {
+Parse.Cloud.job("hashImages", async (request) => {
   await hashImages();
+  request.message("Done");
 });

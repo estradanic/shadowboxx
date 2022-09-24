@@ -44,11 +44,12 @@ const findDuplicateImages = async () => {
           console.log(`Getting batch ${page} for image ${image.get("name")}`);
           const otherImages = await new Parse.Query("Image")
             .equalTo("owner", user.toPointer())
-            .notEqualTo("objectId", image.toPointer())
+            .notEqualTo("objectId", image.id)
             .ascending("createdAt")
             .limit(pageSize)
             .skip(page * pageSize)
             .find({ useMasterKey: true });
+          page++;
           if (otherImages.length === 0) {
             exhausted = true;
           }
