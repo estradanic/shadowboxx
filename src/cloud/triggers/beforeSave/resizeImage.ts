@@ -1,5 +1,9 @@
 import sharp from "sharp";
 
+/**
+ * Function to resize an image to thumbnail, mobile, and desktop sizes.
+ * It also converts the image to png for iOS compatibility, and webp for smaller file size.
+ */
 const resizeImage = async (image: Parse.Object) => {
   if (
     !!image.get("file") &&

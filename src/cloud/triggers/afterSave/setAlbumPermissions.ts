@@ -1,3 +1,4 @@
+/** Function to get all images in this album */
 const getAllImages = async (album: Parse.Object) => {
   const images = [];
   let exhausted = false;
@@ -19,6 +20,7 @@ const getAllImages = async (album: Parse.Object) => {
   return images;
 };
 
+/** Function to get all users by their emails */
 const getAllUsersByEmails = async (emails: string[]) => {
   const users = [];
   let exhausted = false;
@@ -40,6 +42,7 @@ const getAllUsersByEmails = async (emails: string[]) => {
   return users;
 };
 
+/** Function to set permissions for this album and the images within it */
 const setAlbumPermissions = async (album: Parse.Object) => {
   const owner = await new Parse.Query(Parse.User)
     .equalTo("objectId", album.get("owner").id)

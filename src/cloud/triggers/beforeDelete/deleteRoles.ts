@@ -1,3 +1,4 @@
+/** Function to delete roles associated with this album */
 const deleteRoles = async (album: Parse.Object) => {
   const readRole = await new Parse.Query(Parse.Role)
     .equalTo("name", `${album.id}_r`)

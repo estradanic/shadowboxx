@@ -1,3 +1,4 @@
+/** Function to set user permissions for albums */
 const setUserPermissions = async (user: Parse.User) => {
   if (!user.existed()) {
     const collaboratorAlbums = await new Parse.Query("Album")

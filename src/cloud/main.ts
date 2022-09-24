@@ -4,9 +4,14 @@ import {
   resizeImage,
   setAlbumPermissions,
   setUserPermissions,
+  hashImage,
 } from "./triggers";
 
-import { convertImages } from "./jobs";
+import { findDuplicateImages } from "./jobs";
+
+Parse.Cloud.afterSave("Image", async (request) => {
+  await hashImage(request.object);
+});
 
 Parse.Cloud.afterSave("Album", async (request) => {
   await setAlbumPermissions(request.object);
@@ -28,6 +33,6 @@ Parse.Cloud.beforeDelete("Album", async (request) => {
   await deleteRoles(request.object);
 });
 
-Parse.Cloud.job("convertImages", async () => {
-  await convertImages();
+Parse.Cloud.job("findDuplicates", async () => {
+  await findDuplicateImages();
 });

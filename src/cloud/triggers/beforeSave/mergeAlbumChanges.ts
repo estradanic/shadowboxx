@@ -1,3 +1,7 @@
+/**
+ * Function to avoid a race condition when saving an album.
+ * Applies changes to the album in the db rather than just blindly saving the uploaded object.
+ */
 const mergeAlbumChanges = async (
   album: Parse.Object,
   context: Record<string, any>
