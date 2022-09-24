@@ -1,3 +1,5 @@
+const SIMILARITY_THRESHOLD = 0.95;
+
 /** Function to calculate similarity between image hashes */
 const similarity = (hash1: string, hash2: string) => {
   if (!hash1 || !hash2) {
@@ -76,7 +78,7 @@ const findDuplicateImages = async () => {
               image.get("hash"),
               otherImage.get("hash")
             );
-            if (similarityScore > 0.9) {
+            if (similarityScore > SIMILARITY_THRESHOLD) {
               console.log(
                 `Found duplicate images: ${image.get(
                   "name"
