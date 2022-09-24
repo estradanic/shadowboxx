@@ -7,7 +7,7 @@ import {
   hashImage,
 } from "./triggers";
 
-import { findDuplicateImages } from "./jobs";
+import { findDuplicateImages, hashImages } from "./jobs";
 
 Parse.Cloud.afterSave("Image", async (request) => {
   await hashImage(request.object);
@@ -35,4 +35,8 @@ Parse.Cloud.beforeDelete("Album", async (request) => {
 
 Parse.Cloud.job("findDuplicates", async () => {
   await findDuplicateImages();
+});
+
+Parse.Cloud.job("hashImages", async () => {
+  await hashImages();
 });
