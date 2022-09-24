@@ -23,7 +23,7 @@ const findDuplicateImages = async () => {
       .limit(1)
       .skip(userSkip++)
       .find({ useMasterKey: true }))?.[0];
-    console.log("Checking images for user", user.get("email"));
+    console.log("Checking images for user", user?.get("email"));
 
     // Loop over all images for this user, one at a time
     let imageSkip = 0;
