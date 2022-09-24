@@ -30,13 +30,13 @@ const findDuplicateImages = async () => {
     let image: Parse.Object;
     do {
       [image] = await new Parse.Query("Image")
-        .equalTo("owner", user.id)
+        .equalTo("owner", user.toPointer())
         .ascending("objectId")
         .limit(1)
         .skip(imageSkip++)
         .find({ useMasterKey: true });
-      console.log("Checking duplicates for image", image.get("name"));
       if (image?.get("hash")) {
+        console.log("Checking duplicates for image", image.get("name"));
         let page = 0;
         const pageSize = 100;
         let exhausted = false;
