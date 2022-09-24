@@ -57,14 +57,18 @@ const findDuplicateImages = async () => {
             console.log("Checking image", otherImage.get("name"));
             const existingDuplicateQuery = await Parse.Query.or(
               new Parse.Query("Duplicate")
-                .equalTo("image1", image.id)
-                .equalTo("image2", otherImage.id),
+                .equalTo("image1", image.toPointer())
+                .equalTo("image2", otherImage.toPointer()),
               new Parse.Query("Duplicate")
-                .equalTo("image1", otherImage.id)
-                .equalTo("image2", image.id)
+                .equalTo("image1", otherImage.toPointer())
+                .equalTo("image2", image.toPointer())
             ).find({ useMasterKey: true });
             if (existingDuplicateQuery.length > 0) {
-              console.log("Duplicate already exists", image.id, otherImage.id);
+              console.log(
+                "Duplicate already exists",
+                image.get("name"),
+                otherImage.get("name")
+              );
               continue;
             }
             const similarityScore = similarity(
@@ -81,8 +85,8 @@ const findDuplicateImages = async () => {
               );
               duplicates.push(
                 new Parse.Object("Duplicate", {
-                  image1: image.id,
-                  image2: otherImage.id,
+                  image1: image.toPointer(),
+                  image2: otherImage.toPointer(),
                   similarity: similarityScore,
                 })
               );
