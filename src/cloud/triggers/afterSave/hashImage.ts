@@ -34,7 +34,7 @@ const hashImage = async (image: Parse.Object) => {
     console.error("Could not get ImageData for image", image.id);
     return;
   }
-  const hash = hexToBinary(await bmvbhash(imageData, 8));
+  const hash = hexToBinary(await bmvbhash(imageData, 16));
 
   image.set("hash", hash);
 };
