@@ -1814,12 +1814,6 @@
     magic-string "^0.26.2"
     react-refresh "^0.14.0"
 
-"@xmldom/xmldom@^0.7.5", "xmldom@npm:@xmldom/xmldom@^0.7.0":
-  name xmldom
-  version "0.7.5"
-  resolved "https://registry.yarnpkg.com/@xmldom/xmldom/-/xmldom-0.7.5.tgz#09fa51e356d07d0be200642b0e4f91d8e6dd408d"
-  integrity sha512-V3BIhmY36fXZ1OtVcI9W+FxQqxVLsPKcNjWigIaa81dLC9IolJl5Mt4Cvhmr0flUnjSpTdrbMTSbXqYqV5dT6A==
-
 acorn-jsx@^5.3.2:
   version "5.3.2"
   resolved "https://registry.yarnpkg.com/acorn-jsx/-/acorn-jsx-5.3.2.tgz#7ed5bb55908b3b2f1bc55c6af1653bada7f07937"
@@ -2148,12 +2142,10 @@ braces@^3.0.2:
   dependencies:
     fill-range "^7.0.1"
 
-browser-image-resizer@^2.3.2:
-  version "2.3.2"
-  resolved "https://registry.yarnpkg.com/browser-image-resizer/-/browser-image-resizer-2.3.2.tgz#b061e88bf0b8a42e09c0ccb76dbf64a334636e52"
-  integrity sha512-+dvpbz7cCs0Gkwx37cvk3nviJecUwq5GzP2ip/szBc7Dn+h8DCwF6VTXlljlQ7k1R2ktoywE7rh8qgVGhBstmg==
-  dependencies:
-    exifreader "^4.5.1"
+browser-image-resizer@^2.4.1:
+  version "2.4.1"
+  resolved "https://registry.yarnpkg.com/browser-image-resizer/-/browser-image-resizer-2.4.1.tgz#b3332bbd6745efb72c9c63b4578b2a29f199ace3"
+  integrity sha512-gqrmr7+NTI9FgZVVyw/GIqwJE3MhNWaBn1R5ptu75r+/M5ncyntSMQYuYhOPonm44qQNnkGN9cnghlpd9h1Hug==
 
 browserslist@^4, browserslist@^4.0.0, browserslist@^4.16.6, browserslist@^4.20.3, browserslist@^4.21.3:
   version "4.21.3"
@@ -3233,13 +3225,6 @@ events@^3.3.0:
   version "3.3.0"
   resolved "https://registry.yarnpkg.com/events/-/events-3.3.0.tgz#31a95ad0a924e2d2c419a813aeb2c4e878ea7400"
   integrity sha512-mQw+2fkQbALzQ7V0MY0IqdnXNOeTtP4r0lN9z7AAawCXgqea7bDii20AYrIBrFd/Hx0M2Ocz6S111CaFkUcb0Q==
-
-exifreader@^4.5.1:
-  version "4.5.1"
-  resolved "https://registry.yarnpkg.com/exifreader/-/exifreader-4.5.1.tgz#d3422ff88db8eabd3ed539620c36efc97637a798"
-  integrity sha512-TYWL3TLhvPipgFZgaInomFj9ZR80hpq3BypCtSAWNOYVZ59N8oZtHir0kVOUqdOTqmfUhmZDdHn7gfhG/5F3WQ==
-  optionalDependencies:
-    "@xmldom/xmldom" "^0.7.5"
 
 expand-brackets@^2.1.4:
   version "2.1.4"
@@ -6200,6 +6185,11 @@ ws@8.6.0:
   version "8.6.0"
   resolved "https://registry.yarnpkg.com/ws/-/ws-8.6.0.tgz#e5e9f1d9e7ff88083d0c0dd8281ea662a42c9c23"
   integrity sha512-AzmM3aH3gk0aX7/rZLYvjdvZooofDu3fFOzGqcSnQ1tOcTWwhM/o+q++E8mAyVVIyUdajrkzWUGftaVSDLn1bw==
+
+"xmldom@npm:@xmldom/xmldom@^0.7.0":
+  version "0.7.5"
+  resolved "https://registry.yarnpkg.com/@xmldom/xmldom/-/xmldom-0.7.5.tgz#09fa51e356d07d0be200642b0e4f91d8e6dd408d"
+  integrity sha512-V3BIhmY36fXZ1OtVcI9W+FxQqxVLsPKcNjWigIaa81dLC9IolJl5Mt4Cvhmr0flUnjSpTdrbMTSbXqYqV5dT6A==
 
 xmlhttprequest@1.8.0:
   version "1.8.0"
