@@ -91,6 +91,7 @@ const findDuplicateImages = async () => {
                   image1: image.toPointer(),
                   image2: otherImage.toPointer(),
                   similarity: similarityScore,
+                  owner: user.toPointer(),
                 })
               );
             }
