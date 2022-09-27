@@ -20,23 +20,27 @@ const findDuplicateImages = async () => {
   let userSkip = 0;
   let user: Parse.User;
   do {
-    user = (await new Parse.Query(Parse.User)
-      .ascending("createdAt")
-      .limit(1)
-      .skip(userSkip++)
-      .find({ useMasterKey: true }))?.[0];
+    user = (
+      await new Parse.Query(Parse.User)
+        .ascending("createdAt")
+        .limit(1)
+        .skip(userSkip++)
+        .find({ useMasterKey: true })
+    )?.[0];
     console.log("Checking images for user", user?.get("email"));
 
     // Loop over all images for this user, one at a time
     let imageSkip = 0;
     let image: Parse.Object;
     do {
-      image = (await new Parse.Query("Image")
-        .equalTo("owner", user?.toPointer())
-        .ascending("objectId")
-        .limit(1)
-        .skip(imageSkip++)
-        .find({ useMasterKey: true }))?.[0];
+      image = (
+        await new Parse.Query("Image")
+          .equalTo("owner", user?.toPointer())
+          .ascending("objectId")
+          .limit(1)
+          .skip(imageSkip++)
+          .find({ useMasterKey: true })
+      )?.[0];
       if (image?.get("hash")) {
         console.log("Checking duplicates for image", image.get("name"));
         let page = 0;

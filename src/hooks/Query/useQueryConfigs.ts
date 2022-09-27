@@ -308,13 +308,16 @@ const useQueryConfigs = () => {
   const getDuplicatesFunction = async (
     options: FunctionOptions = {}
   ): Promise<ParseDuplicate[]> => {
-    return await runFunctionInTryCatch<ParseDuplicate[]>(async () => {
-      const duplicates = await ParseDuplicate.query(online)
-        .equalTo(ParseDuplicate.COLUMNS.acknowledged, false)
-        .ascending(ParseDuplicate.COLUMNS.createdAt)
-        .find();
-      return duplicates.map((duplicate) => new ParseDuplicate(duplicate));
-    }, {errorMessage: Strings.couldNotGetDuplicates(), ...options})
+    return await runFunctionInTryCatch<ParseDuplicate[]>(
+      async () => {
+        const duplicates = await ParseDuplicate.query(online)
+          .equalTo(ParseDuplicate.COLUMNS.acknowledged, false)
+          .ascending(ParseDuplicate.COLUMNS.createdAt)
+          .find();
+        return duplicates.map((duplicate) => new ParseDuplicate(duplicate));
+      },
+      { errorMessage: Strings.couldNotGetDuplicates(), ...options }
+    );
   };
 
   return {
