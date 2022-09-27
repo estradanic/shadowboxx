@@ -19,10 +19,6 @@ export interface Album extends Attributes {
   viewers: string[];
   /** First image in album, or user selected cover image */
   coverImage?: ParsePointer;
-  /** Last edited date */
-  updatedAt?: Date;
-  /** Created date */
-  createdAt?: Date;
 }
 
 export interface AlbumSaveContext {
@@ -44,7 +40,7 @@ export interface AlbumSaveContext {
  * Class wrapping the Parse.Album class and providing convenience methods/properties
  */
 export default class ParseAlbum extends ParseObject<Album> {
-  static COLUMNS: { [key: string]: string } = {
+  static COLUMNS = {
     ...ParseObject.COLUMNS,
     owner: "owner",
     images: "images",

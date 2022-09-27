@@ -6,6 +6,7 @@ import { ParseAlbum, ParseImage, ParseUser } from "../../classes";
 import useQueryConfigHelpers, {
   FunctionOptions,
 } from "./useQueryConfigHelpers";
+import ParseDuplicate from "../../classes/ParseDuplicate";
 
 export type QueryOptionsFunction<TData> = (
   options?: Partial<QueryObserverOptions<TData, Error>>
@@ -296,7 +297,30 @@ const useQueryConfigs = () => {
     );
   };
 
+  const getDuplicatesQueryKey = () => ["GET_DUPLICATES"];
+  const getDuplicatesOptions: QueryOptionsFunction<ParseDuplicate[]> = (
+    options = {}
+  ) => ({
+    refetchOnWindowFocus: false,
+    refetchInterval: 5 * 60 * 1000,
+    ...options,
+  });
+  const getDuplicatesFunction = async (
+    options: FunctionOptions = {}
+  ): Promise<ParseDuplicate[]> => {
+    return await runFunctionInTryCatch<ParseDuplicate[]>(async () => {
+      const duplicates = await ParseDuplicate.query(online)
+        .equalTo(ParseDuplicate.COLUMNS.acknowledged, false)
+        .ascending(ParseDuplicate.COLUMNS.createdAt)
+        .find();
+      return duplicates.map((duplicate) => new ParseDuplicate(duplicate));
+    }, {errorMessage: Strings.couldNotGetDuplicates(), ...options})
+  };
+
   return {
+    getDuplicatesQueryKey,
+    getDuplicatesOptions,
+    getDuplicatesFunction,
     getAllAlbumsFunction,
     getAllAlbumsQueryKey,
     getAllAlbumsOptions,

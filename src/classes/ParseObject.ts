@@ -27,7 +27,7 @@ export type ParsifyPointers<A extends Attributes> = {
  */
 export default class ParseObject<A extends Attributes> {
   /** Basic columns for any class */
-  static COLUMNS: { [key: string]: string } = {
+  static COLUMNS = {
     id: "objectId",
     createdAt: "createdAt",
     updatedAt: "updatedAt",

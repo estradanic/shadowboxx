@@ -20,6 +20,7 @@ export interface StringEntries {
   confirm: string;
   copyright: string;
   couldNotGetCollaborators: string;
+  couldNotGetDuplicates: string;
   couldNotGetUserInfo: string;
   couldNotWriteImage: string;
   createdAt: string;
@@ -150,6 +151,7 @@ const Strings: {
   copyright: () => `© Nicholas Estrada ${new Date().getFullYear()}`,
   couldNotGetCollaborators: () =>
     `${Strings.commonError()}. Could not get collaborators.`,
+  couldNotGetDuplicates: () => `${Strings.commonError()}. Could not get duplicates.`,
   couldNotGetUserInfo: () =>
     `${Strings.commonError()}. Could not get user info.`,
   couldNotWriteImage: (fileName: string) =>

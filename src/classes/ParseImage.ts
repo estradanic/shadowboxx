@@ -71,7 +71,7 @@ export default class ParseImage extends ParseObject<Image> {
   /**
    * Columns for the "Image" class
    */
-  static COLUMNS: { [key: string]: string } = {
+  static COLUMNS = {
     ...ParseObject.COLUMNS,
     file: "file",
     owner: "owner",

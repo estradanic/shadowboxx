@@ -43,7 +43,7 @@ export default class ParseUser extends ParseObject<User> {
   /**
    * Columns for the Parse.User ("User") class
    */
-  static COLUMNS: { [key: string]: string } = {
+  static COLUMNS = {
     ...ParseObject.COLUMNS,
     emailVerified: "emailVerified",
     password: "password",
