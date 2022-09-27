@@ -34,6 +34,7 @@ export interface StringEntries {
   deleteDirectoryError: string;
   description: string;
   dragOrBrowse: string;
+  duplicatesNotificationTitle: string;
   editAlbum: string;
   editAlbumError: string;
   email: string;
@@ -171,6 +172,7 @@ const Strings: {
     `Could not delete directory ${directory}`,
   description: () => "Description",
   dragOrBrowse: (what: string) => `Drag ${what} here or click to browse`,
+  duplicatesNotificationTitle: () => "You may have uploaded duplicate images!",
   editAlbum: () => "Edit Album",
   editAlbumError: () => `${Strings.commonError()}. Could not edit album.`,
   email: () => "Email",

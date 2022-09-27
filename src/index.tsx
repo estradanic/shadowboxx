@@ -14,6 +14,7 @@ import {
   ScrollPositionContextProvider,
 } from "./contexts";
 import App from "./app/App";
+import { SnackbarProvider } from "./components";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -95,15 +96,17 @@ ReactDOM.render(
       <NetworkDetectionContextProvider>
         <GlobalLoadingContextProvider>
           <QueryClientProvider client={queryClient}>
-            <NotificationsContextProvider>
-              <BrowserRouter>
-                <ScrollPositionContextProvider>
-                  <UserContextProvider>
-                    <App />
-                  </UserContextProvider>
-                </ScrollPositionContextProvider>
-              </BrowserRouter>
-            </NotificationsContextProvider>
+            <BrowserRouter>
+              <ScrollPositionContextProvider>
+                <UserContextProvider>
+                  <SnackbarProvider>
+                    <NotificationsContextProvider>
+                      <App />
+                    </NotificationsContextProvider>
+                  </SnackbarProvider>
+                </UserContextProvider>
+              </ScrollPositionContextProvider>
+            </BrowserRouter>
           </QueryClientProvider>
         </GlobalLoadingContextProvider>
       </NetworkDetectionContextProvider>

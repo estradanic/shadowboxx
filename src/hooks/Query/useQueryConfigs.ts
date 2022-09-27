@@ -2,11 +2,15 @@ import Parse from "parse";
 import { QueryObserverOptions } from "@tanstack/react-query";
 import { useNetworkDetectionContext, useUserContext } from "../../contexts";
 import { Strings } from "../../resources";
-import { ParseAlbum, ParseImage, ParseUser } from "../../classes";
+import {
+  ParseAlbum,
+  ParseImage,
+  ParseUser,
+  ParseDuplicate,
+} from "../../classes";
 import useQueryConfigHelpers, {
   FunctionOptions,
 } from "./useQueryConfigHelpers";
-import ParseDuplicate from "../../classes/ParseDuplicate";
 
 export type QueryOptionsFunction<TData> = (
   options?: Partial<QueryObserverOptions<TData, Error>>

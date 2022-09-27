@@ -30,9 +30,17 @@ const useStyles = makeStyles((theme: Theme) => ({
   icon: {
     marginBottom: theme.spacing(0.25),
   },
+  menu: {
+    backgroundColor: theme.palette.primary.main,
+    color: theme.palette.primary.contrastText,
+    maxHeight: "50vh",
+  },
   menuItem: {
     backgroundColor: theme.palette.primary.main,
     color: theme.palette.primary.contrastText,
+    "& p": {
+      whiteSpace: "pre-wrap",
+    },
   },
   menuItemIcon: {
     "&& *": {
@@ -49,6 +57,10 @@ const useStyles = makeStyles((theme: Theme) => ({
     padding: theme.spacing(0, 2),
     backgroundColor: theme.palette.primary.dark,
     color: theme.palette.primary.contrastText,
+    "& *": {
+      overflowX: "hidden",
+      whiteSpace: "pre-wrap",
+    },
   },
   endIcons: {
     marginLeft: "auto",
@@ -97,7 +109,7 @@ const Notifications = ({ className }: NotificationsProps) => {
           horizontal: "left",
         }}
         getContentAnchorEl={null}
-        classes={{ paper: classes.menuItem }}
+        classes={{ paper: classes.menu }}
         elevation={0}
         keepMounted
         onClose={() => setAnchorEl(undefined)}

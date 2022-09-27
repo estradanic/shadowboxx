@@ -12,7 +12,6 @@ import { useNotificationsContext, useUserContext } from "../contexts";
 import {
   ActionDialogContextProvider,
   DefaultLayout,
-  SnackbarProvider,
 } from "../components";
 import { Strings } from "../resources";
 import routes from "./routes";
@@ -138,37 +137,35 @@ const App = () => {
   return (
     <ThemeProvider theme={darkTheme}>
       <ActionDialogContextProvider>
-        <SnackbarProvider>
-          <Suspense
-            fallback={
-              <div
-                style={{
-                  width: "100vw",
-                  height: "100vh",
-                  backgroundColor: "#1B71B5",
-                  paddingTop: "calc(50vh - 40px)",
-                  paddingLeft: "calc(50vw - 40px)",
-                }}
-              >
-                <CircularProgress style={{ color: "#C14E4E" }} />
-              </div>
-            }
-          >
-            <Routes>
-              {Object.values(routes).map((route) => (
-                <Route
-                  key={route.viewName}
-                  element={
-                    <DefaultLayout viewId={route.viewId}>
-                      <route.View />
-                    </DefaultLayout>
-                  }
-                  path={route.path}
-                />
-              ))}
-            </Routes>
-          </Suspense>
-        </SnackbarProvider>
+        <Suspense
+          fallback={
+            <div
+              style={{
+                width: "100vw",
+                height: "100vh",
+                backgroundColor: "#1B71B5",
+                paddingTop: "calc(50vh - 40px)",
+                paddingLeft: "calc(50vw - 40px)",
+              }}
+            >
+              <CircularProgress style={{ color: "#C14E4E" }} />
+            </div>
+          }
+        >
+          <Routes>
+            {Object.values(routes).map((route) => (
+              <Route
+                key={route.viewName}
+                element={
+                  <DefaultLayout viewId={route.viewId}>
+                    <route.View />
+                  </DefaultLayout>
+                }
+                path={route.path}
+              />
+            ))}
+          </Routes>
+        </Suspense>
       </ActionDialogContextProvider>
     </ThemeProvider>
   );

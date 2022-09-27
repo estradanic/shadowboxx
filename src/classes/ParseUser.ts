@@ -293,4 +293,12 @@ export default class ParseUser extends ParseObject<User> {
   set favoriteAlbums(favoriteAlbums) {
     this._user.set(ParseUser.COLUMNS.favoriteAlbums, favoriteAlbums);
   }
+
+  /** Alias to _user.attributes but with the pointers as ParsePointer objects */
+  get attributes(): User {
+    return {
+      ...this._user.attributes,
+      profilePicture: this.profilePicture,
+    };
+  }
 }

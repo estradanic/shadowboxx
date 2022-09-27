@@ -4,9 +4,16 @@ import React, {
   useContext,
   ReactNode,
   useCallback,
+  useEffect,
 } from "react";
 import { v4 as uuid } from "uuid";
 import NotificationsIcon from "@material-ui/icons/Notifications";
+import BurstModeIcon from "@material-ui/icons/BurstMode";
+import { useQuery } from "@tanstack/react-query";
+import { ParseDuplicate } from "../classes";
+import { useQueryConfigs } from "../hooks";
+import { Strings } from "../resources";
+import { DuplicatesNotificationDetail } from "../components";
 
 /** Interface defining a single notification */
 export interface Notification {
@@ -55,6 +62,18 @@ interface NotificationsContextProviderProps {
 export const NotificationsContextProvider = ({
   children,
 }: NotificationsContextProviderProps) => {
+  const { getDuplicatesQueryKey, getDuplicatesOptions, getDuplicatesFunction } =
+    useQueryConfigs();
+
+  const { data: duplicates } = useQuery<ParseDuplicate[], Error>(
+    getDuplicatesQueryKey(),
+    () => getDuplicatesFunction(),
+    getDuplicatesOptions()
+  );
+
+  const [duplicatesNotification, setDuplicatesNotification] =
+    useState<Notification>();
+
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const addNotification = useCallback(
     ({
@@ -76,6 +95,25 @@ export const NotificationsContextProvider = ({
     },
     [setNotifications]
   );
+
+  useEffect(() => {
+    if (duplicates?.length && !duplicatesNotification) {
+      setDuplicatesNotification(
+        addNotification({
+          title: Strings.duplicatesNotificationTitle(),
+          detail: <DuplicatesNotificationDetail duplicates={duplicates} />,
+          icon: <BurstModeIcon />,
+        })
+      );
+    } else if (!duplicates?.length) {
+      setDuplicatesNotification(undefined);
+    }
+  }, [
+    addNotification,
+    setDuplicatesNotification,
+    duplicatesNotification,
+    duplicates,
+  ]);
 
   const value: NotificationsContextValue = {
     notifications,
