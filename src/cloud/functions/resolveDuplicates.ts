@@ -5,28 +5,28 @@ export interface ResolveDuplicatesParams {
 const resolveDuplicates = async ({ duplicateIds }: ResolveDuplicatesParams) => {
   const duplicates = await new Parse.Query("Duplicate")
     .containedIn("objectId", duplicateIds)
-    .find();
+    .find({ useMasterKey: true });
   for (const duplicate of duplicates) {
     try {
       console.log("Resolving duplicate", duplicate.id);
       const imageToDelete = await new Parse.Query("Image")
         .equalTo("objectId", duplicate.get("image1").id)
-        .first();
+        .first({ useMasterKey: true });
       const imageToKeep = await new Parse.Query("Image")
         .equalTo("objectId", duplicate.get("image2").id)
-        .first();
+        .first({ useMasterKey: true });
       if (!imageToDelete) {
         console.log("Image to delete not found");
-        await duplicate.destroy();
+        await duplicate.destroy({ useMasterKey: true });
         continue;
       } else if (!imageToKeep) {
         console.log("Image to keep not found");
-        await duplicate.destroy();
+        await duplicate.destroy({ useMasterKey: true });
         continue;
       }
       const albumsToCorrect = await new Parse.Query("Album")
         .contains("images", imageToDelete.id)
-        .find();
+        .find({ useMasterKey: true });
       for (const album of albumsToCorrect) {
         try {
           console.log("Correcting album", album.get("name"));
@@ -44,13 +44,13 @@ const resolveDuplicates = async ({ duplicateIds }: ResolveDuplicatesParams) => {
               )
             );
           }
-          await album.save();
+          await album.save(null, { useMasterKey: true });
         } catch (error) {
           console.error("Error correcting album", album.get("name"), error);
         }
       }
-      await imageToDelete.destroy();
-      await duplicate.destroy();
+      await imageToDelete.destroy({ useMasterKey: true });
+      await duplicate.destroy({ useMasterKey: true });
     } catch (error) {
       console.error("Error resolving duplicate", duplicate.id, error);
     }
