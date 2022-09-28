@@ -22,6 +22,7 @@ export interface StringEntries {
   couldNotGetCollaborators: string;
   couldNotGetDuplicates: string;
   couldNotGetUserInfo: string;
+  couldNotResolveDuplicates: string;
   couldNotWriteImage: string;
   createdAt: string;
   darkMode: string;
@@ -161,6 +162,8 @@ const Strings: {
     `${Strings.commonError()}. Could not get duplicates.`,
   couldNotGetUserInfo: () =>
     `${Strings.commonError()}. Could not get user info.`,
+  couldNotResolveDuplicates: () =>
+    `${Strings.commonError()}. Could not resolve duplicate images.`,
   couldNotWriteImage: (fileName: string) =>
     `Could not write image (${fileName})`,
   createdAt: (createdAt: Date) => `Created: ${createdAt.toLocaleDateString()}`,

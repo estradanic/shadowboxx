@@ -1,5 +1,5 @@
-import React, { useMemo, useState } from "react";
-import { ParseDuplicate, ParseImage } from "../../../classes";
+import React, { MutableRefObject, useMemo, useState } from "react";
+import Parse from "parse";
 import Button from "@material-ui/core/Button";
 import Typography from "@material-ui/core/Typography";
 import Grid from "@material-ui/core/Grid";
@@ -8,11 +8,13 @@ import Switch from "@material-ui/core/Switch";
 import { makeStyles, Theme } from "@material-ui/core/styles";
 import { createHtmlPortalNode, InPortal } from "react-reverse-portal";
 import { useQuery } from "@tanstack/react-query";
+import { ParseDuplicate, ParseImage } from "../../../classes";
 import { Strings } from "../../../resources";
 import { Notification } from "../../../contexts";
 import { useActionDialogContext } from "../../Dialog/ActionDialog";
 import { useQueryConfigs, useRandomColor } from "../../../hooks";
 import Image from "../../Image/Image";
+import { useSnackbar } from "../../Snackbar";
 
 const useStyles = makeStyles((theme: Theme) => ({
   resolveButton: {
@@ -35,18 +37,21 @@ export interface DuplicatesNotificationDetailProps {
   /** The duplicate records in question */
   duplicates: ParseDuplicate[];
   /** The notification record in NotificationsContext */
-  notification?: Notification;
+  notificationRef: MutableRefObject<Notification | undefined>;
 }
 
 /** Component displaying actions for the user to take about a Duplicates notification */
 const DuplicatesNotificationDetail = ({
   duplicates,
-  notification,
+  notificationRef = { current: undefined },
 }: DuplicatesNotificationDetailProps) => {
   const classes = useStyles();
   const randomColor = useRandomColor();
+  const { enqueueErrorSnackbar, enqueueSuccessSnackbar } = useSnackbar();
 
-  const [confirmedDuplicateIds, setConfirmedDuplicateIds] = useState<string[]>(duplicates.map((duplicate) => duplicate.id));
+  const [confirmedDuplicateIds, setConfirmedDuplicateIds] = useState<string[]>(
+    duplicates.map((duplicate) => duplicate.id)
+  );
 
   const { openPrompt } = useActionDialogContext();
   const imageIds = useMemo(
@@ -68,8 +73,22 @@ const DuplicatesNotificationDetail = ({
   );
 
   const resolve = async () => {
-    // Todo: Implement
-    notification?.remove();
+    try {
+      const ignoredDuplicates = duplicates.filter(
+        (duplicate) => !confirmedDuplicateIds.includes(duplicate.id)
+      );
+      await Promise.all(
+        ignoredDuplicates.map((duplicate) => duplicate.acknowledge())
+      );
+      await Parse.Cloud.run("resolveDuplicates", {
+        duplicateIds: confirmedDuplicateIds,
+      });
+      notificationRef.current?.remove();
+      enqueueSuccessSnackbar(Strings.commonSaved());
+    } catch (error) {
+      console.error(error);
+      enqueueErrorSnackbar(Strings.couldNotResolveDuplicates());
+    }
   };
 
   const reset = () => {
@@ -133,7 +152,6 @@ const DuplicatesNotificationDetail = ({
                     }
                     label={Strings.isDuplicate()}
                   />
-
                 </Grid>
               </Grid>
             ))}

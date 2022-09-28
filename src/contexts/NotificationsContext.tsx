@@ -5,6 +5,7 @@ import React, {
   ReactNode,
   useCallback,
   useEffect,
+  useRef,
 } from "react";
 import { v4 as uuid } from "uuid";
 import NotificationsIcon from "@material-ui/icons/Notifications";
@@ -69,8 +70,7 @@ export const NotificationsContextProvider = ({
     getDuplicatesOptions()
   );
 
-  const [duplicatesNotification, setDuplicatesNotification] =
-    useState<Notification>();
+  const duplicatesNotificationRef = useRef<Notification>();
 
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const addNotification = useCallback(
@@ -94,28 +94,21 @@ export const NotificationsContextProvider = ({
   );
 
   useEffect(() => {
-    if (duplicates?.length && !duplicatesNotification) {
-      setDuplicatesNotification(
-        addNotification({
-          title: Strings.duplicatesNotificationTitle(),
-          detail: (
-            <DuplicatesNotificationDetail
-              duplicates={duplicates}
-              notification={duplicatesNotification}
-            />
-          ),
-          icon: <BurstModeIcon />,
-        })
-      );
+    if (duplicates?.length && !duplicatesNotificationRef.current) {
+      duplicatesNotificationRef.current = addNotification({
+        title: Strings.duplicatesNotificationTitle(),
+        detail: (
+          <DuplicatesNotificationDetail
+            duplicates={duplicates}
+            notificationRef={duplicatesNotificationRef}
+          />
+        ),
+        icon: <BurstModeIcon />,
+      });
     } else if (!duplicates?.length) {
-      setDuplicatesNotification(undefined);
+      duplicatesNotificationRef.current = undefined;
     }
-  }, [
-    addNotification,
-    setDuplicatesNotification,
-    duplicatesNotification,
-    duplicates,
-  ]);
+  }, [addNotification, duplicatesNotificationRef, duplicates]);
 
   const value: NotificationsContextValue = {
     notifications,

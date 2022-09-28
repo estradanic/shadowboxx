@@ -8,6 +8,7 @@ import {
 } from "./triggers";
 
 import { findDuplicateImages, hashImages } from "./jobs";
+import { resolveDuplicates, ResolveDuplicatesParams } from "./functions";
 
 Parse.Cloud.afterSave("Image", async (request) => {
   await hashImage(request.object);
@@ -42,3 +43,10 @@ Parse.Cloud.job("hashImages", async (request) => {
   await hashImages();
   request.message("Done");
 });
+
+Parse.Cloud.define<(request: ResolveDuplicatesParams) => Promise<void>>(
+  "resolveDuplicates",
+  async (request) => {
+    await resolveDuplicates(request.params);
+  }
+);
