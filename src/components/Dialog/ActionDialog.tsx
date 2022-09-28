@@ -46,6 +46,9 @@ const useStyles = makeStyles((theme: Theme) => ({
   titleText: {
     fontSize: "x-large",
   },
+  content: {
+    textAlign: "center",
+  },
 }));
 
 /** Interface defining props for ActionDialog */
@@ -62,6 +65,8 @@ export interface ActionDialogProps extends DialogProps {
   type: "alert" | "confirm" | "prompt";
   /** Color of the confirm button */
   confirmButtonColor?: "error" | "warning" | "success" | "default";
+  /** Text for the confirm button */
+  confirmButtonText?: string;
   /** Props to be passed to the DialogContent component */
   DialogContentProps?: Omit<DialogContentProps, "children">;
 }
@@ -214,8 +219,11 @@ const ActionDialogContent = memo(
   ({ message, type, children, ...rest }: ActionDialogContentProps) => {
     return (
       <DialogContent {...rest}>
-        <DialogContentText color="textPrimary">{message}</DialogContentText>
-        {type === "prompt" && children}
+        {type === "prompt" ? (
+          children
+        ) : (
+          <DialogContentText color="textPrimary">{message}</DialogContentText>
+        )}
       </DialogContent>
     );
   }
@@ -230,6 +238,7 @@ const ActionDialog = ({
   handleClose,
   type,
   confirmButtonColor = "default",
+  confirmButtonText,
   children,
   DialogContentProps = {},
   ...rest
@@ -246,6 +255,7 @@ const ActionDialog = ({
       <ActionDialogContent
         message={message}
         type={type}
+        className={classes.content}
         {...DialogContentProps}
       >
         {children}
@@ -268,7 +278,7 @@ const ActionDialog = ({
               }
               onClick={handleConfirm}
             >
-              {Strings.confirm()}
+              {confirmButtonText ?? Strings.confirm()}
             </Button>
           </>
         )}

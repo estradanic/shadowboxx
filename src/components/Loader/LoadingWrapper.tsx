@@ -23,7 +23,7 @@ const useStyles = makeStyles((theme: Theme) => ({
     height: "100vh",
     backgroundColor: ({ backgroundColor }) =>
       opacity(backgroundColor ?? theme.palette.background.default, 0.7),
-    zIndex: 1400,
+    zIndex: theme.zIndex.modal,
   },
   loader: {
     position: "absolute",

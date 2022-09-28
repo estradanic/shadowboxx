@@ -35,6 +35,7 @@ export interface StringEntries {
   description: string;
   dragOrBrowse: string;
   duplicatesNotificationTitle: string;
+  duplicatesNotificationDetail: string;
   editAlbum: string;
   editAlbumError: string;
   email: string;
@@ -50,6 +51,7 @@ export interface StringEntries {
   getImagesError: string;
   goBack: string;
   home: string;
+  ignoreDuplicatesConfirm: string;
   imageNotDeleted: string;
   imageNotFound: string;
   imageNotSaved: string;
@@ -65,6 +67,7 @@ export interface StringEntries {
   invalidEmptyFilename: string;
   invalidImage: string;
   invalidPassword: string;
+  isDuplicate: string;
   updatedAt: string;
   lastName: string;
   limitedOffline: string;
@@ -96,6 +99,8 @@ export interface StringEntries {
   profilePicture: string;
   removeImage: string;
   removeImageError: string;
+  resolve: string;
+  resolveDuplicates: string;
   processingImages: string;
   selectImages: string;
   sessionExpired: string;
@@ -173,6 +178,10 @@ const Strings: {
   description: () => "Description",
   dragOrBrowse: (what: string) => `Drag ${what} here or click to browse`,
   duplicatesNotificationTitle: () => "You may have uploaded duplicate images!",
+  duplicatesNotificationDetail: (duplicatesNumber: number) =>
+    `${duplicatesNumber} possible duplicate image${
+      duplicatesNumber === 1 ? "" : "s"
+    } found.`,
   editAlbum: () => "Edit Album",
   editAlbumError: () => `${Strings.commonError()}. Could not edit album.`,
   email: () => "Email",
@@ -189,6 +198,7 @@ const Strings: {
   getImagesError: () => `${Strings.commonError()} Could not get images.`,
   goBack: () => "Go Back",
   home: () => "Home",
+  ignoreDuplicatesConfirm: () => "Are you sure? This action is irreversible.",
   imageNotDeleted: (image: string) =>
     `Image not deleted ${JSON.stringify(image)}`,
   imageNotFound: (imageId) =>
@@ -207,6 +217,7 @@ const Strings: {
   invalidImage: (image: { src: string; fileName: string }) =>
     `Invalid image (${(image && JSON.stringify(image)) || image})`,
   invalidPassword: (password: string) => `Invalid password (${password})`,
+  isDuplicate: () => "Are these images the same?",
   updatedAt: (updatedAt: Date) => `Edited: ${updatedAt.toLocaleDateString()}`,
   lastName: () => "Last Name",
   limitedOffline: () => "Offline functionality will be limited.",
@@ -242,6 +253,8 @@ const Strings: {
   removeImage: () => "Remove image from album",
   removeImageError: (fileName: string) =>
     `Could not remove image ${fileName} from album.`,
+  resolve: () => "Resolve",
+  resolveDuplicates: () => "Resolve Duplicates",
   processingImages: () => "Processing Images...",
   selectImages: () => "Select Images",
   sessionExpired: () => "Session Expired. Please log in again.",

@@ -25,15 +25,13 @@ export interface Notification {
   icon?: ReactNode;
   /** Detailed message or interactive content */
   detail?: React.ReactNode;
-  /** Name of the notification group */
-  groupName?: string;
   /** Function to remove the notification */
   remove: () => void;
 }
 
 /** Interface defining the parameters for the addNotification function */
 interface AddNotificationParams
-  extends Pick<Notification, "title" | "icon" | "detail" | "groupName"> {}
+  extends Pick<Notification, "title" | "icon" | "detail"> {}
 
 /** Interface defining the value of NotifcationsContextProvider */
 interface NotificationsContextValue {
@@ -80,7 +78,6 @@ export const NotificationsContextProvider = ({
       title,
       icon = <NotificationsIcon />,
       detail,
-      groupName,
     }: AddNotificationParams) => {
       const id = uuid();
       const remove = () =>
@@ -89,9 +86,9 @@ export const NotificationsContextProvider = ({
         );
       setNotifications((prev) => [
         ...prev,
-        { id, title, icon, detail, groupName, remove },
+        { id, title, icon, detail, remove },
       ]);
-      return { id, title, icon, detail, groupName, remove };
+      return { id, title, icon, detail, remove };
     },
     [setNotifications]
   );
@@ -101,7 +98,12 @@ export const NotificationsContextProvider = ({
       setDuplicatesNotification(
         addNotification({
           title: Strings.duplicatesNotificationTitle(),
-          detail: <DuplicatesNotificationDetail duplicates={duplicates} />,
+          detail: (
+            <DuplicatesNotificationDetail
+              duplicates={duplicates}
+              notification={duplicatesNotification}
+            />
+          ),
           icon: <BurstModeIcon />,
         })
       );

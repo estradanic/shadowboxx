@@ -14,6 +14,10 @@ export interface Duplicate extends Attributes {
   similarity: number,
   /** Whether the duplicate has been acknowledged by the user */
   acknowledged: boolean,
+  /** The objectId of the duplicate.
+   * Overridden here to be required because these are never created on the frontend
+   */
+  objectId: string,
 }
 
 /**
@@ -37,10 +41,12 @@ export default class ParseDuplicate extends ParseObject<Duplicate> {
   }
 
   _duplicate: Parse.Object<ParsifyPointers<Duplicate>>;
+  _isDuplicate: boolean;
 
   constructor(duplicate: Parse.Object<ParsifyPointers<Duplicate>>) {
     super(duplicate);
     this._duplicate = duplicate;
+    this._isDuplicate = false;
   }
 
   async acknowledge() {
@@ -71,6 +77,11 @@ export default class ParseDuplicate extends ParseObject<Duplicate> {
   /** Whether the duplicate has been acknowledged by the user */
   get acknowledged(): Duplicate["acknowledged"] {
     return this._duplicate.get(ParseDuplicate.COLUMNS.acknowledged);
+  }
+
+  /** The objectId. Overridden because these are always retrieved from the db */
+  get id(): Duplicate["objectId"] {
+    return this._duplicate.id;
   }
 
   get attributes(): Duplicate {

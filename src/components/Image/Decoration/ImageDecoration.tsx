@@ -9,7 +9,7 @@ const useStyles = makeStyles((theme: Theme) => ({
   root: {
     position: "absolute",
     cursor: "pointer",
-    zIndex: 99,
+    zIndex: theme.zIndex.tooltip,
   },
   top: {
     top: theme.spacing(0),

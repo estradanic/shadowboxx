@@ -9,10 +9,7 @@ import {
 import DiscFullIcon from "@material-ui/icons/DiscFull";
 import Parse from "parse";
 import { useNotificationsContext, useUserContext } from "../contexts";
-import {
-  ActionDialogContextProvider,
-  DefaultLayout,
-} from "../components";
+import { ActionDialogContextProvider, DefaultLayout } from "../components";
 import { Strings } from "../resources";
 import routes from "./routes";
 

@@ -34,6 +34,10 @@ const useStyles = makeStyles((theme: Theme) => ({
     backgroundColor: theme.palette.primary.main,
     color: theme.palette.primary.contrastText,
     maxHeight: "50vh",
+    maxWidth: "900px",
+    left: "auto !important",
+    right: theme.spacing(3),
+    boxShadow: theme.shadows[3],
   },
   menuItem: {
     backgroundColor: theme.palette.primary.main,
@@ -54,9 +58,11 @@ const useStyles = makeStyles((theme: Theme) => ({
     },
   },
   detail: {
-    padding: theme.spacing(0, 2),
-    backgroundColor: theme.palette.primary.dark,
+    backgroundColor: theme.palette.background.default,
     color: theme.palette.primary.contrastText,
+    "&>*": {
+      padding: theme.spacing(2),
+    },
     "& *": {
       overflowX: "hidden",
       whiteSpace: "pre-wrap",
@@ -132,7 +138,7 @@ const Notifications = ({ className }: NotificationsProps) => {
 
 export const Notification = forwardRef(
   (
-    { id, title, icon, detail, groupName, remove }: NotificationProps,
+    { title, icon, detail, remove }: NotificationProps,
     ref: ForwardedRef<any>
   ) => {
     const classes = useStyles();
@@ -168,7 +174,7 @@ export const Notification = forwardRef(
           </IconButton>
         </MenuItem>
         <Collapse className={classes.detail} in={open}>
-          <Typography>{detail ?? title}</Typography>
+          {detail ?? <Typography>{title}</Typography>}
         </Collapse>
       </>
     );
