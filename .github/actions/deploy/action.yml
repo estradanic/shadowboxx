@@ -14,4 +14,6 @@ runs:
   using: 'docker'
   image: './Dockerfile'
   args:
-    - ${{ inputs.appid, inputs.accesskey, inputs.email }}
+    - ${{ inputs.appid }}
+    - ${{ inputs.accesskey }}
+    - ${{ inputs.email }}
