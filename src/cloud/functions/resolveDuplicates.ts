@@ -2,7 +2,10 @@ export interface ResolveDuplicatesParams {
   duplicateIds: string[];
 }
 
-const resolveDuplicates = async ({ duplicateIds }: ResolveDuplicatesParams, user?: Parse.User) => {
+const resolveDuplicates = async (
+  { duplicateIds }: ResolveDuplicatesParams,
+  user?: Parse.User
+) => {
   const duplicates = await new Parse.Query("Duplicate")
     .containedIn("objectId", duplicateIds)
     .find({ useMasterKey: true });
@@ -57,11 +60,17 @@ const resolveDuplicates = async ({ duplicateIds }: ResolveDuplicatesParams, user
       if (user) {
         await user.fetch();
         if (user.get("profilePicture").id === imageToDelete.id) {
+          console.log("Fixing profile picture for user", user.get("email"));
           user.set("profilePicture", imageToKeep.toPointer());
-          await user.save(null, { useMasterKey: true, context: { noTrigger: true } });
+          await user.save(null, {
+            useMasterKey: true,
+            context: { noTrigger: true },
+          });
         }
       }
+      console.log("Deleting image", imageToDelete.get("name"));
       await imageToDelete.destroy({ useMasterKey: true });
+      console.log("Deleting duplicate", duplicate.id);
       await duplicate.destroy({ useMasterKey: true });
     } catch (error) {
       console.error("Error resolving duplicate", duplicate.id, error);

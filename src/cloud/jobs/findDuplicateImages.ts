@@ -27,6 +27,9 @@ const findDuplicateImages = async () => {
         .skip(userSkip++)
         .find({ useMasterKey: true })
     )?.[0];
+    if (!user) {
+      continue;
+    }
     console.log("Checking images for user", user?.get("email"));
 
     // Loop over all images for this user, one at a time
@@ -41,67 +44,73 @@ const findDuplicateImages = async () => {
           .skip(imageSkip++)
           .find({ useMasterKey: true })
       )?.[0];
-      if (image?.get("hash")) {
-        console.log("Checking duplicates for image", image.get("name"));
-        let page = 0;
-        const pageSize = 100;
-        let exhausted = false;
-        while (!exhausted) {
-          console.log(`Getting batch ${page} for image ${image.get("name")}`);
-          const otherImages = await new Parse.Query("Image")
-            .equalTo("owner", user.toPointer())
-            .notEqualTo("objectId", image.id)
-            .ascending("createdAt")
-            .limit(pageSize)
-            .skip(page * pageSize)
-            .find({ useMasterKey: true });
-          page++;
-          if (otherImages.length === 0) {
-            exhausted = true;
-          }
-          const duplicates = [];
-          for (const otherImage of otherImages) {
-            console.log("Checking image", otherImage.get("name"));
-            const existingDuplicateQuery = await Parse.Query.or(
-              new Parse.Query("Duplicate")
-                .equalTo("image1", image.toPointer())
-                .equalTo("image2", otherImage.toPointer()),
-              new Parse.Query("Duplicate")
-                .equalTo("image1", otherImage.toPointer())
-                .equalTo("image2", image.toPointer())
-            ).find({ useMasterKey: true });
-            if (existingDuplicateQuery.length > 0) {
-              console.log(
-                "Duplicate already exists",
-                image.get("name"),
-                otherImage.get("name")
-              );
-              continue;
-            }
-            const similarityScore = similarity(
-              image.get("hash"),
-              otherImage.get("hash")
+      console.log("Checking duplicates for image", image?.get("name"));
+      if (!image || !image.get("hash")) {
+        console.warn("Image does not exist or does not have hash", image?.get("name"));
+        continue;
+      }
+      let page = 0;
+      const pageSize = 100;
+      let exhausted = false;
+      while (!exhausted) {
+        console.log(`Getting batch ${page} for image ${image.get("name")}`);
+        const otherImages = await new Parse.Query("Image")
+          .equalTo("owner", user.toPointer())
+          .notEqualTo("objectId", image.id)
+          .ascending("createdAt")
+          .limit(pageSize)
+          .skip(page * pageSize)
+          .find({ useMasterKey: true });
+        page++;
+        if (otherImages.length === 0) {
+          exhausted = true;
+        }
+        const duplicates = [];
+        for (const otherImage of otherImages) {
+          console.log("Checking image", otherImage.get("name"));
+          const existingDuplicateQuery = await Parse.Query.or(
+            new Parse.Query("Duplicate")
+              .equalTo("image1", image.toPointer())
+              .equalTo("image2", otherImage.toPointer()),
+            new Parse.Query("Duplicate")
+              .equalTo("image1", otherImage.toPointer())
+              .equalTo("image2", image.toPointer())
+          ).find({ useMasterKey: true });
+          if (existingDuplicateQuery.length > 0) {
+            console.log(
+              "Duplicate already exists",
+              image.get("name"),
+              otherImage.get("name")
             );
-            if (similarityScore > SIMILARITY_THRESHOLD) {
-              console.log(
-                `Found duplicate images: ${image.get(
-                  "name"
-                )} and ${otherImage.get(
-                  "name"
-                )} with similarity ${similarityScore}`
-              );
-              duplicates.push(
-                new Parse.Object("Duplicate", {
-                  image1: image.toPointer(),
-                  image2: otherImage.toPointer(),
-                  similarity: similarityScore,
-                  owner: user.toPointer(),
-                })
-              );
-            }
+            continue;
           }
-          console.log("Saving duplicates", duplicates);
+          const similarityScore = similarity(
+            image.get("hash"),
+            otherImage.get("hash")
+          );
+          if (similarityScore > SIMILARITY_THRESHOLD) {
+            console.log(
+              `Found duplicate images: ${image.get(
+                "name"
+              )} and ${otherImage.get(
+                "name"
+              )} with similarity ${similarityScore}`
+            );
+            duplicates.push(
+              new Parse.Object("Duplicate", {
+                image1: image.toPointer(),
+                image2: otherImage.toPointer(),
+                similarity: similarityScore,
+                owner: user.toPointer(),
+              })
+            );
+          }
+        }
+        if (duplicates.length) {
+          console.log("Saving duplicates");
           await Parse.Object.saveAll(duplicates, { useMasterKey: true });
+        } else {
+          console.log("No duplicates were found");
         }
       }
     } while (image);
