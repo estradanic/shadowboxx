@@ -4,7 +4,7 @@ inputs:
   appid:
     description: 'The App ID to run'
     required: true
-  accesskey:
+  accountkey:
     description: 'Access key for authentication'
     required: true
   email:
