@@ -2,7 +2,7 @@ import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
 import { createHtmlPlugin } from "vite-plugin-html";
 import eslint from "vite-plugin-eslint";
-import variables from "./public/variables.json";
+import { version } from "./package.json";
 
 export default defineConfig(({ mode }) => ({
   publicDir: "public",
@@ -48,7 +48,7 @@ export default defineConfig(({ mode }) => ({
                     ? "http://shadowboxx.b4a.io"
                     : "http://shadowboxxdevtest.b4a.io"
                 }",
-                SERVICE_WORKER_VERSION_NUMBER: "${variables.version}",
+                SERVICE_WORKER_VERSION_NUMBER: "${version}",
               };
             </script>
           `.replace(/\s/g, ""),

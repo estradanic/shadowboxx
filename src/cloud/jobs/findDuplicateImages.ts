@@ -46,7 +46,10 @@ const findDuplicateImages = async () => {
       )?.[0];
       console.log("Checking duplicates for image", image?.get("name"));
       if (!image || !image.get("hash")) {
-        console.warn("Image does not exist or does not have hash", image?.get("name"));
+        console.warn(
+          "Image does not exist or does not have hash",
+          image?.get("name")
+        );
         continue;
       }
       let page = 0;
