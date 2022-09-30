@@ -86,20 +86,21 @@ const setAlbumPermissions = async (album: Parse.Object) => {
       imageACL.setRoleWriteAccess(readWriteRole, true);
       image.setACL(imageACL);
     });
-    await Parse.Object.saveAll(images, { useMasterKey: true });
+    await Promise.all(
+      images.map((image) =>
+        image.save(null, { useMasterKey: true, context: { noTrigger: true } })
+      )
+    );
   }
 
-  if (!album.get("hasAppliedRoles")) {
-    const albumACL = new Parse.ACL();
-    albumACL.setReadAccess(owner!, true);
-    albumACL.setWriteAccess(owner!, true);
-    albumACL.setRoleReadAccess(readRole, true);
-    albumACL.setRoleReadAccess(readWriteRole, true);
-    albumACL.setRoleWriteAccess(readWriteRole, true);
-    album.setACL(albumACL);
-    album.set("hasAppliedRoles", true);
-    await album.save(null, { useMasterKey: true });
-  }
+  const albumACL = new Parse.ACL();
+  albumACL.setReadAccess(owner!, true);
+  albumACL.setWriteAccess(owner!, true);
+  albumACL.setRoleReadAccess(readRole, true);
+  albumACL.setRoleReadAccess(readWriteRole, true);
+  albumACL.setRoleWriteAccess(readWriteRole, true);
+  album.setACL(albumACL);
+  await album.save(null, { useMasterKey: true, context: { noTrigger: true } });
 };
 
 export default setAlbumPermissions;

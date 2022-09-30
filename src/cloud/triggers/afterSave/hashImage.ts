@@ -37,6 +37,7 @@ const hashImage = async (image: Parse.Object) => {
   const hash = hexToBinary(await bmvbhash(imageData, 16));
 
   image.set("hash", hash);
+  await image.save(null, { useMasterKey: true, context: { noTrigger: true } });
 };
 
 export default hashImage;
