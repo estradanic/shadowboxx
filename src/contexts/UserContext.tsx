@@ -156,7 +156,6 @@ export const UserContextProvider = ({ children }: UserContextProviderProps) => {
     if (loggedInUser) {
       return loggedInUser;
     }
-    navigate(routes.Login.path);
     return new ParseUser(
       new Parse.User<ParsifyPointers<User>>({
         username: "",

@@ -61,7 +61,7 @@ export default class ParseObject<A extends Attributes> {
    * @returns A ParsePointer to this ParseObject
    */
   toPointer(): ParsePointer {
-    return new ParsePointer(this._object.toPointer());
+    return new ParsePointer(this.toNativePointer());
   }
 
   /**
@@ -69,6 +69,9 @@ export default class ParseObject<A extends Attributes> {
    * @returns A native Parse.Pointer to this ParseObject
    */
   toNativePointer(): Parse.Pointer {
+    if (this._object.isNew()) {
+      return { className: this._object.className, objectId: "null", __type: "Pointer" };
+    }
     return this._object.toPointer();
   }
 
