@@ -44,7 +44,12 @@ const resolveDuplicates = async ({ duplicateIds }: ResolveDuplicatesParams) => {
               )
             );
           }
-          await album.save(null, { useMasterKey: true });
+          await album.save(null, {
+            useMasterKey: true,
+            context: {
+              removedImages: [imageToDelete.id],
+            },
+          });
         } catch (error) {
           console.error("Error correcting album", album.get("name"), error);
         }
