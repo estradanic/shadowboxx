@@ -2,7 +2,7 @@ export interface ResolveDuplicatesParams {
   duplicateIds: string[];
 }
 
-const resolveDuplicates = async ({ duplicateIds }: ResolveDuplicatesParams) => {
+const resolveDuplicates = async ({ duplicateIds }: ResolveDuplicatesParams, user?: Parse.User) => {
   const duplicates = await new Parse.Query("Duplicate")
     .containedIn("objectId", duplicateIds)
     .find({ useMasterKey: true });
@@ -52,6 +52,13 @@ const resolveDuplicates = async ({ duplicateIds }: ResolveDuplicatesParams) => {
           });
         } catch (error) {
           console.error("Error correcting album", album.get("name"), error);
+        }
+      }
+      if (user) {
+        await user.fetch();
+        if (user.get("profilePicture").id === imageToDelete.id) {
+          user.set("profilePicture", imageToKeep.toPointer());
+          await user.save(null, { useMasterKey: true, context: { noTrigger: true } });
         }
       }
       await imageToDelete.destroy({ useMasterKey: true });

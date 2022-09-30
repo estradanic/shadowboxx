@@ -56,6 +56,6 @@ Parse.Cloud.job("hashImages", async (request) => {
 Parse.Cloud.define<(request: ResolveDuplicatesParams) => Promise<void>>(
   "resolveDuplicates",
   async (request) => {
-    await resolveDuplicates(request.params);
+    await resolveDuplicates(request.params, request.user);
   }
 );
