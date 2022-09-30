@@ -10,7 +10,7 @@ import { createHtmlPortalNode, InPortal } from "react-reverse-portal";
 import { useQuery } from "@tanstack/react-query";
 import { ParseDuplicate, ParseImage } from "../../../classes";
 import { Strings } from "../../../resources";
-import { Notification } from "../../../contexts";
+import { Notification, useGlobalLoadingContext } from "../../../contexts";
 import { useActionDialogContext } from "../../Dialog/ActionDialog";
 import { useQueryConfigs, useRandomColor } from "../../../hooks";
 import Image from "../../Image/Image";
@@ -48,10 +48,9 @@ const DuplicatesNotificationDetail = ({
   const classes = useStyles();
   const randomColor = useRandomColor();
   const { enqueueErrorSnackbar, enqueueSuccessSnackbar } = useSnackbar();
+  const {startGlobalLoader, stopGlobalLoader} = useGlobalLoadingContext();
 
-  const [confirmedDuplicateIds, setConfirmedDuplicateIds] = useState<string[]>(
-    duplicates.map((duplicate) => duplicate.id)
-  );
+  const [confirmedDuplicateIds, setConfirmedDuplicateIds] = useState<string[]>([]);
 
   const { openPrompt } = useActionDialogContext();
   const imageIds = useMemo(
@@ -74,6 +73,7 @@ const DuplicatesNotificationDetail = ({
 
   const resolve = async () => {
     try {
+      startGlobalLoader();
       const ignoredDuplicates = duplicates.filter(
         (duplicate) => !confirmedDuplicateIds.includes(duplicate.id)
       );
@@ -88,6 +88,8 @@ const DuplicatesNotificationDetail = ({
     } catch (error) {
       console.error(error);
       enqueueErrorSnackbar(Strings.couldNotResolveDuplicates());
+    } finally {
+      stopGlobalLoader();
     }
   };
 
