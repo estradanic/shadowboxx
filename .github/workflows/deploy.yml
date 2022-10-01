@@ -20,7 +20,7 @@ jobs:
       # Runs the docker container with the right params
       - name: Run Docker Script
         id: docker
-        uses: .github/actions/deploy
+        uses: ./.github/actions/deploy
         with:
           appid: 'GkKaaxNRxTc1XONlpCizJtzVIzkWYI6ZLxrLylT4'
           appname: 'Shadowboxx Dev/Test'
