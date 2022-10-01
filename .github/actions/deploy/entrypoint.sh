@@ -1,9 +1,9 @@
 #!/bin/sh -l
 
-APP_ID = $1
-ACCOUNT_KEY = $2
-EMAIL = $3
-APP_NAME = $4
+APP_ID=$1
+ACCOUNT_KEY=$2
+EMAIL=$3
+APP_NAME=$4
 
 if [ -z $APP_ID ]
 then
