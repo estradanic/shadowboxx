@@ -29,4 +29,8 @@ then
   exit 1
 fi
 
+apt install tree -y
+
+tree -L 3 -d /github
+
 printf $ACCOUNT_KEY | b4a configure accountkey
