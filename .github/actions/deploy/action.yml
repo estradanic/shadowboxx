@@ -1,15 +1,18 @@
 name: 'Hello World Back4App'
 description: 'Runs the Back4App CLI'
 inputs:
+  appname:
+    description: 'The App Name'
+    required: true
   appid:
-    description: 'The App ID to run'
+    description: 'The App ID on Back4App'
     required: true
   accountkey:
-    description: 'Account key for authentication'
+    description: 'Account key for admin authentication'
     required: true
   email:
     description: 'The email of the admin'
-    required: false
+    required: true
 runs:
   using: 'docker'
   image: './Dockerfile'
@@ -17,3 +20,4 @@ runs:
     - ${{ inputs.appid }}
     - ${{ inputs.accountkey }}
     - ${{ inputs.email }}
+    - ${{ inputs.appname }}

@@ -1,28 +1,28 @@
 name: Deploy
 
 on:
-  # Triggers the workflow on push or pull request events but only for the "master" branch
+  # Triggers the workflow on push events but only for the "devTest" branch
   push:
-    branches: [ "master" ]
+    branches: [ "devTest" ]
   workflow_dispatch:
 
-# A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
   deploy:
     # The type of runner that the job will run on
     runs-on: ubuntu-latest
-    name: Build and deploy the project
+    name: Build and deploy the project on dev/test environment
     steps:
         # Checks-out under $GITHUB_WORKSPACE
       - name: Check out
         id: checkout
         uses: actions/checkout@v3
 
-      # Starts the docker container with the right params
-      - name: Start Docker
+      # Runs the docker container with the right params
+      - name: Run Docker Script
         id: docker
-        uses: ./.github/actions/deploy
+        uses: .github/actions/deploy
         with:
-          appid: 'aX17fiOL3N1Lklz83UnWMP6oympHLszezxXAXokH'
+          appid: 'GkKaaxNRxTc1XONlpCizJtzVIzkWYI6ZLxrLylT4'
+          appname: 'Shadowboxx Dev/Test'
           accountkey: ${{ secrets.B4A_ACCOUNT_KEY }}
           email: 'b4a@nicholasjestrada.aleeas.com'
