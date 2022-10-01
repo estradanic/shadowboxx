@@ -5,7 +5,7 @@ inputs:
     description: 'The App ID to run'
     required: true
   accountkey:
-    description: 'Access key for authentication'
+    description: 'Account key for authentication'
     required: true
   email:
     description: 'The email of the admin'
@@ -15,5 +15,5 @@ runs:
   image: './Dockerfile'
   args:
     - ${{ inputs.appid }}
-    - ${{ inputs.accesskey }}
+    - ${{ inputs.accountkey }}
     - ${{ inputs.email }}
