@@ -36,12 +36,12 @@ printf $ACCOUNT_KEY | b4a configure accountkey
 
 echo "Installing yarn"
 apt update -y
-apt install curl -y
+DEBIAN_FRONTENT=noninteractive apt install -y --no-install-recommends curl
 curl https://raw.githubusercontent.com/creationix/nvm/master/install.sh | bash
 export NVM_DIR="$HOME/.nvm"
 nvm install 16
 nvm use 16
-printf "2" | apt install npm -y
+DEBIAN_FRONTENT=noninteractive apt install -y --no-install-recommends npm
 npm install -g yarn
 
 echo "Deploying"
