@@ -36,7 +36,11 @@ printf $ACCOUNT_KEY | b4a configure accountkey
 
 echo "Installing yarn"
 apt update -y
-apt install nodejs -y
+apt install curl -y
+curl https://raw.githubusercontent.com/creationix/nvm/master/install.sh | bash
+source ~/.bashrc
+nvm install 16
+nvm use 16
 apt install npm -y
 npm install -g yarn
 
