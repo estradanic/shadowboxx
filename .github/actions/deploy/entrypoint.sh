@@ -29,7 +29,7 @@ then
   exit 1
 fi
 
-cd /github/workspace
+cd /github/workspace/src
 
 echo "Configuring account key"
 printf $ACCOUNT_KEY | b4a configure accountkey
