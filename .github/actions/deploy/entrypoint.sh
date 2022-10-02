@@ -35,8 +35,8 @@ echo "Configuring account key"
 printf $ACCOUNT_KEY | b4a configure accountkey
 
 echo "Installing yarn"
-apt install nodejs
-apt install npm
+apt install nodejs -y
+apt install npm -y
 npm install -g yarn
 
 echo "Deploying"
