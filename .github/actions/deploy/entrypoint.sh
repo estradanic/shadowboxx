@@ -45,3 +45,5 @@ then
 else
   echo "Deploying to devTest"
   yarn deploy
+fi
+echo "Deployed"
