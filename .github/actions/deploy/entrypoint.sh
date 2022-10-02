@@ -38,10 +38,10 @@ echo "Installing yarn"
 apt update -y
 apt install curl -y
 curl https://raw.githubusercontent.com/creationix/nvm/master/install.sh | bash
-source ~/.bashrc
+export NVM_DIR="$HOME/.nvm"
 nvm install 16
 nvm use 16
-apt install npm -y
+printf "2" | apt install npm -y
 npm install -g yarn
 
 echo "Deploying"
