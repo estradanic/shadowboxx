@@ -36,13 +36,13 @@ printf $ACCOUNT_KEY | b4a configure accountkey
 
 echo "Installing yarn"
 apt update -y
+DEBIAN_FRONTENT=noninteractive apt install -y --no-install-recommends npm
+npm install -g yarn
 DEBIAN_FRONTENT=noninteractive apt install -y --no-install-recommends curl
 curl https://raw.githubusercontent.com/creationix/nvm/master/install.sh | bash
 export NVM_DIR="$HOME/.nvm"
 nvm install 16
 nvm use 16
-DEBIAN_FRONTENT=noninteractive apt install -y --no-install-recommends npm
-npm install -g yarn
 
 echo "Deploying"
 if [ $APP_NAME = "Shadowboxx" ]
