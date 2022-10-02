@@ -29,8 +29,19 @@ then
   exit 1
 fi
 
-apt install tree -y
+cd /github/workspace
 
-tree -L 3 -d /github
-
+echo "Configuring account key"
 printf $ACCOUNT_KEY | b4a configure accountkey
+
+echo "Installing yarn"
+npm install -g yarn
+
+echo "Deploying"
+if [ $APP_NAME = "Shadowboxx" ]
+then
+  echo "Deploying to production"
+  yarn deploy:prod
+else
+  echo "Deploying to devTest"
+  yarn deploy

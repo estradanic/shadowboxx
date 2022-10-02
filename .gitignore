@@ -23,7 +23,3 @@ build/Release
 
 # Yarn Integrity file
 **/.yarn-integrity
-
-# Deployment config files
-.parse.local
-.parse.project
