@@ -8,7 +8,6 @@ name: 'Dependency Review'
 on:
   push:
     branches: [ "devTest" ]
-  pull_request:
 
 permissions:
   contents: read
