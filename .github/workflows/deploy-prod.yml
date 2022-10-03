@@ -1,0 +1,28 @@
+name: Deploy Prod
+
+on:
+  # Triggers the workflow on push events but only for the "devTest" branch
+  push:
+    branches: [ "master" ]
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    # The type of runner that the job will run on
+    runs-on: ubuntu-latest
+    name: Build and deploy the project on prod environment
+    steps:
+        # Checks-out under $GITHUB_WORKSPACE
+      - name: Check out
+        id: checkout
+        uses: actions/checkout@v3
+
+      # Runs the docker container with the right params
+      - name: Run Docker Script
+        id: docker
+        uses: ./.github/actions/deploy
+        with:
+          appid: 'aX17fiOL3N1Lklz83UnWMP6oympHLszezxXAXokH'
+          appname: 'Shadowboxx'
+          accountkey: ${{ secrets.B4A_ACCOUNT_KEY }}
+          email: 'b4a@nicholasjestrada.aleeas.com'
