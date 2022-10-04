@@ -4569,11 +4569,6 @@ performance-now@^2.1.0:
   resolved "https://registry.yarnpkg.com/performance-now/-/performance-now-2.1.0.tgz#6309f4e0e5fa913ec1c69307ae364b4b377c9e7b"
   integrity sha512-7EAHlyLHI56VEIdK57uwHdHKIaAGbnXPiw0yWbarQZOKaKpvUIgW0jWRVLiatnM+XXlSwsanIBH/hzGMJulMow==
 
-picocolors@^0.2.1:
-  version "0.2.1"
-  resolved "https://registry.yarnpkg.com/picocolors/-/picocolors-0.2.1.tgz#570670f793646851d1ba135996962abad587859f"
-  integrity sha512-cMlDqaLEqfSaW8Z7N5Jw+lyIW869EzT73/F5lhtY9cLGoVxSXznfgfXMO0Z5K0o0Q2TkTXq+0KFsdnSe3jDViA==
-
 picocolors@^1.0.0:
   version "1.0.0"
   resolved "https://registry.yarnpkg.com/picocolors/-/picocolors-1.0.0.tgz#cb5bdc74ff3f51892236eaf79d68bc44564ab81c"
@@ -4601,12 +4596,10 @@ postcss-attribute-case-insensitive@^5.0.2:
   dependencies:
     postcss-selector-parser "^6.0.10"
 
-postcss-browser-comments@^3.0.0:
-  version "3.0.0"
-  resolved "https://registry.yarnpkg.com/postcss-browser-comments/-/postcss-browser-comments-3.0.0.tgz#1248d2d935fb72053c8e1f61a84a57292d9f65e9"
-  integrity sha512-qfVjLfq7HFd2e0HW4s1dvU8X080OZdG46fFbIBFjW7US7YPDcWfRvdElvwMJr2LI6hMmD+7LnH2HcmXTs+uOig==
-  dependencies:
-    postcss "^7"
+postcss-browser-comments@^4:
+  version "4.0.0"
+  resolved "https://registry.yarnpkg.com/postcss-browser-comments/-/postcss-browser-comments-4.0.0.tgz#bcfc86134df5807f5d3c0eefa191d42136b5e72a"
+  integrity sha512-X9X9/WN3KIvY9+hNERUqX9gncsgBA25XaeR+jshHz2j8+sYyHktHw1JdKuMjeLpGktXidqDhA7b/qm1mrBDmgg==
 
 postcss-calc@^8.2.3:
   version "8.2.4"
@@ -4905,14 +4898,13 @@ postcss-normalize-whitespace@^5.1.1:
   dependencies:
     postcss-value-parser "^4.2.0"
 
-postcss-normalize@9.0.0:
-  version "9.0.0"
-  resolved "https://registry.yarnpkg.com/postcss-normalize/-/postcss-normalize-9.0.0.tgz#3b551279f78ec3b2e151bc8cf52ff6e46c4cc60c"
-  integrity sha512-//kq5O1xkygzN1iCioFIBtzyVTgB6ce9+Hu0mNHuUhPn+FnnFSPybe5kBemnUPPqd7QrHc+kdX6GVECUWdU2uQ==
+postcss-normalize@10.0.1:
+  version "10.0.1"
+  resolved "https://registry.yarnpkg.com/postcss-normalize/-/postcss-normalize-10.0.1.tgz#464692676b52792a06b06880a176279216540dd7"
+  integrity sha512-+5w18/rDev5mqERcG3W5GZNMJa1eoYYNGo8gB7tEwaos0ajk3ZXAI4mHGcNT47NE+ZnZD1pEpUOFLvltIwmeJA==
   dependencies:
     "@csstools/normalize.css" "*"
-    postcss "^7.0.27"
-    postcss-browser-comments "^3.0.0"
+    postcss-browser-comments "^4"
     sanitize.css "*"
 
 postcss-opacity-percentage@^1.1.2:
@@ -5068,14 +5060,6 @@ postcss-value-parser@^4.2.0:
   version "4.2.0"
   resolved "https://registry.yarnpkg.com/postcss-value-parser/-/postcss-value-parser-4.2.0.tgz#723c09920836ba6d3e5af019f92bc0971c02e514"
   integrity sha512-1NNCs6uurfkVbeXG4S8JFT9t19m45ICnif8zWLd5oPSZ50QnwMfK+H3jv408d4jw/7Bttv5axS5IiHoLaVNHeQ==
-
-postcss@^7, postcss@^7.0.27:
-  version "7.0.39"
-  resolved "https://registry.yarnpkg.com/postcss/-/postcss-7.0.39.tgz#9624375d965630e2e1f2c02a935c82a59cb48309"
-  integrity sha512-yioayjNbHn6z1/Bywyb2Y4s3yvDAeXGOyxqD+LnVOinq6Mdmd++SW2wUNVzavyyHxd6+DxzWGIuosg6P1Rj8uA==
-  dependencies:
-    picocolors "^0.2.1"
-    source-map "^0.6.1"
 
 postcss@^8.4.16, postcss@^8.4.17:
   version "8.4.17"
