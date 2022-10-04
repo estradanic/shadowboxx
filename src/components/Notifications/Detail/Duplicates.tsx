@@ -48,9 +48,11 @@ const DuplicatesNotificationDetail = ({
   const classes = useStyles();
   const randomColor = useRandomColor();
   const { enqueueErrorSnackbar, enqueueSuccessSnackbar } = useSnackbar();
-  const {startGlobalLoader, stopGlobalLoader} = useGlobalLoadingContext();
+  const { startGlobalLoader, stopGlobalLoader } = useGlobalLoadingContext();
 
-  const [confirmedDuplicateIds, setConfirmedDuplicateIds] = useState<string[]>([]);
+  const [confirmedDuplicateIds, setConfirmedDuplicateIds] = useState<string[]>(
+    []
+  );
 
   const { openPrompt } = useActionDialogContext();
   const imageIds = useMemo(

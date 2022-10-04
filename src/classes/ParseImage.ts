@@ -165,4 +165,12 @@ export default class ParseImage extends ParseObject<Image> {
   set name(name) {
     this._image.set(ParseImage.COLUMNS.name, name);
   }
+
+  /** All attributes of the image */
+  get attributes(): Image {
+    return {
+      ...this._image.attributes,
+      owner: this.owner,
+    }
+  }
 }
