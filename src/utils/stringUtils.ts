@@ -9,6 +9,13 @@ export const isNullOrWhitespace = (input: string | null | undefined) => {
   return !input || !input.trim();
 };
 
+/**
+ * Function to elide a string with an ellipsis (...)
+ * @param input The string to elide
+ * @param startLength The length of the part before the ellipsis
+ * @param endLength The length of the part after the ellipsis
+ * @returns 
+ */
 export const elide = (
   input?: string,
   startLength?: number,
@@ -23,6 +30,11 @@ export const elide = (
   return `${input.substring(0, startLength)}…${input.substring(
     input.length - endLength - 1
   )}`;
+};
+
+/** Function to return a unique string prefixed by the prefix */
+export const uniqueId = (prefix: string = ""): string => {
+  return `${prefix}-${Math.random().toString(16).slice(2, 10)}`;
 };
 
 /**

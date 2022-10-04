@@ -1,5 +1,5 @@
 import Parse from "parse";
-import difference from "lodash/difference";
+import { difference } from "../utils";
 import ParsePointer from "./ParsePointer";
 import ParseObject, { Attributes, ParsifyPointers } from "./ParseObject";
 
