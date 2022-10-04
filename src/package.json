@@ -110,7 +110,7 @@
     "@types/uuid": "^8.3.3",
     "@vitejs/plugin-react": "^2.1.0",
     "blockhash-core": "^0.1.0",
-    "eslint": "^8.23.0",
+    "eslint": "^8.24.0",
     "eslint-config-react-app": "^7.0.1",
     "vite": "^3.0.9",
     "vite-plugin-eslint": "^1.8.1",
