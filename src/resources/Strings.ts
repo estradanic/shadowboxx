@@ -236,7 +236,7 @@ const Strings: {
   noAlbums: () => "No Albums",
   noEmailExists: (email: string) => `Email doesn't exist (${email})`,
   noImageExists: (fileName: string) => `Image doesn't exist (${fileName})`,
-  noImages: () => "This album is empty",
+  noImages: () => "No Images",
   nonExistentUserWarning: () =>
     `You are saving this album with at least one user that does not currently have a Shadowboxx account.
     This will open up access to your album to the first person who creates an account with that email.
