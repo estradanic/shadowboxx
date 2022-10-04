@@ -1,11 +1,11 @@
-import React, { useCallback, useEffect, useMemo, useState } from "react";
+import React, { useCallback, useMemo, useState } from "react";
 import Grid from "@material-ui/core/Grid";
 import Typography from "@material-ui/core/Typography";
 import useMediaQuery from "@material-ui/core/useMediaQuery";
 import { makeStyles, Theme, useTheme } from "@material-ui/core/styles";
 import classNames from "classnames";
 import { useInfiniteQuery } from "@tanstack/react-query";
-import { dedupeFast } from "../../utils";
+import { difference } from "../../utils";
 import { Strings } from "../../resources";
 import { useUserContext } from "../../contexts";
 import {
@@ -63,8 +63,8 @@ export interface ImageSelectionDialogProps
   extends Pick<ActionDialogProps, "open" | "handleCancel"> {
   /** Function to run when the confirm button is clicked */
   handleConfirm: (value: ParseImage[]) => Promise<void>;
-  /** Value of already selected images */
-  value: ParseImage[];
+  /** List of already selected images */
+  alreadySelected: ParseImage[];
   /** Whether multiple images can be selected */
   multiple?: boolean;
 }
@@ -73,11 +73,11 @@ export interface ImageSelectionDialogProps
 const ImageSelectionDialog = ({
   handleConfirm: piHandleConfirm,
   handleCancel: piHandleCancel,
-  value: initialValue,
+  alreadySelected,
   open,
   multiple = true,
 }: ImageSelectionDialogProps) => {
-  const [value, setValue] = useState<ParseImage[]>(initialValue);
+  const [value, setValue] = useState<ParseImage[]>([]);
   const classes = useStyles();
   const { getLoggedInUser } = useUserContext();
   const randomColor = useRandomColor();
@@ -88,10 +88,6 @@ const ImageSelectionDialog = ({
     getImagesByOwnerInfiniteQueryKey,
     getImagesByOwnerInfiniteOptions,
   } = useInfiniteQueryConfigs();
-
-  useEffect(() => {
-    setValue((prev) => dedupeFast([...initialValue, ...prev]));
-  }, [initialValue]);
 
   // Images that the current user owns, not those shared to them.
   const { data, status, fetchNextPage, isFetchingNextPage } = useInfiniteQuery<
@@ -119,8 +115,8 @@ const ImageSelectionDialog = ({
 
   // Images that the current user owns + those in the passed in value
   const images = useMemo(
-    () => dedupeFast([...(initialValue ?? []), ...(userOwnedImages ?? [])]),
-    [initialValue, userOwnedImages]
+    () => difference(userOwnedImages ?? [], alreadySelected),
+    [alreadySelected, userOwnedImages]
   );
 
   const handleConfirm = async () => {
@@ -128,7 +124,7 @@ const ImageSelectionDialog = ({
   };
 
   const handleCancel = () => {
-    setValue(initialValue);
+    setValue([]);
     piHandleCancel?.();
   };
 

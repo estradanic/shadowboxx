@@ -36,8 +36,12 @@ export type PromptImageSelectionDialogProps = {
   handleCancel?: () => Promise<void>;
   /** Function to run when selection is confirmed */
   handleConfirm?: (newValue: ParseImage[]) => Promise<void>;
-  /** Initial value of images selected */
-  value: ParseImage[];
+  /** IImages already selected */
+  alreadySelected: ParseImage[];
+  /** Whether the image selection dialog allows multiple selections.
+   *  Defaults to true
+   */
+  multiple?: boolean;
 };
 
 /** Interface defining the value of ImageContextProvider */
@@ -78,9 +82,8 @@ export const ImageContextProvider = ({
   const { startGlobalLoader, stopGlobalLoader, updateGlobalLoader } =
     useGlobalLoadingContext();
 
-  const [selectionDialogValue, setSelectionDialogValue] = useState<
-    ParseImage[]
-  >([]);
+  const [alreadySelected, setAlreadySelected] = useState<ParseImage[]>([]);
+  const [multiple, setMultiple] = useState<boolean>(true);
   const [selectionDialogOpen, setSelectionDialogOpen] = useState(false);
   const [handleCancel, setHandleCancel] = useState<() => Promise<void>>(
     () => async () => setSelectionDialogOpen(false)
@@ -93,7 +96,8 @@ export const ImageContextProvider = ({
     ({
       handleCancel: piHandleCancel,
       handleConfirm: piHandleConfirm,
-      value: piValue,
+      alreadySelected,
+      multiple = true,
     }: PromptImageSelectionDialogProps) => {
       setSelectionDialogOpen(true);
       setHandleCancel(() => async () => {
@@ -104,13 +108,15 @@ export const ImageContextProvider = ({
         setSelectionDialogOpen(false);
         await piHandleConfirm?.(newValue);
       });
-      setSelectionDialogValue(piValue);
+      setMultiple(multiple);
+      setAlreadySelected(alreadySelected);
     },
     [
       setSelectionDialogOpen,
-      setSelectionDialogValue,
+      setAlreadySelected,
       setHandleCancel,
       setHandleConfirm,
+      setMultiple,
     ]
   );
 
@@ -206,10 +212,11 @@ export const ImageContextProvider = ({
   return (
     <ImageContext.Provider value={value}>
       <ImageSelectionDialog
-        value={selectionDialogValue}
+        alreadySelected={alreadySelected}
         open={selectionDialogOpen}
         handleConfirm={handleConfirm}
         handleCancel={handleCancel}
+        multiple={multiple}
       />
       {children}
     </ImageContext.Provider>

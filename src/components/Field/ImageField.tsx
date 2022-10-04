@@ -153,7 +153,8 @@ const ImageField = memo(
       promptImageSelectionDialog({
         handleConfirm: async (newValue) =>
           await onChange(multiple ? [...value, ...newValue] : newValue, "ADD"),
-        value,
+        alreadySelected: value,
+        multiple,
       });
     }, [promptImageSelectionDialog, value, onChange, multiple]);
 
