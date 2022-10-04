@@ -17,7 +17,10 @@ Parse.Cloud.afterSave("Image", async (request) => {
 
 Parse.Cloud.afterSave("Album", async (request) => {
   if (!request.master || request.context.noTrigger) {
+    console.log("Album afterSave", request);
     await setAlbumPermissions(request.object);
+  } else {
+    console.log("Album afterSave bypassed", request);
   }
 });
 
@@ -35,7 +38,10 @@ Parse.Cloud.beforeSave("Image", async (request) => {
 
 Parse.Cloud.beforeSave("Album", async (request) => {
   if (!request.master || request.context.noTrigger) {
+    console.log("Album beforeSave", request);
     await mergeAlbumChanges(request.object, request.context);
+  } else {
+    console.log("Album beforeSave bypassed");
   }
 });
 
