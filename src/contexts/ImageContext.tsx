@@ -126,7 +126,8 @@ export const ImageContextProvider = ({
     );
     let newProgress = (completedActions.length / actions.current.length) * 100;
     if (newProgress === 100) {
-      stopGlobalLoader();
+      // Allow user to see progress reach 100
+      setTimeout(() => stopGlobalLoader(), 1000);
     } else if (newProgress === 0) {
       newProgress = 5;
     }

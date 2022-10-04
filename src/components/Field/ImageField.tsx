@@ -22,7 +22,12 @@ import Parse from "parse";
 import classNames from "classnames";
 import { createHtmlPortalNode, InPortal } from "react-reverse-portal";
 import { readAndCompressImage } from "browser-image-resizer";
-import { elide, makeValidFileName, removeExtension, uniqueId } from "../../utils";
+import {
+  elide,
+  makeValidFileName,
+  removeExtension,
+  uniqueId,
+} from "../../utils";
 import { Strings } from "../../resources";
 import { ParseImage, ParsePointer } from "../../classes";
 import { useRandomColor, useRefState } from "../../hooks";

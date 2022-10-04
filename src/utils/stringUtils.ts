@@ -14,7 +14,7 @@ export const isNullOrWhitespace = (input: string | null | undefined) => {
  * @param input The string to elide
  * @param startLength The length of the part before the ellipsis
  * @param endLength The length of the part after the ellipsis
- * @returns 
+ * @returns The elided string
  */
 export const elide = (
   input?: string,
@@ -52,6 +52,7 @@ export const makeValidFileName = (input: string): string => {
   return fileName;
 };
 
+/** Function to remove file extension from the end of a string */
 export const removeExtension = (input: string): string => {
   const fileName = input?.replace(/\..*$/, "");
   if (isNullOrWhitespace(fileName)) {
