@@ -35,7 +35,7 @@
     "md5": "^2.3.0",
     "mkdirp": "^1.0.4",
     "notistack": "^1.0.5",
-    "parse": "^3.4.0",
+    "parse": "^3.4.4",
     "password-hash": "^1.2.2",
     "postcss": "^8.4.17",
     "postcss-flexbugs-fixes": "5.0.2",
