@@ -27,7 +27,7 @@
     "cssnano": "^5.1.13",
     "cssnano-preset-default": "^5.2.12",
     "dotenv": "16.0.3",
-    "dotenv-expand": "8.0.3",
+    "dotenv-expand": "9.0.0",
     "events": "^3.3.0",
     "fs-extra": "^10.1.0",
     "identity-obj-proxy": "3.0.0",
