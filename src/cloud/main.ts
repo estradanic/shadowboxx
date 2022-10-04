@@ -10,38 +10,32 @@ import { findDuplicateImages, hashImages } from "./jobs";
 import { resolveDuplicates, ResolveDuplicatesParams } from "./functions";
 
 Parse.Cloud.afterSave("Image", async (request) => {
-  if (!request.master || request.context.noTrigger) {
+  if (!request.master || !request.context?.noTrigger) {
     await hashImage(request.object);
   }
 });
 
 Parse.Cloud.afterSave("Album", async (request) => {
-  if (!request.master || request.context.noTrigger) {
-    console.log("Album afterSave", request);
+  if (!request.master || !request.context?.noTrigger) {
     await setAlbumPermissions(request.object);
-  } else {
-    console.log("Album afterSave bypassed", request);
   }
 });
 
 Parse.Cloud.afterSave(Parse.User, async (request) => {
-  if (!request.master || request.context.noTrigger) {
+  if (!request.master || !request.context?.noTrigger) {
     await setUserPermissions(request.object);
   }
 });
 
 Parse.Cloud.beforeSave("Image", async (request) => {
-  if (!request.master || request.context.noTrigger) {
+  if (!request.master || !request.context?.noTrigger) {
     await resizeImage(request.object);
   }
 });
 
 Parse.Cloud.beforeSave("Album", async (request) => {
-  if (!request.master || request.context.noTrigger) {
-    console.log("Album beforeSave", request);
+  if (!request.master || !request.context?.noTrigger) {
     await mergeAlbumChanges(request.object, request.context);
-  } else {
-    console.log("Album beforeSave bypassed");
   }
 });
 

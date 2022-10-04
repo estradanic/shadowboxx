@@ -6,7 +6,7 @@ import Grid from "@material-ui/core/Grid";
 import useMediaQuery from "@material-ui/core/useMediaQuery";
 import { useInfiniteQuery } from "@tanstack/react-query";
 import { Strings } from "../../resources";
-import { dedupeFast, ErrorState, isNullOrWhitespace } from "../../utils";
+import { dedupe, ErrorState, isNullOrWhitespace } from "../../utils";
 import { ImageContextProvider, useUserContext } from "../../contexts";
 import { ParseUser, ParseImage, Album } from "../../classes";
 import { useInfiniteScroll, useInfiniteQueryConfigs } from "../../hooks";
@@ -259,7 +259,7 @@ const AlbumFormDialog = ({
                 let newImageIds = imageIds;
                 switch (reason) {
                   case "ADD":
-                    newImageIds = dedupeFast<string>([
+                    newImageIds = dedupe<string>([
                       ...imageIds,
                       ...value
                         .filter((newImage) => !!newImage.id)

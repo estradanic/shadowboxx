@@ -17,7 +17,7 @@ const setUserPermissions = async (user: Parse.User) => {
       readWriteRoles.forEach((role) => {
         role.getUsers().add(user);
       });
-      await Parse.Role.saveAll(readWriteRoles, { useMasterKey: true });
+      await Promise.all(readWriteRoles.map((role) => role.save(null, {useMasterKey: true, context: {noTrigger: true}})));
     }
     if (viewerAlbums.length > 0) {
       const readRoleNames = viewerAlbums.map((album) => `${album.id}_r`);
@@ -27,7 +27,7 @@ const setUserPermissions = async (user: Parse.User) => {
       readRoles.forEach((role) => {
         role.getUsers().add(user);
       });
-      await Parse.Role.saveAll(readRoles, { useMasterKey: true });
+      await Promise.all(readRoles.map((role) => role.save(null, {useMasterKey: true, context: {noTrigger: true}})));
     }
   }
 };

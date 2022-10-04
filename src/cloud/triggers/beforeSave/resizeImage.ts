@@ -31,25 +31,25 @@ const resizeImage = async (image: Parse.Object) => {
       "file",
       await new Parse.File(image.get("name") + ".webp", {
         base64: original,
-      }).save()
+      }).save({useMasterKey: true})
     );
     image.set(
       "fileThumb",
       await new Parse.File(image.get("name") + "_thumb.webp", {
         base64: thumbnail,
-      }).save()
+      }).save({useMasterKey: true})
     );
     image.set(
       "fileMobile",
       await new Parse.File(image.get("name") + "_mobile.wepb", {
         base64: mobile,
-      }).save()
+      }).save({useMasterKey: true})
     );
     image.set(
       "fileLegacy",
       await new Parse.File(image.get("name") + "_legacy.png", {
         base64: legacy,
-      }).save()
+      }).save({useMasterKey: true})
     );
   }
 };

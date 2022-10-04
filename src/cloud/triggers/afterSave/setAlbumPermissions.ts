@@ -72,8 +72,8 @@ const setAlbumPermissions = async (album: Parse.Object) => {
   }
 
   readWriteRole.getUsers().add(owner!);
-  await readRole.save(null, { useMasterKey: true });
-  await readWriteRole.save(null, { useMasterKey: true });
+  await readRole.save(null, { useMasterKey: true, context: {noTrigger: true} });
+  await readWriteRole.save(null, { useMasterKey: true, context: {noTrigger: true} });
 
   if (album.get("images").length > 0) {
     const images = await getAllImages(album);
