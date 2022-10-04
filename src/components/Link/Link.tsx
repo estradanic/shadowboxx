@@ -2,10 +2,10 @@ import {
   Link as RouterLink,
   LinkProps as RouterLinkProps,
   useLocation,
+  parsePath,
 } from "react-router-dom";
 import MuiLink, { LinkProps as MuiLinkProps } from "@material-ui/core/Link";
 import { makeStyles, Theme } from "@material-ui/core/styles";
-import { parsePath } from "history";
 
 /**
  * Interface defining props for Link
