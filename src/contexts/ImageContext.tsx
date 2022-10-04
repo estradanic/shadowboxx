@@ -41,7 +41,7 @@ export type PromptImageSelectionDialogProps = {
   /** Whether the image selection dialog allows multiple selections.
    *  Defaults to true
    */
-  multiple?: boolean,
+  multiple?: boolean;
 };
 
 /** Interface defining the value of ImageContextProvider */
@@ -82,9 +82,7 @@ export const ImageContextProvider = ({
   const { startGlobalLoader, stopGlobalLoader, updateGlobalLoader } =
     useGlobalLoadingContext();
 
-  const [alreadySelected, setAlreadySelected] = useState<
-    ParseImage[]
-  >([]);
+  const [alreadySelected, setAlreadySelected] = useState<ParseImage[]>([]);
   const [multiple, setMultiple] = useState<boolean>(true);
   const [selectionDialogOpen, setSelectionDialogOpen] = useState(false);
   const [handleCancel, setHandleCancel] = useState<() => Promise<void>>(
