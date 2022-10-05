@@ -65,8 +65,10 @@ interface ImageContextProviderProps {
 
 const useStyles = makeStyles((theme: Theme) => ({
   uploadingImages: {
-    color: theme.palette.primary.contrastText,
-    fontSize: theme.typography.h3.fontSize,
+    '&&': {
+      color: theme.palette.primary.contrastText,
+      fontSize: theme.typography.h3.fontSize,
+    },
   },
 }));
 
