@@ -11,10 +11,13 @@ import { findDuplicateImages, hashImages } from "./jobs";
 import { resolveDuplicates, ResolveDuplicatesParams } from "./functions";
 
 Parse.Cloud.beforeLogin(async (request) => {
-  if (!await isUserWhitelisted(request.object)) {
-    throw new Parse.Error(403, "User not whitelisted and public signups are disabled");
+  if (!(await isUserWhitelisted(request.object))) {
+    throw new Parse.Error(
+      403,
+      "User not whitelisted and public signups are disabled"
+    );
   }
-})
+});
 
 Parse.Cloud.afterSave("Image", async (request) => {
   if (!request.master || !request.context?.noTrigger) {
