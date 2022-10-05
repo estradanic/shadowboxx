@@ -47,7 +47,6 @@ npm install -g yarn
 
 echo "Creating folders for deployment"
 mkdir ../public
-mkdir ../cloud
 
 echo "Deploying"
 if [ $APP_NAME = "Shadowboxx" ]
