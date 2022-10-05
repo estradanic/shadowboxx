@@ -42,6 +42,7 @@ const useStyles = makeStyles((theme: Theme) => ({
     margin: "auto",
     border: ({ borderColor }: UseStylesParams) =>
       `2px solid ${theme.palette[borderColor ?? "primary"].dark}`,
+    boxShadow: theme.shadows[5],
   },
   media: {
     cursor: "pointer",

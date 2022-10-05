@@ -36,6 +36,9 @@ const useStyles = makeStyles((theme: Theme) => ({
     backgroundColor: theme.palette.primary.main,
     padding: theme.spacing(2, 0),
   },
+  card: {
+    boxShadow: theme.shadows[5],
+  },
   submitButton: {
     backgroundColor: theme.palette.primary.main,
     color: theme.palette.primary.contrastText,
@@ -202,7 +205,7 @@ const Settings = memo(() => {
   return (
     <PageContainer>
       <Grid item lg={6} sm={8}>
-        <Card>
+        <Card className={classes.card}>
           <form autoComplete="off">
             <Grid container direction="row">
               <Grid className={classes.cardTitle} item xs={12}>

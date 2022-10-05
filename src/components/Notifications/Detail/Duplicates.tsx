@@ -50,9 +50,7 @@ const DuplicatesNotificationDetail = ({
   const { enqueueErrorSnackbar, enqueueSuccessSnackbar } = useSnackbar();
   const { startGlobalLoader, stopGlobalLoader } = useGlobalLoadingContext();
 
-  const [confirmedDuplicateIds, setConfirmedDuplicateIds] = useState<string[]>(
-    []
-  );
+  const [duplicateIds, setDuplicateIds] = useState<string[]>([]);
 
   const { openPrompt } = useActionDialogContext();
   const imageIds = useMemo(
@@ -77,13 +75,13 @@ const DuplicatesNotificationDetail = ({
     try {
       startGlobalLoader();
       const ignoredDuplicates = duplicates.filter(
-        (duplicate) => !confirmedDuplicateIds.includes(duplicate.id)
+        (duplicate) => !duplicateIds.includes(duplicate.id)
       );
       await Promise.all(
         ignoredDuplicates.map((duplicate) => duplicate.acknowledge())
       );
       await Parse.Cloud.run("resolveDuplicates", {
-        duplicateIds: confirmedDuplicateIds,
+        duplicateIds: duplicateIds,
       });
       notificationRef.current?.remove();
       enqueueSuccessSnackbar(Strings.commonSaved());
@@ -96,7 +94,7 @@ const DuplicatesNotificationDetail = ({
   };
 
   const reset = () => {
-    setConfirmedDuplicateIds(duplicates.map((duplicate) => duplicate.id));
+    setDuplicateIds(duplicates.map((duplicate) => duplicate.id));
   };
 
   const resolveDialogPortalNode = useMemo(() => createHtmlPortalNode(), []);
@@ -137,18 +135,13 @@ const DuplicatesNotificationDetail = ({
                     control={
                       <Switch
                         color="primary"
-                        checked={confirmedDuplicateIds.includes(duplicate.id)}
+                        checked={duplicateIds.includes(duplicate.id)}
                         onChange={(event) => {
                           if (event.target.checked) {
-                            setConfirmedDuplicateIds([
-                              ...confirmedDuplicateIds,
-                              duplicate.id,
-                            ]);
+                            setDuplicateIds([...duplicateIds, duplicate.id]);
                           } else {
-                            setConfirmedDuplicateIds(
-                              confirmedDuplicateIds.filter(
-                                (id) => id !== duplicate.id
-                              )
+                            setDuplicateIds(
+                              duplicateIds.filter((id) => id !== duplicate.id)
                             );
                           }
                         }}

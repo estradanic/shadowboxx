@@ -20,6 +20,7 @@ const useStyles = makeStyles((theme: Theme) => ({
     position: "relative",
   },
   image: {
+    boxShadow: theme.shadows[5],
     display: "block",
     borderRadius: theme.spacing(0.5),
     overflow: "hidden",

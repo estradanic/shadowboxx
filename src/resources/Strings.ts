@@ -95,6 +95,7 @@ export interface StringEntries {
   offline: string;
   okay: string;
   password: string;
+  passwordHelperText: string;
   pictures: string;
   pleaseEnterA: string;
   profilePicture: string;
@@ -215,7 +216,7 @@ const Strings: {
   install: () => "Install App",
   installed: () => "Installed! :)",
   installPrompt: () => "View offline!",
-  invalidEmail: (email: string) => `Invalid email (${email})`,
+  invalidEmail: (email: string) => `Invalid email${email ? ` (${email})` : ""}`,
   invalidEmptyFilename: () => "File name cannot be empty!",
   invalidImage: (image: { src: string; fileName: string }) =>
     `Invalid image (${(image && JSON.stringify(image)) || image})`,
@@ -250,6 +251,8 @@ const Strings: {
   offline: () => "You are offline. Viewing mode only",
   okay: () => "Okay",
   password: () => "Password",
+  passwordHelperText: () =>
+    "Password must be at least 8 characters, contain a capital, lowercase, number, and special character",
   pictures: () => "Pictures",
   pleaseEnterA: (field: string) => `Please enter a ${field}`,
   profilePicture: () => "Profile Picture",

@@ -19,11 +19,15 @@ import CheckIcon from "@material-ui/icons/Check";
 import CloudIcon from "@material-ui/icons/Cloud";
 import { makeStyles, Theme } from "@material-ui/core/styles";
 import Parse from "parse";
-import uniqueId from "lodash/uniqueId";
 import classNames from "classnames";
 import { createHtmlPortalNode, InPortal } from "react-reverse-portal";
 import { readAndCompressImage } from "browser-image-resizer";
-import { elide, makeValidFileName, removeExtension } from "../../utils";
+import {
+  elide,
+  makeValidFileName,
+  removeExtension,
+  uniqueId,
+} from "../../utils";
 import { Strings } from "../../resources";
 import { ParseImage, ParsePointer } from "../../classes";
 import { useRandomColor, useRefState } from "../../hooks";

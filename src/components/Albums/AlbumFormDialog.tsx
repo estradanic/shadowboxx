@@ -1,12 +1,11 @@
 import React, { useCallback, useMemo, useState } from "react";
 import Parse from "parse";
-import uniqueId from "lodash/uniqueId";
 import { useTheme } from "@material-ui/core/styles";
 import Grid from "@material-ui/core/Grid";
 import useMediaQuery from "@material-ui/core/useMediaQuery";
 import { useInfiniteQuery } from "@tanstack/react-query";
 import { Strings } from "../../resources";
-import { dedupe, ErrorState, isNullOrWhitespace } from "../../utils";
+import { dedupe, ErrorState, isNullOrWhitespace, uniqueId } from "../../utils";
 import { ImageContextProvider, useUserContext } from "../../contexts";
 import { ParseUser, ParseImage, Album } from "../../classes";
 import { useInfiniteScroll, useInfiniteQueryConfigs } from "../../hooks";
