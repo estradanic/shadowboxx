@@ -12,6 +12,7 @@ import {
   PageContainer,
   TextField,
   useSnackbar,
+  EmailField,
 } from "../../components";
 import {
   ErrorState,
@@ -89,7 +90,7 @@ const Signup = memo(() => {
     if (!validatePassword(password)) {
       newErrors.password = {
         isError: true,
-        errorMessage: Strings.invalidPassword(password),
+        errorMessage: Strings.passwordHelperText(),
       };
     }
     if (isNullOrWhitespace(firstName)) {
@@ -167,7 +168,8 @@ const Signup = memo(() => {
               />
             </Grid>
             <Grid item xs={12}>
-              <TextField
+              <EmailField
+                validate
                 error={errors.email.isError}
                 helperText={errors.email.errorMessage}
                 fullWidth
@@ -175,11 +177,12 @@ const Signup = memo(() => {
                 onChange={(e) => setEmail(e.target.value)}
                 label={Strings.email()}
                 id="email"
-                type="email"
+                onEnterKey={signup}
               />
             </Grid>
             <Grid item xs={12}>
               <PasswordField
+                validate
                 error={errors.password.isError}
                 helperText={errors.password.errorMessage}
                 fullWidth

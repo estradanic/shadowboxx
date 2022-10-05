@@ -39,20 +39,6 @@ Parse.Cloud.beforeSave("Album", async (request) => {
   }
 });
 
-// TODO [public release] Remove this
-Parse.Cloud.beforeSave(Parse.User, async (request) => {
-  if (request.object.isNew()) {
-    const userWhitelist = await new Parse.Query("Whitelist").find();
-    if (
-      !userWhitelist
-        .map((entry) => entry.get("email"))
-        .includes(request.object.get("email"))
-    ) {
-      throw new Parse.Error(401, "User is unauthorized.");
-    }
-  }
-});
-
 Parse.Cloud.beforeDelete("Album", async (request) => {
   await deleteRoles(request.object);
 });

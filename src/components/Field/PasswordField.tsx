@@ -3,6 +3,8 @@ import InputAdornment from "@material-ui/core/InputAdornment";
 import { makeStyles, Theme } from "@material-ui/core/styles";
 import VisibilityIcon from "@material-ui/icons/Visibility";
 import VisibilityOffIcon from "@material-ui/icons/VisibilityOff";
+import { validatePassword } from "../../utils";
+import { Strings } from "../../resources";
 import TextField, { TextFieldProps } from "./TextField";
 
 const useStyles = makeStyles((theme: Theme) => ({
@@ -29,7 +31,10 @@ const useStyles = makeStyles((theme: Theme) => ({
  * Interface defining props for PasswordField
  */
 export interface PasswordFieldProps extends Omit<TextFieldProps, "type"> {
-  onEnterKey: () => void | Promise<void>;
+  /** Handler to run when the enter/return key is pressed */
+  onEnterKey?: () => void | Promise<void>;
+  /** Whether to validate input or not */
+  validate?: boolean;
 }
 
 /**
@@ -38,19 +43,46 @@ export interface PasswordFieldProps extends Omit<TextFieldProps, "type"> {
 const PasswordField = ({
   InputProps: piInputProps,
   onEnterKey,
+  validate,
+  onChange: piOnChange,
+  value: piValue,
+  helperText: piHelperText,
+  error: piError,
   ...rest
 }: PasswordFieldProps) => {
   const classes = useStyles();
   const [passwordIsMasked, setPasswordIsMasked] = useState<boolean>(true);
+  const [value, setValue] = useState(piValue);
+  const [helperText, setHelperText] = useState(piHelperText);
+  const [error, setError] = useState(piError);
+  const onChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    if (
+      validate &&
+      !validatePassword(event.target.value) &&
+      event.target.value?.length > 0
+    ) {
+      setError(true);
+      setHelperText(Strings.passwordHelperText());
+    } else {
+      setError(piError);
+      setHelperText(piHelperText);
+    }
+    setValue(event.target.value);
+    piOnChange?.(event);
+  };
 
   return (
     <TextField
+      error={error}
+      helperText={helperText}
+      onChange={onChange}
+      value={value}
       type={passwordIsMasked ? "password" : "text"}
       className={classes.input}
       inputProps={{ className: classes.input }}
       onKeyUp={(e) => {
         if (e.key === "Enter") {
-          onEnterKey();
+          onEnterKey?.();
         }
       }}
       InputProps={{

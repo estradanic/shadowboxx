@@ -10,8 +10,8 @@ import {
   PasswordField,
   Link,
   PageContainer,
-  TextField,
   useSnackbar,
+  EmailField,
 } from "../../components";
 import { useView } from "../View";
 import { ParseUser } from "../../classes";
@@ -99,13 +99,12 @@ const Login = memo(() => {
               <Typography variant="h4">{Strings.login()}</Typography>
             </Grid>
             <Grid item xs={12}>
-              <TextField
+              <EmailField
                 fullWidth
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 label={Strings.email()}
                 id="email"
-                type="email"
                 error={errors.email.isError}
                 helperText={errors.email.errorMessage}
               />
