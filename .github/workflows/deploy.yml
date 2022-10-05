@@ -19,6 +19,8 @@ jobs:
       - name: Check out
         id: checkout
         uses: actions/checkout@v3
+        with:
+          ref: 'devTest'
 
       # Runs the docker container with the right params
       - name: Run Docker Script
