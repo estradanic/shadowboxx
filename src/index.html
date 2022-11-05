@@ -12,7 +12,8 @@
     <%- preconnectBack4App %>
     <link rel="preconnect" href="https://cdn.jsdelivr.net" />
     <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/css-reset-and-normalize/css/reset-and-normalize.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Alex+Brush&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Alex+Brush&display=swap" />
+    <link rel="stylesheet" href="/index.css" />
     <link rel="apple-touch-icon" href="/icon-192x192.png" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <link rel="apple-touch-startup-image" href="/apple-splash-2048-2732.jpg" media="(device-width: 1024px) and (device-height: 1366px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)" />
@@ -42,23 +43,6 @@
     <link rel="apple-touch-startup-image" href="/apple-splash-640-1136.jpg" media="(device-width: 320px) and (device-height: 568px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)" />
     <link rel="apple-touch-startup-image" href="/apple-splash-1136-640.jpg" media="(device-width: 320px) and (device-height: 568px) and (-webkit-device-pixel-ratio: 2) and (orientation: landscape)" />
     <link rel="manifest" href="/manifest.json" />
-    <style>
-      *:focus {
-        outline: none !important;
-      }
-      * {
-        overscroll-behavior: none;
-      }
-      body {
-        overflow-y: auto;
-        height: 100%;
-        -webkit-overflow-scrolling: touch;
-      }
-      html {
-        height: 100vh;
-        overflow: hidden;
-      }
-    </style>
     <script type="module" src="/index.tsx"></script>
     <%- injectVariables %>
     <title>Shadowboxx</title>

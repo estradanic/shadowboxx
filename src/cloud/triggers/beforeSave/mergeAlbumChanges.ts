@@ -7,10 +7,12 @@ const mergeAlbumChanges = async (
   context: Record<string, any>
 ) => {
   if (
-    (await album.isNew()) ||
-    (!album.dirty("images") &&
-      !album.dirty("collaborators") &&
-      !album.dirty("viewers"))
+    album.isNew() ||
+    !(
+      album.dirty("images") ||
+      album.dirty("collaborators") ||
+      album.dirty("viewers")
+    )
   ) {
     return;
   }
@@ -19,9 +21,9 @@ const mergeAlbumChanges = async (
 
   await album.fetch({ useMasterKey: true });
 
-  const images = album.get("images");
-  const collaborators = album.get("collaborators");
-  const viewers = album.get("viewers");
+  const images: string[] = album.get("images");
+  const collaborators: string[] = album.get("collaborators");
+  const viewers: string[] = album.get("viewers");
 
   if (context.addedImages) {
     images.push(...context.addedImages);
@@ -65,8 +67,11 @@ const mergeAlbumChanges = async (
   }
 
   let coverImage = attributes.coverImage;
-  if (!coverImage && images?.length) {
-    coverImage = images[0].toPointer();
+  if (images && (!coverImage || !images.includes(coverImage.id))) {
+    const image = await new Parse.Query("Image")
+      .equalTo("objectId", images[0])
+      .first({ useMasterKey: true });
+    coverImage = image?.toPointer();
   }
 
   album.set({ ...attributes, images, collaborators, viewers, coverImage });
