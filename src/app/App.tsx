@@ -87,18 +87,18 @@ const App = () => {
     );
 
   useEffect(() => {
-    navigator?.serviceWorker?.register(
+    navigator?.serviceWorker?.register?.(
       `/service-worker.js?version=${window.__env__.SERVICE_WORKER_VERSION_NUMBER}`,
       { scope: "/" }
     );
     if (window.location.host.match(/^www\./) !== null) {
       window.location.host = window.location.host.substring(4);
     }
-    navigator?.storage?.persisted()?.then((initialIsPersisted) => {
+    navigator?.storage?.persisted?.()?.then?.((initialIsPersisted) => {
       if (!initialIsPersisted) {
         navigator.storage
-          .persist()
-          .then((isPersisted) =>
+          .persist?.()
+          ?.then((isPersisted) =>
             console.log(
               "Storage ",
               isPersisted ? "persisted!" : "not persisted..."
@@ -108,7 +108,7 @@ const App = () => {
         console.log("Storage persisted!");
       }
     });
-    navigator?.storage?.estimate()?.then((estimate) => {
+    navigator?.storage?.estimate?.()?.then?.((estimate) => {
       if (
         estimate &&
         estimate.quota !== undefined &&
