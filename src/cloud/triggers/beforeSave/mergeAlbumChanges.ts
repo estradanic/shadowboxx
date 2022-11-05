@@ -67,6 +67,7 @@ const mergeAlbumChanges = async (
   let coverImage = attributes.coverImage;
   if (!coverImage && images?.length) {
     const image = await new Parse.Query("Image").get(images[0]);
+    console.log({images, coverImage, image});
     coverImage = image.toPointer();
   }
 
