@@ -8,9 +8,11 @@ const mergeAlbumChanges = async (
 ) => {
   if (
     album.isNew() ||
-    !(album.dirty("images") ||
+    !(
+      album.dirty("images") ||
       album.dirty("collaborators") ||
-      album.dirty("viewers"))
+      album.dirty("viewers")
+    )
   ) {
     return;
   }
@@ -65,10 +67,11 @@ const mergeAlbumChanges = async (
   }
 
   let coverImage = attributes.coverImage;
-  if (!coverImage && images?.length) {
-    const image = await new Parse.Query("Image").get(images[0]);
-    console.log({images, coverImage, image});
-    coverImage = image.toPointer();
+  if (images && (!coverImage || !images.includes(coverImage.id))) {
+    const image = await new Parse.Query("Image")
+      .equalTo("objectId", images[0])
+      .first({ useMasterKey: true });
+    coverImage = image?.toPointer();
   }
 
   album.set({ ...attributes, images, collaborators, viewers, coverImage });
