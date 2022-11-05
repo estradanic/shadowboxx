@@ -91,6 +91,15 @@ sw.addEventListener("fetch", (event) => {
           })
       )
     );
+  } else {
+    // For everything else, respond with online only
+    // Explicitly sending fetch request instead of allowing pass-through
+    // to avoid Firefox's CORS problems
+    event.respondWith(
+      fetch(event.request).catch((e) => {
+        throw new Error(`Fetch failed for request: ${event.request}`);
+      })
+    );
   }
 });
 

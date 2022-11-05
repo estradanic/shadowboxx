@@ -15,6 +15,7 @@ import { ParseDuplicate } from "../classes";
 import { useQueryConfigs } from "../hooks";
 import { Strings } from "../resources";
 import { DuplicatesNotificationDetail } from "../components";
+import { useUserContext } from "./UserContext";
 
 /** Interface defining a single notification */
 export interface Notification {
@@ -64,10 +65,14 @@ export const NotificationsContextProvider = ({
   const { getDuplicatesQueryKey, getDuplicatesOptions, getDuplicatesFunction } =
     useQueryConfigs();
 
+  const { isUserLoggedIn } = useUserContext();
+
   const { data: duplicates } = useQuery<ParseDuplicate[], Error>(
     getDuplicatesQueryKey(),
     () => getDuplicatesFunction(),
-    getDuplicatesOptions()
+    getDuplicatesOptions({
+      enabled: isUserLoggedIn,
+    })
   );
 
   const duplicatesNotificationRef = useRef<Notification>();
