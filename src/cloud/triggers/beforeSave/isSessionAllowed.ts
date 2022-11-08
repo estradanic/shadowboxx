@@ -11,4 +11,10 @@ const isUserWhitelisted = async (user: Parse.User): Promise<boolean> => {
   );
 };
 
-export default isUserWhitelisted;
+/** Function to check the whitelist of uses and return whether the Session is allowed to save */
+const isSessionAllowed = async (session: Parse.Session): Promise<boolean> => {
+  const user = await session.get("user").fetch({ useMasterKey: true });
+  return isUserWhitelisted(user);
+};
+
+export default isSessionAllowed;
