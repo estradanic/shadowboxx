@@ -3588,10 +3588,10 @@ parse-json@^5.0.0:
     json-parse-even-better-errors "^2.3.0"
     lines-and-columns "^1.1.6"
 
-parse@^3.5.0:
-  version "3.5.0"
-  resolved "https://registry.yarnpkg.com/parse/-/parse-3.5.0.tgz#603c5b2ee64252b70d4f67e3d36f37dbf0a78c4a"
-  integrity sha512-F5YvP95ugBGadB67wj5Vu0zM9xX6UZpWioswq9s0dtTSM7darETVuPbuqnoNJnocSHLxB3rKQhBBa2fjELU1+w==
+parse@3.4.4:
+  version "3.4.4"
+  resolved "https://registry.yarnpkg.com/parse/-/parse-3.4.4.tgz#6358f2a59df4dfac6f6f76f1589d92942249fd43"
+  integrity sha512-6mnFGD3FroQtCYImRXOFF9+BohGWGwaOIo7htD0HxGVooMR1Iyb69eYj+AoLr+o3sBBGCCGmNmjNjmvUIOnSaw==
   dependencies:
     "@babel/runtime" "7.18.0"
     "@babel/runtime-corejs3" "7.17.8"
