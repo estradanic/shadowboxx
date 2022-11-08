@@ -31,14 +31,11 @@ import {
 import { Strings } from "../../resources";
 import { ParseImage, ParsePointer } from "../../classes";
 import { useRandomColor, useRefState } from "../../hooks";
+import { useGlobalLoadingStore } from "../../stores";
 import TextField, { TextFieldProps } from "../Field/TextField";
 import Tooltip from "../Tooltip/Tooltip";
 import { useSnackbar } from "../Snackbar/Snackbar";
-import {
-  useGlobalLoadingContext,
-  useImageContext,
-  useUserContext,
-} from "../../contexts";
+import { useImageContext, useUserContext } from "../../contexts";
 import Image from "../Image/Image";
 import RemoveImageDecoration from "../Image/Decoration/RemoveImageDecoration";
 import CoverImageDecoration from "../Image/Decoration/CoverImageDecoration";
@@ -130,7 +127,12 @@ const ImageField = memo(
     const { uploadImage, promptImageSelectionDialog } = useImageContext();
     const [showUrlInput, setShowUrlInput] = useState<boolean>(false);
     const [imageUrlRef, imageUrl, setImageUrl] = useRefState("");
-    const { startGlobalLoader, stopGlobalLoader } = useGlobalLoadingContext();
+    const { startGlobalLoader, stopGlobalLoader } = useGlobalLoadingStore(
+      (state) => ({
+        startGlobalLoader: state.startGlobalLoader,
+        stopGlobalLoader: state.stopGlobalLoader,
+      })
+    );
 
     const { getLoggedInUser } = useUserContext();
 

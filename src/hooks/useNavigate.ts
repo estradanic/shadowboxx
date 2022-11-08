@@ -3,7 +3,7 @@ import {
   Location,
   To,
 } from "react-router-dom";
-import { useScrollPositionContext } from "../contexts";
+import { useScrollPositionStore } from "../stores";
 
 /**
  * Hook that provides the react-router navigate function to go back and forth between pages.
@@ -11,7 +11,9 @@ import { useScrollPositionContext } from "../contexts";
  */
 const useNavigate = () => {
   const routerNavigate = useRouterNavigate();
-  const { pushScrollPosition } = useScrollPositionContext();
+  const pushScrollPosition = useScrollPositionStore(
+    (state) => state.pushScrollPosition
+  );
 
   return (nextLocation: To, previousLocation?: Location) => {
     if (previousLocation) {

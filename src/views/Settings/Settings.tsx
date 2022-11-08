@@ -21,9 +21,9 @@ import { ErrorState, validateEmail, isNullOrWhitespace } from "../../utils";
 import {
   useUserContext,
   ImageContextProvider,
-  useGlobalLoadingContext,
   useNetworkDetectionContext,
 } from "../../contexts";
+import { useGlobalLoadingStore } from "../../stores";
 import { useView } from "../View";
 
 const useStyles = makeStyles((theme: Theme) => ({
@@ -113,7 +113,12 @@ const Settings = memo(() => {
     saveLoggedInUserUpdates,
   } = useUserContext();
 
-  const { stopGlobalLoader, startGlobalLoader } = useGlobalLoadingContext();
+  const { stopGlobalLoader, startGlobalLoader } = useGlobalLoadingStore(
+    (state) => ({
+      stopGlobalLoader: state.stopGlobalLoader,
+      startGlobalLoader: state.startGlobalLoader,
+    })
+  );
   const { online } = useNetworkDetectionContext();
 
   const classes = useStyles();

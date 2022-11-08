@@ -22,7 +22,8 @@ import {
 } from "../../utils";
 import { routes } from "../../app";
 import { ParseUser } from "../../classes";
-import { useUserContext, useGlobalLoadingContext } from "../../contexts";
+import { useUserContext } from "../../contexts";
+import { useGlobalLoadingStore } from "../../stores";
 import { useView } from "../View";
 
 const useStyles = makeStyles((theme: Theme) => ({
@@ -73,7 +74,12 @@ const Signup = memo(() => {
     useState<ErrorState<"email" | "firstName" | "lastName" | "password">>(
       DefaultErrorState
     );
-  const { stopGlobalLoader, startGlobalLoader } = useGlobalLoadingContext();
+  const { stopGlobalLoader, startGlobalLoader } = useGlobalLoadingStore(
+    (state) => ({
+      startGlobalLoader: state.startGlobalLoader,
+      stopGlobalLoader: state.stopGlobalLoader,
+    })
+  );
   const navigate = useNavigate();
   const { enqueueErrorSnackbar } = useSnackbar();
   const { updateLoggedInUser } = useUserContext();

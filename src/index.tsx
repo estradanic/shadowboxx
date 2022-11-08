@@ -9,9 +9,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import {
   UserContextProvider,
   NotificationsContextProvider,
-  GlobalLoadingContextProvider,
   NetworkDetectionContextProvider,
-  ScrollPositionContextProvider,
 } from "./contexts";
 import App from "./app/App";
 import { SnackbarProvider } from "./components";
@@ -94,21 +92,17 @@ ReactDOM.render(
   <React.StrictMode>
     <MuiThemeProvider theme={theme}>
       <NetworkDetectionContextProvider>
-        <GlobalLoadingContextProvider>
-          <QueryClientProvider client={queryClient}>
-            <BrowserRouter>
-              <ScrollPositionContextProvider>
-                <UserContextProvider>
-                  <SnackbarProvider>
-                    <NotificationsContextProvider>
-                      <App />
-                    </NotificationsContextProvider>
-                  </SnackbarProvider>
-                </UserContextProvider>
-              </ScrollPositionContextProvider>
-            </BrowserRouter>
-          </QueryClientProvider>
-        </GlobalLoadingContextProvider>
+        <QueryClientProvider client={queryClient}>
+          <BrowserRouter>
+            <UserContextProvider>
+              <SnackbarProvider>
+                <NotificationsContextProvider>
+                  <App />
+                </NotificationsContextProvider>
+              </SnackbarProvider>
+            </UserContextProvider>
+          </BrowserRouter>
+        </QueryClientProvider>
       </NetworkDetectionContextProvider>
     </MuiThemeProvider>
   </React.StrictMode>,

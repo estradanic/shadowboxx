@@ -1,25 +1,39 @@
 import React from "react";
 import Typography, { TypographyProps } from "@material-ui/core/Typography";
-import { makeStyles } from "@material-ui/core/styles";
+import { makeStyles, Theme } from "@material-ui/core/styles";
 import classNames from "classnames";
 
-const useStyles = makeStyles(() => ({
+const useStyles = makeStyles((theme: Theme) => ({
   root: {
     fontFamily: "Alex Brush",
   },
+  loading: {
+    color: theme.palette.primary.contrastText,
+    fontSize: theme.typography.h3.fontSize,
+  },
 }));
 
-export interface FancyTypographyProps extends TypographyProps {}
+export interface FancyTypographyProps extends Omit<TypographyProps, "variant"> {
+  variant?: "loading" | TypographyProps["variant"];
+}
 
 const FancyTypography = ({
   className,
   children,
+  variant,
   ...rest
 }: FancyTypographyProps) => {
   const classes = useStyles();
+  const typographyVariant = variant === "loading" ? undefined : variant;
 
   return (
-    <Typography {...rest} className={classNames(className, classes.root)}>
+    <Typography
+      variant={typographyVariant}
+      {...rest}
+      className={classNames(className, classes.root, {
+        [classes.loading]: variant === "loading",
+      })}
+    >
       {children}
     </Typography>
   );

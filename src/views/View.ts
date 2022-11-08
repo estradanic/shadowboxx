@@ -2,7 +2,7 @@ import { useCallback, useEffect, useLayoutEffect } from "react";
 import { useLocation, createPath } from "react-router-dom";
 import { useUserContext } from "../contexts";
 import { routes } from "../app";
-import { useScrollPositionContext } from "../contexts";
+import { useScrollPositionStore } from "../stores";
 import { useNavigate } from "../hooks";
 
 /**
@@ -13,7 +13,7 @@ export const useView = (currentViewId: string) => {
   const location = useLocation();
   const currentRoute = routes[currentViewId];
   const { isUserLoggedIn, setRedirectPath } = useUserContext();
-  const { getScrollPosition } = useScrollPositionContext();
+  const getScrollPosition = useScrollPositionStore((state) => state.getScrollPosition);
 
   const redirectToLogin = useCallback(() => {
     if (currentRoute.redirectOnAuthFail) {
