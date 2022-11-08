@@ -13,9 +13,7 @@ export const useView = (currentViewId: string) => {
   const location = useLocation();
   const currentRoute = routes[currentViewId];
   const { isUserLoggedIn, setRedirectPath } = useUserContext();
-  const getScrollPosition = useScrollPositionStore(
-    (state) => state.getScrollPosition
-  );
+  const getScrollPosition = useScrollPositionStore((state) => state.getScrollPosition);
 
   const redirectToLogin = useCallback(() => {
     if (currentRoute.redirectOnAuthFail) {
