@@ -3,7 +3,7 @@ import Container, { ContainerProps } from "@material-ui/core/Container";
 import Grid from "@material-ui/core/Grid";
 import { makeStyles, Theme } from "@material-ui/core/styles";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
-import { useGlobalLoadingContext } from "../../contexts";
+import { useGlobalLoadingStore } from "../../stores";
 import LoadingWrapper from "../Loader/LoadingWrapper";
 
 const useStyles = makeStyles((theme: Theme) => ({
@@ -31,7 +31,7 @@ const PageContainer = ({ children, ...rest }: PageContainerProps) => {
     globalProgress,
     globalLoaderType,
     globalLoaderContent,
-  } = useGlobalLoadingContext();
+  } = useGlobalLoadingStore();
 
   return (
     <LoadingWrapper

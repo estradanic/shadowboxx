@@ -10,7 +10,8 @@ import { createHtmlPortalNode, InPortal } from "react-reverse-portal";
 import { useQuery } from "@tanstack/react-query";
 import { ParseDuplicate, ParseImage } from "../../../classes";
 import { Strings } from "../../../resources";
-import { Notification, useGlobalLoadingContext } from "../../../contexts";
+import { Notification } from "../../../contexts";
+import { useGlobalLoadingStore } from "../../../stores";
 import { useActionDialogContext } from "../../Dialog/ActionDialog";
 import { useQueryConfigs, useRandomColor } from "../../../hooks";
 import Image from "../../Image/Image";
@@ -48,7 +49,12 @@ const DuplicatesNotificationDetail = ({
   const classes = useStyles();
   const randomColor = useRandomColor();
   const { enqueueErrorSnackbar, enqueueSuccessSnackbar } = useSnackbar();
-  const { startGlobalLoader, stopGlobalLoader } = useGlobalLoadingContext();
+  const { startGlobalLoader, stopGlobalLoader } = useGlobalLoadingStore(
+    (state) => ({
+      startGlobalLoader: state.startGlobalLoader,
+      stopGlobalLoader: state.stopGlobalLoader,
+    })
+  );
 
   const [duplicateIds, setDuplicateIds] = useState<string[]>([]);
 

@@ -14,7 +14,7 @@ Parse.Cloud.beforeLogin(async (request) => {
   if (!(await isUserWhitelisted(request.object))) {
     throw new Parse.Error(
       403,
-      "User not whitelisted and public signups are disabled"
+      "User not whitelisted and public logins are disabled"
     );
   }
 });
@@ -34,6 +34,15 @@ Parse.Cloud.afterSave("Album", async (request) => {
 Parse.Cloud.afterSave(Parse.User, async (request) => {
   if (!request.master || !request.context?.noTrigger) {
     await setUserPermissions(request.object);
+  }
+});
+
+Parse.Cloud.beforeSave(Parse.User, async (request) => {
+  if (request.object.isNew() && !(await isUserWhitelisted(request.object))) {
+    throw new Parse.Error(
+      403,
+      "User not whitelisted and public signups are disabled"
+    );
   }
 });
 

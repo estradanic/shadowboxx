@@ -8,11 +8,10 @@ import React, {
 import Parse from "parse";
 import { useNotificationsContext } from "./NotificationsContext";
 import ErrorIcon from "@material-ui/icons/Error";
-import { makeStyles, Theme } from "@material-ui/core/styles";
 import { FancyTypography, useSnackbar } from "../components";
 import { Strings } from "../resources";
 import { ParseImage, Image } from "../classes";
-import { useGlobalLoadingContext } from "./GlobalLoadingContext";
+import { useGlobalLoadingStore } from "../stores";
 import { isNullOrWhitespace } from "../utils";
 import { ImageSelectionDialog } from "../components/Images";
 
@@ -63,15 +62,6 @@ interface ImageContextProviderProps {
   children: React.ReactNode;
 }
 
-const useStyles = makeStyles((theme: Theme) => ({
-  uploadingImages: {
-    "&&": {
-      color: theme.palette.primary.contrastText,
-      fontSize: theme.typography.h3.fontSize,
-    },
-  },
-}));
-
 export const ImageContextProvider = ({
   children,
 }: ImageContextProviderProps) => {
@@ -79,10 +69,12 @@ export const ImageContextProvider = ({
   const { addNotification } = useNotificationsContext();
   const { enqueueErrorSnackbar } = useSnackbar();
 
-  const classes = useStyles();
-
   const { startGlobalLoader, stopGlobalLoader, updateGlobalLoader } =
-    useGlobalLoadingContext();
+    useGlobalLoadingStore((state) => ({
+      startGlobalLoader: state.startGlobalLoader,
+      stopGlobalLoader: state.stopGlobalLoader,
+      updateGlobalLoader: state.updateGlobalLoader,
+    }));
 
   const [alreadySelected, setAlreadySelected] = useState<ParseImage[]>([]);
   const [multiple, setMultiple] = useState<boolean>(true);
@@ -140,7 +132,7 @@ export const ImageContextProvider = ({
     startGlobalLoader({
       type: "determinate",
       content: (
-        <FancyTypography className={classes.uploadingImages}>
+        <FancyTypography variant="loading">
           {Strings.uploadingImages()}
         </FancyTypography>
       ),

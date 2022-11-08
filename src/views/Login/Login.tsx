@@ -15,7 +15,8 @@ import {
 } from "../../components";
 import { useView } from "../View";
 import { ParseUser } from "../../classes";
-import { useUserContext, useGlobalLoadingContext } from "../../contexts";
+import { useUserContext } from "../../contexts";
+import { useGlobalLoadingStore } from "../../stores";
 
 const useStyles = makeStyles((theme: Theme) => ({
   cardTitle: {
@@ -55,7 +56,12 @@ const Login = memo(() => {
   const [password, setPassword] = useState<string>("");
   const [errors, setErrors] =
     useState<ErrorState<"email" | "password">>(DefaultErrorState);
-  const { startGlobalLoader, stopGlobalLoader } = useGlobalLoadingContext();
+  const { startGlobalLoader, stopGlobalLoader } = useGlobalLoadingStore(
+    (state) => ({
+      startGlobalLoader: state.startGlobalLoader,
+      stopGlobalLoader: state.stopGlobalLoader,
+    })
+  );
   const { enqueueErrorSnackbar } = useSnackbar();
   const { updateLoggedInUser } = useUserContext();
 

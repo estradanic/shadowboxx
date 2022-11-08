@@ -1,9 +1,6 @@
 import { useSnackbar } from "../../components";
-import {
-  useGlobalLoadingContext,
-  useNetworkDetectionContext,
-  useUserContext,
-} from "../../contexts";
+import { useNetworkDetectionContext, useUserContext } from "../../contexts";
+import { useGlobalLoadingStore } from "../../stores";
 import { Strings } from "../../resources";
 import { Interdependent } from "../../types";
 
@@ -48,7 +45,12 @@ const useQueryConfigHelpers = () => {
     enqueueSuccessSnackbar,
     enqueueWarningSnackbar,
   } = useSnackbar();
-  const { startGlobalLoader, stopGlobalLoader } = useGlobalLoadingContext();
+  const { startGlobalLoader, stopGlobalLoader } = useGlobalLoadingStore(
+    (state) => ({
+      startGlobalLoader: state.startGlobalLoader,
+      stopGlobalLoader: state.stopGlobalLoader,
+    })
+  );
   const { getLoggedInUser, updateLoggedInUser } = useUserContext();
   const { online } = useNetworkDetectionContext();
 

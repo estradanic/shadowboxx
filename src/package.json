@@ -29,7 +29,8 @@
     "react-reverse-portal": "^2.1.0",
     "react-router-dom": "^6.3.0",
     "use-debounce": "^8.0.4",
-    "uuid": "^9.0.0"
+    "uuid": "^9.0.0",
+    "zustand": "^4.1.4"
   },
   "scripts": {
     "preBuild": "cd service-worker && tsc && cd ..",

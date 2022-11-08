@@ -151,16 +151,12 @@ export default class ParseUser extends ParseObject<User> {
    * @returns The signed up ParseUser
    */
   async signup(updateLoggedInUser: UpdateLoggedInUser, options?: FullOptions) {
-    try {
-      const loggedInUser = await this._user.signUp(undefined, options);
-      await updateLoggedInUser(
-        new ParseUser(loggedInUser),
-        UpdateReason.SIGN_UP
-      );
-      return new ParseUser(loggedInUser);
-    } catch (error: any) {
-      console.error(error?.message ?? Strings.commonError());
-    }
+    const loggedInUser = await this._user.signUp(undefined, options);
+    await updateLoggedInUser(
+      new ParseUser(loggedInUser),
+      UpdateReason.SIGN_UP
+    );
+    return new ParseUser(loggedInUser);
   }
 
   /**
