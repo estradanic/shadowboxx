@@ -71,7 +71,7 @@ export type ImageProps = ImgHTMLAttributes<HTMLImageElement> & {
   /** Image to display */
   parseImage: ParseImage;
   /** Array of ImageDecorations */
-  decorations?: React.ReactElement<ImageDecorationProps>[];
+  decorations?: React.ReactElement<ImageDecorationProps<any>>[];
   /** CSS border color */
   borderColor?: VariableColor;
   /** Whether to show full resolution popup when the image is clicked */

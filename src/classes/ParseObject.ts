@@ -1,57 +1,52 @@
 import Parse from "parse";
+import { AlbumAttributes } from "./ParseAlbum";
+import { DuplicateAttributes } from "./ParseDuplicate";
+import { ImageAttributes } from "./ParseImage";
 import ParsePointer from "./ParsePointer";
+import { UserAttributes } from "./ParseUser";
 
-/** Interface defining basic attributes of parse objects */
-export interface Attributes {
+/** Type encompassing the classNames allowed for ParseObjects */
+export type ClassName = "Album" | "Image" | "_User" | "_Role" | "Duplicate";
+
+/** Type defining basic attributes of all ParseObjects */
+export interface ObjectAttributes {
   /** Unique id of the object in the database */
   objectId?: string;
   /** Date object is first persisted to the database */
   createdAt?: Date;
   /** Date object has been last updated in the database */
   updatedAt?: Date;
-  /** Other columns */
-  [key: string]: any;
 }
+
+/** Type encompassing the attributes of all kinds of ParseObjects */
+export type Attributes<C extends ClassName> = ObjectAttributes & (C extends "Album" ? AlbumAttributes : C extends "Image" ? ImageAttributes : C extends "_User" ? UserAttributes : C extends "Duplicate" ? DuplicateAttributes : {});
 
 /**
  * Type for converting an Attributes type to one with native Parse Pointers
  */
-export type ParsifyPointers<A extends Attributes> = {
-  [key in keyof A]: A[key] extends ParsePointer | undefined
+export type ParsifyPointers<C extends ClassName> = {
+  [key in keyof Attributes<C>]: Attributes<C>[key] extends (ParsePointer<ClassName> | undefined)
     ? Parse.Pointer
-    : A[key];
+    : Attributes<C>[key];
 };
+
+export class Columns {
+  objectId: "objectId" = "objectId";
+  createdAt: "createdAt" = "createdAt";
+  updatedAt: "updatedAt" = "updatedAt";
+  id: "objectId" = "objectId";
+}
 
 /**
  * Class wrapping the Parse.Object class and providing convenience methods/properties
  */
-export default class ParseObject<A extends Attributes> {
+export default class ParseObject<C extends ClassName> {
   /** Basic columns for any class */
-  static COLUMNS = {
-    id: "objectId",
-    createdAt: "createdAt",
-    updatedAt: "updatedAt",
-  };
+  static COLUMNS = new Columns();
 
-  /**
-   * Get a Parse.Query
-   * @param online Whether to query the online database or the local database
-   * @returns A Parse.Query object
-   */
-  static query(online = true) {
-    if (online) {
-      return new Parse.Query<Parse.Object<ParsifyPointers<Attributes>>>(
-        Parse.Object
-      );
-    }
-    return new Parse.Query<Parse.Object<ParsifyPointers<Attributes>>>(
-      Parse.Object
-    ).fromLocalDatastore();
-  }
+  _object: Parse.Object<ParsifyPointers<C>>;
 
-  _object: Parse.Object<ParsifyPointers<A>>;
-
-  constructor(object: Parse.Object<ParsifyPointers<A>>) {
+  constructor(object: Parse.Object<ParsifyPointers<C>>) {
     this._object = object;
     object.pin()
   }
@@ -60,7 +55,7 @@ export default class ParseObject<A extends Attributes> {
    * Create a ParsePointer to this ParseObject
    * @returns A ParsePointer to this ParseObject
    */
-  toPointer(): ParsePointer {
+  toPointer(): ParsePointer<C> {
     return new ParsePointer(this.toNativePointer());
   }
 
@@ -88,7 +83,7 @@ export default class ParseObject<A extends Attributes> {
    * @param that The other ParseObject to compare to
    * @returns Whether the two ParseObjects are equal or not
    */
-  equals(that: ParseObject<A>): boolean {
+  equals(that: ParseObject<C>): boolean {
     return this.id === that.id;
   }
 
@@ -110,17 +105,17 @@ export default class ParseObject<A extends Attributes> {
 
 
   /** ObjectId for this object */
-  get id(): A["objectId"] {
+  get id(): ObjectAttributes["objectId"] {
     return this._object.id || (this._object as any).objectId;
   }
 
   /** Date that the object was saved to the db */
-  get createdAt(): A["createdAt"] {
+  get createdAt(): ObjectAttributes["createdAt"] {
     return this._object.createdAt;
   }
 
   /** Date that the object was last updated in the db */
-  get updatedAt(): A["updatedAt"] {
+  get updatedAt(): ObjectAttributes["updatedAt"] {
     return this._object.updatedAt;
   }
 }
