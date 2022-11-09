@@ -8,6 +8,7 @@ const Settings = lazy(() => import("../views/Settings/Settings"));
 const Signup = lazy(() => import("../views/Signup/Signup"));
 const Album = lazy(() => import("../views/Album/Album"));
 const Images = lazy(() => import("../views/Images/Images"));
+const Share = lazy(() => import("../views/Share/Share"));
 
 /**
  * Interface defining a route object
@@ -66,6 +67,14 @@ const routes: { [key: string]: RouteProps } = {
     viewName: "Settings",
     View: Settings,
     path: "/settings",
+    tryAuthenticate: true,
+    redirectOnAuthFail: true,
+  },
+  Share: {
+    viewId: "Share",
+    viewName: "Share",
+    view: Share,
+    path: "/share",
     tryAuthenticate: true,
     redirectOnAuthFail: true,
   },

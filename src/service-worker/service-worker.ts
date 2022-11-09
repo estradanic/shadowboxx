@@ -91,6 +91,23 @@ sw.addEventListener("fetch", (event) => {
           })
       )
     );
+  } else if (url.pathname === "/share") {
+    // If this is a request to the share endpoint, handle the shared file
+    event.respondWith((async () => {
+      const formData = await event.request.formData();
+      const file = formData.get("file") as File;
+      const name = formData.get("name") as string;
+      // post message to the client to handle the file
+      const client = await sw.clients.get(event.clientId);
+      if (client) {
+        client.postMessage({
+          type: "share",
+          file,
+          name,
+        });
+      }
+      return fetch("/share");
+    })());
   } else {
     // For everything else, respond with online only
     // Explicitly sending fetch request instead of allowing pass-through
