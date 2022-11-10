@@ -1,4 +1,4 @@
-import React, { memo, useMemo } from "react";
+import React, { memo, useCallback, useMemo } from "react";
 import {
   BackButton,
   FancyTitleTypographySkeleton,
@@ -11,7 +11,7 @@ import Typography from "@material-ui/core/Typography";
 import { makeStyles } from "@material-ui/core/styles";
 import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
 import { Strings } from "../../resources";
-import { ParseImage, ParseAlbum } from "../../classes";
+import { ParseImage, ParseAlbum, ParseUser } from "../../classes";
 import { FancyTitleTypography, Void, Images } from "../../components";
 import { DEFAULT_PAGE_SIZE } from "../../constants";
 import {
@@ -21,6 +21,7 @@ import {
   useInfiniteScroll,
 } from "../../hooks";
 import { useView } from "../View";
+import OwnerImageDecoration from "../../components/Image/Decoration/OwnerImageDecoration";
 
 const useStyles = makeStyles(() => ({
   svgContainer: {
@@ -71,8 +72,14 @@ const Album = memo(() => {
 
   const images = useMemo(
     () => data?.pages?.flatMap((page) => page),
-    [data?.pages]
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [data?.pages?.length]
   );
+
+  const getImageDecorations = useCallback(async (image: ParseImage) => {
+    const owner = await image.owner.fetch<ParseUser>();
+    return [<OwnerImageDecoration owner={owner} />];
+  }, []);
 
   return (
     <PageContainer>
@@ -89,6 +96,7 @@ const Album = memo(() => {
             </FancyTitleTypography>
           </Grid>
           <Images
+            getDecorations={getImageDecorations}
             status={imagesStatus}
             images={images}
             outlineColor={randomColor}

@@ -1,9 +1,10 @@
 import Parse, { FullOptions } from "parse";
 import { Strings } from "../resources";
-import ParseObject, { Attributes, ParsifyPointers } from "./ParseObject";
+import ParseObject, { Attributes, Columns, ParsifyPointers } from "./ParseObject";
 import ParsePointer from "./ParsePointer";
 
-export interface User extends Attributes {
+/** Interface defining User-specific attributes */
+export interface UserAttributes {
   /** Whether email has been verified or not */
   emailVerified?: boolean;
   /** Username (email) for login */
@@ -19,42 +20,43 @@ export interface User extends Attributes {
   /** Whether dark theme is enabled or not */
   isDarkThemeEnabled: boolean;
   /** Pointer to Image record for profile picture */
-  profilePicture?: ParsePointer;
+  profilePicture?: ParsePointer<"_User">;
   /** List of favorited album ids */
   favoriteAlbums: string[];
 }
 
 export type UpdateLoggedInUser = (
   loggedInUser: ParseUser,
-  reason: UpdateReason
+  reason: UserUpdateReason
 ) => Promise<void>;
 
-export enum UpdateReason {
+export enum UserUpdateReason {
   LOG_IN,
   SIGN_UP,
   UPDATE,
   LOG_OUT,
 }
 
+class UserColumns extends Columns {
+  emailVerified: "emailVerified" = "emailVerified";
+  password: "password" = "password";
+  email: "email" = "email";
+  lastName: "lastName" = "lastName";
+  firstName: "firstName" = "firstName";
+  isDarkThemeEnabled: "isDarkThemeEnabled" = "isDarkThemeEnabled";
+  profilePicture: "profilePicture" = "profilePicture";
+  username: "username" = "username";
+  favoriteAlbums: "favoriteAlbums" = "favoriteAlbums";
+}
+
 /**
  * Class wrapping the Parse.User class and providing convenience methods/properties
  */
-export default class ParseUser extends ParseObject<User> {
+export default class ParseUser extends ParseObject<"_User"> {
   /**
    * Columns for the Parse.User ("User") class
    */
-  static COLUMNS = {
-    ...ParseObject.COLUMNS,
-    emailVerified: "emailVerified",
-    password: "password",
-    email: "email",
-    lastName: "lastName",
-    firstName: "firstName",
-    isDarkThemeEnabled: "isDarkThemeEnabled",
-    profilePicture: "profilePicture",
-    username: "username",
-    favoriteAlbums: "favoriteAlbums",
-  };
+  static COLUMNS = new UserColumns();
 
   /**
    * Gets a Parse.Query for the Parse.User ("User") class
@@ -63,9 +65,9 @@ export default class ParseUser extends ParseObject<User> {
    */
   static query(online = true) {
     if (online) {
-      return new Parse.Query<Parse.User<ParsifyPointers<User>>>("User");
+      return new Parse.Query<Parse.User<ParsifyPointers<"_User">>>("User");
     }
-    return new Parse.Query<Parse.User<ParsifyPointers<User>>>("User").fromLocalDatastore();
+    return new Parse.Query<Parse.User<ParsifyPointers<"_User">>>("User").fromLocalDatastore();
   }
 
   /**
@@ -73,8 +75,8 @@ export default class ParseUser extends ParseObject<User> {
    * @param attributes Attributes to create the ParseUser from
    * @returns A new ParseUser
    */
-  static fromAttributes = (attributes: Partial<User>): ParseUser => {
-    const fullAttributes: ParsifyPointers<User> = {
+  static fromAttributes = (attributes: Partial<Attributes<"_User">>): ParseUser => {
+    const fullAttributes: ParsifyPointers<"_User"> = {
       username: attributes.username ?? attributes.email ?? "",
       password: attributes.password ?? "",
       email: attributes.email ?? attributes.username ?? "",
@@ -86,7 +88,7 @@ export default class ParseUser extends ParseObject<User> {
       favoriteAlbums: attributes.favoriteAlbums ?? [],
     };
     const newParseUser = new ParseUser(
-      new Parse.User<ParsifyPointers<User>>(fullAttributes)
+      new Parse.User<ParsifyPointers<"_User">>(fullAttributes)
     );
 
     // Set this again to make sure that the pointer is the right type
@@ -94,9 +96,9 @@ export default class ParseUser extends ParseObject<User> {
     return newParseUser;
   };
 
-  _user: Parse.User<ParsifyPointers<User>>;
+  _user: Parse.User<ParsifyPointers<"_User">>;
 
-  constructor(user: Parse.User<ParsifyPointers<User>>) {
+  constructor(user: Parse.User<ParsifyPointers<"_User">>) {
     super(user);
     this._user = user;
   }
@@ -140,7 +142,7 @@ export default class ParseUser extends ParseObject<User> {
    */
   async login(updateLoggedInUser: UpdateLoggedInUser, options?: FullOptions) {
     const loggedInUser = await this._user.logIn(options);
-    await updateLoggedInUser(new ParseUser(loggedInUser), UpdateReason.LOG_IN);
+    await updateLoggedInUser(new ParseUser(loggedInUser), UserUpdateReason.LOG_IN);
     return new ParseUser(loggedInUser);
   }
 
@@ -154,7 +156,7 @@ export default class ParseUser extends ParseObject<User> {
     const loggedInUser = await this._user.signUp(undefined, options);
     await updateLoggedInUser(
       new ParseUser(loggedInUser),
-      UpdateReason.SIGN_UP
+      UserUpdateReason.SIGN_UP
     );
     return new ParseUser(loggedInUser);
   }
@@ -173,7 +175,7 @@ export default class ParseUser extends ParseObject<User> {
       const loggedInUser = await this._user.save(undefined, options);
       await updateLoggedInUser(
         new ParseUser(loggedInUser),
-        UpdateReason.UPDATE
+        UserUpdateReason.UPDATE
       );
       return new ParseUser(loggedInUser);
     } catch (error: any) {
@@ -189,16 +191,16 @@ export default class ParseUser extends ParseObject<User> {
   async logout(updateLoggedInUser: UpdateLoggedInUser) {
     try {
       const loggedOutUser = await Parse.User.logOut<
-        Parse.User<ParsifyPointers<User>>
+        Parse.User<ParsifyPointers<"_User">>
       >();
       await updateLoggedInUser(
         new ParseUser(loggedOutUser),
-        UpdateReason.LOG_OUT
+        UserUpdateReason.LOG_OUT
       );
       return new ParseUser(loggedOutUser);
     } catch (error: any) {
       console.error(error?.message ?? Strings.commonError());
-      await updateLoggedInUser(this, UpdateReason.LOG_OUT);
+      await updateLoggedInUser(this, UserUpdateReason.LOG_OUT);
     }
   }
 
@@ -273,8 +275,9 @@ export default class ParseUser extends ParseObject<User> {
   }
 
   /** This user's profile picture, if it exists */
-  get profilePicture(): ParsePointer | undefined {
-    return new ParsePointer(this._user.get(ParseUser.COLUMNS.profilePicture));
+  get profilePicture(): ParsePointer<"_User"> | undefined {
+    const profilePicture = this._user.get(ParseUser.COLUMNS.profilePicture);
+    return profilePicture ? new ParsePointer(profilePicture) : undefined;
   }
 
   set profilePicture(profilePicture) {
@@ -291,7 +294,7 @@ export default class ParseUser extends ParseObject<User> {
   }
 
   /** Alias to _user.attributes but with the pointers as ParsePointer objects */
-  get attributes(): User {
+  get attributes(): Attributes<"_User"> {
     return {
       ...this._user.attributes,
       profilePicture: this.profilePicture,

@@ -1,9 +1,11 @@
-import React from "react";
+import React, { ForwardedRef } from "react";
 import { makeStyles, Theme } from "@material-ui/core/styles";
 import RemoveIcon from "@material-ui/icons/Remove";
+import Icon, { IconProps } from "@material-ui/core/Icon";
 import classNames from "classnames";
 import { Strings } from "../../../resources";
 import ImageDecoration, { ImageDecorationProps } from "./ImageDecoration";
+import { forwardRef } from "react";
 
 const useStyles = makeStyles((theme: Theme) => ({
   root: {
@@ -16,25 +18,38 @@ const useStyles = makeStyles((theme: Theme) => ({
 
 export interface RemoveImageDecorationProps
   extends Omit<
-    ImageDecorationProps,
-    "IconComponent" | "description" | "corner"
+    ImageDecorationProps<IconProps>,
+    "Component" | "description" | "corner" | "ComponentProps"
   > {
-  corner?: ImageDecorationProps["corner"];
+  corner?: ImageDecorationProps<IconProps>["corner"];
+  IconProps?: IconProps;
 }
+
+const RemoveImageDecorationIcon = forwardRef(
+  (props: IconProps, ref: ForwardedRef<any>) => (
+    <Icon {...props} ref={ref}>
+      <RemoveIcon />
+    </Icon>
+  )
+);
 
 const RemoveImageDecoration = ({
   corner = "topLeft",
   className: userClassName,
+  IconProps = {},
   ...rest
 }: RemoveImageDecorationProps) => {
   const classes = useStyles();
 
   return (
-    <ImageDecoration
+    <ImageDecoration<IconProps>
       corner={corner}
-      IconComponent={RemoveIcon}
+      Component={RemoveImageDecorationIcon}
       description={Strings.removeImage()}
-      fontSize="large"
+      ComponentProps={{
+        fontSize: "large",
+        ...IconProps,
+      }}
       className={classNames(classes.root, userClassName)}
       {...rest}
     />

@@ -1,37 +1,53 @@
 import Parse from "parse";
 import { removeExtension } from "../utils";
 import ParsePointer from "./ParsePointer";
-import ParseObject, { Attributes, ParsifyPointers } from "./ParseObject";
+import ParseObject, { Attributes, Columns, ParsifyPointers } from "./ParseObject";
 import ParseUser from "./ParseUser";
 
-/** Interface defining an Image */
-export interface Image extends Attributes {
+/** Interface defining Image-specific attributes */
+export interface ImageAttributes {
   /** The actual saved file */
   file: Parse.File;
+  /** The file resized for mobile */
+  fileMobile: Parse.File;
+  /** The file resized for thumbnails */
+  fileThumb: Parse.File;
+  /** The file in png format for older iPhones */
+  fileLegacy: Parse.File;
   /** User that owns this picture */
-  owner: ParsePointer;
+  owner: ParsePointer<"_User">;
   /** Name of the image */
   name: string;
 }
 
+class ImageColumns extends Columns {
+  file: "file" = "file";
+  owner: "owner" = "owner";
+  name: "name" = "name";
+  fileMobile: "fileMobile" = "fileMobile";
+  fileThumb: "fileThumb" = "fileThumb";
+  fileLegacy: "fileLegacy" = "fileLegacy";
+}
+
+
 /**
  * Class wrapping the Parse.Image class and providing convenience methods/properties
  */
-export default class ParseImage extends ParseObject<Image> {
+export default class ParseImage extends ParseObject<"Image"> {
 
   /**
    * Create a new image from attributes
    * @param attributes Attributes to create the image with
    * @returns The created image
    */
-  static fromAttributes(attributes: Image): ParseImage {
-    const newAttributes: ParsifyPointers<Image> = {
+  static fromAttributes(attributes: Attributes<"Image">): ParseImage {
+    const newAttributes: ParsifyPointers<"Image"> = {
       ...attributes,
       owner: attributes.owner._pointer,
       name: attributes.name,
     };
     return new ParseImage(
-      new Parse.Object<ParsifyPointers<Image>>("Image", newAttributes)
+      new Parse.Object<ParsifyPointers<"Image">>("Image", newAttributes)
     );
   }
 
@@ -42,9 +58,9 @@ export default class ParseImage extends ParseObject<Image> {
    */
   static query(online = true) {
     if (online) {
-      return new Parse.Query<Parse.Object<ParsifyPointers<Image>>>("Image");
+      return new Parse.Query<Parse.Object<ParsifyPointers<"Image">>>("Image");
     }
-    return new Parse.Query<Parse.Object<ParsifyPointers<Image>>>("Image").fromLocalDatastore();
+    return new Parse.Query<Parse.Object<ParsifyPointers<"Image">>>("Image").fromLocalDatastore();
   }
 
   /**
@@ -53,7 +69,7 @@ export default class ParseImage extends ParseObject<Image> {
    * @param coverImage Image to sort to the top
    * @returns Sorted list of images
    */
-  static sort(images: ParseImage[], coverImage?: ParsePointer): ParseImage[] {
+  static sort(images: ParseImage[], coverImage?: ParsePointer<"Image">): ParseImage[] {
     if (coverImage) {
       return [...images].sort((a, b) => {
         if (a.id === coverImage.id) {
@@ -71,19 +87,11 @@ export default class ParseImage extends ParseObject<Image> {
   /**
    * Columns for the "Image" class
    */
-  static COLUMNS = {
-    ...ParseObject.COLUMNS,
-    file: "file",
-    owner: "owner",
-    name: "name",
-    fileThumb: "fileThumb",
-    fileMobile: "fileMobile",
-    fileLegacy: "fileLegacy",
-  };
+  static COLUMNS = new ImageColumns();
 
-  _image: Parse.Object<ParsifyPointers<Image>>;
+  _image: Parse.Object<ParsifyPointers<"Image">>;
 
-  constructor(image: Parse.Object<ParsifyPointers<Image>>) {
+  constructor(image: Parse.Object<ParsifyPointers<"Image">>) {
     super(image);
     this._image = image;
   }
@@ -141,12 +149,12 @@ export default class ParseImage extends ParseObject<Image> {
   }
 
   /** PNG version of the file for mobile Safari and IE */
-  get fileLegacy(): Parse.File | undefined {
+  get fileLegacy(): Parse.File {
     return this._image.get(ParseImage.COLUMNS.fileLegacy);
   }
 
   /** Pointer to user who owns the image */
-  get owner(): Image["owner"] {
+  get owner(): Attributes<"Image">["owner"] {
     return new ParsePointer(this._image.get(ParseImage.COLUMNS.owner));
   }
 
@@ -155,7 +163,7 @@ export default class ParseImage extends ParseObject<Image> {
   }
 
   /** Image name */
-  get name(): Image["name"] {
+  get name(): Attributes<"Image">["name"] {
     return (
       this._image.get(ParseImage.COLUMNS.name) ??
       removeExtension(this.file.name())
@@ -167,7 +175,7 @@ export default class ParseImage extends ParseObject<Image> {
   }
 
   /** All attributes of the image */
-  get attributes(): Image {
+  get attributes(): Attributes<"Image"> {
     return {
       ...this._image.attributes,
       owner: this.owner,

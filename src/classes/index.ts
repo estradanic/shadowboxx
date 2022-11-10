@@ -8,6 +8,6 @@ export type { Image } from "./ParseImage";
 export { default as ParseObject } from "./ParseObject";
 export type { Attributes } from "./ParseObject";
 export { default as ParsePointer } from "./ParsePointer";
-export { default as ParseUser, UpdateReason } from "./ParseUser";
+export { default as ParseUser, UserUpdateReason as UpdateReason } from "./ParseUser";
 export type { User, UpdateLoggedInUser } from "./ParseUser";
 export {default as IdbKeyvalStorage} from "./IdbKeyvalStorage";

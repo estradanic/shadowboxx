@@ -1,6 +1,7 @@
-import React from "react";
+import React, { ForwardedRef, forwardRef } from "react";
 import { makeStyles, Theme } from "@material-ui/core/styles";
 import StarIcon from "@material-ui/icons/Star";
+import Icon, { IconProps } from "@material-ui/core/Icon";
 import classNames from "classnames";
 import { Strings } from "../../../resources";
 import ImageDecoration, { ImageDecorationProps } from "./ImageDecoration";
@@ -21,33 +22,46 @@ const useStyles = makeStyles((theme: Theme) => ({
 
 export interface CoverImageDecorationProps
   extends Omit<
-    ImageDecorationProps,
-    "IconComponent" | "description" | "corner"
+    ImageDecorationProps<IconProps>,
+    "Component" | "description" | "corner" | "ComponentProps"
   > {
-  corner?: ImageDecorationProps["corner"];
+  corner?: ImageDecorationProps<IconProps>["corner"];
   checked: boolean;
+  IconProps?: IconProps;
 }
+
+const CoverImageDecorationIcon = forwardRef(
+  (props: IconProps, ref: ForwardedRef<any>) => (
+    <Icon {...props} ref={ref}>
+      <StarIcon />
+    </Icon>
+  )
+);
 
 const CoverImageDecoration = ({
   checked,
   corner = "bottomRight",
-  className: userClassName,
+  IconProps = {},
+  className: piClassName,
   ...rest
 }: CoverImageDecorationProps) => {
   const classes = useStyles();
 
   return (
-    <ImageDecoration
+    <ImageDecoration<IconProps>
       corner={corner}
-      IconComponent={StarIcon}
+      Component={CoverImageDecorationIcon}
       description={
         checked ? Strings.unsetCoverImage() : Strings.setImageAsCover()
       }
-      className={classNames(userClassName, classes.root, {
+      className={classNames(classes.root, piClassName, {
         [classes.checked]: checked,
         [classes.unchecked]: !checked,
       })}
-      fontSize="large"
+      ComponentProps={{
+        fontSize: "large",
+        ...IconProps,
+      }}
       {...rest}
     />
   );
