@@ -35,5 +35,5 @@ export type RequireAtLeastOne<T, Keys extends keyof T> = Omit<T, Keys> &
     [Key in Keys]: Record<Key, T[Key]> &
       Partial<Record<Exclude<Keys, Key>, T[Key]>> extends infer O
       ? { [P in keyof O]: O[P] }
-      : { [P in keyof T]?: T[P]};
+      : { [P in keyof T]?: T[P] };
   }[Keys];

@@ -68,7 +68,15 @@ const useUserInfo = ({
     } else {
       return await getUserByEmailFunction(email, queryFunctionOptions);
     }
-  }, [fetchUser, user, userPointer, email, getUserByEmailFunction, queryFunctionOptions, online]);
+  }, [
+    fetchUser,
+    user,
+    userPointer,
+    email,
+    getUserByEmailFunction,
+    queryFunctionOptions,
+    online,
+  ]);
 
   const { data: fetchedUser } = useQuery<ParseUser, Error>(
     getUserByEmailQueryKey(queryKey),
