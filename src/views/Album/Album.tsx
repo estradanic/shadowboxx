@@ -11,7 +11,7 @@ import Typography from "@material-ui/core/Typography";
 import { makeStyles } from "@material-ui/core/styles";
 import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
 import { Strings } from "../../resources";
-import { ParseImage, ParseAlbum, ParseUser } from "../../classes";
+import { ParseImage, ParseAlbum } from "../../classes";
 import { FancyTitleTypography, Void, Images } from "../../components";
 import { DEFAULT_PAGE_SIZE } from "../../constants";
 import {
@@ -77,8 +77,13 @@ const Album = memo(() => {
   );
 
   const getImageDecorations = useCallback(async (image: ParseImage) => {
-    const owner = await image.owner.fetch<ParseUser>();
-    return [<OwnerImageDecoration owner={owner} />];
+    return [
+      <OwnerImageDecoration
+        UserAvatarProps={{
+          UseUserInfoParams: { userPointer: image.owner },
+        }}
+      />,
+    ];
   }, []);
 
   return (

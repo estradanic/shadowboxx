@@ -1,35 +1,22 @@
-import React, { memo } from "react";
+import React from "react";
 import Typography, { TypographyProps } from "@material-ui/core/Typography";
-import { ParseUser } from "../../classes";
-import { useQueryConfigs } from "../../hooks";
-import { useQuery } from "@tanstack/react-query";
+import { useUserInfo, UseUserInfoParams } from "../../hooks";
 
 /** Interface defining props for UserLabel */
 export interface UserLabelProps extends TypographyProps {
-  /** Email of the user to display */
-  email: string;
-  /** Function to get user. If provided, this component does not request data from the server */
-  fetchUser?: () => ParseUser;
+  /** Params to be passed into useUserInfo */
+  UseUserInfoParams: UseUserInfoParams;
 }
 
 /** Component to display the name of a user */
-const UserLabel = memo(({ email, fetchUser, ...rest }: UserLabelProps) => {
-  const {
-    getUserByEmailFunction,
-    getUserByEmailQueryKey,
-    getUserByEmailOptions,
-  } = useQueryConfigs();
-  const { data: user } = useQuery<ParseUser, Error>(
-    getUserByEmailQueryKey(email),
-    () => (fetchUser ? fetchUser() : getUserByEmailFunction(email)),
-    getUserByEmailOptions()
-  );
+const UserLabel = ({ UseUserInfoParams, ...rest }: UserLabelProps) => {
+  const user = useUserInfo(UseUserInfoParams);
 
   return (
     <Typography variant="overline" {...rest}>
       {user?.name}
     </Typography>
   );
-});
+};
 
 export default UserLabel;
