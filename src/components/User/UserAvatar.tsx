@@ -13,6 +13,7 @@ const useStyles = makeStyles((theme: Theme) => ({
     backgroundColor: theme.palette.primary.light,
     color: theme.palette.error.contrastText,
     cursor: "pointer",
+    border: `2px solid ${theme.palette.primary.main}`,
   },
 }));
 

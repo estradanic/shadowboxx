@@ -18,6 +18,8 @@ export type ImagesProps = {
   getDecorations?: (
     image: ParseImage
   ) => Promise<ReactElement<ImageDecorationProps<any>>[]>;
+  /** Function to get a caption given a particular image */
+  getCaption?: (image: ParseImage) => Promise<string | undefined>;
 };
 
 /** Component showing a list of images */
@@ -26,11 +28,16 @@ const Images = ({
   status,
   outlineColor,
   getDecorations = () => Promise.resolve([]),
+  getCaption = () =>
+    Promise.resolve(Math.random() > 0.5 ? "This is a caption" : undefined),
 }: ImagesProps) => {
   const classes = useStyles();
   const [decorations, setDecorations] = useState<
     Record<string, ReactElement<ImageDecorationProps<any>>[]>
   >({});
+  const [captions, setCaptions] = useState<Record<string, string | undefined>>(
+    {}
+  );
 
   useEffect(() => {
     if (images) {
@@ -40,9 +47,14 @@ const Images = ({
           ...prev,
           [image.id!]: decorations,
         }));
+        const caption = await getCaption(image);
+        setCaptions((prev) => ({
+          ...prev,
+          [image.id!]: caption,
+        }));
       });
     }
-  }, [setDecorations, images, getDecorations]);
+  }, [setDecorations, images, getDecorations, getCaption, setCaptions]);
 
   if (status === "loading" || (!images && status !== "error")) {
     return <ImagesSkeleton />;
@@ -55,6 +67,7 @@ const Images = ({
           <Grid key={image.id} item xs={12} md={6} lg={4} xl={3}>
             <Image
               decorations={decorations[image.id!]}
+              caption={captions[image.id!]}
               borderColor={outlineColor}
               parseImage={image}
               showFullResolutionOnClick

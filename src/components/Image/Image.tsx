@@ -9,9 +9,11 @@ import Tooltip from "../Tooltip/Tooltip";
 import { ImageDecorationProps } from "./Decoration/ImageDecoration";
 import Skeleton from "../Skeleton/Skeleton";
 import { IMAGE_SKELETON_HEIGHT } from "../Skeleton/ImageSkeleton";
+import { Typography } from "@material-ui/core";
 
 interface UseStylesParams {
   borderColor: VariableColor;
+  hasCaption: boolean;
 }
 
 const useStyles = makeStyles((theme: Theme) => ({
@@ -43,6 +45,7 @@ const useStyles = makeStyles((theme: Theme) => ({
     height: "100vh",
     display: "flex",
     backgroundColor: opacity(theme.palette.background.default, 0.7),
+    flexDirection: "column",
   },
   fullResolutionImage: {
     borderRadius: theme.spacing(0.5),
@@ -54,14 +57,31 @@ const useStyles = makeStyles((theme: Theme) => ({
   },
   fullResolutionPicture: {
     margin: "auto",
+    marginBottom: ({ hasCaption }: UseStylesParams) =>
+      hasCaption ? 0 : "auto",
   },
   fullResolutionSkeleton: {
     "&&": {
       maxWidth: "600px",
     },
+    margin: "auto",
   },
   displayNone: {
     display: "none",
+  },
+  caption: {
+    color: theme.palette.text.primary,
+    fontSize: "large",
+    textAlign: "center",
+    margin: "auto",
+    marginTop: 0,
+    backgroundColor: opacity(theme.palette.background.paper, 0.9),
+    maxWidth: "90vw",
+    width: "max-content",
+    padding: theme.spacing(2),
+    borderRadius: theme.spacing(0.5),
+    border: ({ borderColor }: UseStylesParams) =>
+      `2px solid ${theme.palette[borderColor].dark}`,
   },
 }));
 
@@ -78,6 +98,8 @@ export type ImageProps = ImgHTMLAttributes<HTMLImageElement> & {
   showFullResolutionOnClick?: boolean;
   /** Style variant */
   variant?: "bordered" | "contained";
+  /** Caption text */
+  caption?: string;
 };
 
 /** Component showing an image in a pretty and functional way */
@@ -90,9 +112,10 @@ const Image = ({
   parseImage,
   variant = "bordered",
   onClick: piOnClick,
+  caption,
   ...rest
 }: ImageProps) => {
-  const classes = useStyles({ borderColor });
+  const classes = useStyles({ borderColor, hasCaption: !!caption });
   if (variant === "contained") {
     classes.image = "";
     classes.pointer = "";
@@ -161,6 +184,13 @@ const Image = ({
               src={parseImage.fileLegacy?.url()}
             />
           </picture>
+          <Typography
+            className={classNames(classes.caption, {
+              [classes.displayNone]: !isFullResolutionLoaded || !caption,
+            })}
+          >
+            {caption}
+          </Typography>
           {!isFullResolutionLoaded && (
             <Skeleton
               variant="rect"
@@ -168,7 +198,6 @@ const Image = ({
               height="90vh"
               className={classNames(
                 classes.fullResolutionImage,
-                classes.fullResolutionPicture,
                 classes.fullResolutionSkeleton
               )}
             />
