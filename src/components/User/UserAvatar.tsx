@@ -6,6 +6,7 @@ import { useQuery } from "@tanstack/react-query";
 import { ParseImage } from "../../classes";
 import { Strings } from "../../resources";
 import { useQueryConfigs, useUserInfo, UseUserInfoParams } from "../../hooks";
+import Tooltip from "../Tooltip/Tooltip";
 
 const useStyles = makeStyles((theme: Theme) => ({
   avatar: {
@@ -40,15 +41,22 @@ const UserAvatar = forwardRef(
       () => getImageByIdFunction(user?.profilePicture?.id ?? ""),
       getImageByIdOptions({ enabled: !!user?.profilePicture?.id })
     );
+    const userName =
+      user?.name ??
+      UseUserInfoParams.email ??
+      UseUserInfoParams.user?.name ??
+      "";
 
     return (
-      <Avatar
-        ref={ref}
-        alt={user?.name ?? Strings.profilePicture()}
-        className={cx(classes.avatar, piClassName)}
-        src={profilePicture?.fileThumb?.url()}
-        {...rest}
-      />
+      <Tooltip title={userName}>
+        <Avatar
+          ref={ref}
+          alt={user?.name ?? Strings.profilePicture()}
+          className={cx(classes.avatar, piClassName)}
+          src={profilePicture?.fileThumb?.url()}
+          {...rest}
+        />
+      </Tooltip>
     );
   }
 );
