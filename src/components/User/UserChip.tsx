@@ -1,9 +1,9 @@
-import React, { memo } from "react";
+import React from "react";
 import UserLabel from "./UserLabel";
 import UserAvatar from "./UserAvatar";
 import Chip, { ChipProps } from "@material-ui/core/Chip";
 import { makeStyles, Theme } from "@material-ui/core/styles";
-import { ParseUser } from "../../classes";
+import { UseUserInfoParams } from "../../hooks";
 
 const useStyles = makeStyles((theme: Theme) => ({
   root: {
@@ -30,23 +30,21 @@ const useStyles = makeStyles((theme: Theme) => ({
 /** Interface defining props for UserChip */
 export interface UserChipProps
   extends Omit<ChipProps, "label" | "icon" | "component" | "classes"> {
-  /** Email of the user to display */
-  email: string;
-  /** Function to get user. If provided, this component does not request data from the server */
-  fetchUser?: () => ParseUser;
+  /** Params to be passed into useUserInfo */
+  UseUserInfoParams: UseUserInfoParams;
 }
 
 /** Component to display the name and profile picture of a user */
-const UserChip = memo(({ email, fetchUser, ...rest }: UserChipProps) => {
+const UserChip = ({ UseUserInfoParams, ...rest }: UserChipProps) => {
   const classes = useStyles();
   return (
     <Chip
       {...rest}
       classes={classes}
-      icon={<UserAvatar fetchUser={fetchUser} email={email} />}
-      label={<UserLabel fetchUser={fetchUser} email={email} />}
+      icon={<UserAvatar UseUserInfoParams={UseUserInfoParams} />}
+      label={<UserLabel UseUserInfoParams={UseUserInfoParams} />}
     />
   );
-});
+};
 
 export default UserChip;

@@ -237,7 +237,7 @@ const AlbumCard = memo(({ value, onChange, borderColor }: AlbumCardProps) => {
       <Card className={classes.card}>
         <CardHeader
           classes={{ title: classes.title, subheader: classes.subheader }}
-          avatar={<UserAvatar email={owner?.email!} fetchUser={() => owner!} />}
+          avatar={<UserAvatar UseUserInfoParams={{ user: owner! }} />}
           action={
             isViewer ? undefined : (
               <Online>
@@ -313,8 +313,7 @@ const AlbumCard = memo(({ value, onChange, borderColor }: AlbumCardProps) => {
                     >
                       <UserAvatar
                         className={classes.collaboratorAvatar}
-                        email={collaborator.email}
-                        fetchUser={() => collaborator}
+                        UseUserInfoParams={{ user: collaborator }}
                         key={collaborator.email}
                       />
                     </Tooltip>
@@ -331,8 +330,7 @@ const AlbumCard = memo(({ value, onChange, borderColor }: AlbumCardProps) => {
                     >
                       <UserAvatar
                         className={classes.collaboratorAvatar}
-                        email={viewer.email}
-                        fetchUser={() => viewer}
+                        UseUserInfoParams={{ user: viewer }}
                         key={viewer.email}
                       />
                     </Tooltip>

@@ -121,7 +121,7 @@ const Header = ({ viewId, className, ...rest }: HeaderProps) => {
             <Notifications className={classes.notifications} />
             {!!profilePicture?.fileThumb?.url() && (
               <UserAvatar
-                email={getLoggedInUser().email}
+                UseUserInfoParams={{ user: getLoggedInUser() }}
                 className={classes.profile}
               />
             )}

@@ -34,7 +34,7 @@ export interface ImageDecorationProps<P> {
   Component: ForwardRefExoticComponent<P>;
   ComponentProps: P;
   corner: "topLeft" | "bottomLeft" | "topRight" | "bottomRight";
-  description: string;
+  description?: string;
   className?: string;
   children?: ReactNode;
   onClick?: MouseEventHandler;
@@ -63,12 +63,16 @@ const ImageDecoration = <P,>({
   }
   const className = classNames(...cornerClasses, classes.root, piClassName);
 
-  return (
+  return description ? (
     <Tooltip title={description}>
       <Component {...rest} {...ComponentProps} className={className}>
         {children}
       </Component>
     </Tooltip>
+  ) : (
+    <Component {...rest} {...ComponentProps} className={className}>
+      {children}
+    </Component>
   );
 };
 

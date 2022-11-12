@@ -2,10 +2,10 @@ import React, { ForwardedRef, forwardRef } from "react";
 import Avatar, { AvatarProps } from "@material-ui/core/Avatar";
 import { makeStyles, Theme } from "@material-ui/core/styles";
 import cx from "classnames";
-import { ParseUser, ParseImage } from "../../classes";
-import { Strings } from "../../resources";
 import { useQuery } from "@tanstack/react-query";
-import { useQueryConfigs } from "../../hooks";
+import { ParseImage } from "../../classes";
+import { Strings } from "../../resources";
+import { useQueryConfigs, useUserInfo, UseUserInfoParams } from "../../hooks";
 
 const useStyles = makeStyles((theme: Theme) => ({
   avatar: {
@@ -17,32 +17,24 @@ const useStyles = makeStyles((theme: Theme) => ({
 
 /** Interface defining props for UserAvatar */
 export interface UserAvatarProps extends AvatarProps {
-  /** Email of the user to display */
-  email: string;
-  /** Function to get user. If provided, this component does not request data from the server */
-  fetchUser?: () => ParseUser;
+  /** Params to be passed into useUserInfo */
+  UseUserInfoParams: UseUserInfoParams;
 }
 
 /** Component to display the profile picture of a user */
 const UserAvatar = forwardRef(
   (
-    { email, fetchUser, className: piClassName = "", ...rest }: UserAvatarProps,
+    {
+      UseUserInfoParams,
+      className: piClassName = "",
+      ...rest
+    }: UserAvatarProps,
     ref: ForwardedRef<any>
   ) => {
     const classes = useStyles();
-    const {
-      getUserByEmailFunction,
-      getUserByEmailQueryKey,
-      getUserByEmailOptions,
-      getImageByIdFunction,
-      getImageByIdQueryKey,
-      getImageByIdOptions,
-    } = useQueryConfigs();
-    const { data: user } = useQuery<ParseUser, Error>(
-      getUserByEmailQueryKey(email),
-      () => (fetchUser ? fetchUser() : getUserByEmailFunction(email)),
-      getUserByEmailOptions()
-    );
+    const { getImageByIdFunction, getImageByIdQueryKey, getImageByIdOptions } =
+      useQueryConfigs();
+    const user = useUserInfo(UseUserInfoParams);
     const { data: profilePicture } = useQuery<ParseImage, Error>(
       getImageByIdQueryKey(user?.profilePicture?.id ?? ""),
       () => getImageByIdFunction(user?.profilePicture?.id ?? ""),

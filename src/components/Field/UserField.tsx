@@ -114,7 +114,10 @@ const UserField = forwardRef(
         }
         renderTags={(value, getTagProps) =>
           value.map((user, index) => (
-            <UserChip {...getTagProps({ index })} email={user} />
+            <UserChip
+              {...getTagProps({ index })}
+              UseUserInfoParams={{ email: user }}
+            />
           ))
         }
         renderInput={(props) => (
