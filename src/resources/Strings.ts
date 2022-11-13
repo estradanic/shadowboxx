@@ -7,11 +7,14 @@ export interface StringEntries {
   addFromFile: string;
   addFromLibrary: string;
   addFromUrl: string;
+  addOrEditCaption: string;
   albumNotFound: string;
   alreadyHaveAccount: string;
   appName: string;
   back: string;
   cancel: string;
+  caption: string;
+  captionImage: string;
   checkEmailVerified: string;
   collaborators: string;
   collaboratorsTooltip: string;
@@ -143,12 +146,15 @@ const Strings: {
   addFromFile: () => "Add from file",
   addFromLibrary: () => "Add from existing library",
   addFromUrl: () => "Add from URL",
+  addOrEditCaption: () => "Add/Edit caption",
   albumNotFound: (album: string) =>
     `Album not found${album ? ` (${album})` : ""}`,
   alreadyHaveAccount: () => "Already have an account?",
   appName: () => "Shadowboxx",
   back: () => "Back",
   cancel: () => "Cancel",
+  caption: () => "Caption",
+  captionImage: () => "Caption Image",
   checkEmailVerified: () => "Check Verification Status",
   collaborators: () => "Collaborators",
   collaboratorsTooltip: () =>

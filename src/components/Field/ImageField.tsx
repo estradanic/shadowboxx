@@ -41,6 +41,7 @@ import RemoveImageDecoration from "../Image/Decoration/RemoveImageDecoration";
 import CoverImageDecoration from "../Image/Decoration/CoverImageDecoration";
 import { useActionDialogContext } from "../Dialog/ActionDialog";
 import { FancyTypography } from "../Typography";
+import { CaptionImageDecoration } from "../Image";
 
 const useStyles = makeStyles((theme: Theme) => ({
   endAdornment: {
@@ -102,9 +103,13 @@ export type ImageFieldProps = Omit<
   /** Props to pass to the IconButton when variant=="button" */
   ButtonProps?: IconButtonProps;
   /** Cover image for the album */
-  coverImage?: ParsePointer;
+  coverImage?: ParsePointer<"Image">;
   /** Function to set coverImage */
-  setCoverImage?: (newCoverImage: ParsePointer) => void;
+  setCoverImage?: (newCoverImage: ParsePointer<"Image">) => void;
+  /** Function to set caption on an image */
+  setCaption?: (image: ParseImage, caption: string) => void;
+  /** Function to get caption for an image */
+  getCaption?: (image: ParseImage) => string;
 };
 
 /** Component to input images from the filesystem or online */
@@ -120,6 +125,8 @@ const ImageField = memo(
     disabled,
     coverImage,
     setCoverImage,
+    getCaption,
+    setCaption,
     ...rest
   }: ImageFieldProps) => {
     const classes = useStyles();
@@ -351,7 +358,7 @@ const ImageField = memo(
                       >
                         <Avatar
                           className={classes.endAdornmentAvatar}
-                          src={value[0].fileThumb.url()}
+                          src={value[0].fileThumb?.url?.()}
                           alt={value[0].name}
                         />
                       </InputAdornment>
@@ -385,6 +392,14 @@ const ImageField = memo(
                       }}
                     />,
                   ];
+                  if (getCaption && setCaption) {
+                    imageDecorations.push(
+                      <CaptionImageDecoration
+                        initialCaption={getCaption(image)}
+                        onConfirm={(caption) => setCaption(image, caption)}
+                      />
+                    );
+                  }
                   if (coverImage) {
                     const checked = coverImage.id === image.id;
                     imageDecorations.push(

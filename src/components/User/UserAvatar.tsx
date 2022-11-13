@@ -18,7 +18,8 @@ const useStyles = makeStyles((theme: Theme) => ({
 }));
 
 /** Interface defining props for UserAvatar */
-export interface UserAvatarProps extends AvatarProps {
+export interface UserAvatarProps
+  extends Omit<AvatarProps, "title" | "alt" | "src"> {
   /** Params to be passed into useUserInfo */
   UseUserInfoParams: UseUserInfoParams;
 }
@@ -46,17 +47,18 @@ const UserAvatar = forwardRef(
       user?.name ??
       UseUserInfoParams.email ??
       UseUserInfoParams.user?.name ??
-      "";
+      Strings.profilePicture();
 
     return (
-      <Tooltip title={userName}>
-        <Avatar
-          ref={ref}
-          alt={user?.name ?? Strings.profilePicture()}
-          className={cx(classes.avatar, piClassName)}
-          src={profilePicture?.fileThumb?.url()}
-          {...rest}
-        />
+      <Tooltip ref={ref} title={userName}>
+        <div>
+          <Avatar
+            {...rest}
+            className={cx(classes.avatar, piClassName)}
+            src={profilePicture?.fileThumb?.url()}
+            alt={userName}
+          />
+        </div>
       </Tooltip>
     );
   }

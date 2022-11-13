@@ -27,9 +27,8 @@ const Images = ({
   images,
   status,
   outlineColor,
-  getDecorations = () => Promise.resolve([]),
-  getCaption = () =>
-    Promise.resolve(Math.random() > 0.5 ? "This is a caption" : undefined),
+  getDecorations,
+  getCaption,
 }: ImagesProps) => {
   const classes = useStyles();
   const [decorations, setDecorations] = useState<
@@ -42,16 +41,20 @@ const Images = ({
   useEffect(() => {
     if (images) {
       images.forEach(async (image) => {
-        const decorations = await getDecorations(image);
-        setDecorations((prev) => ({
-          ...prev,
-          [image.id!]: decorations,
-        }));
-        const caption = await getCaption(image);
-        setCaptions((prev) => ({
-          ...prev,
-          [image.id!]: caption,
-        }));
+        if (getDecorations) {
+          const decorations = await getDecorations(image);
+          setDecorations((prev) => ({
+            ...prev,
+            [image.id!]: decorations,
+          }));
+        }
+        if (getCaption) {
+          const caption = await getCaption(image);
+          setCaptions((prev) => ({
+            ...prev,
+            [image.id!]: caption,
+          }));
+        }
       });
     }
   }, [setDecorations, images, getDecorations, getCaption, setCaptions]);

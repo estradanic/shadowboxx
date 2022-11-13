@@ -1,5 +1,6 @@
 import React, { ImgHTMLAttributes, useRef, useState } from "react";
 import { makeStyles, Theme } from "@material-ui/core/styles";
+import NotesIcon from "@material-ui/icons/Notes";
 import Popper from "@material-ui/core/Popper";
 import classNames from "classnames";
 import { VariableColor } from "../../types";
@@ -9,7 +10,7 @@ import Tooltip from "../Tooltip/Tooltip";
 import { ImageDecorationProps } from "./Decoration/ImageDecoration";
 import Skeleton from "../Skeleton/Skeleton";
 import { IMAGE_SKELETON_HEIGHT } from "../Skeleton/ImageSkeleton";
-import { Typography } from "@material-ui/core";
+import Typography from "@material-ui/core/Typography";
 
 interface UseStylesParams {
   borderColor: VariableColor;
@@ -83,6 +84,11 @@ const useStyles = makeStyles((theme: Theme) => ({
     border: ({ borderColor }: UseStylesParams) =>
       `2px solid ${theme.palette[borderColor].dark}`,
   },
+  captionIcon: {
+    color: theme.palette.text.primary,
+    fontSize: "large",
+    marginRight: theme.spacing(1),
+  },
 }));
 
 export type ImageProps = ImgHTMLAttributes<HTMLImageElement> & {
@@ -140,8 +146,8 @@ const Image = ({
               [classes.displayNone]: !isLoaded,
             })}
           >
-            <source srcSet={parseImage.fileMobile.url()} type="image/webp" />
-            <source srcSet={parseImage.fileLegacy?.url()} type="image/png" />
+            <source srcSet={parseImage.fileMobile?.url?.()} type="image/webp" />
+            <source srcSet={parseImage.fileLegacy?.url?.()} type="image/png" />
             <img
               className={classes.width100}
               onLoad={() => setIsLoaded(true)}
@@ -189,6 +195,7 @@ const Image = ({
               [classes.displayNone]: !isFullResolutionLoaded || !caption,
             })}
           >
+            <NotesIcon className={classes.captionIcon} />
             {caption}
           </Typography>
           {!isFullResolutionLoaded && (
