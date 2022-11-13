@@ -6,17 +6,20 @@ import { useQuery } from "@tanstack/react-query";
 import { ParseImage } from "../../classes";
 import { Strings } from "../../resources";
 import { useQueryConfigs, useUserInfo, UseUserInfoParams } from "../../hooks";
+import Tooltip from "../Tooltip/Tooltip";
 
 const useStyles = makeStyles((theme: Theme) => ({
   avatar: {
     backgroundColor: theme.palette.primary.light,
     color: theme.palette.error.contrastText,
     cursor: "pointer",
+    border: `2px solid ${theme.palette.primary.main}`,
   },
 }));
 
 /** Interface defining props for UserAvatar */
-export interface UserAvatarProps extends AvatarProps {
+export interface UserAvatarProps
+  extends Omit<AvatarProps, "title" | "alt" | "src"> {
   /** Params to be passed into useUserInfo */
   UseUserInfoParams: UseUserInfoParams;
 }
@@ -40,15 +43,23 @@ const UserAvatar = forwardRef(
       () => getImageByIdFunction(user?.profilePicture?.id ?? ""),
       getImageByIdOptions({ enabled: !!user?.profilePicture?.id })
     );
+    const userName =
+      user?.name ??
+      UseUserInfoParams.email ??
+      UseUserInfoParams.user?.name ??
+      Strings.profilePicture();
 
     return (
-      <Avatar
-        ref={ref}
-        alt={user?.name ?? Strings.profilePicture()}
-        className={cx(classes.avatar, piClassName)}
-        src={profilePicture?.fileThumb?.url()}
-        {...rest}
-      />
+      <Tooltip ref={ref} title={userName}>
+        <div>
+          <Avatar
+            {...rest}
+            className={cx(classes.avatar, piClassName)}
+            src={profilePicture?.fileThumb?.url()}
+            alt={userName}
+          />
+        </div>
+      </Tooltip>
     );
   }
 );

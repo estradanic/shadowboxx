@@ -1,4 +1,4 @@
-import React from "react";
+import React, { forwardRef } from "react";
 import { makeStyles, Theme } from "@material-ui/core/styles";
 import MuiTooltip, {
   TooltipProps as MuiTooltipProps,
@@ -20,13 +20,13 @@ const useStyles = makeStyles((theme: Theme) => ({
 export interface TooltipProps extends Omit<MuiTooltipProps, "arrow"> {}
 
 /** Component to display helpful information on hover */
-const Tooltip = ({ children, ...rest }: TooltipProps) => {
+const Tooltip = forwardRef(({ children, ...rest }: TooltipProps, ref) => {
   const classes = useStyles();
   return (
-    <MuiTooltip {...rest} arrow classes={classes}>
+    <MuiTooltip {...rest} arrow classes={classes} ref={ref}>
       {children}
     </MuiTooltip>
   );
-};
+});
 
 export default Tooltip;

@@ -9,11 +9,11 @@ export interface ImageAttributes {
   /** The actual saved file */
   file: Parse.File;
   /** The file resized for mobile */
-  fileMobile: Parse.File;
+  fileMobile?: Parse.File;
   /** The file resized for thumbnails */
-  fileThumb: Parse.File;
+  fileThumb?: Parse.File;
   /** The file in png format for older iPhones */
-  fileLegacy: Parse.File;
+  fileLegacy?: Parse.File;
   /** User that owns this picture */
   owner: ParsePointer<"_User">;
   /** Name of the image */
@@ -126,7 +126,7 @@ export default class ParseImage extends ParseObject<"Image"> {
   }
 
   /** The actual saved file */
-  get file(): Parse.File {
+  get file(): Attributes<"Image">["file"] {
     return this._image.get(ParseImage.COLUMNS.file);
   }
 
@@ -135,7 +135,7 @@ export default class ParseImage extends ParseObject<"Image"> {
   }
 
   /** Thumbnail size of the file */
-  get fileThumb(): Parse.File {
+  get fileThumb(): Attributes<"Image">["fileThumb"] {
     return (
       this._image.get(ParseImage.COLUMNS.fileThumb) ??
       this.fileMobile ??
@@ -144,12 +144,12 @@ export default class ParseImage extends ParseObject<"Image"> {
   }
 
   /** Mobile size of the file (700px max edge) */
-  get fileMobile(): Parse.File {
+  get fileMobile(): Attributes<"Image">["fileMobile"] {
     return this._image.get(ParseImage.COLUMNS.fileMobile) ?? this.file;
   }
 
   /** PNG version of the file for mobile Safari and IE */
-  get fileLegacy(): Parse.File {
+  get fileLegacy(): Attributes<"Image">["fileLegacy"] {
     return this._image.get(ParseImage.COLUMNS.fileLegacy);
   }
 

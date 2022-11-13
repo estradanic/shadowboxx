@@ -86,6 +86,13 @@ const Album = memo(() => {
     ];
   }, []);
 
+  const getImageCaption = useCallback(
+    async (image: ParseImage) => {
+      return album?.captions?.[image.id!] ?? "";
+    },
+    [album?.captions]
+  );
+
   return (
     <PageContainer>
       {albumStatus === "loading" ? (
@@ -102,6 +109,7 @@ const Album = memo(() => {
           </Grid>
           <Images
             getDecorations={getImageDecorations}
+            getCaption={getImageCaption}
             status={imagesStatus}
             images={images}
             outlineColor={randomColor}
