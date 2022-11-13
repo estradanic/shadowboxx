@@ -7,7 +7,7 @@ import { useInfiniteQuery } from "@tanstack/react-query";
 import { Strings } from "../../resources";
 import { dedupe, ErrorState, isNullOrWhitespace, uniqueId } from "../../utils";
 import { ImageContextProvider, useUserContext } from "../../contexts";
-import { ParseUser, ParseImage, Album } from "../../classes";
+import { ParseUser, ParseImage, AlbumAttributes } from "../../classes";
 import { useInfiniteScroll, useInfiniteQueryConfigs } from "../../hooks";
 import ActionDialog, {
   ActionDialogProps,
@@ -24,9 +24,9 @@ import { DEFAULT_PAGE_SIZE } from "../../constants";
 export interface AlbumFormDialogProps
   extends Pick<ActionDialogProps, "open" | "handleCancel"> {
   /** Value for the component */
-  value: Album;
+  value: AlbumAttributes;
   /** Function to run when the confirm button is clicked */
-  handleConfirm: (value: Album) => Promise<void>;
+  handleConfirm: (value: AlbumAttributes) => Promise<void>;
   /** Whether to reset dialog state when confirm button is clicked */
   resetOnConfirm?: boolean;
 }
@@ -40,18 +40,25 @@ const AlbumFormDialog = ({
   resetOnConfirm = true,
 }: AlbumFormDialogProps) => {
   const id = uniqueId("album-form-dialog-content");
-  const [imageIds, setImageIds] = useState<Album["images"]>(value.images);
-  const [coverImage, setCoverImage] = useState<Album["coverImage"]>(
+  const [imageIds, setImageIds] = useState<AlbumAttributes["images"]>(
+    value.images
+  );
+  const [coverImage, setCoverImage] = useState<AlbumAttributes["coverImage"]>(
     value.coverImage
   );
-  const [name, setName] = useState<Album["name"]>(value.name);
-  const [description, setDescription] = useState<Album["description"]>(
-    value.description
+  const [name, setName] = useState<AlbumAttributes["name"]>(value.name);
+  const [description, setDescription] = useState<
+    AlbumAttributes["description"]
+  >(value.description);
+  const [collaborators, setCollaborators] = useState<
+    AlbumAttributes["collaborators"]
+  >(value.collaborators);
+  const [viewers, setViewers] = useState<AlbumAttributes["viewers"]>(
+    value.viewers
   );
-  const [collaborators, setCollaborators] = useState<Album["collaborators"]>(
-    value.collaborators
+  const [captions, setCaptions] = useState<AlbumAttributes["captions"]>(
+    value.captions ?? {}
   );
-  const [viewers, setViewers] = useState<Album["viewers"]>(value.viewers);
 
   const {
     getImagesByIdInfiniteOptions,
@@ -106,6 +113,7 @@ const AlbumFormDialog = ({
     setCollaborators(value.collaborators);
     setViewers(value.viewers);
     setErrors(defaultErrors);
+    setCaptions(value.captions ?? {});
   }, [
     setName,
     setDescription,
@@ -114,6 +122,7 @@ const AlbumFormDialog = ({
     setErrors,
     value,
     defaultErrors,
+    setCaptions,
   ]);
   const { enqueueErrorSnackbar } = useSnackbar();
 
@@ -160,6 +169,7 @@ const AlbumFormDialog = ({
             collaborators,
             viewers,
             coverImage,
+            captions,
           });
         });
       } else {
@@ -171,6 +181,7 @@ const AlbumFormDialog = ({
           collaborators,
           viewers,
           coverImage,
+          captions,
         });
       }
       if (resetOnConfirm) {
@@ -249,6 +260,13 @@ const AlbumFormDialog = ({
         <Grid item xs={12}>
           <ImageContextProvider>
             <ImageField
+              getCaption={(image) => captions[image.id!]}
+              setCaption={(image, caption) => {
+                setCaptions((captions) => ({
+                  ...captions,
+                  [image.id!]: caption,
+                }));
+              }}
               coverImage={coverImage ?? images?.[0]?.toPointer()}
               setCoverImage={setCoverImage}
               label={Strings.images()}

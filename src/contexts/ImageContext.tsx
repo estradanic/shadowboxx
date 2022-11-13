@@ -10,7 +10,7 @@ import { useNotificationsContext } from "./NotificationsContext";
 import ErrorIcon from "@material-ui/icons/Error";
 import { FancyTypography, useSnackbar } from "../components";
 import { Strings } from "../resources";
-import { ParseImage, Image } from "../classes";
+import { ParseImage, ImageAttributes } from "../classes";
 import { useGlobalLoadingStore } from "../stores";
 import { isNullOrWhitespace } from "../utils";
 import { ImageSelectionDialog } from "../components/Images";
@@ -23,7 +23,7 @@ export enum ImageActionCommand {
 /** Interface defining an action being done to an image */
 export interface ImageAction {
   /** The image being worked on */
-  image: Image;
+  image: ImageAttributes;
   /** The command being performed on the image */
   command: ImageActionCommand;
   /** Whether action is completed or not */
@@ -46,7 +46,7 @@ export type PromptImageSelectionDialogProps = {
 /** Interface defining the value of ImageContextProvider */
 interface ImageContextValue {
   /** Function to upload an image */
-  uploadImage: (image: Image, acl?: Parse.ACL) => Promise<ParseImage>;
+  uploadImage: (image: ImageAttributes, acl?: Parse.ACL) => Promise<ParseImage>;
   /** Function to delete image */
   deleteImage: (parseImage: ParseImage) => Promise<void>;
   /** Function to open an ImageSelectionDialog prompt */
@@ -128,7 +128,7 @@ export const ImageContextProvider = ({
     updateGlobalLoader({ progress: newProgress });
   };
 
-  const uploadImage = async (image: Image, acl?: Parse.ACL) => {
+  const uploadImage = async (image: ImageAttributes, acl?: Parse.ACL) => {
     startGlobalLoader({
       type: "determinate",
       content: (

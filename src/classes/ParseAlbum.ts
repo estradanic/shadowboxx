@@ -19,6 +19,8 @@ export interface AlbumAttributes {
   viewers: string[];
   /** First image in album, or user selected cover image */
   coverImage?: ParsePointer<"Image">;
+  /** Map of image id to captions */
+  captions: { [imageId: string]: string };
 }
 
 export interface AlbumSaveContext {
@@ -44,6 +46,7 @@ class AlbumColumns extends Columns {
   collaborators: "collaborators" = "collaborators";
   viewers: "viewers" = "viewers";
   coverImage: "coverImage" = "coverImage";
+  captions: "captions" = "captions";
 }
 
 /**
@@ -195,6 +198,26 @@ export default class ParseAlbum extends ParseObject<"Album"> {
 
   set coverImage(coverImage) {
     this._album.set(ParseAlbum.COLUMNS.coverImage, coverImage?._pointer);
+  }
+
+  /** Map of image ids to captions */
+  get captions(): Attributes<"Album">["captions"] {
+    return this._album.get(ParseAlbum.COLUMNS.captions);
+  }
+
+  set captions(captions) {
+    this._album.set(ParseAlbum.COLUMNS.captions, captions);
+  }
+
+  /** Function to set caption for an image */
+  setCaption(imageId: string, caption: string) {
+    this.captions[imageId] = caption;
+    this._album.set(ParseAlbum.COLUMNS.captions, this.captions);
+  }
+
+  /** Get caption for an image */
+  getCaption(imageId: string): string {
+    return this.captions[imageId];
   }
 
   /** Attributes for this album */
