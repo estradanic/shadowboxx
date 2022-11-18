@@ -12,7 +12,7 @@ import {
   ParseUser,
   UpdateLoggedInUser,
   UpdateReason,
-  User,
+  UserAttributes,
   ParseImage,
   ParsifyPointers,
 } from "../classes";
@@ -68,7 +68,7 @@ export const UserContextProvider = ({ children }: UserContextProviderProps) => {
   const [profilePicture, setProfilePicture] = useState<
     ParseImage | undefined
   >();
-  const [attributes, setAttributes] = useState<User | undefined>(
+  const [attributes, setAttributes] = useState<UserAttributes | undefined>(
     loggedInUser ? { ...loggedInUser.attributes } : undefined
   );
 
@@ -157,7 +157,7 @@ export const UserContextProvider = ({ children }: UserContextProviderProps) => {
       return loggedInUser;
     }
     return new ParseUser(
-      new Parse.User<ParsifyPointers<User>>({
+      new Parse.User<ParsifyPointers<"_User">>({
         username: "",
         email: "",
         firstName: "",

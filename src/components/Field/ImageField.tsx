@@ -4,6 +4,8 @@ import React, {
   useMemo,
   ChangeEventHandler,
   useCallback,
+  useRef,
+  useEffect,
 } from "react";
 import InputAdornment from "@material-ui/core/InputAdornment";
 import Avatar from "@material-ui/core/Avatar";
@@ -22,11 +24,11 @@ import Parse from "parse";
 import classNames from "classnames";
 import { createHtmlPortalNode, InPortal } from "react-reverse-portal";
 import { readAndCompressImage } from "browser-image-resizer";
+import {useDebounce} from "use-debounce";
 import {
   elide,
   makeValidFileName,
   removeExtension,
-  uniqueId,
 } from "../../utils";
 import { Strings } from "../../resources";
 import { ParseImage, ParsePointer } from "../../classes";
@@ -140,14 +142,11 @@ const ImageField = memo(
         stopGlobalLoader: state.stopGlobalLoader,
       })
     );
-
+    const selectingImages = useRef<boolean>(false);
     const { getLoggedInUser } = useUserContext();
 
     const [anchorEl, setAnchorEl] = useState<Element>();
     const closeMenu = () => setAnchorEl(undefined);
-
-    const inputId = uniqueId("profile-pic-input");
-    const urlInputId = uniqueId("image-url-input");
 
     const { enqueueErrorSnackbar } = useSnackbar();
 
@@ -162,6 +161,9 @@ const ImageField = memo(
 
     const { openPrompt } = useActionDialogContext();
 
+    const inputRef = useRef<HTMLInputElement>(null);
+    const urlInputRef = useRef<HTMLInputElement>(null);
+
     const selectFromLibrary = useCallback(() => {
       promptImageSelectionDialog({
         handleConfirm: async (newValue) =>
@@ -171,64 +173,82 @@ const ImageField = memo(
       });
     }, [promptImageSelectionDialog, value, onChange, multiple]);
 
+    const processFiles = async (eventFiles: FileList) => {
+      const files: File[] = [];
+      for (let i = 0; i < eventFiles.length; i++) {
+        files[i] = eventFiles[i];
+      }
+      const max = multiple ? files.length : 1;
+      const resizeImagePromises: Promise<File>[] = [];
+      for (let i = 0; i < max; i++) {
+        let file = files[i];
+        if (file.size > 15000000) {
+          resizeImagePromises.push(
+            readAndCompressImage(file, {
+              quality: 1,
+              maxWidth: 2400,
+              maxHeight: 2400,
+              mimeType: "image/webp",
+            })
+          );
+        } else {
+          resizeImagePromises.push(Promise.resolve(file));
+        }
+      }
+      return await Promise.all(resizeImagePromises);
+    };
+
+    const uploadFiles = async (files: File[]) => {
+      const max = multiple ? files.length : 1;
+      const newImagePromises: Promise<ParseImage>[] = [];
+      console.log("Uploading images", {files});
+      for (let i = 0; i < max; i++) {
+        console.log("Uploading image", {file: files[i]});
+        let file = files[i];
+        const fileName = makeValidFileName(files[i].name);
+        const parseFile = new Parse.File(fileName, file);
+        newImagePromises.push(
+          uploadImage(
+            {
+              file: parseFile,
+              owner: getLoggedInUser().toPointer(),
+              name: removeExtension(fileName),
+            },
+            acl
+          )
+        );
+        console.log("Started uploading image", {file: files[i]});
+      }
+      return Promise.all(newImagePromises);
+    };
+
     const addFromFile: ChangeEventHandler<HTMLInputElement> = async (event) => {
+      console.log("OnChange called", {event});
       if (event.target.files?.[0]) {
+        console.log("Processing images", {files: event.target.files});
         startGlobalLoader({
-          type: "indeterminate",
+          type: "determinate",
           content: (
             <FancyTypography className={classes.resizingImages}>
               {Strings.processingImages()}
             </FancyTypography>
           ),
         });
-        let files: File[] = [];
-        const fileNames: string[] = [];
-        for (let i = 0; i < event.target.files.length; i++) {
-          files[i] = event.target.files[i];
-          fileNames[i] = event.target.files[i].name;
-        }
-        const max = multiple ? files.length : 1;
-        const resizeImagePromises: Promise<File>[] = [];
-        for (let i = 0; i < max; i++) {
-          let file = files[i];
-          if (file.size > 15000000) {
-            resizeImagePromises.push(
-              readAndCompressImage(file, {
-                quality: 1,
-                maxWidth: 2400,
-                maxHeight: 2400,
-                mimeType: "image/webp",
-              })
-            );
-          } else {
-            resizeImagePromises.push(Promise.resolve(file));
+        setTimeout(async () => { // allow global loader rerender to happen using setTimeout
+          const files = await processFiles(event.target.files!);
+          try {
+            const newImages = await uploadFiles(files);
+            console.log("Done uploading images", {newImages});
+            const newValue = multiple ? [...value, ...newImages] : newImages;
+            await onChange(newValue, "ADD");
+          } catch (error: any) {
+            enqueueErrorSnackbar(error?.message ?? Strings.uploadImageError());
+          } finally {
+            // Clear the input so that the same file can be uploaded again
+            event.target.value = "";
+            stopGlobalLoader();
           }
-        }
-        files = await Promise.all(resizeImagePromises);
-        stopGlobalLoader();
-        const newImagePromises: Promise<ParseImage>[] = [];
-        for (let i = 0; i < max; i++) {
-          let file = files[i];
-          const fileName = makeValidFileName(fileNames[i]);
-          const parseFile = new Parse.File(fileName, file);
-          newImagePromises.push(
-            uploadImage(
-              {
-                file: parseFile,
-                owner: getLoggedInUser().toPointer(),
-                name: removeExtension(fileName),
-              },
-              acl
-            )
-          );
-        }
-        try {
-          const newImages = await Promise.all(newImagePromises);
-          const newValue = multiple ? [...value, ...newImages] : newImages;
-          await onChange(newValue, "ADD");
-        } catch (error: any) {
-          enqueueErrorSnackbar(error?.message ?? Strings.uploadImageError());
-        }
+        }, 10);
       }
     };
 
@@ -259,7 +279,7 @@ const ImageField = memo(
 
     const openUrlInput = () => {
       setShowUrlInput(true);
-      document.getElementById(urlInputId)?.focus();
+      urlInputRef.current?.focus?.();
     };
 
     const dialogImageUrlInputPortalNode = useMemo(
@@ -267,14 +287,33 @@ const ImageField = memo(
       []
     );
 
+    const onWindowFocus = useCallback(() => {
+      console.log("Window focus");
+      setTimeout(() => { // Hopefully the onChange will run before this. Thus the setTimeout.
+        if (selectingImages.current && !inputRef.current?.files?.length) {
+          console.log("Stopping global loader due to window focus");
+          selectingImages.current = false;
+          stopGlobalLoader();
+        }
+      });
+    }, [stopGlobalLoader, selectingImages]);
+
+    const [onWindowFocusDebounced] = useDebounce(onWindowFocus, 500, {leading: true});
+
+    useEffect(() => {
+      console.log("Adding window focus listener");
+      window.addEventListener("focus", onWindowFocusDebounced);
+      return () => window.removeEventListener("focus", onWindowFocusDebounced);
+    }, [onWindowFocusDebounced]);
+
     return (
       <>
         {variant === "field" ? (
           <>
             <TextField // Url src input
               style={{ display: showUrlInput ? "inherit" : "none" }}
-              id={urlInputId}
-              inputRef={(input) => input && input.focus()}
+              ref={urlInputRef}
+              inputRef={(input) => input && input.focus()} // Focus on mount
               fullWidth
               onChange={(event) => setImageUrl(event.target.value)}
               onKeyPress={(event) => {
@@ -310,7 +349,6 @@ const ImageField = memo(
             />
             <TextField // Main input
               className={classes.main}
-              id={inputId}
               style={{ display: showUrlInput ? "none" : "inherit" }}
               onChange={addFromFile}
               fullWidth
@@ -318,6 +356,7 @@ const ImageField = memo(
                 accept: "image/*",
                 multiple,
                 className: classes.input,
+                ref: inputRef,
               }}
               type="file"
               label={label}
@@ -345,7 +384,11 @@ const ImageField = memo(
                     <InputAdornment
                       disablePointerEvents={disabled}
                       position="end"
-                      onClick={() => document.getElementById(inputId)?.click()}
+                      onClick={() => {
+                        selectingImages.current = true;
+                        inputRef.current?.click?.();
+                        startGlobalLoader();
+                      }}
                     >
                       <Tooltip title={Strings.addFromFile()}>
                         <AddAPhotoIcon className={classes.endAdornment} />
@@ -445,19 +488,23 @@ const ImageField = memo(
               />
             </InPortal>
             <input
-              id={inputId}
               type="file"
               style={{ display: "none" }}
               onChange={addFromFile}
               accept="image/*"
               multiple={multiple}
+              ref={inputRef}
+              onClick={() => {
+                selectingImages.current = true;
+                startGlobalLoader();
+              }}
             />
             <Menu open={!!anchorEl} anchorEl={anchorEl} onClose={closeMenu}>
               <MenuItem onClick={selectFromLibrary}>
                 {Strings.addFromLibrary()}
               </MenuItem>
               <MenuItem
-                onClick={() => document.getElementById(inputId)?.click()}
+                onClick={() => inputRef.current?.click?.()}
               >
                 {Strings.addFromFile()}
               </MenuItem>

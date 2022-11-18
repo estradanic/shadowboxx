@@ -10,6 +10,7 @@ import { useSnackbar } from "../Snackbar";
 import { useHideOnScroll } from "../../hooks";
 import Offline from "../NetworkDetector/Offline";
 import Online from "../NetworkDetector/Online";
+import { useEffect } from "react";
 
 const useStyles = makeStyles((theme: Theme) => ({
   footer: {
@@ -74,13 +75,16 @@ const Footer = () => {
 
   const { enqueueSuccessSnackbar, enqueueErrorSnackbar } = useSnackbar();
 
-  window.addEventListener("beforeinstallprompt", (e) => {
-    // Prevent the mini-infobar from appearing on mobile
-    e.preventDefault();
-    // Stash the event so that it can be triggered later
-    setInstallPrompt(e as BeforeInstallPromptEvent);
-    setShowInstallPrompt(true);
-  });
+  useEffect(() => {
+    window.addEventListener("beforeinstallprompt", (e) => {
+      // Prevent the mini-infobar from appearing on mobile
+      e.preventDefault();
+      // Stash the event so that it can be triggered later
+      setInstallPrompt(e as BeforeInstallPromptEvent);
+      setShowInstallPrompt(true);
+    });
+  }, [setInstallPrompt, setShowInstallPrompt]);
+
 
   const install = async () => {
     setShowInstallPrompt(false);

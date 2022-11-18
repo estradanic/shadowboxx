@@ -11,7 +11,7 @@ const useStyles = makeStyles((theme: Theme) => ({
   root: {
     position: "absolute",
     cursor: "pointer",
-    zIndex: theme.zIndex.tooltip,
+    zIndex: theme.zIndex.mobileStepper,
     "& > svg": {
       height: "100%",
     },

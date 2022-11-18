@@ -114,6 +114,7 @@ const AlbumFormDialog = ({
     setViewers(value.viewers);
     setErrors(defaultErrors);
     setCaptions(value.captions ?? {});
+    setImageIds(value.images);
   }, [
     setName,
     setDescription,
@@ -171,6 +172,9 @@ const AlbumFormDialog = ({
             coverImage,
             captions,
           });
+          if (resetOnConfirm) {
+            reinitialize();
+          }
         });
       } else {
         await piHandleConfirm({
@@ -183,9 +187,6 @@ const AlbumFormDialog = ({
           coverImage,
           captions,
         });
-      }
-      if (resetOnConfirm) {
-        reinitialize();
       }
     }
   };

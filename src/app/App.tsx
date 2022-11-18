@@ -12,6 +12,7 @@ import { useNotificationsContext, useUserContext } from "../contexts";
 import { ActionDialogContextProvider, DefaultLayout } from "../components";
 import { Strings } from "../resources";
 import routes from "./routes";
+import { darkThemeSettings } from "./theme";
 
 Parse.serverURL = window.__env__?.PARSE_HOST_URL;
 Parse.initialize(
@@ -24,66 +25,11 @@ const App = () => {
   const { getLoggedInUser, isUserLoggedIn } = useUserContext();
   const { addNotification } = useNotificationsContext();
 
-  const darkTheme = (lightTheme: Theme) =>
+  const darkTheme = (lightThemeSettings: Theme) =>
     createTheme(
       isUserLoggedIn && getLoggedInUser()?.isDarkThemeEnabled
-        ? {
-            ...lightTheme,
-            palette: {
-              primary: {
-                main: "#003F6F",
-                dark: "#003156",
-                contrastText: "#FFFFFF",
-                light: "#01579B",
-              },
-              secondary: {
-                main: "#A01E1E",
-                dark: "#601212",
-                light: "#B22222",
-                contrastText: "#FFFFFF",
-              },
-              error: {
-                main: "#A01E1E",
-                dark: "#601212",
-                light: "#B22222",
-                contrastText: "#FFFFFF",
-              },
-              success: {
-                main: "#209461",
-                dark: "#166743",
-                light: "#24A56C",
-                contrastText: "#FFFFFF",
-              },
-              info: {
-                main: "#01467C",
-                dark: "#003156",
-                contrastText: "#FFFFFF",
-                light: "#01579B",
-              },
-              warning: {
-                main: "#E17E00",
-                dark: "#874B00",
-                contrastText: "#FFFFFF",
-                light: "#FB8C00",
-              },
-              divider: "#EEEEEE",
-              background: {
-                default: "#00182B",
-                paper: "#0F1111",
-              },
-              text: {
-                primary: "#FFFFFF",
-                secondary: "#000000",
-                disabled: "#DDDDDD",
-                hint: "#DDDDDD",
-              },
-              grey: {
-                50: "#111111",
-                200: "#333333",
-              },
-            },
-          }
-        : { ...lightTheme }
+        ? darkThemeSettings
+        : lightThemeSettings
     );
 
   useEffect(() => {

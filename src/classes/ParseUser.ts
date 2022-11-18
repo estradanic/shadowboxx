@@ -20,7 +20,7 @@ export interface UserAttributes {
   /** Whether dark theme is enabled or not */
   isDarkThemeEnabled: boolean;
   /** Pointer to Image record for profile picture */
-  profilePicture?: ParsePointer<"_User">;
+  profilePicture?: ParsePointer<"Image">;
   /** List of favorited album ids */
   favoriteAlbums: string[];
 }
@@ -275,7 +275,7 @@ export default class ParseUser extends ParseObject<"_User"> {
   }
 
   /** This user's profile picture, if it exists */
-  get profilePicture(): ParsePointer<"_User"> | undefined {
+  get profilePicture(): ParsePointer<"Image"> | undefined {
     const profilePicture = this._user.get(ParseUser.COLUMNS.profilePicture);
     return profilePicture ? new ParsePointer(profilePicture) : undefined;
   }

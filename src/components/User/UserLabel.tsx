@@ -1,6 +1,7 @@
 import React from "react";
 import Typography, { TypographyProps } from "@material-ui/core/Typography";
 import { useUserInfo, UseUserInfoParams } from "../../hooks";
+import { Strings } from "../../resources";
 
 /** Interface defining props for UserLabel */
 export interface UserLabelProps extends TypographyProps {
@@ -11,10 +12,15 @@ export interface UserLabelProps extends TypographyProps {
 /** Component to display the name of a user */
 const UserLabel = ({ UseUserInfoParams, ...rest }: UserLabelProps) => {
   const user = useUserInfo(UseUserInfoParams);
+  const userName =
+    user?.name ??
+    UseUserInfoParams.email ??
+    UseUserInfoParams.user?.name ??
+    Strings.aUser();
 
   return (
     <Typography variant="overline" {...rest}>
-      {user?.name}
+      {userName}
     </Typography>
   );
 };
