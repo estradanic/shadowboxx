@@ -163,6 +163,7 @@ const Home = memo(() => {
           name: Strings.untitledAlbum(),
           collaborators: [],
           viewers: [],
+          captions: {},
         }}
         open={addAlbumDialogOpen}
         handleCancel={() => setAddAlbumDialogOpen(false)}

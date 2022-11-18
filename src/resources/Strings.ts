@@ -11,6 +11,7 @@ export interface StringEntries {
   albumNotFound: string;
   alreadyHaveAccount: string;
   appName: string;
+  aUser: string;
   back: string;
   cancel: string;
   caption: string;
@@ -151,6 +152,7 @@ const Strings: {
     `Album not found${album ? ` (${album})` : ""}`,
   alreadyHaveAccount: () => "Already have an account?",
   appName: () => "Shadowboxx",
+  aUser: () => "User",
   back: () => "Back",
   cancel: () => "Cancel",
   caption: () => "Caption",

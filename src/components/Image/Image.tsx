@@ -41,7 +41,7 @@ const useStyles = makeStyles((theme: Theme) => ({
     },
   },
   fullResolution: {
-    zIndex: theme.zIndex.tooltip,
+    zIndex: theme.zIndex.modal,
     width: "100vw",
     height: "100vh",
     display: "flex",
