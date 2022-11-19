@@ -85,7 +85,6 @@ const Footer = () => {
     });
   }, [setInstallPrompt, setShowInstallPrompt]);
 
-
   const install = async () => {
     setShowInstallPrompt(false);
     installPrompt!.prompt();
