@@ -114,6 +114,15 @@ export type ImageFieldProps = Omit<
   getCaption?: (image: ParseImage) => string;
 };
 
+const ProcessingImagesLoaderContent = () => {
+  const classes = useStyles();
+  return (
+    <FancyTypography className={classes.resizingImages}>
+      {Strings.processingImages()}
+    </FancyTypography>
+  );
+};
+
 /** Component to input images from the filesystem or online */
 const ImageField = memo(
   ({
@@ -228,11 +237,7 @@ const ImageField = memo(
         console.log("Processing images", {files: event.target.files});
         startGlobalLoader({
           type: "determinate",
-          content: (
-            <FancyTypography className={classes.resizingImages}>
-              {Strings.processingImages()}
-            </FancyTypography>
-          ),
+          content: <ProcessingImagesLoaderContent />,
         });
         setTimeout(async () => { // allow global loader rerender to happen using setTimeout
           const files = await processFiles(event.target.files!);
