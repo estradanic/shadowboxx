@@ -1,12 +1,13 @@
 import Parse from "parse";
 import { AlbumAttributes } from "./ParseAlbum";
+import { AlbumChangeNotificationAttributes } from "./ParseAlbumChangeNotification";
 import { DuplicateAttributes } from "./ParseDuplicate";
 import { ImageAttributes } from "./ParseImage";
 import ParsePointer from "./ParsePointer";
 import { UserAttributes } from "./ParseUser";
 
 /** Type encompassing the classNames allowed for ParseObjects */
-export type ClassName = "Album" | "Image" | "_User" | "_Role" | "Duplicate";
+export type ClassName = "Album" | "Image" | "_User" | "_Role" | "Duplicate" | "AlbumChangeNotification";
 
 /** Type defining basic attributes of all ParseObjects */
 export interface ObjectAttributes {
@@ -19,7 +20,14 @@ export interface ObjectAttributes {
 }
 
 /** Type encompassing the attributes of all kinds of ParseObjects */
-export type Attributes<C extends ClassName> = ObjectAttributes & (C extends "Album" ? AlbumAttributes : C extends "Image" ? ImageAttributes : C extends "_User" ? UserAttributes : C extends "Duplicate" ? DuplicateAttributes : {});
+export type Attributes<C extends ClassName> = ObjectAttributes & (
+  C extends "Album" ? AlbumAttributes
+    : C extends "Image" ? ImageAttributes
+    : C extends "_User" ? UserAttributes
+    : C extends "Duplicate" ? DuplicateAttributes
+    : C extends "AlbumChangeNotification" ? AlbumChangeNotificationAttributes
+    : {}
+);
 
 /**
  * Type for converting an Attributes type to one with native Parse Pointers

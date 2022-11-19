@@ -39,7 +39,7 @@ const useInfiniteScroll = (
     ) {
       await onThresholdReached();
     }
-  }, [canExecute, scrollThreshold, piOnThresholdReached, element]);
+  }, [canExecute, scrollThreshold, onThresholdReached, element]);
 
   useEffect(() => {
     if (element.current) {

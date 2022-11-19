@@ -8,6 +8,8 @@ export interface StringEntries {
   addFromLibrary: string;
   addFromUrl: string;
   addOrEditCaption: string;
+  albumChangeNotificationDetail: string;
+  albumChangeNotificationTitle: string;
   albumNotFound: string;
   alreadyHaveAccount: string;
   appName: string;
@@ -55,6 +57,7 @@ export interface StringEntries {
   getImageError: string;
   getImagesError: string;
   goBack: string;
+  goSee: string;
   home: string;
   ignoreDuplicatesConfirm: string;
   imageNotDeleted: string;
@@ -148,6 +151,9 @@ const Strings: {
   addFromLibrary: () => "Add from existing library",
   addFromUrl: () => "Add from URL",
   addOrEditCaption: () => "Add/Edit caption",
+  albumChangeNotificationDetail: (userName: string, albumName: string) =>
+    `${userName} changed ${albumName}`,
+  albumChangeNotificationTitle: () => "Album changed!",
   albumNotFound: (album: string) =>
     `Album not found${album ? ` (${album})` : ""}`,
   alreadyHaveAccount: () => "Already have an account?",
@@ -209,6 +215,7 @@ const Strings: {
   getImageError: () => `${Strings.commonError()} Could not get image.`,
   getImagesError: () => `${Strings.commonError()} Could not get images.`,
   goBack: () => "Go Back",
+  goSee: () => "Go See",
   home: () => "Home",
   ignoreDuplicatesConfirm: () => "Are you sure? This action is irreversible.",
   imageNotDeleted: (image: string) =>

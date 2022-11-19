@@ -22,11 +22,6 @@ const useStyles = makeStyles((theme: Theme) => ({
     backgroundColor: theme.palette.success.main,
     color: theme.palette.success.contrastText,
   },
-  ignoreButton: {
-    backgroundColor: theme.palette.warning.main,
-    color: theme.palette.warning.contrastText,
-    marginRight: theme.spacing(1),
-  },
   buttonContainer: {
     textAlign: "end",
   },

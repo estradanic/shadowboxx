@@ -6,6 +6,7 @@ import {
   setUserPermissions,
   hashImage,
   isUserWhitelisted,
+  notifyOfAlbumChange,
 } from "./triggers";
 import { findDuplicateImages, hashImages } from "./jobs";
 import { resolveDuplicates, ResolveDuplicatesParams } from "./functions";
@@ -28,6 +29,7 @@ Parse.Cloud.afterSave("Image", async (request) => {
 Parse.Cloud.afterSave("Album", async (request) => {
   if (!request.master || !request.context?.noTrigger) {
     await setAlbumPermissions(request.object);
+    await notifyOfAlbumChange(request.object, request.user);
   }
 });
 

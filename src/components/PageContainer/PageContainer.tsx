@@ -49,7 +49,7 @@ const PageContainer = ({ children, ...rest }: PageContainerProps) => {
           className={classes.grid}
         >
           {children}
-          {/* <ReactQueryDevtools initialIsOpen={false} /> */}
+          <ReactQueryDevtools initialIsOpen={false} />
         </Grid>
       </Container>
     </LoadingWrapper>
