@@ -24,12 +24,8 @@ import Parse from "parse";
 import classNames from "classnames";
 import { createHtmlPortalNode, InPortal } from "react-reverse-portal";
 import { readAndCompressImage } from "browser-image-resizer";
-import {useDebounce} from "use-debounce";
-import {
-  elide,
-  makeValidFileName,
-  removeExtension,
-} from "../../utils";
+import { useDebounce } from "use-debounce";
+import { elide, makeValidFileName, removeExtension } from "../../utils";
 import { Strings } from "../../resources";
 import { ParseImage, ParsePointer } from "../../classes";
 import { useRandomColor, useRefState } from "../../hooks";
@@ -112,6 +108,15 @@ export type ImageFieldProps = Omit<
   setCaption?: (image: ParseImage, caption: string) => void;
   /** Function to get caption for an image */
   getCaption?: (image: ParseImage) => string;
+};
+
+const ProcessingImagesLoaderContent = () => {
+  const classes = useStyles();
+  return (
+    <FancyTypography className={classes.resizingImages}>
+      {Strings.processingImages()}
+    </FancyTypography>
+  );
 };
 
 /** Component to input images from the filesystem or online */
@@ -201,9 +206,7 @@ const ImageField = memo(
     const uploadFiles = async (files: File[]) => {
       const max = multiple ? files.length : 1;
       const newImagePromises: Promise<ParseImage>[] = [];
-      console.log("Uploading images", {files});
       for (let i = 0; i < max; i++) {
-        console.log("Uploading image", {file: files[i]});
         let file = files[i];
         const fileName = makeValidFileName(files[i].name);
         const parseFile = new Parse.File(fileName, file);
@@ -217,28 +220,21 @@ const ImageField = memo(
             acl
           )
         );
-        console.log("Started uploading image", {file: files[i]});
       }
       return Promise.all(newImagePromises);
     };
 
     const addFromFile: ChangeEventHandler<HTMLInputElement> = async (event) => {
-      console.log("OnChange called", {event});
       if (event.target.files?.[0]) {
-        console.log("Processing images", {files: event.target.files});
         startGlobalLoader({
           type: "determinate",
-          content: (
-            <FancyTypography className={classes.resizingImages}>
-              {Strings.processingImages()}
-            </FancyTypography>
-          ),
+          content: <ProcessingImagesLoaderContent />,
         });
-        setTimeout(async () => { // allow global loader rerender to happen using setTimeout
+        setTimeout(async () => {
+          // allow global loader rerender to happen using setTimeout
           const files = await processFiles(event.target.files!);
           try {
             const newImages = await uploadFiles(files);
-            console.log("Done uploading images", {newImages});
             const newValue = multiple ? [...value, ...newImages] : newImages;
             await onChange(newValue, "ADD");
           } catch (error: any) {
@@ -288,20 +284,20 @@ const ImageField = memo(
     );
 
     const onWindowFocus = useCallback(() => {
-      console.log("Window focus");
-      setTimeout(() => { // Hopefully the onChange will run before this. Thus the setTimeout.
+      setTimeout(() => {
+        // Hopefully the onChange will run before this. Thus the setTimeout.
         if (selectingImages.current && !inputRef.current?.files?.length) {
-          console.log("Stopping global loader due to window focus");
           selectingImages.current = false;
           stopGlobalLoader();
         }
       });
     }, [stopGlobalLoader, selectingImages]);
 
-    const [onWindowFocusDebounced] = useDebounce(onWindowFocus, 500, {leading: true});
+    const [onWindowFocusDebounced] = useDebounce(onWindowFocus, 500, {
+      leading: true,
+    });
 
     useEffect(() => {
-      console.log("Adding window focus listener");
       window.addEventListener("focus", onWindowFocusDebounced);
       return () => window.removeEventListener("focus", onWindowFocusDebounced);
     }, [onWindowFocusDebounced]);
@@ -503,9 +499,7 @@ const ImageField = memo(
               <MenuItem onClick={selectFromLibrary}>
                 {Strings.addFromLibrary()}
               </MenuItem>
-              <MenuItem
-                onClick={() => inputRef.current?.click?.()}
-              >
+              <MenuItem onClick={() => inputRef.current?.click?.()}>
                 {Strings.addFromFile()}
               </MenuItem>
               <MenuItem

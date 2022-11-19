@@ -24,10 +24,14 @@ export interface TextFieldProps
   extends Omit<FilledTextFieldProps, "variant" | "classes"> {}
 
 /** Component to input text */
-const TextField = forwardRef((props: TextFieldProps, ref: ForwardedRef<any>) => {
-  const classes = useStyles();
+const TextField = forwardRef(
+  (props: TextFieldProps, ref: ForwardedRef<any>) => {
+    const classes = useStyles();
 
-  return <MuiTextField variant="filled" classes={classes} {...props} ref={ref} />;
-});
+    return (
+      <MuiTextField variant="filled" classes={classes} {...props} ref={ref} />
+    );
+  }
+);
 
 export default TextField;
