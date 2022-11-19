@@ -4,18 +4,9 @@ import React, {
   useContext,
   ReactNode,
   useCallback,
-  useEffect,
-  useRef,
 } from "react";
 import { v4 as uuid } from "uuid";
 import NotificationsIcon from "@material-ui/icons/Notifications";
-import BurstModeIcon from "@material-ui/icons/BurstMode";
-import { useQuery } from "@tanstack/react-query";
-import { ParseDuplicate } from "../classes";
-import { useQueryConfigs } from "../hooks";
-import { Strings } from "../resources";
-import { DuplicatesNotificationDetail } from "../components";
-import { useUserContext } from "./UserContext";
 
 /** Interface defining a single notification */
 export interface Notification {
@@ -28,12 +19,14 @@ export interface Notification {
   /** Detailed message or interactive content */
   detail?: React.ReactNode;
   /** Function to remove the notification */
-  remove: () => void;
+  remove: () => void | Promise<void>;
 }
 
 /** Interface defining the parameters for the addNotification function */
 interface AddNotificationParams
-  extends Pick<Notification, "title" | "icon" | "detail"> {}
+  extends Pick<Notification, "title" | "icon" | "detail" > {
+    onRemove?: () => Promise<void> | void;
+}
 
 /** Interface defining the value of NotifcationsContextProvider */
 interface NotificationsContextValue {
@@ -62,33 +55,21 @@ interface NotificationsContextProviderProps {
 export const NotificationsContextProvider = ({
   children,
 }: NotificationsContextProviderProps) => {
-  const { getDuplicatesQueryKey, getDuplicatesOptions, getDuplicatesFunction } =
-    useQueryConfigs();
-
-  const { isUserLoggedIn } = useUserContext();
-
-  const { data: duplicates } = useQuery<ParseDuplicate[], Error>(
-    getDuplicatesQueryKey(),
-    () => getDuplicatesFunction(),
-    getDuplicatesOptions({
-      enabled: isUserLoggedIn,
-    })
-  );
-
-  const duplicatesNotificationRef = useRef<Notification>();
-
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const addNotification = useCallback(
     ({
       title,
       icon = <NotificationsIcon />,
       detail,
+      onRemove,
     }: AddNotificationParams) => {
       const id = uuid();
-      const remove = () =>
+      const remove = async () => {
         setNotifications((prev) =>
           prev.filter((notification) => notification.id !== id)
         );
+        await onRemove?.();
+      }
       setNotifications((prev) => [
         ...prev,
         { id, title, icon, detail, remove },
@@ -97,23 +78,6 @@ export const NotificationsContextProvider = ({
     },
     [setNotifications]
   );
-
-  useEffect(() => {
-    if (duplicates?.length && !duplicatesNotificationRef.current) {
-      duplicatesNotificationRef.current = addNotification({
-        title: Strings.duplicatesNotificationTitle(),
-        detail: (
-          <DuplicatesNotificationDetail
-            duplicates={duplicates}
-            notificationRef={duplicatesNotificationRef}
-          />
-        ),
-        icon: <BurstModeIcon />,
-      });
-    } else if (!duplicates?.length) {
-      duplicatesNotificationRef.current = undefined;
-    }
-  }, [addNotification, duplicatesNotificationRef, duplicates]);
 
   const value: NotificationsContextValue = {
     notifications,

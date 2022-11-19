@@ -6,3 +6,4 @@ export { default as useHideOnScroll } from "./useHideOnScroll";
 export { default as useUserInfo } from "./useUserInfo";
 export type { UseUserInfoParams } from "./useUserInfo";
 export * from "./Query";
+export * from "./Notifications";

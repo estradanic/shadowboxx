@@ -7,6 +7,7 @@ import {
   ParseImage,
   ParseUser,
   ParseDuplicate,
+  ParseAlbumChangeNotification,
 } from "../../classes";
 import useQueryConfigHelpers, {
   FunctionOptions,
@@ -333,7 +334,39 @@ const useQueryConfigs = () => {
     );
   };
 
+  const getAlbumChangeNotificationsQueryKey = () => [
+    QueryCacheGroups.GET_ALBUM_CHANGE_NOTIFICATIONS,
+  ];
+  const getAlbumChangeNotificationsOptions: QueryOptionsFunction<
+    ParseAlbumChangeNotification[]
+  > = (options = {}) => ({
+    refetchOnWindowFocus: false,
+    refetchInterval: 5 * 60 * 1000,
+    ...options,
+  });
+  const getAlbumChangeNotificationsFunction = async (
+    options: FunctionOptions = {}
+  ): Promise<ParseAlbumChangeNotification[]> => {
+    return await runFunctionInTryCatch<ParseAlbumChangeNotification[]>(
+      async () => {
+        const albumChangeNotifications =
+          await ParseAlbumChangeNotification.query(online)
+            .greaterThan(ParseAlbumChangeNotification.COLUMNS.count, 0)
+            .ascending(ParseAlbumChangeNotification.COLUMNS.createdAt)
+            .find();
+        return albumChangeNotifications.map(
+          (albumChangeNotification) =>
+            new ParseAlbumChangeNotification(albumChangeNotification)
+        );
+      },
+      { errorMessage: Strings.couldNotGetDuplicates(), ...options }
+    );
+  };
+
   return {
+    getAlbumChangeNotificationsQueryKey,
+    getAlbumChangeNotificationsOptions,
+    getAlbumChangeNotificationsFunction,
     getDuplicatesQueryKey,
     getDuplicatesOptions,
     getDuplicatesFunction,

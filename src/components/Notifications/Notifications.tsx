@@ -1,4 +1,4 @@
-import React, { ForwardedRef, forwardRef, useState } from "react";
+import React, { ForwardedRef, forwardRef, useRef, useState } from "react";
 import Badge from "@material-ui/core/Badge";
 import Collapse from "@material-ui/core/Collapse";
 import IconButton from "@material-ui/core/IconButton";
@@ -84,13 +84,15 @@ const Notifications = ({ className }: NotificationsProps) => {
   const classes = useStyles();
   const { notifications } = useNotificationsContext();
   const empty = !notifications.length;
-  const [anchorEl, setAnchorEl] = useState<Element>();
+  const iconButtonRef = useRef(null);
+  const [open, setOpen] = useState(false);
 
   return (
     <>
       <IconButton
         className={className}
-        onClick={(e) => setAnchorEl(e.currentTarget)}
+        ref={iconButtonRef}
+        onClick={() => setOpen((prev) => !prev)}
       >
         <Badge
           overlap="rectangular"
@@ -118,9 +120,9 @@ const Notifications = ({ className }: NotificationsProps) => {
         classes={{ paper: classes.menu }}
         elevation={0}
         keepMounted
-        onClose={() => setAnchorEl(undefined)}
-        anchorEl={anchorEl}
-        open={!!anchorEl}
+        onClose={() => setOpen(false)}
+        anchorEl={iconButtonRef.current}
+        open={open}
       >
         {notifications.length ? (
           notifications.map((notification) => (

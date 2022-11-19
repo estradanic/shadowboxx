@@ -42,12 +42,10 @@ export default class ParseDuplicate extends ParseObject<"Duplicate"> {
   }
 
   _duplicate: Parse.Object<ParsifyPointers<"Duplicate">>;
-  _isDuplicate: boolean;
 
   constructor(duplicate: Parse.Object<ParsifyPointers<"Duplicate">>) {
     super(duplicate);
     this._duplicate = duplicate;
-    this._isDuplicate = false;
   }
 
   async acknowledge() {

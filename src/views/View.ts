@@ -4,7 +4,11 @@ import { useQueryClient } from "@tanstack/react-query";
 import { useUserContext } from "../contexts";
 import { routes } from "../app";
 import { useScrollPositionStore } from "../stores";
-import { useNavigate } from "../hooks";
+import {
+  useNavigate,
+  useDuplicatesNotifications,
+  useAlbumChangeNotifications,
+} from "../hooks";
 
 /**
  * Hook that handles navigation, query invalidation, and authentication at the beginning of every View component.
@@ -42,4 +46,7 @@ export const useView = (currentViewId: string) => {
   useEffect(() => {
     document.body.scrollTo(0, getScrollPosition(location.pathname));
   }, [location.pathname, getScrollPosition]);
+
+  useDuplicatesNotifications();
+  useAlbumChangeNotifications();
 };
