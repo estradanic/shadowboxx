@@ -1,6 +1,6 @@
 import React, { useEffect, MutableRefObject, useRef } from "react";
 import { useQuery } from "@tanstack/react-query";
-import NewReleasesIcon from "@material-ui/icons/NewReleases";
+import FiberNewIcon from "@material-ui/icons/FiberNew";
 import { ParseAlbumChangeNotification } from "../../classes";
 import {
   useUserContext,
@@ -54,7 +54,7 @@ const useAlbumChangeNotifications = () => {
                   }
                 />
               ),
-              icon: <NewReleasesIcon />,
+              icon: <FiberNewIcon />,
               onRemove: async () => await albumChangeNotification.acknowledge(),
             });
         }
