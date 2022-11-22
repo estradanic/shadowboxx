@@ -83,7 +83,7 @@ interface NotificationsProps {
 const Notifications = ({ className }: NotificationsProps) => {
   const classes = useStyles();
   const { notifications } = useNotificationsContext();
-  const empty = !notifications.length;
+  const empty = !Object.keys(notifications).length;
   const iconButtonRef = useRef(null);
   const [open, setOpen] = useState(false);
 
@@ -96,7 +96,7 @@ const Notifications = ({ className }: NotificationsProps) => {
       >
         <Badge
           overlap="rectangular"
-          badgeContent={notifications.length}
+          badgeContent={Object.keys(notifications).length}
           color="error"
         >
           <NotificationsIcon
@@ -124,9 +124,9 @@ const Notifications = ({ className }: NotificationsProps) => {
         anchorEl={iconButtonRef.current}
         open={open}
       >
-        {notifications.length ? (
-          notifications.map((notification) => (
-            <Notification key={notification.id} {...notification} />
+        {Object.keys(notifications).length ? (
+          Object.keys(notifications).map((key) => (
+            <Notification key={notifications[key].id} {...notifications[key]} />
           ))
         ) : (
           <MenuItem className={classes.menuItem}>
