@@ -173,6 +173,7 @@ export const ImageContextProvider = ({
         error.message = Strings.uploadImageError();
       }
       addNotification({
+        id: `upload-image-error-${image.name}`,
         title: Strings.uploadImageError(),
         icon: <ErrorIcon />,
       });

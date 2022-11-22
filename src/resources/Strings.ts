@@ -276,7 +276,7 @@ const Strings: {
     `Could not remove image ${fileName} from album.`,
   resolve: () => "Resolve",
   resolveDuplicates: () => "Resolve Duplicates",
-  processingImages: () => "Processing Images...",
+  processingImages: () => "Processing...",
   selectImages: () => "Select Images",
   sessionExpired: () => "Session Expired. Please log in again.",
   setImageAsCover: () => "Set this image as the album cover",
@@ -294,7 +294,7 @@ const Strings: {
   uploadImageError: (fileName?: string) =>
     `Error uploading image${fileName ? ` ${fileName}` : ""}.`,
   uploadingImage: (fileName: string) => `Uploading image (${fileName})`,
-  uploadingImages: () => "Uploading images...",
+  uploadingImages: () => "Uploading...",
   verifyEmail: (email: string) =>
     `Please check ${email} for the verification message, then return here.`,
   viewers: () => "Viewers",

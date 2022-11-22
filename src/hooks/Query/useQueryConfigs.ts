@@ -351,6 +351,7 @@ const useQueryConfigs = () => {
       async () => {
         const albumChangeNotifications =
           await ParseAlbumChangeNotification.query(online)
+            .notEqualTo("user", getLoggedInUser().toNativePointer())
             .greaterThan(ParseAlbumChangeNotification.COLUMNS.count, 0)
             .ascending(ParseAlbumChangeNotification.COLUMNS.createdAt)
             .find();
