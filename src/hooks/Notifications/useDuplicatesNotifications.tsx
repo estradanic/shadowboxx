@@ -32,6 +32,7 @@ const useDuplicatesNotifications = () => {
   useEffect(() => {
     if (duplicates?.length && !notificationRef.current) {
       notificationRef.current = addNotification({
+        id: "duplicates-notification",
         title: Strings.duplicatesNotificationTitle(),
         detail: (
           <DuplicatesNotificationDetail

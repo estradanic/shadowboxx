@@ -65,6 +65,7 @@ const App = () => {
         console.log("Storage left:", estimate.quota / 1000000, "Megabytes");
         if (estimate.quota - estimate.usage < 500000000) {
           addNotification({
+            id: "low-storage-notification",
             title: Strings.notEnoughSpace(),
             detail: Strings.limitedOffline(),
             icon: <DiscFullIcon />,

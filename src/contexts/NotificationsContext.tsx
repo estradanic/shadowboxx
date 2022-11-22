@@ -24,17 +24,22 @@ export interface Notification {
 
 /** Interface defining the parameters for the addNotification function */
 interface AddNotificationParams
-  extends Pick<Notification, "title" | "icon" | "detail" > {
-    onRemove?: () => Promise<void> | void;
+  extends Pick<Notification, "title" | "icon" | "detail" | "id"> {
+  onRemove?: () => Promise<void> | void;
 }
 
 /** Interface defining the value of NotifcationsContextProvider */
 interface NotificationsContextValue {
   /** An array of notifications */
-  notifications: Notification[];
+  notifications: Record<string, Notification>;
   /** React state setter for notifications */
-  setNotifications: React.Dispatch<React.SetStateAction<Notification[]>>;
-  /** Function to easily add a new notification, automatically setting id and remove */
+  setNotifications: React.Dispatch<
+    React.SetStateAction<Record<string, Notification>>
+  >;
+  /**
+   * Function to easily add a new notification.
+   * If notification with id already exists, it is updated to the new one
+   */
   addNotification: (params: AddNotificationParams) => Notification;
 }
 
@@ -55,25 +60,33 @@ interface NotificationsContextProviderProps {
 export const NotificationsContextProvider = ({
   children,
 }: NotificationsContextProviderProps) => {
-  const [notifications, setNotifications] = useState<Notification[]>([]);
+  const [notifications, setNotifications] = useState<
+    Record<string, Notification>
+  >({});
   const addNotification = useCallback(
     ({
+      id,
       title,
       icon = <NotificationsIcon />,
       detail,
       onRemove,
     }: AddNotificationParams) => {
-      const id = uuid();
       const remove = async () => {
-        setNotifications((prev) =>
-          prev.filter((notification) => notification.id !== id)
-        );
+        setNotifications((prev) => {
+          const newNotifications: Record<string, Notification> = {};
+          for (const key of Object.keys(prev)) {
+            if (key !== id) {
+              newNotifications[key] = prev[key];
+            }
+          }
+          return newNotifications;
+        });
         await onRemove?.();
-      }
-      setNotifications((prev) => [
+      };
+      setNotifications((prev) => ({
         ...prev,
-        { id, title, icon, detail, remove },
-      ]);
+        [id]: { id, title, icon, detail, remove },
+      }));
       return { id, title, icon, detail, remove };
     },
     [setNotifications]
