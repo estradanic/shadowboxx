@@ -74,7 +74,7 @@
     "@types/react-dom": "^18.0.6",
     "@types/react-router-dom": "^5.3.3",
     "@types/sharp": "^0.31.0",
-    "@types/uuid": "^8.3.3",
+    "@types/uuid": "^9.0.0",
     "@vitejs/plugin-react": "^2.2.0",
     "blockhash-core": "^0.1.0",
     "eslint": "^8.28.0",
