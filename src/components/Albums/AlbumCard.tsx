@@ -378,6 +378,15 @@ const AlbumCard = memo(({ value, onChange, borderColor }: AlbumCardProps) => {
                   ButtonProps={{ className: classes.addImages }}
                   variant="button"
                   value={images ?? []}
+                  onAdd={async (images) => {
+                    if (!value.id) {
+                      return;
+                    }
+                    await value.update(async (album) => {
+                      album.images.push(...images);
+                    });
+                    await onChange(value);
+                  }}
                   onChange={async (newImages) => {
                     try {
                       const newValue = await value.update({
@@ -402,10 +411,10 @@ const AlbumCard = memo(({ value, onChange, borderColor }: AlbumCardProps) => {
         value={value.attributes}
         open={editAlbumDialogOpen}
         handleCancel={() => setEditAlbumDialogOpen(false)}
-        handleConfirm={async (attributes) => {
+        handleConfirm={async (attributes, changes) => {
           setEditAlbumDialogOpen(false);
           try {
-            const response = await value.update(attributes);
+            const response = await value.update(attributes, changes);
             await onChange(response);
             enqueueSuccessSnackbar(Strings.commonSaved());
           } catch (error: any) {

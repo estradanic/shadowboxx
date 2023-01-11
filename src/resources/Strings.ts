@@ -153,7 +153,8 @@ const Strings: {
   addOrEditCaption: () => "Add/Edit caption",
   albumChangeNotificationDetail: (userName: string, albumName: string) =>
     `${userName} changed ${albumName}`,
-  albumChangeNotificationTitle: () => "Album changed!",
+  albumChangeNotificationTitle: (count: number) =>
+    `${count} album change${count > 1 ? "s" : ""} to see!`,
   albumNotFound: (album: string) =>
     `Album not found${album ? ` (${album})` : ""}`,
   alreadyHaveAccount: () => "Already have an account?",

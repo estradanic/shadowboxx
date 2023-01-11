@@ -78,8 +78,6 @@ const useStyles = makeStyles((theme: Theme) => ({
   },
 }));
 
-export type ImageFieldOnChangeReason = "REMOVE" | "ADD";
-
 /** Interface defining props for ImageField */
 export type ImageFieldProps = Omit<
   TextFieldProps,
@@ -87,11 +85,10 @@ export type ImageFieldProps = Omit<
 > & {
   /** Value of the field, array of Images */
   value: ParseImage[];
-  /** Function to run when the value changes */
-  onChange: (
-    value: ParseImage[],
-    reason: ImageFieldOnChangeReason
-  ) => Promise<void>;
+  /** Function to run when an image is removed */
+  onRemove: (...image: ParseImage[]) => Promise<void> | void;
+  /** Function to run when an image is added */
+  onAdd: (...image: ParseImage[]) => Promise<void> | void;
   /** Whether multiple images can be selected or not */
   multiple?: boolean;
   /** ACL to save new images with after upload */
@@ -122,7 +119,8 @@ const ProcessingImagesLoaderContent = () => {
 /** Component to input images from the filesystem or online */
 const ImageField = memo(
   ({
-    onChange: piOnChange,
+    onAdd,
+    onRemove,
     label,
     value = [],
     multiple = false,
@@ -157,13 +155,6 @@ const ImageField = memo(
 
     const randomColor = useRandomColor();
 
-    const onChange = useCallback(
-      async (newValue: ParseImage[], reason: ImageFieldOnChangeReason) => {
-        await piOnChange(Array.from(new Set(newValue)), reason);
-      },
-      [piOnChange]
-    );
-
     const { openPrompt } = useActionDialogContext();
 
     const inputRef = useRef<HTMLInputElement>(null);
@@ -171,12 +162,11 @@ const ImageField = memo(
 
     const selectFromLibrary = useCallback(() => {
       promptImageSelectionDialog({
-        handleConfirm: async (newValue) =>
-          await onChange(multiple ? [...value, ...newValue] : newValue, "ADD"),
+        handleConfirm: async (toAdd) => await onAdd(...toAdd),
         alreadySelected: value,
         multiple,
       });
-    }, [promptImageSelectionDialog, value, onChange, multiple]);
+    }, [promptImageSelectionDialog, value, onAdd, multiple]);
 
     const processFiles = async (eventFiles: FileList) => {
       const files: File[] = [];
@@ -235,8 +225,7 @@ const ImageField = memo(
           const files = await processFiles(event.target.files!);
           try {
             const newImages = await uploadFiles(files);
-            const newValue = multiple ? [...value, ...newImages] : newImages;
-            await onChange(newValue, "ADD");
+            await onAdd(...newImages);
           } catch (error: any) {
             enqueueErrorSnackbar(error?.message ?? Strings.uploadImageError());
           } finally {
@@ -262,8 +251,7 @@ const ImageField = memo(
           },
           acl
         );
-        const newValue = multiple ? [...value, newImage] : [newImage];
-        await onChange(newValue, "ADD");
+        await onAdd(newImage);
       } catch (error: any) {
         enqueueErrorSnackbar(
           error?.message ?? Strings.uploadImageError(fileName)
@@ -295,6 +283,7 @@ const ImageField = memo(
 
     const [onWindowFocusDebounced] = useDebounce(onWindowFocus, 500, {
       leading: true,
+      trailing: false,
     });
 
     useEffect(() => {
@@ -424,10 +413,7 @@ const ImageField = memo(
                   const imageDecorations = [
                     <RemoveImageDecoration
                       onClick={async () => {
-                        const newValue = value.filter(
-                          (valueImage) => image.id !== valueImage.id
-                        );
-                        await onChange(newValue, "REMOVE");
+                        await onRemove(image);
                       }}
                     />,
                   ];
