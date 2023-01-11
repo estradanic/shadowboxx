@@ -9,7 +9,10 @@ export type AlbumFormChanges = AlbumSaveContext;
 
 export type UseAlbumFormOptions = {
   resetOnSubmit?: boolean;
-  onSubmit: (album: AlbumAttributes, changes: AlbumFormChanges) => Promise<void> | void;
+  onSubmit: (
+    album: AlbumAttributes,
+    changes: AlbumFormChanges
+  ) => Promise<void> | void;
   onCancel?: () => Promise<void> | void;
 };
 
@@ -26,7 +29,10 @@ const useAlbumForm = (
 
   const [allImageIds, setAllImageIds] = useState<string[]>(album.images);
   const [removedImages, setRemovedImageIds] = useState<string[]>([]);
-  const imageIds = useMemo(() => allImageIds.filter((imageId) => !removedImages.includes(imageId)), [allImageIds, removedImages]);
+  const imageIds = useMemo(
+    () => allImageIds.filter((imageId) => !removedImages.includes(imageId)),
+    [allImageIds, removedImages]
+  );
 
   const [coverImage, setCoverImage] = useState<AlbumAttributes["coverImage"]>(
     album.coverImage
@@ -101,11 +107,13 @@ const useAlbumForm = (
     const addedCollaborators = dedupe(
       collaborators.filter(
         (collaborator) => !album.collaborators.includes(collaborator)
-      ));
+      )
+    );
     const removedCollaborators = dedupe(
       album.collaborators.filter(
         (collaborator) => !collaborators.includes(collaborator)
-      ));
+      )
+    );
     const addedViewers = dedupe(
       viewers.filter((viewer) => !album.viewers.includes(viewer))
     );
@@ -149,7 +157,6 @@ const useAlbumForm = (
     return changes;
   };
 
-
   const onSubmit = async () => {
     if (validate()) {
       const userEmails = new Set([...viewers, ...collaborators]);
@@ -158,7 +165,26 @@ const useAlbumForm = (
         .count();
       if (signedUpUserCount < userEmails.size) {
         openConfirm(Strings.nonExistentUserWarning(), async () => {
-          await piOnSubmit({
+          await piOnSubmit(
+            {
+              ...album,
+              images: imageIds,
+              name,
+              description,
+              collaborators,
+              viewers,
+              coverImage,
+              captions,
+            },
+            calculateChanges()
+          );
+          if (resetOnSubmit) {
+            reinitialize();
+          }
+        });
+      } else {
+        await piOnSubmit(
+          {
             ...album,
             images: imageIds,
             name,
@@ -167,22 +193,9 @@ const useAlbumForm = (
             viewers,
             coverImage,
             captions,
-          }, calculateChanges());
-          if (resetOnSubmit) {
-            reinitialize();
-          }
-        });
-      } else {
-        await piOnSubmit({
-          ...album,
-          images: imageIds,
-          name,
-          description,
-          collaborators,
-          viewers,
-          coverImage,
-          captions,
-        }, calculateChanges());
+          },
+          calculateChanges()
+        );
       }
     }
   };
@@ -194,7 +207,9 @@ const useAlbumForm = (
 
   const onAdd = async (...imageIds: string[]) => {
     setAllImageIds(dedupe([...allImageIds, ...imageIds]));
-    setRemovedImageIds(removedImages.filter((imageId) => !imageIds.includes(imageId)));
+    setRemovedImageIds(
+      removedImages.filter((imageId) => !imageIds.includes(imageId))
+    );
   };
 
   const onRemove = async (...imageIds: string[]) => {

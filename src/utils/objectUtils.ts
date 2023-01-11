@@ -36,7 +36,10 @@ export const difference = <T extends Hashable | string>(
 };
 
 /** Function for getting deep equality of two objects */
-export const deepEqual = (obj1: Record<any, any>, obj2: Record<any, any>): boolean => {
+export const deepEqual = (
+  obj1: Record<any, any>,
+  obj2: Record<any, any>
+): boolean => {
   if (obj1 === obj2) {
     return true;
   }
@@ -62,9 +65,7 @@ export const deepEqual = (obj1: Record<any, any>, obj2: Record<any, any>): boole
     }
   }
   return equal;
-}
-
-
+};
 
 export const fromEntries = <Key extends PropertyKey, Value>(
   entries: [Key, Value][]

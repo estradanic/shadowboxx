@@ -184,13 +184,15 @@ const AlbumFormDialog = ({
               label={Strings.images()}
               multiple
               value={
-                images?.filter?.((image) => !removedImageIds.includes(image.id!)) ?? []
+                images?.filter?.(
+                  (image) => !removedImageIds.includes(image.id!)
+                ) ?? []
               }
               onRemove={async (...images) => {
-                await onRemove(...(images.map((image) => image.id!)));
+                await onRemove(...images.map((image) => image.id!));
               }}
               onAdd={async (...images) => {
-                await onAdd(...(images.map((image) => image.id!)));
+                await onAdd(...images.map((image) => image.id!));
               }}
             />
           </ImageContextProvider>

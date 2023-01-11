@@ -6,6 +6,6 @@ export { default as useHideOnScroll } from "./useHideOnScroll";
 export { default as useUserInfo } from "./useUserInfo";
 export { default as useAlbumForm } from "./useAlbumForm";
 export type { UseUserInfoParams } from "./useUserInfo";
-export type {UseAlbumFormOptions} from "./useAlbumForm";
+export type { UseAlbumFormOptions } from "./useAlbumForm";
 export * from "./Query";
 export * from "./Notifications";
