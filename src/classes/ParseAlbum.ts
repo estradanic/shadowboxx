@@ -36,6 +36,14 @@ export interface AlbumSaveContext {
   removedViewers?: string[];
   /** Array of viewer emails removed from the album */
   addedViewers?: string[];
+  /** New cover image for the album */
+  coverImage?: AlbumAttributes["coverImage"];
+  /** New name for the album */
+  name?: AlbumAttributes["name"];
+  /** New description for the album */
+  description?: AlbumAttributes["description"];
+  /** New captions for the album */
+  captions?: AlbumAttributes["captions"];
 }
 
 class AlbumColumns extends Columns {
@@ -105,28 +113,14 @@ export default class ParseAlbum extends ParseObject<"Album"> {
     return this.save({});
   }
 
-  async update(attributes: Attributes<"Album">) {
+  async update(attributes: Attributes<"Album">, changes: AlbumSaveContext) {
     const newAttributes: ParsifyPointers<"Album"> = {
       ...attributes,
       owner: attributes.owner._pointer,
       coverImage: attributes.coverImage?._pointer,
     };
-    const context: AlbumSaveContext = {
-      removedImages: difference(this.images, newAttributes.images),
-      addedImages: difference(newAttributes.images, this.images),
-      removedCollaborators: difference(
-        this.collaborators,
-        newAttributes.collaborators
-      ),
-      addedCollaborators: difference(
-        newAttributes.collaborators,
-        this.collaborators
-      ),
-      removedViewers: difference(this.viewers, newAttributes.viewers),
-      addedViewers: difference(newAttributes.viewers, this.viewers),
-    };
     this._album.set(newAttributes);
-    return this.save(context);
+    return this.save(changes);
   }
 
   /** Pointer to the owner of this album */

@@ -22,6 +22,7 @@ export const dedupe = <T extends Hashable | string>(
   return Array.from(deduped.values());
 };
 
+/** Function for getting the difference between two collections */
 export const difference = <T extends Hashable | string>(
   collection1: Iterable<T> | ArrayLike<T>,
   collection2: Iterable<T> | ArrayLike<T>
@@ -33,6 +34,37 @@ export const difference = <T extends Hashable | string>(
         .includes(hashString(entry1))
   );
 };
+
+/** Function for getting deep equality of two objects */
+export const deepEqual = (obj1: Record<any, any>, obj2: Record<any, any>): boolean => {
+  if (obj1 === obj2) {
+    return true;
+  }
+  if (!obj1 || !obj2) {
+    return false;
+  }
+  const keys1 = Object.keys(obj1);
+  const keys2 = Object.keys(obj2);
+  if (keys1.length !== keys2.length) {
+    return false;
+  }
+  let equal = true;
+  for (const key of keys1) {
+    if (obj1[key] !== obj2[key]) {
+      if (typeof obj1[key] === "object" && typeof obj2[key] === "object") {
+        equal = deepEqual(obj1[key], obj2[key]);
+      } else {
+        equal = false;
+      }
+    }
+    if (!equal) {
+      break;
+    }
+  }
+  return equal;
+}
+
+
 
 export const fromEntries = <Key extends PropertyKey, Value>(
   entries: [Key, Value][]
