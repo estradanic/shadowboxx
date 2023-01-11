@@ -1,5 +1,5 @@
-import React, { useEffect, MutableRefObject, useRef } from "react";
-import { useQuery } from "@tanstack/react-query";
+import React, { useEffect, MutableRefObject, useRef, useCallback } from "react";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import FiberNewIcon from "@material-ui/icons/FiberNew";
 import { ParseAlbumChangeNotification } from "../../classes";
 import {
@@ -23,6 +23,7 @@ const useAlbumChangeNotifications = () => {
     getAlbumChangeNotificationsOptions,
     getAlbumChangeNotificationsFunction,
   } = useQueryConfigs();
+  const queryClient = useQueryClient();
 
   const { data: albumChangeNotifications } = useQuery<
     ParseAlbumChangeNotification[],
@@ -36,6 +37,16 @@ const useAlbumChangeNotifications = () => {
     })
   );
 
+  const onRemove = useCallback(
+    async (albumChangeNotification: ParseAlbumChangeNotification) => {
+      await albumChangeNotification.acknowledge();
+      queryClient.invalidateQueries({
+        queryKey: getAlbumChangeNotificationsQueryKey(),
+      });
+    },
+    [queryClient, getAlbumChangeNotificationsQueryKey]
+  );
+
   useEffect(() => {
     if (albumChangeNotifications?.length) {
       albumChangeNotifications.forEach((albumChangeNotification) => {
@@ -46,7 +57,9 @@ const useAlbumChangeNotifications = () => {
           notificationRef.current[albumChangeNotification.id!].current =
             addNotification({
               id: albumChangeNotification.id!,
-              title: Strings.albumChangeNotificationTitle(),
+              title: Strings.albumChangeNotificationTitle(
+                albumChangeNotification.count
+              ),
               detail: (
                 <AlbumChangesNotificationDetail
                   albumChange={albumChangeNotification}
@@ -56,12 +69,12 @@ const useAlbumChangeNotifications = () => {
                 />
               ),
               icon: <FiberNewIcon />,
-              onRemove: async () => await albumChangeNotification.acknowledge(),
+              onRemove: async () => await onRemove(albumChangeNotification),
             });
         }
       });
     }
-  }, [addNotification, albumChangeNotifications, notificationRef]);
+  }, [addNotification, albumChangeNotifications, notificationRef, onRemove]);
 };
 
 export default useAlbumChangeNotifications;

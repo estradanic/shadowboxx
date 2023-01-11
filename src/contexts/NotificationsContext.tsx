@@ -5,7 +5,6 @@ import React, {
   ReactNode,
   useCallback,
 } from "react";
-import { v4 as uuid } from "uuid";
 import NotificationsIcon from "@material-ui/icons/Notifications";
 
 /** Interface defining a single notification */
@@ -48,9 +47,7 @@ const NotificationsContext = createContext<
   NotificationsContextValue | undefined
 >(undefined);
 
-/**
- * Interface defining props for the NotificationsContextProvider
- */
+/** Interface defining props for the NotificationsContextProvider */
 interface NotificationsContextProviderProps {
   /** Child node */
   children: React.ReactNode;
