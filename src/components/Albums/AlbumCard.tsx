@@ -17,7 +17,13 @@ import { useQuery } from "@tanstack/react-query";
 import { Strings } from "../../resources";
 import { routes } from "../../app";
 import { VariableColor } from "../../types";
-import { ParseImage, ParseUser, ParseAlbum } from "../../classes";
+import {
+  ParseImage,
+  ParseUser,
+  ParseAlbum,
+  Attributes,
+  AlbumSaveContext,
+} from "../../classes";
 import { ImageContextProvider, useUserContext } from "../../contexts";
 import { useQueryConfigs, useNavigate } from "../../hooks";
 import UserAvatar from "../User/UserAvatar";
@@ -232,6 +238,15 @@ const AlbumCard = memo(({ value, onChange, borderColor }: AlbumCardProps) => {
     !!value.id && getLoggedInUser().favoriteAlbums.includes(value.id)
   );
 
+  const save = async (
+    attributes: Attributes<"Album">,
+    changes: AlbumSaveContext
+  ) => {
+    await value.update(attributes, changes);
+    await onChange(value);
+    enqueueSuccessSnackbar(Strings.commonSaved());
+  };
+
   return status !== "loading" ? (
     <ImageContextProvider>
       <Card className={classes.card}>
@@ -378,28 +393,14 @@ const AlbumCard = memo(({ value, onChange, borderColor }: AlbumCardProps) => {
                   ButtonProps={{ className: classes.addImages }}
                   variant="button"
                   value={images ?? []}
-                  onAdd={async (images) => {
+                  onAdd={async (...images) => {
                     if (!value.id) {
                       return;
                     }
-                    await value.update(async (album) => {
-                      album.images.push(...images);
-                    });
-                    await onChange(value);
-                  }}
-                  onChange={async (newImages) => {
-                    try {
-                      const newValue = await value.update({
-                        ...value.attributes,
-                        images: newImages.map((image) => image.id!),
-                      });
-                      await onChange(newValue);
-                      enqueueSuccessSnackbar(Strings.commonSaved());
-                    } catch (error: any) {
-                      enqueueErrorSnackbar(
-                        error?.message ?? Strings.editAlbumError()
-                      );
-                    }
+                    const imageIds = images.map((image) => image.id!);
+                    const newAttributes = { ...value.attributes };
+                    newAttributes.images.push(...imageIds);
+                    await save(newAttributes, { addedImages: imageIds });
                   }}
                 />
               </Online>

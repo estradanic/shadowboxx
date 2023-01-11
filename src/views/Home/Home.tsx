@@ -3,6 +3,7 @@ import Fab from "@material-ui/core/Fab";
 import Typography from "@material-ui/core/Typography";
 import Grid from "@material-ui/core/Grid";
 import { makeStyles, Theme } from "@material-ui/core/styles";
+import AddIcon from "@material-ui/icons/Add";
 import { useInfiniteQuery } from "@tanstack/react-query";
 import classNames from "classnames";
 import {
@@ -146,14 +147,13 @@ const Home = memo(() => {
         )}
       </>
       <Fab
-        variant="extended"
         onClick={() => setAddAlbumDialogOpen(true)}
         className={classNames(classes.fab, {
           [classes.fabVisible]: fabVisible,
           [classes.fabHidden]: !fabVisible,
         })}
       >
-        <Typography>{Strings.addAlbum()}</Typography>
+        <AddIcon />
       </Fab>
       <AlbumFormDialog
         resetOnConfirm
