@@ -1,15 +1,22 @@
-import React, { memo, useCallback, useMemo } from "react";
+import React, { memo, useCallback, useMemo, useState } from "react";
 import {
+  AlbumFormDialog,
   BackButton,
   FancyTitleTypographySkeleton,
   ImagesSkeleton,
   PageContainer,
+  useSnackbar,
 } from "../../components";
 import { useLocation, useParams } from "react-router-dom";
 import Grid from "@material-ui/core/Grid";
 import Typography from "@material-ui/core/Typography";
-import { makeStyles } from "@material-ui/core/styles";
-import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
+import { makeStyles, Theme } from "@material-ui/core/styles";
+import EditIcon from "@material-ui/icons/Edit";
+import {
+  useInfiniteQuery,
+  useQuery,
+  useQueryClient,
+} from "@tanstack/react-query";
 import { Strings } from "../../resources";
 import { ParseImage, ParseAlbum } from "../../classes";
 import { FancyTitleTypography, Void, Images } from "../../components";
@@ -19,11 +26,30 @@ import {
   useQueryConfigs,
   useInfiniteQueryConfigs,
   useInfiniteScroll,
+  useHideOnScroll,
 } from "../../hooks";
 import { useView } from "../View";
 import OwnerImageDecoration from "../../components/Image/Decoration/OwnerImageDecoration";
+import { Fab } from "@material-ui/core";
+import classNames from "classnames";
 
-const useStyles = makeStyles(() => ({
+const useStyles = makeStyles((theme: Theme) => ({
+  fab: {
+    position: "absolute",
+    right: theme.spacing(4),
+    "&:hover, &:focus, &:active": {
+      backgroundColor: theme.palette.success.dark,
+    },
+    transition: theme.transitions.create("bottom"),
+    backgroundColor: theme.palette.success.main,
+    color: theme.palette.success.contrastText,
+  },
+  fabVisible: {
+    bottom: theme.spacing(7),
+  },
+  fabHidden: {
+    bottom: theme.spacing(-10),
+  },
   svgContainer: {
     textAlign: "center",
   },
@@ -48,6 +74,7 @@ const Album = memo(() => {
     getImagesByIdInfiniteQueryKey,
     getImagesByIdInfiniteOptions,
   } = useInfiniteQueryConfigs();
+  const queryClient = useQueryClient();
   const { data: album, status: albumStatus } = useQuery<ParseAlbum, Error>(
     getAlbumQueryKey(id),
     () => getAlbumFunction(id, { showErrorsInSnackbar: true }),
@@ -69,6 +96,9 @@ const Album = memo(() => {
     getImagesByIdInfiniteOptions({ enabled: !!album?.images })
   );
   useInfiniteScroll(fetchNextPage, { canExecute: !isFetchingNextPage });
+  const [editMode, setEditMode] = useState<boolean>(false);
+  const fabVisible = useHideOnScroll();
+  const { enqueueSuccessSnackbar, enqueueErrorSnackbar } = useSnackbar();
 
   const images = useMemo(
     () => data?.pages?.flatMap((page) => page),
@@ -102,6 +132,24 @@ const Album = memo(() => {
         </>
       ) : albumStatus === "success" && album ? (
         <>
+          <AlbumFormDialog
+            resetOnConfirm
+            value={album.attributes}
+            open={editMode}
+            handleCancel={() => setEditMode(false)}
+            handleConfirm={async (attributes, changes) => {
+              setEditMode(false);
+              try {
+                const newAlbum = await album.update(attributes, changes);
+                queryClient.setQueryData(getAlbumQueryKey(id), newAlbum);
+                enqueueSuccessSnackbar(Strings.commonSaved());
+              } catch (error: any) {
+                enqueueErrorSnackbar(
+                  error?.message ?? Strings.editAlbumError()
+                );
+              }
+            }}
+          />
           <Grid item sm={8}>
             <FancyTitleTypography outlineColor={randomColor}>
               {album.name}
@@ -114,6 +162,15 @@ const Album = memo(() => {
             images={images}
             outlineColor={randomColor}
           />
+          <Fab
+            onClick={() => setEditMode(true)}
+            className={classNames(classes.fab, {
+              [classes.fabVisible]: fabVisible,
+              [classes.fabHidden]: !fabVisible,
+            })}
+          >
+            <EditIcon />
+          </Fab>
         </>
       ) : (
         <Grid item className={classes.svgContainer}>
