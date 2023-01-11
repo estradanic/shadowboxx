@@ -7,7 +7,7 @@ import FormControlLabel from "@material-ui/core/FormControlLabel";
 import Switch from "@material-ui/core/Switch";
 import { makeStyles, Theme } from "@material-ui/core/styles";
 import { createHtmlPortalNode, InPortal } from "react-reverse-portal";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { ParseDuplicate, ParseImage } from "../../../classes";
 import { Strings } from "../../../resources";
 import { Notification } from "../../../contexts";
@@ -63,8 +63,13 @@ const DuplicatesNotificationDetail = ({
     [duplicates]
   );
 
-  const { getImagesByIdQueryKey, getImagesByIdFunction, getImagesByIdOptions } =
-    useQueryConfigs();
+  const queryClient = useQueryClient();
+  const {
+    getImagesByIdQueryKey,
+    getImagesByIdFunction,
+    getImagesByIdOptions,
+    getDuplicatesQueryKey,
+  } = useQueryConfigs();
 
   const { data: images } = useQuery<ParseImage[], Error>(
     getImagesByIdQueryKey(imageIds),
@@ -91,6 +96,7 @@ const DuplicatesNotificationDetail = ({
       enqueueErrorSnackbar(Strings.couldNotResolveDuplicates());
     } finally {
       stopGlobalLoader();
+      queryClient.invalidateQueries({ queryKey: [getDuplicatesQueryKey()] });
     }
   };
 
