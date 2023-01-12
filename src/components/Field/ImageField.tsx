@@ -5,7 +5,6 @@ import React, {
   ChangeEventHandler,
   useCallback,
   useRef,
-  useEffect,
 } from "react";
 import InputAdornment from "@material-ui/core/InputAdornment";
 import Avatar from "@material-ui/core/Avatar";
@@ -24,7 +23,6 @@ import Parse from "parse";
 import classNames from "classnames";
 import { createHtmlPortalNode, InPortal } from "react-reverse-portal";
 import { readAndCompressImage } from "browser-image-resizer";
-import { useDebounce } from "use-debounce";
 import { elide, makeValidFileName, removeExtension } from "../../utils";
 import { Strings } from "../../resources";
 import { ParseImage, ParsePointer } from "../../classes";
@@ -229,8 +227,8 @@ const ImageField = memo(
           type: "determinate",
           content: <ProcessingImagesLoaderContent />,
         });
+        // Using setTimeout to prevent the loader from not showing up
         setTimeout(async () => {
-          // allow global loader rerender to happen using setTimeout
           const files = await processFiles(event.target.files!);
           try {
             const newImages = await uploadFiles(files);
@@ -279,26 +277,6 @@ const ImageField = memo(
       () => createHtmlPortalNode(),
       []
     );
-
-    const onWindowFocus = useCallback(() => {
-      setTimeout(() => {
-        // Hopefully the onChange will run before this. Thus the setTimeout.
-        if (selectingImages.current && !inputRef.current?.files?.length) {
-          selectingImages.current = false;
-          stopGlobalLoader();
-        }
-      });
-    }, [stopGlobalLoader, selectingImages]);
-
-    const [onWindowFocusDebounced] = useDebounce(onWindowFocus, 500, {
-      leading: true,
-      trailing: false,
-    });
-
-    useEffect(() => {
-      window.addEventListener("focus", onWindowFocusDebounced);
-      return () => window.removeEventListener("focus", onWindowFocusDebounced);
-    }, [onWindowFocusDebounced]);
 
     return (
       <>
@@ -381,7 +359,6 @@ const ImageField = memo(
                       onClick={() => {
                         selectingImages.current = true;
                         inputRef.current?.click?.();
-                        startGlobalLoader();
                       }}
                     >
                       <Tooltip title={Strings.addFromFile()}>
@@ -487,7 +464,6 @@ const ImageField = memo(
               ref={inputRef}
               onClick={() => {
                 selectingImages.current = true;
-                startGlobalLoader();
               }}
             />
             <Menu open={!!anchorEl} anchorEl={anchorEl} onClose={closeMenu}>
