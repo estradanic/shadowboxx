@@ -43,6 +43,7 @@ const useStyles = makeStyles((theme: Theme) => ({
     transition: theme.transitions.create("bottom"),
     backgroundColor: theme.palette.success.main,
     color: theme.palette.success.contrastText,
+    zIndex: theme.zIndex.speedDial,
   },
   fabVisible: {
     bottom: theme.spacing(7),
