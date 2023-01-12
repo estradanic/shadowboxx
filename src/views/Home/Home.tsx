@@ -1,11 +1,9 @@
 import React, { memo, useMemo, useState } from "react";
-import Fab from "@material-ui/core/Fab";
 import Typography from "@material-ui/core/Typography";
 import Grid from "@material-ui/core/Grid";
 import { makeStyles, Theme } from "@material-ui/core/styles";
 import AddIcon from "@material-ui/icons/Add";
 import { useInfiniteQuery } from "@tanstack/react-query";
-import classNames from "classnames";
 import {
   PageContainer,
   AlbumCard,
@@ -13,13 +11,13 @@ import {
   useSnackbar,
   BlankCanvas,
   AlbumCardSkeleton,
+  Fab,
 } from "../../components";
 import { Strings } from "../../resources";
 import { ParseAlbum } from "../../classes";
 import { useUserContext } from "../../contexts";
 import { useView } from "../View";
 import {
-  useHideOnScroll,
   useInfiniteQueryConfigs,
   useInfiniteScroll,
   useRandomColor,
@@ -27,23 +25,6 @@ import {
 import { DEFAULT_PAGE_SIZE } from "../../constants";
 
 const useStyles = makeStyles((theme: Theme) => ({
-  fab: {
-    backgroundColor: theme.palette.success.main,
-    color: theme.palette.success.contrastText,
-    position: "absolute",
-    right: theme.spacing(4),
-    "&:hover, &:focus, &:active": {
-      backgroundColor: theme.palette.success.dark,
-    },
-    transition: theme.transitions.create("bottom"),
-    zIndex: theme.zIndex.speedDial,
-  },
-  fabVisible: {
-    bottom: theme.spacing(7),
-  },
-  fabHidden: {
-    bottom: theme.spacing(-10),
-  },
   title: {
     marginRight: "auto",
   },
@@ -95,7 +76,6 @@ const Home = memo(() => {
 
   const { getLoggedInUser } = useUserContext();
   const randomColor = useRandomColor();
-  const fabVisible = useHideOnScroll();
 
   return (
     <PageContainer>
@@ -147,13 +127,7 @@ const Home = memo(() => {
           </>
         )}
       </>
-      <Fab
-        onClick={() => setAddAlbumDialogOpen(true)}
-        className={classNames(classes.fab, {
-          [classes.fabVisible]: fabVisible,
-          [classes.fabHidden]: !fabVisible,
-        })}
-      >
+      <Fab onClick={() => setAddAlbumDialogOpen(true)} >
         <AddIcon />
       </Fab>
       <AlbumFormDialog

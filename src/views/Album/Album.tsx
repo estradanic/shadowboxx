@@ -5,6 +5,7 @@ import {
   FancyTitleTypographySkeleton,
   ImagesSkeleton,
   PageContainer,
+  Fab,
   useSnackbar,
 } from "../../components";
 import { useLocation, useParams } from "react-router-dom";
@@ -26,31 +27,11 @@ import {
   useQueryConfigs,
   useInfiniteQueryConfigs,
   useInfiniteScroll,
-  useHideOnScroll,
 } from "../../hooks";
 import { useView } from "../View";
 import OwnerImageDecoration from "../../components/Image/Decoration/OwnerImageDecoration";
-import { Fab } from "@material-ui/core";
-import classNames from "classnames";
 
 const useStyles = makeStyles((theme: Theme) => ({
-  fab: {
-    position: "absolute",
-    right: theme.spacing(4),
-    "&:hover, &:focus, &:active": {
-      backgroundColor: theme.palette.success.dark,
-    },
-    transition: theme.transitions.create("bottom"),
-    backgroundColor: theme.palette.success.main,
-    color: theme.palette.success.contrastText,
-    zIndex: theme.zIndex.speedDial,
-  },
-  fabVisible: {
-    bottom: theme.spacing(7),
-  },
-  fabHidden: {
-    bottom: theme.spacing(-10),
-  },
   svgContainer: {
     textAlign: "center",
   },
@@ -98,7 +79,6 @@ const Album = memo(() => {
   );
   useInfiniteScroll(fetchNextPage, { canExecute: !isFetchingNextPage });
   const [editMode, setEditMode] = useState<boolean>(false);
-  const fabVisible = useHideOnScroll();
   const { enqueueSuccessSnackbar, enqueueErrorSnackbar } = useSnackbar();
 
   const images = useMemo(
@@ -163,13 +143,7 @@ const Album = memo(() => {
             images={images}
             outlineColor={randomColor}
           />
-          <Fab
-            onClick={() => setEditMode(true)}
-            className={classNames(classes.fab, {
-              [classes.fabVisible]: fabVisible,
-              [classes.fabHidden]: !fabVisible,
-            })}
-          >
+          <Fab onClick={() => setEditMode(true)} >
             <EditIcon />
           </Fab>
         </>
