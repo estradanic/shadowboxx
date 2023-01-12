@@ -143,7 +143,7 @@ const Album = memo(() => {
             images={images}
             outlineColor={randomColor}
           />
-          <Fab onClick={() => setEditMode(true)} >
+          <Fab onClick={() => setEditMode(true)}>
             <EditIcon />
           </Fab>
         </>

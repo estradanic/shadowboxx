@@ -1,5 +1,5 @@
 import React from "react";
-import MuiFab, {FabProps as MuiFabProps} from "@material-ui/core/Fab";
+import MuiFab, { FabProps as MuiFabProps } from "@material-ui/core/Fab";
 import { makeStyles, Theme } from "@material-ui/core/styles";
 import classNames from "classnames";
 import { useHideOnScroll } from "../../hooks";
@@ -24,9 +24,9 @@ const useStyles = makeStyles((theme: Theme) => ({
   },
 }));
 
-export interface FabProps extends MuiFabProps { }
+export interface FabProps extends MuiFabProps {}
 
-const Fab = ({children, className, ...rest}: FabProps) => {
+const Fab = ({ children, className, ...rest }: FabProps) => {
   const visible = useHideOnScroll();
   const classes = useStyles();
 

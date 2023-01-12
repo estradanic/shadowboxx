@@ -127,7 +127,7 @@ const Home = memo(() => {
           </>
         )}
       </>
-      <Fab onClick={() => setAddAlbumDialogOpen(true)} >
+      <Fab onClick={() => setAddAlbumDialogOpen(true)}>
         <AddIcon />
       </Fab>
       <AlbumFormDialog
