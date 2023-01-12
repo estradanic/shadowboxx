@@ -7,11 +7,17 @@ export interface StringEntries {
   addFromFile: string;
   addFromLibrary: string;
   addFromUrl: string;
+  addOrEditCaption: string;
+  albumChangeNotificationDetail: string;
+  albumChangeNotificationTitle: string;
   albumNotFound: string;
   alreadyHaveAccount: string;
   appName: string;
+  aUser: string;
   back: string;
   cancel: string;
+  caption: string;
+  captionImage: string;
   checkEmailVerified: string;
   collaborators: string;
   collaboratorsTooltip: string;
@@ -51,6 +57,7 @@ export interface StringEntries {
   getImageError: string;
   getImagesError: string;
   goBack: string;
+  goSee: string;
   home: string;
   ignoreDuplicatesConfirm: string;
   imageNotDeleted: string;
@@ -143,12 +150,20 @@ const Strings: {
   addFromFile: () => "Add from file",
   addFromLibrary: () => "Add from existing library",
   addFromUrl: () => "Add from URL",
+  addOrEditCaption: () => "Add/Edit caption",
+  albumChangeNotificationDetail: (userName: string, albumName: string) =>
+    `${userName} changed ${albumName}`,
+  albumChangeNotificationTitle: (count: number) =>
+    `${count} album change${count > 1 ? "s" : ""} to see!`,
   albumNotFound: (album: string) =>
     `Album not found${album ? ` (${album})` : ""}`,
   alreadyHaveAccount: () => "Already have an account?",
   appName: () => "Shadowboxx",
+  aUser: () => "User",
   back: () => "Back",
   cancel: () => "Cancel",
+  caption: () => "Caption",
+  captionImage: () => "Caption Image",
   checkEmailVerified: () => "Check Verification Status",
   collaborators: () => "Collaborators",
   collaboratorsTooltip: () =>
@@ -201,6 +216,7 @@ const Strings: {
   getImageError: () => `${Strings.commonError()} Could not get image.`,
   getImagesError: () => `${Strings.commonError()} Could not get images.`,
   goBack: () => "Go Back",
+  goSee: () => "Go See",
   home: () => "Home",
   ignoreDuplicatesConfirm: () => "Are you sure? This action is irreversible.",
   imageNotDeleted: (image: string) =>
@@ -261,7 +277,7 @@ const Strings: {
     `Could not remove image ${fileName} from album.`,
   resolve: () => "Resolve",
   resolveDuplicates: () => "Resolve Duplicates",
-  processingImages: () => "Processing Images...",
+  processingImages: () => "Processing...",
   selectImages: () => "Select Images",
   sessionExpired: () => "Session Expired. Please log in again.",
   setImageAsCover: () => "Set this image as the album cover",
@@ -279,7 +295,7 @@ const Strings: {
   uploadImageError: (fileName?: string) =>
     `Error uploading image${fileName ? ` ${fileName}` : ""}.`,
   uploadingImage: (fileName: string) => `Uploading image (${fileName})`,
-  uploadingImages: () => "Uploading images...",
+  uploadingImages: () => "Uploading...",
   verifyEmail: (email: string) =>
     `Please check ${email} for the verification message, then return here.`,
   viewers: () => "Viewers",

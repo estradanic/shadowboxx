@@ -1,15 +1,23 @@
-import React, { memo, useMemo } from "react";
+import React, { memo, useCallback, useMemo, useState } from "react";
 import {
+  AlbumFormDialog,
   BackButton,
   FancyTitleTypographySkeleton,
   ImagesSkeleton,
   PageContainer,
+  Fab,
+  useSnackbar,
 } from "../../components";
 import { useLocation, useParams } from "react-router-dom";
 import Grid from "@material-ui/core/Grid";
 import Typography from "@material-ui/core/Typography";
-import { makeStyles } from "@material-ui/core/styles";
-import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
+import { makeStyles, Theme } from "@material-ui/core/styles";
+import EditIcon from "@material-ui/icons/Edit";
+import {
+  useInfiniteQuery,
+  useQuery,
+  useQueryClient,
+} from "@tanstack/react-query";
 import { Strings } from "../../resources";
 import { ParseImage, ParseAlbum } from "../../classes";
 import { FancyTitleTypography, Void, Images } from "../../components";
@@ -21,8 +29,9 @@ import {
   useInfiniteScroll,
 } from "../../hooks";
 import { useView } from "../View";
+import OwnerImageDecoration from "../../components/Image/Decoration/OwnerImageDecoration";
 
-const useStyles = makeStyles(() => ({
+const useStyles = makeStyles((theme: Theme) => ({
   svgContainer: {
     textAlign: "center",
   },
@@ -47,6 +56,7 @@ const Album = memo(() => {
     getImagesByIdInfiniteQueryKey,
     getImagesByIdInfiniteOptions,
   } = useInfiniteQueryConfigs();
+  const queryClient = useQueryClient();
   const { data: album, status: albumStatus } = useQuery<ParseAlbum, Error>(
     getAlbumQueryKey(id),
     () => getAlbumFunction(id, { showErrorsInSnackbar: true }),
@@ -68,10 +78,30 @@ const Album = memo(() => {
     getImagesByIdInfiniteOptions({ enabled: !!album?.images })
   );
   useInfiniteScroll(fetchNextPage, { canExecute: !isFetchingNextPage });
+  const [editMode, setEditMode] = useState<boolean>(false);
+  const { enqueueSuccessSnackbar, enqueueErrorSnackbar } = useSnackbar();
 
   const images = useMemo(
     () => data?.pages?.flatMap((page) => page),
-    [data?.pages]
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [data?.pages?.length]
+  );
+
+  const getImageDecorations = useCallback(async (image: ParseImage) => {
+    return [
+      <OwnerImageDecoration
+        UserAvatarProps={{
+          UseUserInfoParams: { userPointer: image.owner },
+        }}
+      />,
+    ];
+  }, []);
+
+  const getImageCaption = useCallback(
+    async (image: ParseImage) => {
+      return album?.captions?.[image.id!] ?? "";
+    },
+    [album?.captions]
   );
 
   return (
@@ -83,16 +113,39 @@ const Album = memo(() => {
         </>
       ) : albumStatus === "success" && album ? (
         <>
+          <AlbumFormDialog
+            resetOnConfirm
+            value={album.attributes}
+            open={editMode}
+            handleCancel={() => setEditMode(false)}
+            handleConfirm={async (attributes, changes) => {
+              setEditMode(false);
+              try {
+                const newAlbum = await album.update(attributes, changes);
+                queryClient.setQueryData(getAlbumQueryKey(id), newAlbum);
+                enqueueSuccessSnackbar(Strings.commonSaved());
+              } catch (error: any) {
+                enqueueErrorSnackbar(
+                  error?.message ?? Strings.editAlbumError()
+                );
+              }
+            }}
+          />
           <Grid item sm={8}>
             <FancyTitleTypography outlineColor={randomColor}>
               {album.name}
             </FancyTitleTypography>
           </Grid>
           <Images
+            getDecorations={getImageDecorations}
+            getCaption={getImageCaption}
             status={imagesStatus}
             images={images}
             outlineColor={randomColor}
           />
+          <Fab onClick={() => setEditMode(true)}>
+            <EditIcon />
+          </Fab>
         </>
       ) : (
         <Grid item className={classes.svgContainer}>

@@ -4,6 +4,7 @@ import React, {
   useMemo,
   ChangeEventHandler,
   useCallback,
+  useRef,
 } from "react";
 import InputAdornment from "@material-ui/core/InputAdornment";
 import Avatar from "@material-ui/core/Avatar";
@@ -22,12 +23,7 @@ import Parse from "parse";
 import classNames from "classnames";
 import { createHtmlPortalNode, InPortal } from "react-reverse-portal";
 import { readAndCompressImage } from "browser-image-resizer";
-import {
-  elide,
-  makeValidFileName,
-  removeExtension,
-  uniqueId,
-} from "../../utils";
+import { elide, makeValidFileName, removeExtension } from "../../utils";
 import { Strings } from "../../resources";
 import { ParseImage, ParsePointer } from "../../classes";
 import { useRandomColor, useRefState } from "../../hooks";
@@ -41,6 +37,7 @@ import RemoveImageDecoration from "../Image/Decoration/RemoveImageDecoration";
 import CoverImageDecoration from "../Image/Decoration/CoverImageDecoration";
 import { useActionDialogContext } from "../Dialog/ActionDialog";
 import { FancyTypography } from "../Typography";
+import { CaptionImageDecoration } from "../Image";
 
 const useStyles = makeStyles((theme: Theme) => ({
   endAdornment: {
@@ -79,8 +76,6 @@ const useStyles = makeStyles((theme: Theme) => ({
   },
 }));
 
-export type ImageFieldOnChangeReason = "REMOVE" | "ADD";
-
 /** Interface defining props for ImageField */
 export type ImageFieldProps = Omit<
   TextFieldProps,
@@ -88,29 +83,51 @@ export type ImageFieldProps = Omit<
 > & {
   /** Value of the field, array of Images */
   value: ParseImage[];
-  /** Function to run when the value changes */
-  onChange: (
-    value: ParseImage[],
-    reason: ImageFieldOnChangeReason
-  ) => Promise<void>;
+  /** Function to run when an image is added */
+  onAdd: (...image: ParseImage[]) => Promise<void> | void;
   /** Whether multiple images can be selected or not */
   multiple?: boolean;
   /** ACL to save new images with after upload */
   acl?: Parse.ACL;
-  /** Variant for how to display the field */
-  variant?: "button" | "field";
   /** Props to pass to the IconButton when variant=="button" */
   ButtonProps?: IconButtonProps;
   /** Cover image for the album */
-  coverImage?: ParsePointer;
+  coverImage?: ParsePointer<"Image">;
   /** Function to set coverImage */
-  setCoverImage?: (newCoverImage: ParsePointer) => void;
+  setCoverImage?: (newCoverImage: ParsePointer<"Image">) => void;
+  /** Function to set caption on an image */
+  setCaption?: (image: ParseImage, caption: string) => void;
+  /** Function to get caption for an image */
+  getCaption?: (image: ParseImage) => string;
+} & (
+    | {
+        /** Function to run when an image is removed */
+        onRemove: (...image: ParseImage[]) => Promise<void> | void;
+        /** Variant for how to display the field */
+        variant?: "field";
+      }
+    | {
+        /** Function to run when an image is removed */
+        onRemove?: never;
+        /** Variant for how to display the field */
+        variant: "button";
+      }
+  );
+
+const ProcessingImagesLoaderContent = () => {
+  const classes = useStyles();
+  return (
+    <FancyTypography className={classes.resizingImages}>
+      {Strings.processingImages()}
+    </FancyTypography>
+  );
 };
 
 /** Component to input images from the filesystem or online */
 const ImageField = memo(
   ({
-    onChange: piOnChange,
+    onAdd,
+    onRemove,
     label,
     value = [],
     multiple = false,
@@ -120,6 +137,8 @@ const ImageField = memo(
     disabled,
     coverImage,
     setCoverImage,
+    getCaption,
+    setCaption,
     ...rest
   }: ImageFieldProps) => {
     const classes = useStyles();
@@ -133,95 +152,95 @@ const ImageField = memo(
         stopGlobalLoader: state.stopGlobalLoader,
       })
     );
-
+    const selectingImages = useRef<boolean>(false);
     const { getLoggedInUser } = useUserContext();
 
     const [anchorEl, setAnchorEl] = useState<Element>();
     const closeMenu = () => setAnchorEl(undefined);
 
-    const inputId = uniqueId("profile-pic-input");
-    const urlInputId = uniqueId("image-url-input");
-
     const { enqueueErrorSnackbar } = useSnackbar();
 
     const randomColor = useRandomColor();
 
-    const onChange = useCallback(
-      async (newValue: ParseImage[], reason: ImageFieldOnChangeReason) => {
-        await piOnChange(Array.from(new Set(newValue)), reason);
-      },
-      [piOnChange]
-    );
-
     const { openPrompt } = useActionDialogContext();
+
+    const inputRef = useRef<HTMLInputElement>(null);
+    const urlInputRef = useRef<HTMLInputElement>(null);
 
     const selectFromLibrary = useCallback(() => {
       promptImageSelectionDialog({
-        handleConfirm: async (newValue) =>
-          await onChange(multiple ? [...value, ...newValue] : newValue, "ADD"),
+        handleConfirm: async (toAdd) => await onAdd(...toAdd),
         alreadySelected: value,
         multiple,
       });
-    }, [promptImageSelectionDialog, value, onChange, multiple]);
+    }, [promptImageSelectionDialog, value, onAdd, multiple]);
+
+    const processFiles = async (eventFiles: FileList) => {
+      const files: File[] = [];
+      for (let i = 0; i < eventFiles.length; i++) {
+        files[i] = eventFiles[i];
+      }
+      const max = multiple ? files.length : 1;
+      const resizeImagePromises: Promise<File>[] = [];
+      for (let i = 0; i < max; i++) {
+        let file = files[i];
+        if (file.size > 15000000) {
+          resizeImagePromises.push(
+            readAndCompressImage(file, {
+              quality: 1,
+              maxWidth: 2400,
+              maxHeight: 2400,
+              mimeType: "image/webp",
+            })
+          );
+        } else {
+          resizeImagePromises.push(Promise.resolve(file));
+        }
+      }
+      return await Promise.all(resizeImagePromises);
+    };
+
+    const uploadFiles = async (files: File[]) => {
+      const max = multiple ? files.length : 1;
+      const newImagePromises: Promise<ParseImage>[] = [];
+      for (let i = 0; i < max; i++) {
+        let file = files[i];
+        const fileName = makeValidFileName(files[i].name);
+        const parseFile = new Parse.File(fileName, file);
+        newImagePromises.push(
+          uploadImage(
+            {
+              file: parseFile,
+              owner: getLoggedInUser().toPointer(),
+              name: removeExtension(fileName),
+            },
+            acl
+          )
+        );
+      }
+      return Promise.all(newImagePromises);
+    };
 
     const addFromFile: ChangeEventHandler<HTMLInputElement> = async (event) => {
       if (event.target.files?.[0]) {
         startGlobalLoader({
-          type: "indeterminate",
-          content: (
-            <FancyTypography className={classes.resizingImages}>
-              {Strings.processingImages()}
-            </FancyTypography>
-          ),
+          type: "determinate",
+          content: <ProcessingImagesLoaderContent />,
         });
-        let files: File[] = [];
-        const fileNames: string[] = [];
-        for (let i = 0; i < event.target.files.length; i++) {
-          files[i] = event.target.files[i];
-          fileNames[i] = event.target.files[i].name;
-        }
-        const max = multiple ? files.length : 1;
-        const resizeImagePromises: Promise<File>[] = [];
-        for (let i = 0; i < max; i++) {
-          let file = files[i];
-          if (file.size > 15000000) {
-            resizeImagePromises.push(
-              readAndCompressImage(file, {
-                quality: 1,
-                maxWidth: 2400,
-                maxHeight: 2400,
-                mimeType: "image/webp",
-              })
-            );
-          } else {
-            resizeImagePromises.push(Promise.resolve(file));
+        // Using setTimeout to prevent the loader from not showing up
+        setTimeout(async () => {
+          const files = await processFiles(event.target.files!);
+          try {
+            const newImages = await uploadFiles(files);
+            await onAdd(...newImages);
+          } catch (error: any) {
+            enqueueErrorSnackbar(error?.message ?? Strings.uploadImageError());
+          } finally {
+            // Clear the input so that the same file can be uploaded again
+            event.target.value = "";
+            stopGlobalLoader();
           }
-        }
-        files = await Promise.all(resizeImagePromises);
-        stopGlobalLoader();
-        const newImagePromises: Promise<ParseImage>[] = [];
-        for (let i = 0; i < max; i++) {
-          let file = files[i];
-          const fileName = makeValidFileName(fileNames[i]);
-          const parseFile = new Parse.File(fileName, file);
-          newImagePromises.push(
-            uploadImage(
-              {
-                file: parseFile,
-                owner: getLoggedInUser().toPointer(),
-                name: removeExtension(fileName),
-              },
-              acl
-            )
-          );
-        }
-        try {
-          const newImages = await Promise.all(newImagePromises);
-          const newValue = multiple ? [...value, ...newImages] : newImages;
-          await onChange(newValue, "ADD");
-        } catch (error: any) {
-          enqueueErrorSnackbar(error?.message ?? Strings.uploadImageError());
-        }
+        }, 10);
       }
     };
 
@@ -239,8 +258,7 @@ const ImageField = memo(
           },
           acl
         );
-        const newValue = multiple ? [...value, newImage] : [newImage];
-        await onChange(newValue, "ADD");
+        await onAdd(newImage);
       } catch (error: any) {
         enqueueErrorSnackbar(
           error?.message ?? Strings.uploadImageError(fileName)
@@ -252,7 +270,7 @@ const ImageField = memo(
 
     const openUrlInput = () => {
       setShowUrlInput(true);
-      document.getElementById(urlInputId)?.focus();
+      urlInputRef.current?.focus?.();
     };
 
     const dialogImageUrlInputPortalNode = useMemo(
@@ -266,8 +284,8 @@ const ImageField = memo(
           <>
             <TextField // Url src input
               style={{ display: showUrlInput ? "inherit" : "none" }}
-              id={urlInputId}
-              inputRef={(input) => input && input.focus()}
+              ref={urlInputRef}
+              inputRef={(input) => input && input.focus()} // Focus on mount
               fullWidth
               onChange={(event) => setImageUrl(event.target.value)}
               onKeyPress={(event) => {
@@ -303,7 +321,6 @@ const ImageField = memo(
             />
             <TextField // Main input
               className={classes.main}
-              id={inputId}
               style={{ display: showUrlInput ? "none" : "inherit" }}
               onChange={addFromFile}
               fullWidth
@@ -311,6 +328,7 @@ const ImageField = memo(
                 accept: "image/*",
                 multiple,
                 className: classes.input,
+                ref: inputRef,
               }}
               type="file"
               label={label}
@@ -338,7 +356,10 @@ const ImageField = memo(
                     <InputAdornment
                       disablePointerEvents={disabled}
                       position="end"
-                      onClick={() => document.getElementById(inputId)?.click()}
+                      onClick={() => {
+                        selectingImages.current = true;
+                        inputRef.current?.click?.();
+                      }}
                     >
                       <Tooltip title={Strings.addFromFile()}>
                         <AddAPhotoIcon className={classes.endAdornment} />
@@ -351,7 +372,7 @@ const ImageField = memo(
                       >
                         <Avatar
                           className={classes.endAdornmentAvatar}
-                          src={value[0].fileThumb.url()}
+                          src={value[0].fileThumb?.url?.()}
                           alt={value[0].name}
                         />
                       </InputAdornment>
@@ -378,13 +399,18 @@ const ImageField = memo(
                   const imageDecorations = [
                     <RemoveImageDecoration
                       onClick={async () => {
-                        const newValue = value.filter(
-                          (valueImage) => image.id !== valueImage.id
-                        );
-                        await onChange(newValue, "REMOVE");
+                        await onRemove!(image);
                       }}
                     />,
                   ];
+                  if (getCaption && setCaption) {
+                    imageDecorations.push(
+                      <CaptionImageDecoration
+                        initialCaption={getCaption(image)}
+                        onConfirm={(caption) => setCaption(image, caption)}
+                      />
+                    );
+                  }
                   if (coverImage) {
                     const checked = coverImage.id === image.id;
                     imageDecorations.push(
@@ -430,20 +456,21 @@ const ImageField = memo(
               />
             </InPortal>
             <input
-              id={inputId}
               type="file"
               style={{ display: "none" }}
               onChange={addFromFile}
               accept="image/*"
               multiple={multiple}
+              ref={inputRef}
+              onClick={() => {
+                selectingImages.current = true;
+              }}
             />
             <Menu open={!!anchorEl} anchorEl={anchorEl} onClose={closeMenu}>
               <MenuItem onClick={selectFromLibrary}>
                 {Strings.addFromLibrary()}
               </MenuItem>
-              <MenuItem
-                onClick={() => document.getElementById(inputId)?.click()}
-              >
+              <MenuItem onClick={() => inputRef.current?.click?.()}>
                 {Strings.addFromFile()}
               </MenuItem>
               <MenuItem

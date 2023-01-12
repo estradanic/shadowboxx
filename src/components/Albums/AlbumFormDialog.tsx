@@ -1,20 +1,20 @@
-import React, { useCallback, useMemo, useState } from "react";
-import Parse from "parse";
+import React, { useMemo } from "react";
 import { useTheme } from "@material-ui/core/styles";
 import Grid from "@material-ui/core/Grid";
 import useMediaQuery from "@material-ui/core/useMediaQuery";
 import { useInfiniteQuery } from "@tanstack/react-query";
 import { Strings } from "../../resources";
-import { dedupe, ErrorState, isNullOrWhitespace, uniqueId } from "../../utils";
+import { uniqueId } from "../../utils";
 import { ImageContextProvider, useUserContext } from "../../contexts";
-import { ParseUser, ParseImage, Album } from "../../classes";
-import { useInfiniteScroll, useInfiniteQueryConfigs } from "../../hooks";
-import ActionDialog, {
-  ActionDialogProps,
-  useActionDialogContext,
-} from "../Dialog/ActionDialog";
+import { ParseImage, AlbumAttributes } from "../../classes";
+import {
+  useInfiniteScroll,
+  useInfiniteQueryConfigs,
+  useAlbumForm,
+  UseAlbumFormOptions,
+} from "../../hooks";
+import ActionDialog, { ActionDialogProps } from "../Dialog/ActionDialog";
 import ImageField from "../Field/ImageField";
-import { useSnackbar } from "../Snackbar/Snackbar";
 import UserField from "../Field/UserField";
 import TextField from "../Field/TextField";
 import Tooltip from "../Tooltip/Tooltip";
@@ -24,9 +24,9 @@ import { DEFAULT_PAGE_SIZE } from "../../constants";
 export interface AlbumFormDialogProps
   extends Pick<ActionDialogProps, "open" | "handleCancel"> {
   /** Value for the component */
-  value: Album;
+  value: AlbumAttributes;
   /** Function to run when the confirm button is clicked */
-  handleConfirm: (value: Album) => Promise<void>;
+  handleConfirm: UseAlbumFormOptions["onSubmit"];
   /** Whether to reset dialog state when confirm button is clicked */
   resetOnConfirm?: boolean;
 }
@@ -40,18 +40,31 @@ const AlbumFormDialog = ({
   resetOnConfirm = true,
 }: AlbumFormDialogProps) => {
   const id = uniqueId("album-form-dialog-content");
-  const [imageIds, setImageIds] = useState<Album["images"]>(value.images);
-  const [coverImage, setCoverImage] = useState<Album["coverImage"]>(
-    value.coverImage
-  );
-  const [name, setName] = useState<Album["name"]>(value.name);
-  const [description, setDescription] = useState<Album["description"]>(
-    value.description
-  );
-  const [collaborators, setCollaborators] = useState<Album["collaborators"]>(
-    value.collaborators
-  );
-  const [viewers, setViewers] = useState<Album["viewers"]>(value.viewers);
+  const {
+    allImageIds,
+    removedImageIds,
+    coverImage,
+    name,
+    description,
+    collaborators,
+    viewers,
+    captions,
+    errors,
+    onSubmit,
+    onCancel,
+    onAdd,
+    onRemove,
+    setCoverImage,
+    setName,
+    setDescription,
+    setCollaborators,
+    setViewers,
+    setCaptions,
+  } = useAlbumForm(value, {
+    onSubmit: piHandleConfirm,
+    onCancel: piHandleCancel,
+    resetOnSubmit: resetOnConfirm,
+  });
 
   const {
     getImagesByIdInfiniteOptions,
@@ -62,9 +75,9 @@ const AlbumFormDialog = ({
     ParseImage[],
     Error
   >(
-    getImagesByIdInfiniteQueryKey(imageIds),
+    getImagesByIdInfiniteQueryKey(allImageIds),
     ({ pageParam: page = 0 }) =>
-      getImagesByIdInfiniteFunction(imageIds, {
+      getImagesByIdInfiniteFunction(allImageIds, {
         showErrorsInSnackbar: true,
         page,
         pageSize: DEFAULT_PAGE_SIZE,
@@ -72,6 +85,8 @@ const AlbumFormDialog = ({
     getImagesByIdInfiniteOptions({
       refetchOnWindowFocus: false,
       enabled: open,
+      staleTime: 0,
+      keepPreviousData: true,
     })
   );
   useInfiniteScroll(fetchNextPage, {
@@ -89,100 +104,8 @@ const AlbumFormDialog = ({
     [getLoggedInUser, value.owner?.id]
   );
 
-  const defaultErrors = useMemo(
-    () => ({
-      name: {
-        isError: false,
-        errorMessage: "",
-      },
-    }),
-    []
-  );
-  const [errors, setErrors] = useState<ErrorState<"name">>(defaultErrors);
-
-  const reinitialize = useCallback(() => {
-    setName(value.name);
-    setDescription(value.description);
-    setCollaborators(value.collaborators);
-    setViewers(value.viewers);
-    setErrors(defaultErrors);
-  }, [
-    setName,
-    setDescription,
-    setCollaborators,
-    setViewers,
-    setErrors,
-    value,
-    defaultErrors,
-  ]);
-  const { enqueueErrorSnackbar } = useSnackbar();
-
   const theme = useTheme();
   const sm = useMediaQuery(theme.breakpoints.down("sm"));
-  const { openConfirm } = useActionDialogContext();
-
-  const validate = () => {
-    const errors = defaultErrors;
-    let valid = true;
-    if (isNullOrWhitespace(name)) {
-      errors.name = {
-        isError: true,
-        errorMessage: Strings.pleaseEnterA("name"),
-      };
-      valid = false;
-    }
-    let errorMessage = "";
-    Object.values(errors).forEach((error) => {
-      if (error.isError) {
-        errorMessage += error.errorMessage + "\n";
-      }
-    });
-    if (!valid) {
-      setErrors(errors);
-      enqueueErrorSnackbar(errorMessage);
-    }
-    return valid;
-  };
-
-  const handleConfirm = async () => {
-    if (validate()) {
-      const userEmails = new Set([...viewers, ...collaborators]);
-      const signedUpUserCount = await new Parse.Query("User")
-        .containedIn(ParseUser.COLUMNS.email, [...viewers, ...collaborators])
-        .count();
-      if (signedUpUserCount < userEmails.size) {
-        openConfirm(Strings.nonExistentUserWarning(), async () => {
-          await piHandleConfirm({
-            ...value,
-            images: imageIds,
-            name,
-            description,
-            collaborators,
-            viewers,
-            coverImage,
-          });
-        });
-      } else {
-        await piHandleConfirm({
-          ...value,
-          images: imageIds,
-          name,
-          description,
-          collaborators,
-          viewers,
-          coverImage,
-        });
-      }
-      if (resetOnConfirm) {
-        reinitialize();
-      }
-    }
-  };
-
-  const handleCancel = () => {
-    reinitialize();
-    piHandleCancel?.();
-  };
 
   return (
     <ActionDialog
@@ -192,8 +115,8 @@ const AlbumFormDialog = ({
       open={open}
       title={name ?? Strings.untitledAlbum()}
       message=""
-      handleConfirm={handleConfirm}
-      handleCancel={handleCancel}
+      handleConfirm={onSubmit}
+      handleCancel={onCancel}
       type="prompt"
       confirmButtonColor="success"
       DialogContentProps={{ id }}
@@ -249,38 +172,27 @@ const AlbumFormDialog = ({
         <Grid item xs={12}>
           <ImageContextProvider>
             <ImageField
+              getCaption={(image) => captions[image.id!]}
+              setCaption={(image, caption) => {
+                setCaptions((captions) => ({
+                  ...captions,
+                  [image.id!]: caption,
+                }));
+              }}
               coverImage={coverImage ?? images?.[0]?.toPointer()}
               setCoverImage={setCoverImage}
               label={Strings.images()}
               multiple
-              value={images ?? []}
-              onChange={async (value, reason) => {
-                let newImageIds = imageIds;
-                switch (reason) {
-                  case "ADD":
-                    newImageIds = dedupe<string>([
-                      ...imageIds,
-                      ...value
-                        .filter((newImage) => !!newImage.id)
-                        .map((newImage) => newImage.id!),
-                    ]);
-                    break;
-                  case "REMOVE":
-                    const removedImages =
-                      images?.filter(
-                        (image) =>
-                          !value
-                            .map((newImage) => newImage.id)
-                            .includes(image.id)
-                      ) ?? [];
-                    newImageIds = imageIds.filter(
-                      (imageId) =>
-                        !removedImages
-                          .map((removedImage) => removedImage.id)
-                          .includes(imageId)
-                    );
-                }
-                setImageIds(newImageIds);
+              value={
+                images?.filter?.(
+                  (image) => !removedImageIds.includes(image.id!)
+                ) ?? []
+              }
+              onRemove={async (...images) => {
+                await onRemove(...images.map((image) => image.id!));
+              }}
+              onAdd={async (...images) => {
+                await onAdd(...images.map((image) => image.id!));
               }}
             />
           </ImageContextProvider>

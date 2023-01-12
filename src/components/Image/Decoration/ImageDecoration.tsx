@@ -1,7 +1,9 @@
-import React from "react";
+import React, {
+  ForwardRefExoticComponent,
+  MouseEventHandler,
+  ReactNode,
+} from "react";
 import { makeStyles, Theme } from "@material-ui/core/styles";
-import { SvgIconProps, SvgIconTypeMap } from "@material-ui/core/SvgIcon";
-import { OverridableComponent } from "@material-ui/core/OverridableComponent";
 import classNames from "classnames";
 import Tooltip from "../../Tooltip/Tooltip";
 
@@ -9,7 +11,10 @@ const useStyles = makeStyles((theme: Theme) => ({
   root: {
     position: "absolute",
     cursor: "pointer",
-    zIndex: theme.zIndex.tooltip,
+    zIndex: theme.zIndex.mobileStepper,
+    "& > svg": {
+      height: "100%",
+    },
   },
   top: {
     top: theme.spacing(0),
@@ -25,20 +30,25 @@ const useStyles = makeStyles((theme: Theme) => ({
   },
 }));
 
-export interface ImageDecorationProps extends SvgIconProps {
-  IconComponent: OverridableComponent<SvgIconTypeMap>;
+export interface ImageDecorationProps<P> {
+  Component: ForwardRefExoticComponent<P>;
+  ComponentProps: P;
   corner: "topLeft" | "bottomLeft" | "topRight" | "bottomRight";
-  description: string;
+  description?: string;
+  className?: string;
+  children?: ReactNode;
+  onClick?: MouseEventHandler;
 }
 
-const ImageDecoration = ({
-  IconComponent,
+const ImageDecoration = <P,>({
+  Component,
+  ComponentProps,
   corner,
   description,
+  className: piClassName,
   children,
-  className: userClassName,
   ...rest
-}: ImageDecorationProps) => {
+}: ImageDecorationProps<P>) => {
   const classes = useStyles();
   const cornerClasses = [];
   if (corner.includes("top")) {
@@ -51,14 +61,18 @@ const ImageDecoration = ({
   } else {
     cornerClasses.push(classes.left);
   }
-  const className = classNames(...cornerClasses, userClassName, classes.root);
+  const className = classNames(...cornerClasses, classes.root, piClassName);
 
-  return (
+  return description ? (
     <Tooltip title={description}>
-      <IconComponent className={className} {...rest}>
+      <Component {...rest} {...ComponentProps} className={className}>
         {children}
-      </IconComponent>
+      </Component>
     </Tooltip>
+  ) : (
+    <Component {...rest} {...ComponentProps} className={className}>
+      {children}
+    </Component>
   );
 };
 

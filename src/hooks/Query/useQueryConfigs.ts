@@ -7,10 +7,12 @@ import {
   ParseImage,
   ParseUser,
   ParseDuplicate,
+  ParseAlbumChangeNotification,
 } from "../../classes";
 import useQueryConfigHelpers, {
   FunctionOptions,
 } from "./useQueryConfigHelpers";
+import QueryCacheGroups from "./QueryCacheGroups";
 
 export type QueryOptionsFunction<TData> = (
   options?: Partial<QueryObserverOptions<TData, Error>>
@@ -25,7 +27,7 @@ const useQueryConfigs = () => {
   const { online } = useNetworkDetectionContext();
   const { runFunctionInTryCatch } = useQueryConfigHelpers();
 
-  const getAllAlbumsQueryKey = () => ["GET_ALL_ALBUMS"];
+  const getAllAlbumsQueryKey = () => [QueryCacheGroups.GET_ALL_ALBUMS];
   const getAllAlbumsOptions: QueryOptionsFunction<ParseAlbum[]> = (
     options = {}
   ) => ({
@@ -44,7 +46,7 @@ const useQueryConfigs = () => {
     );
   };
 
-  const getAllImagesQueryKey = () => ["GET_ALL_IMAGES"];
+  const getAllImagesQueryKey = () => [QueryCacheGroups.GET_ALL_IMAGES];
   const getAllImagesOptions: QueryOptionsFunction<ParseImage[]> = (
     options = {}
   ) => ({
@@ -63,7 +65,10 @@ const useQueryConfigs = () => {
     );
   };
 
-  const getAlbumQueryKey = (albumId?: string) => ["GET_ALBUM", albumId];
+  const getAlbumQueryKey = (albumId?: string) => [
+    QueryCacheGroups.GET_ALBUM,
+    albumId,
+  ];
   const getAlbumOptions: QueryOptionsFunction<ParseAlbum> = (options = {}) => ({
     refetchInterval: 5 * 60 * 1000,
     ...options,
@@ -85,7 +90,7 @@ const useQueryConfigs = () => {
   };
 
   const getImagesByIdQueryKey = (imageIds: string[]) => [
-    "GET_IMAGES_BY_ID",
+    QueryCacheGroups.GET_IMAGES_BY_ID,
     imageIds,
   ];
   const getImagesByIdOptions: QueryOptionsFunction<ParseImage[]> = (
@@ -110,7 +115,7 @@ const useQueryConfigs = () => {
   };
 
   const getImageByIdQueryKey = (imageId: string) => [
-    "GET_IMAGE_BY_ID",
+    QueryCacheGroups.GET_IMAGE_BY_ID,
     imageId,
   ];
   const getImageByIdOptions: QueryOptionsFunction<ParseImage> = (
@@ -141,7 +146,7 @@ const useQueryConfigs = () => {
   };
 
   const getImagesByOwnerQueryKey = (owner: ParseUser) => [
-    "GET_IMAGE_BY_OWNER",
+    QueryCacheGroups.GET_IMAGES_BY_OWNER,
     owner.id,
   ];
   const getImagesByOwnerOptions: QueryOptionsFunction<ParseImage[]> = (
@@ -167,7 +172,10 @@ const useQueryConfigs = () => {
     );
   };
 
-  const getUserByIdQueryKey = (userId: string) => ["GET_USER_BY_ID", userId];
+  const getUserByIdQueryKey = (userId: string) => [
+    QueryCacheGroups.GET_USER_BY_ID,
+    userId,
+  ];
   const getUserByIdOptions: QueryOptionsFunction<ParseUser> = (
     options = {}
   ) => ({
@@ -191,7 +199,7 @@ const useQueryConfigs = () => {
   };
 
   const getUsersByEmailQueryKey = (emails: string[]) => [
-    "GET_USERS_BY_EMAIL",
+    QueryCacheGroups.GET_USERS_BY_EMAIL,
     emails,
   ];
   const getUsersByEmailOptions: QueryOptionsFunction<ParseUser[]> = (
@@ -217,7 +225,7 @@ const useQueryConfigs = () => {
   };
 
   const getUserByEmailQueryKey = (email: string) => [
-    "GET_USER_BY_EMAIL",
+    QueryCacheGroups.GET_USER_BY_EMAIL,
     email,
   ];
   const getUserByEmailOptions: QueryOptionsFunction<ParseUser> = (
@@ -247,7 +255,9 @@ const useQueryConfigs = () => {
     );
   };
 
-  const getRelatedUserEmailsQueryKey = () => ["GET_RELATED_USER_EMAILS"];
+  const getRelatedUserEmailsQueryKey = () => [
+    QueryCacheGroups.GET_RELATED_USER_EMAILS,
+  ];
   const getRelatedUserEmailsOptions: QueryOptionsFunction<string[]> = (
     options = {}
   ) => ({
@@ -301,7 +311,7 @@ const useQueryConfigs = () => {
     );
   };
 
-  const getDuplicatesQueryKey = () => ["GET_DUPLICATES"];
+  const getDuplicatesQueryKey = () => [QueryCacheGroups.GET_DUPLICATES];
   const getDuplicatesOptions: QueryOptionsFunction<ParseDuplicate[]> = (
     options = {}
   ) => ({
@@ -314,17 +324,55 @@ const useQueryConfigs = () => {
   ): Promise<ParseDuplicate[]> => {
     return await runFunctionInTryCatch<ParseDuplicate[]>(
       async () => {
-        const duplicates = await ParseDuplicate.query(online)
-          .equalTo(ParseDuplicate.COLUMNS.acknowledged, false)
-          .ascending(ParseDuplicate.COLUMNS.createdAt)
-          .find();
+        const duplicates = await Parse.Query.or(
+          ParseDuplicate.query(online).equalTo(
+            ParseDuplicate.COLUMNS.acknowledged,
+            false
+          ),
+          ParseDuplicate.query(online).doesNotExist(
+            ParseDuplicate.COLUMNS.acknowledged
+          )
+        ).findAll();
         return duplicates.map((duplicate) => new ParseDuplicate(duplicate));
       },
       { errorMessage: Strings.couldNotGetDuplicates(), ...options }
     );
   };
 
+  const getAlbumChangeNotificationsQueryKey = () => [
+    QueryCacheGroups.GET_ALBUM_CHANGE_NOTIFICATIONS,
+  ];
+  const getAlbumChangeNotificationsOptions: QueryOptionsFunction<
+    ParseAlbumChangeNotification[]
+  > = (options = {}) => ({
+    refetchOnWindowFocus: false,
+    refetchInterval: 5 * 60 * 1000,
+    ...options,
+  });
+  const getAlbumChangeNotificationsFunction = async (
+    options: FunctionOptions = {}
+  ): Promise<ParseAlbumChangeNotification[]> => {
+    return await runFunctionInTryCatch<ParseAlbumChangeNotification[]>(
+      async () => {
+        const albumChangeNotifications =
+          await ParseAlbumChangeNotification.query(online)
+            .notEqualTo("user", getLoggedInUser().toNativePointer())
+            .greaterThan(ParseAlbumChangeNotification.COLUMNS.count, 0)
+            .ascending(ParseAlbumChangeNotification.COLUMNS.createdAt)
+            .find();
+        return albumChangeNotifications.map(
+          (albumChangeNotification) =>
+            new ParseAlbumChangeNotification(albumChangeNotification)
+        );
+      },
+      { errorMessage: Strings.couldNotGetDuplicates(), ...options }
+    );
+  };
+
   return {
+    getAlbumChangeNotificationsQueryKey,
+    getAlbumChangeNotificationsOptions,
+    getAlbumChangeNotificationsFunction,
     getDuplicatesQueryKey,
     getDuplicatesOptions,
     getDuplicatesFunction,

@@ -1,12 +1,11 @@
 import Parse from "parse";
-import { difference } from "../utils";
 import ParsePointer from "./ParsePointer";
-import ParseObject, { Attributes, ParsifyPointers } from "./ParseObject";
+import ParseObject, { Attributes, Columns, ParsifyPointers } from "./ParseObject";
 
-/** Interface defining an Album */
-export interface Album extends Attributes {
-  /** User that owns this album */
-  owner: ParsePointer;
+/** Interface defining Album-specific attributes */
+export interface AlbumAttributes {
+  /** User that owns the album */
+  owner: ParsePointer<"_User">;
   /** Images in the album */
   images: string[];
   /** Name of the album */
@@ -18,7 +17,9 @@ export interface Album extends Attributes {
   /** Collaborators with "view" access */
   viewers: string[];
   /** First image in album, or user selected cover image */
-  coverImage?: ParsePointer;
+  coverImage?: ParsePointer<"Image">;
+  /** Map of image id to captions */
+  captions: { [imageId: string]: string };
 }
 
 export interface AlbumSaveContext {
@@ -34,22 +35,32 @@ export interface AlbumSaveContext {
   removedViewers?: string[];
   /** Array of viewer emails removed from the album */
   addedViewers?: string[];
+  /** New cover image for the album */
+  coverImage?: AlbumAttributes["coverImage"];
+  /** New name for the album */
+  name?: AlbumAttributes["name"];
+  /** New description for the album */
+  description?: AlbumAttributes["description"];
+  /** New captions for the album */
+  captions?: AlbumAttributes["captions"];
+}
+
+class AlbumColumns extends Columns {
+  owner: "owner" = "owner";
+  images: "images" = "images";
+  name: "name" = "name";
+  description: "description" = "description";
+  collaborators: "collaborators" = "collaborators";
+  viewers: "viewers" = "viewers";
+  coverImage: "coverImage" = "coverImage";
+  captions: "captions" = "captions";
 }
 
 /**
  * Class wrapping the Parse.Album class and providing convenience methods/properties
  */
-export default class ParseAlbum extends ParseObject<Album> {
-  static COLUMNS = {
-    ...ParseObject.COLUMNS,
-    owner: "owner",
-    images: "images",
-    name: "name",
-    description: "description",
-    collaborators: "collaborators",
-    viewers: "viewers",
-    coverImage: "coverImage",
-  };
+export default class ParseAlbum extends ParseObject<"Album"> {
+  static COLUMNS = new AlbumColumns();
 
   static sort(albums: ParseAlbum[], favoriteAlbums?: string[]) {
     return [...albums].sort((a, b) => {
@@ -66,25 +77,25 @@ export default class ParseAlbum extends ParseObject<Album> {
 
   static query(online = true) {
     if (online) {
-      return new Parse.Query<Parse.Object<ParsifyPointers<Album>>>("Album");
+      return new Parse.Query<Parse.Object<ParsifyPointers<"Album">>>("Album");
     }
-    return new Parse.Query<Parse.Object<ParsifyPointers<Album>>>("Album").fromLocalDatastore();
+    return new Parse.Query<Parse.Object<ParsifyPointers<"Album">>>("Album").fromLocalDatastore();
   }
 
-  static fromAttributes(attributes: Album): ParseAlbum {
-    const newAttributes: ParsifyPointers<Album> = {
+  static fromAttributes(attributes: Attributes<"Album">): ParseAlbum {
+    const newAttributes: ParsifyPointers<"Album"> = {
       ...attributes,
       owner: attributes.owner._pointer,
       coverImage: attributes.coverImage?._pointer,
     };
     return new ParseAlbum(
-      new Parse.Object<ParsifyPointers<Album>>("Album", newAttributes)
+      new Parse.Object<ParsifyPointers<"Album">>("Album", newAttributes)
     );
   }
 
-  _album: Parse.Object<ParsifyPointers<Album>>;
+  _album: Parse.Object<ParsifyPointers<"Album">>;
 
-  constructor(album: Parse.Object<ParsifyPointers<Album>>) {
+  constructor(album: Parse.Object<ParsifyPointers<"Album">>) {
     super(album);
     this._album = album;
   }
@@ -101,32 +112,18 @@ export default class ParseAlbum extends ParseObject<Album> {
     return this.save({});
   }
 
-  async update(attributes: Album) {
-    const newAttributes: ParsifyPointers<Album> = {
+  async update(attributes: Attributes<"Album">, changes: AlbumSaveContext) {
+    const newAttributes: ParsifyPointers<"Album"> = {
       ...attributes,
       owner: attributes.owner._pointer,
       coverImage: attributes.coverImage?._pointer,
     };
-    const context: AlbumSaveContext = {
-      removedImages: difference(this.images, newAttributes.images),
-      addedImages: difference(newAttributes.images, this.images),
-      removedCollaborators: difference(
-        this.collaborators,
-        newAttributes.collaborators
-      ),
-      addedCollaborators: difference(
-        newAttributes.collaborators,
-        this.collaborators
-      ),
-      removedViewers: difference(this.viewers, newAttributes.viewers),
-      addedViewers: difference(newAttributes.viewers, this.viewers),
-    };
     this._album.set(newAttributes);
-    return this.save(context);
+    return this.save(changes);
   }
 
   /** Pointer to the owner of this album */
-  get owner(): Album["owner"] {
+  get owner(): Attributes<"Album">["owner"] {
     return new ParsePointer(this._album.get(ParseAlbum.COLUMNS.owner));
   }
 
@@ -135,7 +132,7 @@ export default class ParseAlbum extends ParseObject<Album> {
   }
 
   /** List of image ids */
-  get images(): Album["images"] {
+  get images(): Attributes<"Album">["images"] {
     return this._album.get(ParseAlbum.COLUMNS.images);
   }
 
@@ -144,7 +141,7 @@ export default class ParseAlbum extends ParseObject<Album> {
   }
 
   /** Name of the album */
-  get name(): Album["name"] {
+  get name(): Attributes<"Album">["name"] {
     return this._album.get(ParseAlbum.COLUMNS.name);
   }
 
@@ -153,7 +150,7 @@ export default class ParseAlbum extends ParseObject<Album> {
   }
 
   /** Description for this album */
-  get description(): Album["description"] {
+  get description(): Attributes<"Album">["description"] {
     return this._album.get(ParseAlbum.COLUMNS.description);
   }
 
@@ -162,7 +159,7 @@ export default class ParseAlbum extends ParseObject<Album> {
   }
 
   /** List of collaborator emails */
-  get collaborators(): Album["collaborators"] {
+  get collaborators(): Attributes<"Album">["collaborators"] {
     return this._album.get(ParseAlbum.COLUMNS.collaborators);
   }
 
@@ -171,7 +168,7 @@ export default class ParseAlbum extends ParseObject<Album> {
   }
 
   /** List of viewer emails */
-  get viewers(): Album["viewers"] {
+  get viewers(): Attributes<"Album">["viewers"] {
     return this._album.get(ParseAlbum.COLUMNS.viewers);
   }
 
@@ -180,9 +177,10 @@ export default class ParseAlbum extends ParseObject<Album> {
   }
 
   /** Pointer to the cover image for this album */
-  get coverImage(): Album["coverImage"] {
-    if (this._album.get(ParseAlbum.COLUMNS.coverImage)) {
-      return new ParsePointer(this._album.get(ParseAlbum.COLUMNS.coverImage));
+  get coverImage(): Attributes<"Album">["coverImage"] {
+    const coverImage = this._album.get(ParseAlbum.COLUMNS.coverImage)
+    if (coverImage) {
+      return new ParsePointer(coverImage);
     }
     return new ParsePointer({
       objectId: this.images[0],
@@ -195,8 +193,28 @@ export default class ParseAlbum extends ParseObject<Album> {
     this._album.set(ParseAlbum.COLUMNS.coverImage, coverImage?._pointer);
   }
 
+  /** Map of image ids to captions */
+  get captions(): Attributes<"Album">["captions"] {
+    return this._album.get(ParseAlbum.COLUMNS.captions);
+  }
+
+  set captions(captions) {
+    this._album.set(ParseAlbum.COLUMNS.captions, captions);
+  }
+
+  /** Function to set caption for an image */
+  setCaption(imageId: string, caption: string) {
+    this.captions[imageId] = caption;
+    this._album.set(ParseAlbum.COLUMNS.captions, this.captions);
+  }
+
+  /** Get caption for an image */
+  getCaption(imageId: string): string {
+    return this.captions[imageId];
+  }
+
   /** Attributes for this album */
-  get attributes(): Album {
+  get attributes(): Attributes<"Album"> {
     return {
       ...this._album.attributes,
       owner: this.owner,

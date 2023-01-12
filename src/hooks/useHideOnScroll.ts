@@ -1,4 +1,4 @@
-import { useLayoutEffect, useRef, useState } from "react";
+import { useCallback, useLayoutEffect, useRef, useState } from "react";
 import { useDebounce } from "use-debounce";
 
 export type UseHideOnScrollOptions = {
@@ -16,7 +16,7 @@ const useHideOnScroll = ({
   const [visible, setVisible] = useState<boolean>(true);
   const scrollTopRef = useRef<number>(0);
 
-  const [handleScroll] = useDebounce(
+  const handleScroll = useCallback(
     (e: Event) => {
       const target = e.target as HTMLElement;
       const scrollTop = target.scrollTop;
@@ -25,18 +25,20 @@ const useHideOnScroll = ({
       }
       scrollTopRef.current = scrollTop;
     },
-    500,
-    {
-      leading: true,
-    }
+    [setVisible, allowUntrustedEvents]
   );
+
+  const [handleScrollDebounced] = useDebounce(handleScroll, 500, {
+    leading: true,
+  });
 
   // Set the header invisible when it's scrolled down
   // Set it visible again when scrolled up
   useLayoutEffect(() => {
-    document.body.addEventListener("scroll", handleScroll);
-    return () => document.body.removeEventListener("scroll", handleScroll);
-  });
+    document.body.addEventListener("scroll", handleScrollDebounced);
+    return () =>
+      document.body.removeEventListener("scroll", handleScrollDebounced);
+  }, [handleScrollDebounced]);
 
   return visible;
 };

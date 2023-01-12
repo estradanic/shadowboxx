@@ -1,5 +1,5 @@
-import { ComponentType } from "react";
-import { lazy } from "react";
+import { ComponentType, lazy } from "react";
+import QueryCacheGroups from "../hooks/Query/QueryCacheGroups";
 
 // Lazy importing these to allow code-splitting
 const Home = lazy(() => import("../views/Home/Home"));
@@ -26,6 +26,8 @@ export interface RouteProps {
   tryAuthenticate?: boolean;
   /** Redirect to login page if not authenticated */
   redirectOnAuthFail?: boolean;
+  /** Query Cache Groups to make stale on page load */
+  queryCacheGroups: QueryCacheGroups[];
 }
 
 /**
@@ -39,6 +41,10 @@ const routes: { [key: string]: RouteProps } = {
     path: "/album/:id",
     tryAuthenticate: true,
     redirectOnAuthFail: true,
+    queryCacheGroups: [
+      QueryCacheGroups.GET_IMAGES_BY_ID_INFINITE,
+      QueryCacheGroups.GET_ALBUM,
+    ],
   },
   Home: {
     viewId: "Home",
@@ -47,12 +53,14 @@ const routes: { [key: string]: RouteProps } = {
     path: "/home",
     tryAuthenticate: true,
     redirectOnAuthFail: true,
+    queryCacheGroups: [QueryCacheGroups.GET_ALL_ALBUMS_INFINITE],
   },
   Login: {
     viewId: "Login",
     viewName: "Login",
     View: Login,
     path: "/login",
+    queryCacheGroups: [],
   },
   Images: {
     viewId: "Images",
@@ -61,6 +69,7 @@ const routes: { [key: string]: RouteProps } = {
     path: "/images",
     tryAuthenticate: true,
     redirectOnAuthFail: true,
+    queryCacheGroups: [QueryCacheGroups.GET_ALL_IMAGES_INFINITE],
   },
   Settings: {
     viewId: "Settings",
@@ -69,6 +78,7 @@ const routes: { [key: string]: RouteProps } = {
     path: "/settings",
     tryAuthenticate: true,
     redirectOnAuthFail: true,
+    queryCacheGroups: [],
   },
   Share: {
     viewId: "Share",
@@ -83,12 +93,16 @@ const routes: { [key: string]: RouteProps } = {
     viewName: "Signup",
     View: Signup,
     path: "/signup",
+    queryCacheGroups: [],
   },
   Root: {
     viewId: "Home",
     viewName: "Home",
     View: Home,
     path: "/",
+    tryAuthenticate: true,
+    redirectOnAuthFail: true,
+    queryCacheGroups: [QueryCacheGroups.GET_ALL_ALBUMS_INFINITE],
   },
 };
 

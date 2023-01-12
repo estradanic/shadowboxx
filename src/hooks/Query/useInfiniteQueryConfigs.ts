@@ -8,6 +8,7 @@ import useQueryConfigHelpers, {
   FunctionOptions,
 } from "./useQueryConfigHelpers";
 import { DEFAULT_PAGE_SIZE } from "../../constants";
+import QueryCacheGroups from "./QueryCacheGroups";
 
 export type InfiniteFunctionOptions = FunctionOptions & {
   /** Page index */
@@ -47,7 +48,9 @@ const useInfiniteQueryConfigs = () => {
   const { runFunctionInTryCatch } = useQueryConfigHelpers();
   const { getUserByIdFunction } = useQueryConfigs();
 
-  const getAllAlbumsInfiniteQueryKey = () => ["GET_ALL_ALBUMS_INFINITE"];
+  const getAllAlbumsInfiniteQueryKey = () => [
+    QueryCacheGroups.GET_ALL_ALBUMS_INFINITE,
+  ];
   const getAllAlbumsInfiniteOptions: InfiniteQueryOptionsFunction<
     ParseAlbum[]
   > = (options = {}) => ({
@@ -71,7 +74,9 @@ const useInfiniteQueryConfigs = () => {
     );
   };
 
-  const getAllImagesInfiniteQueryKey = () => ["GET_ALL_IMAGES_INFINITE"];
+  const getAllImagesInfiniteQueryKey = () => [
+    QueryCacheGroups.GET_ALL_IMAGES_INFINITE,
+  ];
   const getAllImagesInfiniteOptions: InfiniteQueryOptionsFunction<
     ParseImage[]
   > = (options = {}) => ({
@@ -95,7 +100,7 @@ const useInfiniteQueryConfigs = () => {
   };
 
   const getImagesByIdInfiniteQueryKey = (imageIds: string[]) => [
-    "GET_IMAGES_BY_ID_INFINITE",
+    QueryCacheGroups.GET_IMAGES_BY_ID_INFINITE,
     imageIds,
   ];
   const getImagesByIdInfiniteOptions: InfiniteQueryOptionsFunction<
@@ -123,7 +128,7 @@ const useInfiniteQueryConfigs = () => {
   };
 
   const getImagesByOwnerInfiniteQueryKey = (owner: ParseUser) => [
-    "GET_IMAGE_BY_OWNER_INFINITE",
+    QueryCacheGroups.GET_IMAGE_BY_OWNER_INFINITE,
     owner.id,
   ];
   const getImagesByOwnerInfiniteOptions: InfiniteQueryOptionsFunction<
@@ -152,7 +157,7 @@ const useInfiniteQueryConfigs = () => {
   };
 
   const getUsersByEmailInfiniteQueryKey = (emails: string[]) => [
-    "GET_USERS_BY_EMAIL_INFINITE",
+    QueryCacheGroups.GET_USERS_BY_EMAIL_INFINITE,
     emails,
   ];
   const getUsersByEmailInfiniteOptions: InfiniteQueryOptionsFunction<
@@ -181,7 +186,7 @@ const useInfiniteQueryConfigs = () => {
   };
 
   const getRelatedUserEmailsInfiniteQueryKey = () => [
-    "GET_RELATED_USER_EMAILS_INFINITE",
+    QueryCacheGroups.GET_RELATED_USER_EMAILS_INFINITE,
   ];
   const getRelatedUserEmailsInfiniteOptions: InfiniteQueryOptionsFunction<
     string[]
