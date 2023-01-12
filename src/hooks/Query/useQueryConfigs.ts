@@ -324,10 +324,15 @@ const useQueryConfigs = () => {
   ): Promise<ParseDuplicate[]> => {
     return await runFunctionInTryCatch<ParseDuplicate[]>(
       async () => {
-        const duplicates = await ParseDuplicate.query(online)
-          .equalTo(ParseDuplicate.COLUMNS.acknowledged, false)
-          .ascending(ParseDuplicate.COLUMNS.createdAt)
-          .find();
+        const duplicates = await Parse.Query.or(
+          ParseDuplicate.query(online).equalTo(
+            ParseDuplicate.COLUMNS.acknowledged,
+            false
+          ),
+          ParseDuplicate.query(online).doesNotExist(
+            ParseDuplicate.COLUMNS.acknowledged
+          )
+        ).findAll();
         return duplicates.map((duplicate) => new ParseDuplicate(duplicate));
       },
       { errorMessage: Strings.couldNotGetDuplicates(), ...options }

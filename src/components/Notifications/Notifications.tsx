@@ -123,6 +123,7 @@ const Notifications = ({ className }: NotificationsProps) => {
         onClose={() => setOpen(false)}
         anchorEl={iconButtonRef.current}
         open={open}
+        onClick={() => setOpen(false)}
       >
         {Object.keys(notifications).length ? (
           Object.keys(notifications).map((key) => (
