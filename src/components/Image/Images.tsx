@@ -2,6 +2,7 @@ import React, { ReactElement, useEffect, useState } from "react";
 import Grid from "@material-ui/core/Grid";
 import { VariableColor } from "../../types";
 import { ParseImage } from "../../classes";
+import { useVirtualList } from "../../hooks";
 import ImagesSkeleton, { useStyles } from "../Skeleton/ImagesSkeleton";
 import Image from "./Image";
 import NoImages from "./NoImages";
@@ -59,6 +60,12 @@ const Images = ({
     }
   }, [setDecorations, images, getDecorations, getCaption, setCaptions]);
 
+  const { virtualized: virtualizedImages } = useVirtualList<ParseImage>({
+    list: images,
+    interval: 10,
+    enabled: images !== undefined,
+  });
+
   if (status === "loading" || (!images && status !== "error")) {
     return <ImagesSkeleton />;
   } else if (status === "error" || !images?.length) {
@@ -66,7 +73,7 @@ const Images = ({
   } else {
     return (
       <Grid item container className={classes.imageContainer} xs={12}>
-        {images?.map((image) => (
+        {virtualizedImages?.map((image) => (
           <Grid key={image.id} item xs={12} md={6} lg={4} xl={3}>
             <Image
               decorations={decorations[image.id!]}
