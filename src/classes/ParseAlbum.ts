@@ -96,6 +96,7 @@ export default class ParseAlbum extends ParseObject<"Album"> {
   _album: Parse.Object<ParsifyPointers<"Album">>;
 
   constructor(album: Parse.Object<ParsifyPointers<"Album">>) {
+    album.pin();
     super(album);
     this._album = album;
   }

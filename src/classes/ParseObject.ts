@@ -56,7 +56,6 @@ export default class ParseObject<C extends ClassName> {
 
   constructor(object: Parse.Object<ParsifyPointers<C>>) {
     this._object = object;
-    object.pinWithName(object.id);
   }
 
   /**

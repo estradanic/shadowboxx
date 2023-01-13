@@ -92,6 +92,7 @@ export default class ParseImage extends ParseObject<"Image"> {
   _image: Parse.Object<ParsifyPointers<"Image">>;
 
   constructor(image: Parse.Object<ParsifyPointers<"Image">>) {
+    image.pin();
     super(image);
     this._image = image;
   }

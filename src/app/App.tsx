@@ -8,6 +8,7 @@ import {
   unstable_createMuiStrictModeTheme as createTheme,
 } from "@material-ui/core/styles";
 import DiscFullIcon from "@material-ui/icons/DiscFull";
+import { get, set, entries, createStore, del, clear } from "idb-keyval";
 import { useNotificationsContext, useUserContext } from "../contexts";
 import { ActionDialogContextProvider, DefaultLayout } from "../components";
 import { Strings } from "../resources";
@@ -19,7 +20,24 @@ Parse.initialize(
   window.__env__?.PARSE_APPLICATION_ID,
   window.__env__?.PARSE_JAVASCRIPT_KEY
 );
-Parse.CoreManager.setStorageController(Parse.IndexedDB);
+const parseDB = createStore("parseDB", "parseStore");
+Parse.setLocalDatastoreController({
+  fromPinWithName(name: string) {
+    return get(name, parseDB);
+  },
+  pinWithName(name: string, value: any) {
+    return set(name, value, parseDB);
+  },
+  unPinWithName(name: string) {
+    return del(name, parseDB);
+  },
+  getAllContents() {
+    return entries(parseDB);
+  },
+  clear() {
+    return clear(parseDB);
+  }
+});
 Parse.enableLocalDatastore(false);
 
 const App = () => {
