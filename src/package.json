@@ -28,7 +28,7 @@
     "react-dom": "^17.0.1",
     "react-reverse-portal": "^2.1.0",
     "react-router-dom": "^6.3.0",
-    "use-debounce": "^9.0.2",
+    "use-debounce": "^9.0.3",
     "uuid": "^9.0.0",
     "zustand": "^4.3.1"
   },
