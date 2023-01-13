@@ -110,6 +110,13 @@ export default class ParseObject<C extends ClassName> {
     return await this._object.destroy();
   }
 
+  /**
+   * Save this object to the local datastore
+   * @returns A promise that resolves when the object has been saved
+   */
+  async pin() {
+    await this._object.pin();
+  }
 
   /** ObjectId for this object */
   get id(): ObjectAttributes["objectId"] {

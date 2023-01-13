@@ -1,6 +1,6 @@
 import Parse from "parse";
 import { QueryObserverOptions } from "@tanstack/react-query";
-import { useNetworkDetectionContext, useUserContext } from "../../contexts";
+import { useUserContext } from "../../contexts";
 import { Strings } from "../../resources";
 import {
   ParseAlbum,
@@ -24,7 +24,6 @@ export type QueryOptionsFunction<TData> = (
  */
 const useQueryConfigs = () => {
   const { getLoggedInUser, profilePicture } = useUserContext();
-  const { online } = useNetworkDetectionContext();
   const { runFunctionInTryCatch } = useQueryConfigHelpers();
 
   /** ["GET_ALBUM", albumId] */
@@ -39,6 +38,7 @@ const useQueryConfigs = () => {
   });
   /** Function to get album by id */
   const getAlbumFunction = async (
+    online: boolean,
     albumId?: string,
     options: FunctionOptions = {}
   ): Promise<ParseAlbum> => {
@@ -67,6 +67,7 @@ const useQueryConfigs = () => {
   });
   /** Function to get images by id, unsorted */
   const getImagesByIdFunction = async (
+    online: boolean,
     imageIds: string[],
     options: FunctionOptions = {}
   ): Promise<ParseImage[]> => {
@@ -95,6 +96,7 @@ const useQueryConfigs = () => {
   });
   /** Function to get image by id */
   const getImageByIdFunction = async (
+    online: boolean,
     imageId: string,
     options: FunctionOptions = {}
   ): Promise<ParseImage> => {
@@ -129,6 +131,7 @@ const useQueryConfigs = () => {
   });
   /** Function to get user by id */
   const getUserByIdFunction = async (
+    online: boolean,
     userId: string,
     options: FunctionOptions = {}
   ): Promise<ParseUser> => {
@@ -158,6 +161,7 @@ const useQueryConfigs = () => {
   });
   /** Function to get users by email, unsorted */
   const getUsersByEmailFunction = async (
+    online: boolean,
     emails: string[],
     options: FunctionOptions = {}
   ): Promise<ParseUser[]> => {
@@ -186,6 +190,7 @@ const useQueryConfigs = () => {
   });
   /** Function to get user by email */
   const getUserByEmailFunction = async (
+    online: boolean,
     email: string,
     options: FunctionOptions = {}
   ): Promise<ParseUser> => {
@@ -219,6 +224,7 @@ const useQueryConfigs = () => {
   });
   /** Function to get related user emails, unsorted */
   const getRelatedUserEmailsFunction = async (
+    online: boolean,
     options: FunctionOptions = {}
   ): Promise<string[]> => {
     return await runFunctionInTryCatch<string[]>(
@@ -247,6 +253,7 @@ const useQueryConfigs = () => {
           relatedEmails.push(...album.collaborators, ...album.viewers);
           if (!gotUsers[album.owner.id]) {
             gotUsers[album.owner.id] = await getUserByIdFunction(
+              online,
               album.owner.id,
               options
             );
@@ -267,12 +274,13 @@ const useQueryConfigs = () => {
 
   /** ["GET_DUPLICATES"] */
   const getDuplicatesQueryKey = () => [QueryCacheGroups.GET_DUPLICATES];
-  /** Defaults to default + refetch on window focus: false + refetch interval: 5 minutes */
+  /** Defaults to default + refetch on window focus: false + refetch interval: 5 minutes + network mode: online */
   const getDuplicatesOptions: QueryOptionsFunction<ParseDuplicate[]> = (
     options = {}
   ) => ({
     refetchOnWindowFocus: false,
     refetchInterval: 5 * 60 * 1000,
+    networkMode: "online",
     ...options,
   });
   /** Function to get duplicates, unsorted */
@@ -282,11 +290,11 @@ const useQueryConfigs = () => {
     return await runFunctionInTryCatch<ParseDuplicate[]>(
       async () => {
         const duplicates = await Parse.Query.or(
-          ParseDuplicate.query(online).equalTo(
+          ParseDuplicate.query().equalTo(
             ParseDuplicate.COLUMNS.acknowledged,
             false
           ),
-          ParseDuplicate.query(online).doesNotExist(
+          ParseDuplicate.query().doesNotExist(
             ParseDuplicate.COLUMNS.acknowledged
           )
         ).findAll();
@@ -300,12 +308,13 @@ const useQueryConfigs = () => {
   const getAlbumChangeNotificationsQueryKey = () => [
     QueryCacheGroups.GET_ALBUM_CHANGE_NOTIFICATIONS,
   ];
-  /** Defaults to default + refetch on window focus: false + refetch interval: 5 minutes */
+  /** Defaults to default + refetch on window focus: false + refetch interval: 5 minutes + network mode: online */
   const getAlbumChangeNotificationsOptions: QueryOptionsFunction<
     ParseAlbumChangeNotification[]
   > = (options = {}) => ({
     refetchOnWindowFocus: false,
     refetchInterval: 5 * 60 * 1000,
+    networkMode: "online",
     ...options,
   });
   /** Function to get album change notifications, unsorted */
@@ -315,7 +324,7 @@ const useQueryConfigs = () => {
     return await runFunctionInTryCatch<ParseAlbumChangeNotification[]>(
       async () => {
         const albumChangeNotifications =
-          await ParseAlbumChangeNotification.query(online)
+          await ParseAlbumChangeNotification.query()
             .notEqualTo("user", getLoggedInUser().toNativePointer())
             .greaterThan(ParseAlbumChangeNotification.COLUMNS.count, 0)
             .ascending(ParseAlbumChangeNotification.COLUMNS.createdAt)

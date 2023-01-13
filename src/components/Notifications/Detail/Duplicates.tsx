@@ -10,7 +10,7 @@ import { createHtmlPortalNode, InPortal } from "react-reverse-portal";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { ParseDuplicate, ParseImage } from "../../../classes";
 import { Strings } from "../../../resources";
-import { Notification } from "../../../contexts";
+import { Notification, useNetworkDetectionContext } from "../../../contexts";
 import { useGlobalLoadingStore } from "../../../stores";
 import { useActionDialogContext } from "../../Dialog/ActionDialog";
 import { useQueryConfigs, useRandomColor } from "../../../hooks";
@@ -71,9 +71,11 @@ const DuplicatesNotificationDetail = ({
     getDuplicatesQueryKey,
   } = useQueryConfigs();
 
+  const { online } = useNetworkDetectionContext();
+
   const { data: images } = useQuery<ParseImage[], Error>(
     getImagesByIdQueryKey(imageIds),
-    () => getImagesByIdFunction(imageIds),
+    () => getImagesByIdFunction(online, imageIds),
     getImagesByIdOptions()
   );
 

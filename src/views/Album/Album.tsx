@@ -7,6 +7,7 @@ import {
   PageContainer,
   Fab,
   useSnackbar,
+  Online,
 } from "../../components";
 import { useLocation, useParams } from "react-router-dom";
 import Grid from "@material-ui/core/Grid";
@@ -30,6 +31,7 @@ import {
 } from "../../hooks";
 import { useView } from "../View";
 import OwnerImageDecoration from "../../components/Image/Decoration/OwnerImageDecoration";
+import { useNetworkDetectionContext } from "../../contexts";
 
 const useStyles = makeStyles((theme: Theme) => ({
   svgContainer: {
@@ -49,6 +51,7 @@ const Album = memo(() => {
   const classes = useStyles();
   const location = useLocation() as { state: { previousLocation?: Location } };
   const randomColor = useRandomColor();
+  const { online } = useNetworkDetectionContext();
   const { getAlbumFunction, getAlbumQueryKey, getAlbumOptions } =
     useQueryConfigs();
   const {
@@ -59,7 +62,7 @@ const Album = memo(() => {
   const queryClient = useQueryClient();
   const { data: album, status: albumStatus } = useQuery<ParseAlbum, Error>(
     getAlbumQueryKey(id),
-    () => getAlbumFunction(id, { showErrorsInSnackbar: true }),
+    () => getAlbumFunction(online, id, { showErrorsInSnackbar: true }),
     getAlbumOptions()
   );
   const {
@@ -70,7 +73,7 @@ const Album = memo(() => {
   } = useInfiniteQuery<ParseImage[], Error>(
     getImagesByIdInfiniteQueryKey(album?.images ?? []),
     ({ pageParam: page = 0 }) =>
-      getImagesByIdInfiniteFunction(album?.images ?? [], {
+      getImagesByIdInfiniteFunction(online, album?.images ?? [], {
         showErrorsInSnackbar: true,
         page,
         pageSize: DEFAULT_PAGE_SIZE,
@@ -143,9 +146,11 @@ const Album = memo(() => {
             images={images}
             outlineColor={randomColor}
           />
-          <Fab onClick={() => setEditMode(true)}>
-            <EditIcon />
-          </Fab>
+          <Online>
+            <Fab onClick={() => setEditMode(true)}>
+              <EditIcon />
+            </Fab>
+          </Online>
         </>
       ) : (
         <Grid item className={classes.svgContainer}>

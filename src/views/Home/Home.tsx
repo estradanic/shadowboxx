@@ -12,10 +12,11 @@ import {
   BlankCanvas,
   AlbumCardSkeleton,
   Fab,
+  Online,
 } from "../../components";
 import { Strings } from "../../resources";
 import { ParseAlbum } from "../../classes";
-import { useUserContext } from "../../contexts";
+import { useUserContext, useNetworkDetectionContext } from "../../contexts";
 import { useView } from "../View";
 import {
   useInfiniteQueryConfigs,
@@ -53,6 +54,7 @@ const Home = memo(() => {
     getAllAlbumsInfiniteQueryKey,
     getAllAlbumsInfiniteOptions,
   } = useInfiniteQueryConfigs();
+  const { online } = useNetworkDetectionContext();
   const {
     data,
     status,
@@ -62,7 +64,7 @@ const Home = memo(() => {
   } = useInfiniteQuery<ParseAlbum[], Error>(
     getAllAlbumsInfiniteQueryKey(),
     ({ pageParam: page = 0 }) =>
-      getAllAlbumsInfiniteFunction({
+      getAllAlbumsInfiniteFunction(online, {
         showErrorsInSnackbar: true,
         page,
         pageSize: DEFAULT_PAGE_SIZE,
@@ -130,9 +132,11 @@ const Home = memo(() => {
           </>
         )}
       </>
-      <Fab onClick={() => setAddAlbumDialogOpen(true)}>
-        <AddIcon />
-      </Fab>
+      <Online>
+        <Fab onClick={() => setAddAlbumDialogOpen(true)}>
+          <AddIcon />
+        </Fab>
+      </Online>
       <AlbumFormDialog
         resetOnConfirm
         value={{

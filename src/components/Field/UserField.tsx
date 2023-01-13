@@ -10,6 +10,7 @@ import TextField from "../Field/TextField";
 import { makeStyles, Theme } from "@material-ui/core/styles";
 import { useQuery } from "@tanstack/react-query";
 import { useQueryConfigs } from "../../hooks";
+import { useNetworkDetectionContext } from "../../contexts";
 
 const useStyles = makeStyles((theme: Theme) => ({
   endAdornment: {
@@ -51,6 +52,7 @@ const UserField = forwardRef(
   ) => {
     const classes = useStyles();
     const [inputValue, setInputValue] = useState<string>("");
+    const { online } = useNetworkDetectionContext();
 
     const {
       getRelatedUserEmailsFunction,
@@ -59,7 +61,7 @@ const UserField = forwardRef(
     } = useQueryConfigs();
     const { data: options } = useQuery<string[], Error>(
       getRelatedUserEmailsQueryKey(),
-      () => getRelatedUserEmailsFunction(),
+      () => getRelatedUserEmailsFunction(online),
       getRelatedUserEmailsOptions()
     );
 

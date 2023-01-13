@@ -1,4 +1,4 @@
-import { useNetworkDetectionContext, useUserContext } from "../../contexts";
+import { useUserContext } from "../../contexts";
 import { Strings } from "../../resources";
 import { ParseAlbum, ParseImage, ParseUser } from "../../classes";
 import { InfiniteQueryObserverOptions } from "@tanstack/react-query";
@@ -42,7 +42,6 @@ const DEFAULT_FUNCTION_OPTIONS: InfiniteFunctionOptions = {
  */
 const useInfiniteQueryConfigs = () => {
   const { getLoggedInUser } = useUserContext();
-  const { online } = useNetworkDetectionContext();
   const { runFunctionInTryCatch } = useQueryConfigHelpers();
 
   /** ["GET_ALL_ALBUMS_INFINITE"] */
@@ -59,6 +58,7 @@ const useInfiniteQueryConfigs = () => {
   });
   /** Infinite function to get all albums, sorted by favoriteAlbums, then desc updatedAt */
   const getAllAlbumsInfiniteFunction = async (
+    online: boolean,
     options: InfiniteFunctionOptions = DEFAULT_FUNCTION_OPTIONS
   ): Promise<ParseAlbum[]> => {
     return await runFunctionInTryCatch<ParseAlbum[]>(
@@ -105,6 +105,7 @@ const useInfiniteQueryConfigs = () => {
   });
   /** Infinite function to get all images, sorted desc by createdAt */
   const getAllImagesInfiniteFunction = async (
+    online: boolean,
     options: InfiniteFunctionOptions = DEFAULT_FUNCTION_OPTIONS
   ): Promise<ParseImage[]> => {
     return await runFunctionInTryCatch<ParseImage[]>(
@@ -134,6 +135,7 @@ const useInfiniteQueryConfigs = () => {
   });
   /** Infinite function to get images by id, sorted desc by createdAt */
   const getImagesByIdInfiniteFunction = async (
+    online: boolean,
     imageIds: string[],
     options: InfiniteFunctionOptions = DEFAULT_FUNCTION_OPTIONS
   ): Promise<ParseImage[]> => {
@@ -166,6 +168,7 @@ const useInfiniteQueryConfigs = () => {
   });
   /** Infinite function to get images by owner, sorted desc by createdAt */
   const getImagesByOwnerInfiniteFunction = async (
+    online: boolean,
     owner: ParseUser,
     options: InfiniteFunctionOptions = DEFAULT_FUNCTION_OPTIONS
   ): Promise<ParseImage[]> => {

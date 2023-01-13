@@ -57,6 +57,7 @@ export default class ParseImage extends ParseObject<"Image"> {
    * @returns Parse.Query for the "Image" class
    */
   static query(online = true) {
+    console.log("Image", {online});
     if (online) {
       return new Parse.Query<Parse.Object<ParsifyPointers<"Image">>>("Image");
     }
@@ -92,9 +93,9 @@ export default class ParseImage extends ParseObject<"Image"> {
   _image: Parse.Object<ParsifyPointers<"Image">>;
 
   constructor(image: Parse.Object<ParsifyPointers<"Image">>) {
-    image.pin();
     super(image);
     this._image = image;
+    this.pin();
   }
 
   /**

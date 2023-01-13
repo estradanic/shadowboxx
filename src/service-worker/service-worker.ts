@@ -27,7 +27,7 @@ sw.addEventListener("activate", () => {
 // Middleware for fetches (caching vs. online)
 sw.addEventListener("fetch", (event) => {
   const url = new URL(event.request.url);
-  // Don't bother managing non-http requests or requests to httpbin.org,
+  // Don't bother managing non-http(s) requests or requests to httpbin.org,
   // which are used for determining online status
   if (
     (url.protocol !== "http:" && url.protocol !== "https:") ||

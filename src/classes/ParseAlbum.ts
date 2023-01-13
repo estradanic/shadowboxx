@@ -76,6 +76,7 @@ export default class ParseAlbum extends ParseObject<"Album"> {
   }
 
   static query(online = true) {
+    console.log("Album", {online});
     if (online) {
       return new Parse.Query<Parse.Object<ParsifyPointers<"Album">>>("Album");
     }
@@ -96,9 +97,9 @@ export default class ParseAlbum extends ParseObject<"Album"> {
   _album: Parse.Object<ParsifyPointers<"Album">>;
 
   constructor(album: Parse.Object<ParsifyPointers<"Album">>) {
-    album.pin();
     super(album);
     this._album = album;
+    this.pin();
   }
 
   compareTo(that: ParseAlbum): number {

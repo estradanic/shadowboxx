@@ -31,12 +31,12 @@ Parse.setLocalDatastoreController({
   unPinWithName(name: string) {
     return del(name, parseDB);
   },
-  getAllContents() {
-    return entries(parseDB);
+  async getAllContents() {
+    return Object.fromEntries(await entries(parseDB));
   },
   clear() {
     return clear(parseDB);
-  }
+  },
 });
 Parse.enableLocalDatastore(false);
 
