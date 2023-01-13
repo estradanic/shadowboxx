@@ -62,9 +62,7 @@ export const UserContextProvider = ({ children }: UserContextProviderProps) => {
   const location = useLocation();
   const { online } = useNetworkDetectionContext();
 
-  const [loggedInUser, setLoggedInUser] = useState<ParseUser | undefined>(
-    Parse.User.current() ? new ParseUser(Parse.User.current()!) : undefined
-  );
+  const [loggedInUser, setLoggedInUser] = useState<ParseUser | undefined>(undefined);
   const [profilePicture, setProfilePicture] = useState<
     ParseImage | undefined
   >();
@@ -147,9 +145,13 @@ export const UserContextProvider = ({ children }: UserContextProviderProps) => {
       return;
     }
     initialized.current = true;
-    if (loggedInUser) {
-      updateLoggedInUser(loggedInUser, UpdateReason.LOG_IN);
-    }
+    Parse.User.currentAsync<Parse.User<ParsifyPointers<"_User">>>()
+      .then((user) => {
+        if (user) {
+          updateLoggedInUser(new ParseUser(user), UpdateReason.LOG_IN);
+        }
+      })
+      .catch((error: any) => console.error(error));
   }, [loggedInUser, updateLoggedInUser, initialized]);
 
   const getLoggedInUser = () => {

@@ -8,8 +8,13 @@ declare global {
     };
   }
 
+  namespace Parse.CoreManager {
+    function setStorageController(controller: any): void;
+  }
+
   namespace Parse {
-    const enableLocalDatastore: (poll?: boolean) => void;
+    function enableLocalDatastore(poll?: boolean): void;
+    const IndexedDB: any;
   }
 }
 

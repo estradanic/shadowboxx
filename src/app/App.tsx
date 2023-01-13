@@ -1,4 +1,5 @@
 import React, { Suspense, useEffect } from "react";
+import Parse from "parse";
 import { Routes, Route } from "react-router-dom";
 import CircularProgress from "@material-ui/core/CircularProgress";
 import {
@@ -7,7 +8,6 @@ import {
   unstable_createMuiStrictModeTheme as createTheme,
 } from "@material-ui/core/styles";
 import DiscFullIcon from "@material-ui/icons/DiscFull";
-import Parse from "parse";
 import { useNotificationsContext, useUserContext } from "../contexts";
 import { ActionDialogContextProvider, DefaultLayout } from "../components";
 import { Strings } from "../resources";
@@ -19,6 +19,7 @@ Parse.initialize(
   window.__env__?.PARSE_APPLICATION_ID,
   window.__env__?.PARSE_JAVASCRIPT_KEY
 );
+Parse.CoreManager.setStorageController(Parse.IndexedDB);
 Parse.enableLocalDatastore(false);
 
 const App = () => {
