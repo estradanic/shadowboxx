@@ -71,13 +71,10 @@ const Home = memo(() => {
   );
   useInfiniteScroll(fetchNextPage, { canExecute: !isFetchingNextPage });
   const { getLoggedInUser } = useUserContext();
+
   const albums = useMemo(
-    () =>
-      ParseAlbum.sort(
-        data?.pages?.flatMap((page) => page) ?? [],
-        getLoggedInUser().favoriteAlbums
-      ),
-    [data?.pages, getLoggedInUser]
+    () => data?.pages?.flatMap((page) => page) ?? [],
+    [data?.pages]
   );
   const { virtualized: virtualizedAlbums, reset: resetVirtualList } =
     useVirtualList({ list: albums, interval: 10, enabled: !!albums?.length });

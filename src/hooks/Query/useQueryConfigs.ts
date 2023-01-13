@@ -27,52 +27,17 @@ const useQueryConfigs = () => {
   const { online } = useNetworkDetectionContext();
   const { runFunctionInTryCatch } = useQueryConfigHelpers();
 
-  const getAllAlbumsQueryKey = () => [QueryCacheGroups.GET_ALL_ALBUMS];
-  const getAllAlbumsOptions: QueryOptionsFunction<ParseAlbum[]> = (
-    options = {}
-  ) => ({
-    refetchInterval: 5 * 60 * 1000,
-    ...options,
-  });
-  const getAllAlbumsFunction = async (
-    options: FunctionOptions = {}
-  ): Promise<ParseAlbum[]> => {
-    return await runFunctionInTryCatch<ParseAlbum[]>(
-      async () => {
-        const albums = await ParseAlbum.query(online).limit(1000).find();
-        return albums.map((album) => new ParseAlbum(album));
-      },
-      { errorMessage: Strings.noAlbums(), ...options }
-    );
-  };
-
-  const getAllImagesQueryKey = () => [QueryCacheGroups.GET_ALL_IMAGES];
-  const getAllImagesOptions: QueryOptionsFunction<ParseImage[]> = (
-    options = {}
-  ) => ({
-    refetchInterval: 5 * 60 * 1000,
-    ...options,
-  });
-  const getAllImagesFunction = async (
-    options: FunctionOptions = {}
-  ): Promise<ParseImage[]> => {
-    return await runFunctionInTryCatch<ParseImage[]>(
-      async () => {
-        const images = await ParseImage.query(online).limit(1000).find();
-        return images.map((image) => new ParseImage(image));
-      },
-      { errorMessage: Strings.noImages(), ...options }
-    );
-  };
-
+  /** ["GET_ALBUM", albumId] */
   const getAlbumQueryKey = (albumId?: string) => [
     QueryCacheGroups.GET_ALBUM,
     albumId,
   ];
+  /** Defaults to default + refetch interval: 5 minutes */
   const getAlbumOptions: QueryOptionsFunction<ParseAlbum> = (options = {}) => ({
     refetchInterval: 5 * 60 * 1000,
     ...options,
   });
+  /** Function to get album by id */
   const getAlbumFunction = async (
     albumId?: string,
     options: FunctionOptions = {}
@@ -89,15 +54,18 @@ const useQueryConfigs = () => {
     );
   };
 
+  /** ["GET_IMAGES_BY_ID", imageIds] */
   const getImagesByIdQueryKey = (imageIds: string[]) => [
     QueryCacheGroups.GET_IMAGES_BY_ID,
     imageIds,
   ];
+  /** Defaults to default */
   const getImagesByIdOptions: QueryOptionsFunction<ParseImage[]> = (
     options = {}
   ) => ({
     ...options,
   });
+  /** Function to get images by id, unsorted */
   const getImagesByIdFunction = async (
     imageIds: string[],
     options: FunctionOptions = {}
@@ -106,24 +74,26 @@ const useQueryConfigs = () => {
       async () => {
         const images = await ParseImage.query(online)
           .containedIn(ParseImage.COLUMNS.id, imageIds)
-          .limit(1000)
-          .find();
+          .findAll();
         return images.map((image) => new ParseImage(image));
       },
       { errorMessage: Strings.getImagesError(), ...options }
     );
   };
 
+  /** ["GET_IMAGE_BY_ID", imageId] */
   const getImageByIdQueryKey = (imageId: string) => [
     QueryCacheGroups.GET_IMAGE_BY_ID,
     imageId,
   ];
+  /** Defaults to default + refetch on window focus: false */
   const getImageByIdOptions: QueryOptionsFunction<ParseImage> = (
     options = {}
   ) => ({
     refetchOnWindowFocus: false,
     ...options,
   });
+  /** Function to get image by id */
   const getImageByIdFunction = async (
     imageId: string,
     options: FunctionOptions = {}
@@ -145,43 +115,19 @@ const useQueryConfigs = () => {
     );
   };
 
-  const getImagesByOwnerQueryKey = (owner: ParseUser) => [
-    QueryCacheGroups.GET_IMAGES_BY_OWNER,
-    owner.id,
-  ];
-  const getImagesByOwnerOptions: QueryOptionsFunction<ParseImage[]> = (
-    options = {}
-  ) => ({
-    refetchInterval: 5 * 60 * 1000,
-    refetchOnWindowFocus: false,
-    ...options,
-  });
-  const getImagesByOwnerFunction = async (
-    owner: ParseUser,
-    options: FunctionOptions = {}
-  ): Promise<ParseImage[]> => {
-    return await runFunctionInTryCatch<ParseImage[]>(
-      async () => {
-        const images = await ParseImage.query(online)
-          .equalTo(ParseImage.COLUMNS.owner, owner.toNativePointer())
-          .limit(1000)
-          .find();
-        return images.map((image) => new ParseImage(image));
-      },
-      { errorMessage: Strings.getImageError(), ...options }
-    );
-  };
-
+  /** ["GET_USER_BY_ID", userId] */
   const getUserByIdQueryKey = (userId: string) => [
     QueryCacheGroups.GET_USER_BY_ID,
     userId,
   ];
+  /** Defaults to default + refetch on window focus: false */
   const getUserByIdOptions: QueryOptionsFunction<ParseUser> = (
     options = {}
   ) => ({
     refetchOnWindowFocus: false,
     ...options,
   });
+  /** Function to get user by id */
   const getUserByIdFunction = async (
     userId: string,
     options: FunctionOptions = {}
@@ -198,16 +144,19 @@ const useQueryConfigs = () => {
     );
   };
 
+  /** ["GET_USERS_BY_EMAIL", emails] */
   const getUsersByEmailQueryKey = (emails: string[]) => [
     QueryCacheGroups.GET_USERS_BY_EMAIL,
     emails,
   ];
+  /** Defaults to default */
   const getUsersByEmailOptions: QueryOptionsFunction<ParseUser[]> = (
     options = {}
   ) => ({
     refetchOnWindowFocus: false,
     ...options,
   });
+  /** Function to get users by email, unsorted */
   const getUsersByEmailFunction = async (
     emails: string[],
     options: FunctionOptions = {}
@@ -216,24 +165,26 @@ const useQueryConfigs = () => {
       async () => {
         const users = await ParseUser.query(online)
           .containedIn(ParseUser.COLUMNS.email, emails)
-          .limit(1000)
-          .find();
+          .findAll();
         return users.map((user) => new ParseUser(user));
       },
       { errorMessage: Strings.couldNotGetUserInfo(), ...options }
     );
   };
 
+  /** ["GET_USER_BY_EMAIL", email] */
   const getUserByEmailQueryKey = (email: string) => [
     QueryCacheGroups.GET_USER_BY_EMAIL,
     email,
   ];
+  /** Defaults to default + refetch on window focus: false */
   const getUserByEmailOptions: QueryOptionsFunction<ParseUser> = (
     options = {}
   ) => ({
     refetchOnWindowFocus: false,
     ...options,
   });
+  /** Function to get user by email */
   const getUserByEmailFunction = async (
     email: string,
     options: FunctionOptions = {}
@@ -255,15 +206,18 @@ const useQueryConfigs = () => {
     );
   };
 
+  /** ["GET_RELATED_USER_EMAILS"] */
   const getRelatedUserEmailsQueryKey = () => [
     QueryCacheGroups.GET_RELATED_USER_EMAILS,
   ];
+  /** Defaults to default + refetch on window focus: false */
   const getRelatedUserEmailsOptions: QueryOptionsFunction<string[]> = (
     options = {}
   ) => ({
     refetchOnWindowFocus: false,
     ...options,
   });
+  /** Function to get related user emails, unsorted */
   const getRelatedUserEmailsFunction = async (
     options: FunctionOptions = {}
   ): Promise<string[]> => {
@@ -285,7 +239,7 @@ const useQueryConfigs = () => {
         if (!online) {
           query.fromLocalDatastore();
         }
-        const albums = await query.limit(1000).find();
+        const albums = await query.findAll();
         const relatedEmails = [];
         const gotUsers: { [key: string]: ParseUser } = {};
         for (const albumResponse of albums) {
@@ -311,7 +265,9 @@ const useQueryConfigs = () => {
     );
   };
 
+  /** ["GET_DUPLICATES"] */
   const getDuplicatesQueryKey = () => [QueryCacheGroups.GET_DUPLICATES];
+  /** Defaults to default + refetch on window focus: false + refetch interval: 5 minutes */
   const getDuplicatesOptions: QueryOptionsFunction<ParseDuplicate[]> = (
     options = {}
   ) => ({
@@ -319,6 +275,7 @@ const useQueryConfigs = () => {
     refetchInterval: 5 * 60 * 1000,
     ...options,
   });
+  /** Function to get duplicates, unsorted */
   const getDuplicatesFunction = async (
     options: FunctionOptions = {}
   ): Promise<ParseDuplicate[]> => {
@@ -339,9 +296,11 @@ const useQueryConfigs = () => {
     );
   };
 
+  /** ["GET_ALBUM_CHANGE_NOTIFICATIONS"] */
   const getAlbumChangeNotificationsQueryKey = () => [
     QueryCacheGroups.GET_ALBUM_CHANGE_NOTIFICATIONS,
   ];
+  /** Defaults to default + refetch on window focus: false + refetch interval: 5 minutes */
   const getAlbumChangeNotificationsOptions: QueryOptionsFunction<
     ParseAlbumChangeNotification[]
   > = (options = {}) => ({
@@ -349,6 +308,7 @@ const useQueryConfigs = () => {
     refetchInterval: 5 * 60 * 1000,
     ...options,
   });
+  /** Function to get album change notifications, unsorted */
   const getAlbumChangeNotificationsFunction = async (
     options: FunctionOptions = {}
   ): Promise<ParseAlbumChangeNotification[]> => {
@@ -376,12 +336,6 @@ const useQueryConfigs = () => {
     getDuplicatesQueryKey,
     getDuplicatesOptions,
     getDuplicatesFunction,
-    getAllAlbumsFunction,
-    getAllAlbumsQueryKey,
-    getAllAlbumsOptions,
-    getAllImagesFunction,
-    getAllImagesQueryKey,
-    getAllImagesOptions,
     getAlbumFunction,
     getAlbumOptions,
     getAlbumQueryKey,
@@ -391,9 +345,6 @@ const useQueryConfigs = () => {
     getImageByIdOptions,
     getImageByIdFunction,
     getImageByIdQueryKey,
-    getImagesByOwnerFunction,
-    getImagesByOwnerOptions,
-    getImagesByOwnerQueryKey,
     getUserByIdQueryKey,
     getUserByIdOptions,
     getUserByIdFunction,
