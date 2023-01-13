@@ -52,10 +52,6 @@ const App = () => {
     );
 
   useEffect(() => {
-    navigator?.serviceWorker?.register?.(
-      `/service-worker.js?version=${window.__env__.SERVICE_WORKER_VERSION_NUMBER}`,
-      { scope: "/" }
-    );
     if (window.location.host.match(/^www\./) !== null) {
       window.location.host = window.location.host.substring(4);
     }
@@ -88,9 +84,6 @@ const App = () => {
             title: Strings.notEnoughSpace(),
             detail: Strings.limitedOffline(),
             icon: <DiscFullIcon />,
-          });
-          navigator?.serviceWorker?.ready?.then((registration) => {
-            registration.active?.postMessage({ useCache: false });
           });
         }
       }

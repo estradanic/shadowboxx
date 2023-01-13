@@ -28,15 +28,15 @@
     "react-dom": "^17.0.1",
     "react-reverse-portal": "^2.1.0",
     "react-router-dom": "^6.3.0",
+    "rollup-plugin-typescript": "^1.0.1",
     "use-debounce": "^9.0.3",
     "uuid": "^9.0.0",
     "zustand": "^4.3.1"
   },
   "scripts": {
-    "preBuild": "cd service-worker && tsc && cd ..",
-    "build": "yarn preBuild && vite build --mode development",
-    "build:prod": "yarn preBuild && vite build",
-    "start": "yarn preBuild && vite serve",
+    "build": "vite build --mode development",
+    "build:prod": "vite build",
+    "start": "vite serve",
     "start:prod": "yarn build:prod && vite preview",
     "compileCloud": "cd ./cloud && tsc && cd ..",
     "format": "prettier --write '{@types,app,cloud,components,contexts,hooks,resources,types,utils,views,service-worker}/**/*.{ts,tsx,js,json,jsx}' && prettier --write '*.{ts,tsx,js,json,jsx}'",
@@ -82,6 +82,7 @@
     "typescript": "^4.9.4",
     "vite": "^4.0.4",
     "vite-plugin-eslint": "^1.8.1",
-    "vite-plugin-html": "^3.2.0"
+    "vite-plugin-html": "^3.2.0",
+    "vite-plugin-pwa": "^0.14.1"
   }
 }

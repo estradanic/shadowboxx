@@ -4,7 +4,6 @@ declare global {
       PARSE_APPLICATION_ID: string;
       PARSE_JAVASCRIPT_KEY: string;
       PARSE_HOST_URL: string;
-      SERVICE_WORKER_VERSION_NUMBER: string;
     };
   }
 
