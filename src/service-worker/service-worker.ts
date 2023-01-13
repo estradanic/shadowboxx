@@ -1,18 +1,10 @@
 const CACHE_NAME = "Shadowboxx";
 
-const sw = this as unknown as ServiceWorkerGlobalScope;
+const sw = self as unknown as ServiceWorkerGlobalScope;
 
 // Middleware for fetches (caching vs. online)
 sw.addEventListener("fetch", (event) => {
   const url = new URL(event.request.url);
-  // Don't bother managing non-http(s) requests or requests to httpbin.org,
-  // which are used for determining online status
-  if (
-    (url.protocol !== "http:" && url.protocol !== "https:") ||
-    url.host === "httpbin.org"
-  ) {
-    return;
-  }
   if (url.host === "parsefiles.back4app.com") {
     // For images, respond with online only if cached doesn't exist
     event.respondWith(

@@ -57,7 +57,6 @@ export default class ParseImage extends ParseObject<"Image"> {
    * @returns Parse.Query for the "Image" class
    */
   static query(online = true) {
-    console.log("Image", {online});
     if (online) {
       return new Parse.Query<Parse.Object<ParsifyPointers<"Image">>>("Image");
     }

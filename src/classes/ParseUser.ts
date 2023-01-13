@@ -64,7 +64,6 @@ export default class ParseUser extends ParseObject<"_User"> {
    * @returns A Parse.Query for the Parse.User ("User") class
    */
   static query(online = true) {
-    console.log("User", { online });
     if (online) {
       return new Parse.Query<Parse.User<ParsifyPointers<"_User">>>("User");
     }

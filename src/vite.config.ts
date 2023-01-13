@@ -2,7 +2,6 @@ import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
 import { createHtmlPlugin } from "vite-plugin-html";
 import { VitePWA } from "vite-plugin-pwa";
-import eslint from "vite-plugin-eslint";
 import CompileTypescriptServiceWorker from "./CompileTsServiceWorker";
 
 export default defineConfig(({ mode }) => ({
@@ -55,35 +54,33 @@ export default defineConfig(({ mode }) => ({
         },
       },
     }),
-    eslint(),
     VitePWA({
       devOptions: {
         enabled: true,
       },
       outDir: "build",
-      filename: "service-worker.js",
       scope: "/",
       injectRegister: "inline",
       registerType: "autoUpdate",
       manifest: {
-        "short_name": "Shadowboxx",
-        "name": "Collaborative Photo Albums",
-        "start_url": "/",
-        "display": "standalone",
-        "theme_color": "#ffffff",
-        "background_color": "#1B71B5",
-        "icons": [
+        short_name: "Shadowboxx",
+        name: "Collaborative Photo Albums",
+        start_url: "/",
+        display: "standalone",
+        theme_color: "#ffffff",
+        background_color: "#1B71B5",
+        icons: [
           {
-            "src": "/icon-512x512.png",
-            "type": "image/png",
-            "sizes": "512x512",
-            "purpose": "any maskable"
+            src: "/icon-512x512.png",
+            type: "image/png",
+            sizes: "512x512",
+            purpose: "any maskable",
           },
         ],
       },
       workbox: {
-        importScripts: ["./custom-sw.js"],
-        globIgnores: ["**/custom-sw.js"],
+        importScripts: ["./service-worker.js"],
+        globIgnores: ["**/service-worker.js"],
       },
     }),
     CompileTypescriptServiceWorker(),
