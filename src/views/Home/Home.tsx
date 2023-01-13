@@ -1,11 +1,9 @@
 import React, { memo, useMemo, useState } from "react";
-import Fab from "@material-ui/core/Fab";
 import Typography from "@material-ui/core/Typography";
 import Grid from "@material-ui/core/Grid";
 import { makeStyles, Theme } from "@material-ui/core/styles";
 import AddIcon from "@material-ui/icons/Add";
 import { useInfiniteQuery } from "@tanstack/react-query";
-import classNames from "classnames";
 import {
   PageContainer,
   AlbumCard,
@@ -13,36 +11,22 @@ import {
   useSnackbar,
   BlankCanvas,
   AlbumCardSkeleton,
+  Fab,
+  Online,
 } from "../../components";
 import { Strings } from "../../resources";
 import { ParseAlbum } from "../../classes";
-import { useUserContext } from "../../contexts";
+import { useUserContext, useNetworkDetectionContext } from "../../contexts";
 import { useView } from "../View";
 import {
-  useHideOnScroll,
   useInfiniteQueryConfigs,
   useInfiniteScroll,
   useRandomColor,
+  useVirtualList,
 } from "../../hooks";
 import { DEFAULT_PAGE_SIZE } from "../../constants";
 
 const useStyles = makeStyles((theme: Theme) => ({
-  fab: {
-    backgroundColor: theme.palette.success.main,
-    color: theme.palette.success.contrastText,
-    position: "absolute",
-    right: theme.spacing(4),
-    "&:hover, &:focus, &:active": {
-      backgroundColor: theme.palette.success.dark,
-    },
-    transition: theme.transitions.create("bottom"),
-  },
-  fabVisible: {
-    bottom: theme.spacing(7),
-  },
-  fabHidden: {
-    bottom: theme.spacing(-10),
-  },
   title: {
     marginRight: "auto",
   },
@@ -70,6 +54,7 @@ const Home = memo(() => {
     getAllAlbumsInfiniteQueryKey,
     getAllAlbumsInfiniteOptions,
   } = useInfiniteQueryConfigs();
+  const { online } = useNetworkDetectionContext();
   const {
     data,
     status,
@@ -79,7 +64,7 @@ const Home = memo(() => {
   } = useInfiniteQuery<ParseAlbum[], Error>(
     getAllAlbumsInfiniteQueryKey(),
     ({ pageParam: page = 0 }) =>
-      getAllAlbumsInfiniteFunction({
+      getAllAlbumsInfiniteFunction(online, {
         showErrorsInSnackbar: true,
         page,
         pageSize: DEFAULT_PAGE_SIZE,
@@ -87,33 +72,34 @@ const Home = memo(() => {
     getAllAlbumsInfiniteOptions()
   );
   useInfiniteScroll(fetchNextPage, { canExecute: !isFetchingNextPage });
+  const { getLoggedInUser } = useUserContext();
+
   const albums = useMemo(
     () => data?.pages?.flatMap((page) => page) ?? [],
     [data?.pages]
   );
+  const { virtualized: virtualizedAlbums, reset: resetVirtualList } =
+    useVirtualList({ list: albums, interval: 10, enabled: !!albums?.length });
 
-  const { getLoggedInUser } = useUserContext();
   const randomColor = useRandomColor();
-  const fabVisible = useHideOnScroll();
 
   return (
     <PageContainer>
       <>
         {status === "success" && !!albums.length ? (
           <Grid item spacing={2} container className={classes.albumsContainer}>
-            {ParseAlbum.sort(albums, getLoggedInUser().favoriteAlbums).map(
-              (album) => (
-                <Grid key={album?.name} item xs={12} md={6} lg={4} xl={3}>
-                  <AlbumCard
-                    borderColor={randomColor}
-                    onChange={async (_) => {
-                      await refetchAlbums();
-                    }}
-                    value={album}
-                  />
-                </Grid>
-              )
-            )}
+            {virtualizedAlbums.map((album) => (
+              <Grid key={album?.name} item xs={12} md={6} lg={4} xl={3}>
+                <AlbumCard
+                  borderColor={randomColor}
+                  onChange={async (_) => {
+                    await refetchAlbums();
+                    resetVirtualList();
+                  }}
+                  value={album}
+                />
+              </Grid>
+            ))}
           </Grid>
         ) : (
           <>
@@ -146,15 +132,11 @@ const Home = memo(() => {
           </>
         )}
       </>
-      <Fab
-        onClick={() => setAddAlbumDialogOpen(true)}
-        className={classNames(classes.fab, {
-          [classes.fabVisible]: fabVisible,
-          [classes.fabHidden]: !fabVisible,
-        })}
-      >
-        <AddIcon />
-      </Fab>
+      <Online>
+        <Fab onClick={() => setAddAlbumDialogOpen(true)}>
+          <AddIcon />
+        </Fab>
+      </Online>
       <AlbumFormDialog
         resetOnConfirm
         value={{

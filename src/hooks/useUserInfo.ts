@@ -66,7 +66,7 @@ const useUserInfo = ({
     } else if (userPointer) {
       return await userPointer.fetch<ParseUser>(online);
     } else {
-      return await getUserByEmailFunction(email, queryFunctionOptions);
+      return await getUserByEmailFunction(online, email, queryFunctionOptions);
     }
   }, [
     fetchUser,

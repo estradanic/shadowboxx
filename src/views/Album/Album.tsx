@@ -5,7 +5,9 @@ import {
   FancyTitleTypographySkeleton,
   ImagesSkeleton,
   PageContainer,
+  Fab,
   useSnackbar,
+  Online,
 } from "../../components";
 import { useLocation, useParams } from "react-router-dom";
 import Grid from "@material-ui/core/Grid";
@@ -26,30 +28,12 @@ import {
   useQueryConfigs,
   useInfiniteQueryConfigs,
   useInfiniteScroll,
-  useHideOnScroll,
 } from "../../hooks";
 import { useView } from "../View";
 import OwnerImageDecoration from "../../components/Image/Decoration/OwnerImageDecoration";
-import { Fab } from "@material-ui/core";
-import classNames from "classnames";
+import { useNetworkDetectionContext } from "../../contexts";
 
 const useStyles = makeStyles((theme: Theme) => ({
-  fab: {
-    position: "absolute",
-    right: theme.spacing(4),
-    "&:hover, &:focus, &:active": {
-      backgroundColor: theme.palette.success.dark,
-    },
-    transition: theme.transitions.create("bottom"),
-    backgroundColor: theme.palette.success.main,
-    color: theme.palette.success.contrastText,
-  },
-  fabVisible: {
-    bottom: theme.spacing(7),
-  },
-  fabHidden: {
-    bottom: theme.spacing(-10),
-  },
   svgContainer: {
     textAlign: "center",
   },
@@ -67,6 +51,7 @@ const Album = memo(() => {
   const classes = useStyles();
   const location = useLocation() as { state: { previousLocation?: Location } };
   const randomColor = useRandomColor();
+  const { online } = useNetworkDetectionContext();
   const { getAlbumFunction, getAlbumQueryKey, getAlbumOptions } =
     useQueryConfigs();
   const {
@@ -77,7 +62,7 @@ const Album = memo(() => {
   const queryClient = useQueryClient();
   const { data: album, status: albumStatus } = useQuery<ParseAlbum, Error>(
     getAlbumQueryKey(id),
-    () => getAlbumFunction(id, { showErrorsInSnackbar: true }),
+    () => getAlbumFunction(online, id, { showErrorsInSnackbar: true }),
     getAlbumOptions()
   );
   const {
@@ -88,7 +73,7 @@ const Album = memo(() => {
   } = useInfiniteQuery<ParseImage[], Error>(
     getImagesByIdInfiniteQueryKey(album?.images ?? []),
     ({ pageParam: page = 0 }) =>
-      getImagesByIdInfiniteFunction(album?.images ?? [], {
+      getImagesByIdInfiniteFunction(online, album?.images ?? [], {
         showErrorsInSnackbar: true,
         page,
         pageSize: DEFAULT_PAGE_SIZE,
@@ -97,7 +82,6 @@ const Album = memo(() => {
   );
   useInfiniteScroll(fetchNextPage, { canExecute: !isFetchingNextPage });
   const [editMode, setEditMode] = useState<boolean>(false);
-  const fabVisible = useHideOnScroll();
   const { enqueueSuccessSnackbar, enqueueErrorSnackbar } = useSnackbar();
 
   const images = useMemo(
@@ -162,15 +146,11 @@ const Album = memo(() => {
             images={images}
             outlineColor={randomColor}
           />
-          <Fab
-            onClick={() => setEditMode(true)}
-            className={classNames(classes.fab, {
-              [classes.fabVisible]: fabVisible,
-              [classes.fabHidden]: !fabVisible,
-            })}
-          >
-            <EditIcon />
-          </Fab>
+          <Online>
+            <Fab onClick={() => setEditMode(true)}>
+              <EditIcon />
+            </Fab>
+          </Online>
         </>
       ) : (
         <Grid item className={classes.svgContainer}>

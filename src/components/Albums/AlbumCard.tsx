@@ -24,7 +24,11 @@ import {
   Attributes,
   AlbumSaveContext,
 } from "../../classes";
-import { ImageContextProvider, useUserContext } from "../../contexts";
+import {
+  ImageContextProvider,
+  useNetworkDetectionContext,
+  useUserContext,
+} from "../../contexts";
 import { useQueryConfigs, useNavigate } from "../../hooks";
 import UserAvatar from "../User/UserAvatar";
 import Empty from "../Svgs/Empty";
@@ -109,6 +113,7 @@ const AlbumCard = memo(({ value, onChange, borderColor }: AlbumCardProps) => {
   const [anchorEl, setAnchorEl] = useState<Element>();
   const [editAlbumDialogOpen, setEditAlbumDialogOpen] =
     useState<boolean>(false);
+  const { online } = useNetworkDetectionContext();
 
   const {
     getUserByIdQueryKey,
@@ -126,12 +131,12 @@ const AlbumCard = memo(({ value, onChange, borderColor }: AlbumCardProps) => {
   } = useQueryConfigs();
   const { data: owner, status: ownerStatus } = useQuery<ParseUser, Error>(
     getUserByIdQueryKey(value.owner.id),
-    () => getUserByIdFunction(value.owner.id),
+    () => getUserByIdFunction(online, value.owner.id),
     getUserByIdOptions()
   );
   const { data: images } = useQuery<ParseImage[], Error>(
     getImagesByIdQueryKey(value.images),
-    () => getImagesByIdFunction(value.images),
+    () => getImagesByIdFunction(online, value.images),
     getImagesByIdOptions()
   );
   const { data: coverImage, status: coverImageStatus } = useQuery<
@@ -139,7 +144,7 @@ const AlbumCard = memo(({ value, onChange, borderColor }: AlbumCardProps) => {
     Error
   >(
     getImageByIdQueryKey(value.coverImage?.id ?? ""),
-    () => getImageByIdFunction(value.coverImage?.id ?? ""),
+    () => getImageByIdFunction(online, value.coverImage?.id ?? ""),
     getImageByIdOptions({ enabled: !!value.coverImage?.id })
   );
   const { data: collaborators, status: collaboratorsStatus } = useQuery<
@@ -147,12 +152,12 @@ const AlbumCard = memo(({ value, onChange, borderColor }: AlbumCardProps) => {
     Error
   >(
     getUsersByEmailQueryKey(value.collaborators),
-    () => getUsersByEmailFunction(value.collaborators),
+    () => getUsersByEmailFunction(online, value.collaborators),
     getUsersByEmailOptions()
   );
   const { data: viewers, status: viewersStatus } = useQuery<ParseUser[], Error>(
     getUsersByEmailQueryKey(value.viewers),
-    () => getUsersByEmailFunction(value.viewers),
+    () => getUsersByEmailFunction(online, value.viewers),
     getUsersByEmailOptions()
   );
 
