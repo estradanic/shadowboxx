@@ -39,7 +39,7 @@
     "start": "vite serve",
     "start:prod": "yarn build:prod && vite preview",
     "compileCloud": "cd ./cloud && tsc && cd ..",
-    "format": "prettier --write '{@types,app,cloud,components,contexts,hooks,resources,types,utils,views,service-worker}/**/*.{ts,tsx,js,json,jsx}' && prettier --write '*.{ts,tsx,js,json,jsx}'",
+    "format": "prettier --write '{@types,app,cloud,components,contexts,hooks,resources,types,utils,views,serviceWorker}/**/*.{ts,tsx,js,json,jsx}' && prettier --write '*.{ts,tsx,js,json,jsx}'",
     "analyze": "source-map-explorer 'build/assets/*.js'",
     "preDeploy": "yarn install && yarn build && yarn compileCloud && rm -rf ../public/* && cp -r ./build/* ../public",
     "preDeploy:prod": "yarn install && yarn build:prod && yarn compileCloud && rm -rf ../public/* && cp -r ./build/* ../public",
@@ -79,10 +79,15 @@
     "eslint": "^8.31.0",
     "eslint-config-react-app": "^7.0.1",
     "prettier": "^2.8.2",
+    "tslib": "^2.4.1",
     "typescript": "^4.9.4",
     "vite": "^4.0.4",
     "vite-plugin-eslint": "^1.8.1",
     "vite-plugin-html": "^3.2.0",
-    "vite-plugin-pwa": "^0.14.1"
+    "vite-plugin-pwa": "^0.14.1",
+    "workbox-build": "^6.5.4",
+    "workbox-routing": "^6.5.4",
+    "workbox-strategies": "^6.5.4",
+    "workbox-window": "^6.5.4"
   }
 }

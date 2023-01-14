@@ -2,13 +2,11 @@ import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
 import { createHtmlPlugin } from "vite-plugin-html";
 import { VitePWA } from "vite-plugin-pwa";
-import CompileTypescriptServiceWorker from "./CompileTsServiceWorker";
 
 export default defineConfig(({ mode }) => ({
   publicDir: "public",
   build: {
     outDir: "build",
-    target: "es6",
     rollupOptions: {
       output: {
         manualChunks: {
@@ -55,13 +53,6 @@ export default defineConfig(({ mode }) => ({
       },
     }),
     VitePWA({
-      devOptions: {
-        enabled: true,
-      },
-      outDir: "build",
-      scope: "/",
-      injectRegister: "inline",
-      registerType: "autoUpdate",
       manifest: {
         short_name: "Shadowboxx",
         name: "Collaborative Photo Albums",
@@ -78,11 +69,11 @@ export default defineConfig(({ mode }) => ({
           },
         ],
       },
-      workbox: {
-        importScripts: ["./service-worker.js"],
-        globIgnores: ["**/service-worker.js"],
-      },
+      strategies: "injectManifest",
+      srcDir: "serviceWorker",
+      filename: "serviceWorker.ts",
+      registerType: "autoUpdate",
+      scope: "/",
     }),
-    CompileTypescriptServiceWorker(),
   ],
 }));
