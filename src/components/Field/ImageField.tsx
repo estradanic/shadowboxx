@@ -85,8 +85,6 @@ export type ImageFieldProps = Omit<
   value: ParseImage[];
   /** Function to run when an image is added */
   onAdd: (...image: ParseImage[]) => Promise<void> | void;
-  /** Whether multiple images can be selected or not */
-  multiple?: boolean;
   /** ACL to save new images with after upload */
   acl?: Parse.ACL;
   /** Props to pass to the IconButton when variant=="button" */
@@ -105,12 +103,24 @@ export type ImageFieldProps = Omit<
         onRemove: (...image: ParseImage[]) => Promise<void> | void;
         /** Variant for how to display the field */
         variant?: "field";
+        /** Whether multiple images can be selected or not */
+        multiple: true;
+      }
+    | {
+        /** Function to run when an image is removed */
+        onRemove?: never;
+        /** Variant for how to display the field */
+        variant: "field";
+        /** Whether multiple images can be selected or not */
+        multiple?: false;
       }
     | {
         /** Function to run when an image is removed */
         onRemove?: never;
         /** Variant for how to display the field */
         variant: "button";
+        /** Whether multiple images can be selected or not */
+        multiple?: boolean;
       }
   );
 

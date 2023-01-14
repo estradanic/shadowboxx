@@ -231,7 +231,7 @@ const Strings: {
   insertCollaboratorsError: () => "Error inserting collaborators",
   install: () => "Install App",
   installed: () => "Installed! :)",
-  installPrompt: () => "View offline!",
+  installPrompt: () => "Use Shadowboxx offline!",
   invalidEmail: (email: string) => `Invalid email${email ? ` (${email})` : ""}`,
   invalidEmptyFilename: () => "File name cannot be empty!",
   invalidImage: (image: { src: string; fileName: string }) =>

@@ -7,7 +7,7 @@ import classNames from "classnames";
 import { useInfiniteQuery } from "@tanstack/react-query";
 import { difference } from "../../utils";
 import { Strings } from "../../resources";
-import { useUserContext } from "../../contexts";
+import { useNetworkDetectionContext, useUserContext } from "../../contexts";
 import {
   useRandomColor,
   useInfiniteQueryConfigs,
@@ -88,6 +88,7 @@ const ImageSelectionDialog = ({
     getImagesByOwnerInfiniteQueryKey,
     getImagesByOwnerInfiniteOptions,
   } = useInfiniteQueryConfigs();
+  const { online } = useNetworkDetectionContext();
 
   // Images that the current user owns, not those shared to them.
   const { data, status, fetchNextPage, isFetchingNextPage } = useInfiniteQuery<
@@ -96,7 +97,7 @@ const ImageSelectionDialog = ({
   >(
     getImagesByOwnerInfiniteQueryKey(getLoggedInUser()),
     ({ pageParam: page = 0 }) =>
-      getImagesByOwnerInfiniteFunction(getLoggedInUser(), {
+      getImagesByOwnerInfiniteFunction(online, getLoggedInUser(), {
         showErrorsInSnackbar: true,
         page,
         pageSize: DEFAULT_PAGE_SIZE,

@@ -6,8 +6,7 @@
     "strict": true,
     "forceConsistentCasingInFileNames": true,
     "noFallthroughCasesInSwitch": true,
-    "isolatedModules": false,
-    "outDir": "../public",
-    "skipLibCheck": true
+    "sourceMap": true,
+    "moduleResolution": "node"
   }
 }

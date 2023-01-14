@@ -262,12 +262,14 @@ const Settings = memo(() => {
                     value={
                       settings.profilePicture ? [settings.profilePicture] : []
                     }
-                    onChange={async ([newProfilePicture]) =>
+                    variant="field"
+                    onAdd={async (newProfilePicture) =>
                       setSettings((prev) => ({
                         ...prev,
                         profilePicture: newProfilePicture,
                       }))
                     }
+                    multiple={false}
                     label={Strings.profilePicture()}
                   />
                 </ImageContextProvider>
