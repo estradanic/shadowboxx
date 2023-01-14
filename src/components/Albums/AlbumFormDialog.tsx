@@ -5,7 +5,11 @@ import useMediaQuery from "@material-ui/core/useMediaQuery";
 import { useInfiniteQuery } from "@tanstack/react-query";
 import { Strings } from "../../resources";
 import { uniqueId } from "../../utils";
-import { ImageContextProvider, useUserContext } from "../../contexts";
+import {
+  ImageContextProvider,
+  useNetworkDetectionContext,
+  useUserContext,
+} from "../../contexts";
 import { ParseImage, AlbumAttributes } from "../../classes";
 import {
   useInfiniteScroll,
@@ -65,7 +69,7 @@ const AlbumFormDialog = ({
     onCancel: piHandleCancel,
     resetOnSubmit: resetOnConfirm,
   });
-
+  const { online } = useNetworkDetectionContext();
   const {
     getImagesByIdInfiniteOptions,
     getImagesByIdInfiniteFunction,
@@ -77,7 +81,7 @@ const AlbumFormDialog = ({
   >(
     getImagesByIdInfiniteQueryKey(allImageIds),
     ({ pageParam: page = 0 }) =>
-      getImagesByIdInfiniteFunction(allImageIds, {
+      getImagesByIdInfiniteFunction(online, allImageIds, {
         showErrorsInSnackbar: true,
         page,
         pageSize: DEFAULT_PAGE_SIZE,

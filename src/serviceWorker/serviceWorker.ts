@@ -4,7 +4,7 @@ import {
   setCatchHandler,
   setDefaultHandler,
 } from "workbox-routing";
-import { NetworkFirst, NetworkOnly, CacheFirst } from "workbox-strategies";
+import { NetworkFirst, NetworkOnly } from "workbox-strategies";
 import type { ManifestEntry } from "workbox-build";
 
 declare let self: ServiceWorkerGlobalScope;
@@ -25,7 +25,7 @@ const manifestURLs = manifest.map((entry) => {
 
 self.addEventListener("install", (event: ExtendableEvent) => {
   event.waitUntil(
-    caches.open(cacheNames.runtime).then((cache) => {
+    caches.open(cacheNames.precache).then((cache) => {
       return cache.addAll(cacheEntries);
     })
   );
@@ -33,7 +33,7 @@ self.addEventListener("install", (event: ExtendableEvent) => {
 
 self.addEventListener("activate", (event: ExtendableEvent) => {
   event.waitUntil(
-    caches.open(cacheNames.runtime).then((cache) => {
+    caches.open(cacheNames.precache).then((cache) => {
       // clean up those who are not listed in manifestURLs
       cache.keys().then((keys) => {
         keys.forEach((request) => {
@@ -48,7 +48,7 @@ self.addEventListener("activate", (event: ExtendableEvent) => {
 
 registerRoute(
   ({ url }) => manifestURLs.includes(url.href),
-  new NetworkFirst({ cacheName: cacheNames.runtime, networkTimeoutSeconds: 3 })
+  new NetworkFirst({ cacheName: cacheNames.precache, networkTimeoutSeconds: 3 })
 );
 
 registerRoute(

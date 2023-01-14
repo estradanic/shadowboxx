@@ -2,6 +2,7 @@ import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
 import { createHtmlPlugin } from "vite-plugin-html";
 import { VitePWA } from "vite-plugin-pwa";
+import checker from "vite-plugin-checker";
 
 export default defineConfig(({ mode }) => ({
   publicDir: "public",
@@ -17,6 +18,7 @@ export default defineConfig(({ mode }) => ({
     },
   },
   plugins: [
+    checker({ typescript: true }),
     react({
       include: "**/*.{tsx}",
     }),
