@@ -15,6 +15,7 @@ import { ParseImage } from "../../classes";
 import { useView } from "../View";
 import { useInfiniteQuery } from "@tanstack/react-query";
 import { DEFAULT_PAGE_SIZE } from "../../constants";
+import { useNetworkDetectionContext } from "../../contexts";
 
 /**
  * Page for viewing all the logged in users's images
@@ -22,6 +23,7 @@ import { DEFAULT_PAGE_SIZE } from "../../constants";
 const Images = memo(() => {
   useView("Images");
   const randomColor = useRandomColor();
+  const { online } = useNetworkDetectionContext();
   const {
     getAllImagesInfiniteFunction,
     getAllImagesInfiniteQueryKey,
@@ -33,7 +35,7 @@ const Images = memo(() => {
   >(
     getAllImagesInfiniteQueryKey(),
     ({ pageParam: page = 0 }) =>
-      getAllImagesInfiniteFunction({
+      getAllImagesInfiniteFunction(online, {
         showErrorsInSnackbar: true,
         page,
         pageSize: DEFAULT_PAGE_SIZE,

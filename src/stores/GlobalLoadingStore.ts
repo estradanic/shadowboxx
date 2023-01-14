@@ -1,4 +1,4 @@
-import create from "zustand";
+import {create} from "zustand";
 import { LoadingWrapperProps } from "../components/Loader/LoadingWrapper";
 
 type StartGlobalLoaderOptions = {

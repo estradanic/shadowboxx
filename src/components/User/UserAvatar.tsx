@@ -6,6 +6,7 @@ import { useQuery } from "@tanstack/react-query";
 import { ParseImage } from "../../classes";
 import { Strings } from "../../resources";
 import { useQueryConfigs, useUserInfo, UseUserInfoParams } from "../../hooks";
+import { useNetworkDetectionContext } from "../../contexts";
 import Tooltip from "../Tooltip/Tooltip";
 
 const useStyles = makeStyles((theme: Theme) => ({
@@ -38,9 +39,10 @@ const UserAvatar = forwardRef(
     const { getImageByIdFunction, getImageByIdQueryKey, getImageByIdOptions } =
       useQueryConfigs();
     const user = useUserInfo(UseUserInfoParams);
+    const { online } = useNetworkDetectionContext();
     const { data: profilePicture } = useQuery<ParseImage, Error>(
       getImageByIdQueryKey(user?.profilePicture?.id ?? ""),
-      () => getImageByIdFunction(user?.profilePicture?.id ?? ""),
+      () => getImageByIdFunction(online, user?.profilePicture?.id ?? ""),
       getImageByIdOptions({ enabled: !!user?.profilePicture?.id })
     );
     const userName =

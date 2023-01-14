@@ -12,4 +12,3 @@ export { default as ParseUser, UserUpdateReason as UpdateReason } from "./ParseU
 export type { UserAttributes, UpdateLoggedInUser } from "./ParseUser";
 export {default as ParseAlbumChangeNotification} from "./ParseAlbumChangeNotification";
 export type {AlbumChangeNotificationAttributes} from "./ParseAlbumChangeNotification";
-export {default as IdbKeyvalStorage} from "./IdbKeyvalStorage";

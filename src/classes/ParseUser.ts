@@ -101,6 +101,7 @@ export default class ParseUser extends ParseObject<"_User"> {
   constructor(user: Parse.User<ParsifyPointers<"_User">>) {
     super(user);
     this._user = user;
+    this.pin();
   }
 
   /**

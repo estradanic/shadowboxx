@@ -98,6 +98,7 @@ export default class ParseAlbum extends ParseObject<"Album"> {
   constructor(album: Parse.Object<ParsifyPointers<"Album">>) {
     super(album);
     this._album = album;
+    this.pin();
   }
 
   compareTo(that: ParseAlbum): number {

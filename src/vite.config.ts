@@ -1,14 +1,13 @@
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
 import { createHtmlPlugin } from "vite-plugin-html";
-import eslint from "vite-plugin-eslint";
-import { version } from "./package.json";
+import { VitePWA } from "vite-plugin-pwa";
+import checker from "vite-plugin-checker";
 
 export default defineConfig(({ mode }) => ({
   publicDir: "public",
   build: {
     outDir: "build",
-    target: "es6",
     rollupOptions: {
       output: {
         manualChunks: {
@@ -19,6 +18,7 @@ export default defineConfig(({ mode }) => ({
     },
   },
   plugins: [
+    checker({ typescript: true }),
     react({
       include: "**/*.{tsx}",
     }),
@@ -48,13 +48,34 @@ export default defineConfig(({ mode }) => ({
                     ? "http://shadowboxx.b4a.io"
                     : "http://shadowboxxdevtest.b4a.io"
                 }",
-                SERVICE_WORKER_VERSION_NUMBER: "${version}",
               };
             </script>
           `.replace(/\s/g, ""),
         },
       },
     }),
-    eslint(),
+    VitePWA({
+      manifest: {
+        short_name: "Shadowboxx",
+        name: "Collaborative Photo Albums",
+        start_url: "/",
+        display: "standalone",
+        theme_color: "#ffffff",
+        background_color: "#1B71B5",
+        icons: [
+          {
+            src: "/icon-512x512.png",
+            type: "image/png",
+            sizes: "512x512",
+            purpose: "any maskable",
+          },
+        ],
+      },
+      strategies: "injectManifest",
+      srcDir: "serviceWorker",
+      filename: "serviceWorker.ts",
+      registerType: "autoUpdate",
+      scope: "/",
+    }),
   ],
 }));

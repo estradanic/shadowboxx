@@ -12,15 +12,17 @@ import {
   BlankCanvas,
   AlbumCardSkeleton,
   Fab,
+  Online,
 } from "../../components";
 import { Strings } from "../../resources";
 import { ParseAlbum } from "../../classes";
-import { useUserContext } from "../../contexts";
+import { useUserContext, useNetworkDetectionContext } from "../../contexts";
 import { useView } from "../View";
 import {
   useInfiniteQueryConfigs,
   useInfiniteScroll,
   useRandomColor,
+  useVirtualList,
 } from "../../hooks";
 import { DEFAULT_PAGE_SIZE } from "../../constants";
 
@@ -52,6 +54,7 @@ const Home = memo(() => {
     getAllAlbumsInfiniteQueryKey,
     getAllAlbumsInfiniteOptions,
   } = useInfiniteQueryConfigs();
+  const { online } = useNetworkDetectionContext();
   const {
     data,
     status,
@@ -61,7 +64,7 @@ const Home = memo(() => {
   } = useInfiniteQuery<ParseAlbum[], Error>(
     getAllAlbumsInfiniteQueryKey(),
     ({ pageParam: page = 0 }) =>
-      getAllAlbumsInfiniteFunction({
+      getAllAlbumsInfiniteFunction(online, {
         showErrorsInSnackbar: true,
         page,
         pageSize: DEFAULT_PAGE_SIZE,
@@ -69,12 +72,15 @@ const Home = memo(() => {
     getAllAlbumsInfiniteOptions()
   );
   useInfiniteScroll(fetchNextPage, { canExecute: !isFetchingNextPage });
+  const { getLoggedInUser } = useUserContext();
+
   const albums = useMemo(
     () => data?.pages?.flatMap((page) => page) ?? [],
     [data?.pages]
   );
+  const { virtualized: virtualizedAlbums, reset: resetVirtualList } =
+    useVirtualList({ list: albums, interval: 10, enabled: !!albums?.length });
 
-  const { getLoggedInUser } = useUserContext();
   const randomColor = useRandomColor();
 
   return (
@@ -82,19 +88,18 @@ const Home = memo(() => {
       <>
         {status === "success" && !!albums.length ? (
           <Grid item spacing={2} container className={classes.albumsContainer}>
-            {ParseAlbum.sort(albums, getLoggedInUser().favoriteAlbums).map(
-              (album) => (
-                <Grid key={album?.name} item xs={12} md={6} lg={4} xl={3}>
-                  <AlbumCard
-                    borderColor={randomColor}
-                    onChange={async (_) => {
-                      await refetchAlbums();
-                    }}
-                    value={album}
-                  />
-                </Grid>
-              )
-            )}
+            {virtualizedAlbums.map((album) => (
+              <Grid key={album?.name} item xs={12} md={6} lg={4} xl={3}>
+                <AlbumCard
+                  borderColor={randomColor}
+                  onChange={async (_) => {
+                    await refetchAlbums();
+                    resetVirtualList();
+                  }}
+                  value={album}
+                />
+              </Grid>
+            ))}
           </Grid>
         ) : (
           <>
@@ -127,9 +132,11 @@ const Home = memo(() => {
           </>
         )}
       </>
-      <Fab onClick={() => setAddAlbumDialogOpen(true)}>
-        <AddIcon />
-      </Fab>
+      <Online>
+        <Fab onClick={() => setAddAlbumDialogOpen(true)}>
+          <AddIcon />
+        </Fab>
+      </Online>
       <AlbumFormDialog
         resetOnConfirm
         value={{

@@ -1,4 +1,4 @@
-import create from "zustand";
+import {create} from "zustand";
 
 interface ScrollPositionState {
   /** Scroll positions of the PageContainers across pages */
