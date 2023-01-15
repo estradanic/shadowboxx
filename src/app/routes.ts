@@ -8,6 +8,7 @@ const Settings = lazy(() => import("../views/Settings/Settings"));
 const Signup = lazy(() => import("../views/Signup/Signup"));
 const Album = lazy(() => import("../views/Album/Album"));
 const Images = lazy(() => import("../views/Images/Images"));
+const Share = lazy(() => import("../views/Share/Share"));
 
 /**
  * Interface defining a route object
@@ -78,6 +79,15 @@ const routes: { [key: string]: RouteProps } = {
     tryAuthenticate: true,
     redirectOnAuthFail: true,
     queryCacheGroups: [],
+  },
+  Share: {
+    viewId: "Share",
+    viewName: "Share",
+    View: Share,
+    path: "/share",
+    tryAuthenticate: true,
+    redirectOnAuthFail: true,
+    queryCacheGroups: [QueryCacheGroups.GET_ALL_MODIFYABLE_ALBUMS_INFINITE],
   },
   Signup: {
     viewId: "Signup",

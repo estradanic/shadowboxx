@@ -10,13 +10,14 @@ const frontendRoutes = [
   "images",
   "settings",
   "signup",
+  "share",
   "",
 ];
 
 app.enable("trust proxy");
 
 app.use((req, res, next) => {
-  req.secure || app.get("X-Forwarded-Proto") != "http"
+  req.secure || app.get("X-Forwarded-Proto") !== "http"
     ? next()
     : res.redirect("https://" + req.headers.host + req.url);
 });

@@ -12,8 +12,14 @@ import { FancyTypography, useSnackbar } from "../components";
 import { Strings } from "../resources";
 import { ParseImage, ImageAttributes } from "../classes";
 import { useGlobalLoadingStore } from "../stores";
-import { isNullOrWhitespace } from "../utils";
+import {
+  isNullOrWhitespace,
+  makeValidFileName,
+  removeExtension,
+} from "../utils";
 import { ImageSelectionDialog } from "../components/Images";
+import { readAndCompressImage } from "browser-image-resizer";
+import { useUserContext } from "./UserContext";
 
 export enum ImageActionCommand {
   DELETE,
@@ -45,12 +51,17 @@ export type PromptImageSelectionDialogProps = {
 
 /** Interface defining the value of ImageContextProvider */
 interface ImageContextValue {
-  /** Function to upload an image */
-  uploadImage: (image: ImageAttributes, acl?: Parse.ACL) => Promise<ParseImage>;
   /** Function to delete image */
   deleteImage: (parseImage: ParseImage) => Promise<void>;
   /** Function to open an ImageSelectionDialog prompt */
   promptImageSelectionDialog: (props: PromptImageSelectionDialogProps) => void;
+  /** Function to upload images from files */
+  uploadImagesFromFiles: (
+    files: File[],
+    acl?: Parse.ACL
+  ) => Promise<ParseImage[]>;
+  /** Function to upload image from url */
+  uploadImageFromUrl: (url: string, acl?: Parse.ACL) => Promise<ParseImage>;
 }
 
 /** Context to manage Images */
@@ -68,6 +79,8 @@ export const ImageContextProvider = ({
   const actions = useRef<ImageAction[]>([]);
   const { addNotification } = useNotificationsContext();
   const { enqueueErrorSnackbar } = useSnackbar();
+
+  const { getLoggedInUser } = useUserContext();
 
   const { startGlobalLoader, stopGlobalLoader, updateGlobalLoader } =
     useGlobalLoadingStore((state) => ({
@@ -181,6 +194,91 @@ export const ImageContextProvider = ({
     }
   };
 
+  const processFiles = async (eventFiles: File[]) => {
+    const files: File[] = [];
+    for (let i = 0; i < eventFiles.length; i++) {
+      files[i] = eventFiles[i];
+    }
+    const max = multiple ? files.length : 1;
+    const resizeImagePromises: Promise<File>[] = [];
+    for (let i = 0; i < max; i++) {
+      let file = files[i];
+      if (file.size > 15000000) {
+        resizeImagePromises.push(
+          readAndCompressImage(file, {
+            quality: 1,
+            maxWidth: 2400,
+            maxHeight: 2400,
+            mimeType: "image/webp",
+          })
+        );
+      } else {
+        resizeImagePromises.push(Promise.resolve(file));
+      }
+    }
+    return await Promise.all(resizeImagePromises);
+  };
+
+  const uploadFiles = async (files: File[], acl?: Parse.ACL) => {
+    const max = multiple ? files.length : 1;
+    const newImagePromises: Promise<ParseImage>[] = [];
+    for (let i = 0; i < max; i++) {
+      let file = files[i];
+      const fileName = makeValidFileName(files[i].name);
+      const parseFile = new Parse.File(fileName, file);
+      newImagePromises.push(
+        uploadImage(
+          {
+            file: parseFile,
+            owner: getLoggedInUser().toPointer(),
+            name: removeExtension(fileName),
+          },
+          acl
+        )
+      );
+    }
+    return Promise.all(newImagePromises);
+  };
+
+  const uploadImagesFromFiles = async (files: File[], acl?: Parse.ACL) => {
+    startGlobalLoader({
+      type: "determinate",
+      content: (
+        <FancyTypography variant="loading">
+          {Strings.processingImages()}
+        </FancyTypography>
+      ),
+    });
+    return new Promise<ParseImage[]>((resolve, reject) => {
+      // Using setTimeout to prevent the loader from not showing up
+      setTimeout(async () => {
+        const processedFiles = await processFiles(files);
+        try {
+          const newImages = await uploadFiles(processedFiles, acl);
+          resolve(newImages);
+        } catch (error: any) {
+          reject(error?.message);
+        } finally {
+          stopGlobalLoader();
+        }
+      }, 10);
+    });
+  };
+
+  const uploadImageFromUrl = async (url: string, acl?: Parse.ACL) => {
+    const fileName = makeValidFileName(url.substring(url.lastIndexOf("/") + 1));
+    const parseFile = new Parse.File(fileName, { uri: url });
+    const newImage = await uploadImage(
+      {
+        file: parseFile,
+        owner: getLoggedInUser().toPointer(),
+        name: removeExtension(fileName),
+      },
+      acl
+    );
+    return newImage;
+  };
+
   const deleteImage = async (parseImage: ParseImage) => {
     startGlobalLoader();
     const action: ImageAction = {
@@ -200,9 +298,10 @@ export const ImageContextProvider = ({
   };
 
   const value: ImageContextValue = {
-    uploadImage,
     deleteImage,
     promptImageSelectionDialog,
+    uploadImagesFromFiles,
+    uploadImageFromUrl,
   };
 
   return (

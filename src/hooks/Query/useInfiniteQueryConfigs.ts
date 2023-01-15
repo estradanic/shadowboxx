@@ -1,3 +1,4 @@
+import Parse from "parse";
 import { useUserContext } from "../../contexts";
 import { Strings } from "../../resources";
 import { ParseAlbum, ParseImage, ParseUser } from "../../classes";
@@ -186,6 +187,74 @@ const useInfiniteQueryConfigs = () => {
     );
   };
 
+  /** ["GET_ALL_MODIFYABLE_ALBUMS_INFINITE"] */
+  const getAllModifyableAlbumsInfiniteQueryKey = () => [
+    QueryCacheGroups.GET_ALL_MODIFYABLE_ALBUMS_INFINITE,
+  ];
+  /** Defaults to default + refetch interval: 5 minutes */
+  const getAllModifyableAlbumsInfiniteOptions: InfiniteQueryOptionsFunction<
+    ParseAlbum[]
+  > = (options = {}) => ({
+    ...DEFAULT_OPTIONS,
+    refetchInterval: 5 * 60 * 1000,
+    ...options,
+  });
+  /** Infinite function to get all albums wher the current user is a collaborator or owner
+   *  Sorted by favoriteAlbums, then desc updatedAt
+   */
+  const getAllModifyableAlbumsInfiniteFunction = async (
+    online: boolean,
+    options: InfiniteFunctionOptions = DEFAULT_FUNCTION_OPTIONS
+  ): Promise<ParseAlbum[]> => {
+    return await runFunctionInTryCatch<ParseAlbum[]>(
+      async () => {
+        const favoriteAlbums =
+          options.page === 0
+            ? await Parse.Query.or(
+                ParseAlbum.query(online).contains(
+                  ParseAlbum.COLUMNS.collaborators,
+                  getLoggedInUser().email
+                ),
+                ParseAlbum.query(online).equalTo(
+                  ParseAlbum.COLUMNS.owner,
+                  getLoggedInUser().toNativePointer()
+                )
+              )
+                .containedIn(
+                  ParseAlbum.COLUMNS.id,
+                  getLoggedInUser().favoriteAlbums
+                )
+                .descending(ParseAlbum.COLUMNS.updatedAt)
+                .limit(1000)
+                .find()
+            : [];
+        const nonFavoriteAlbums = await Parse.Query.or(
+          ParseAlbum.query(online).contains(
+            ParseAlbum.COLUMNS.collaborators,
+            getLoggedInUser().email
+          ),
+          ParseAlbum.query(online).equalTo(
+            ParseAlbum.COLUMNS.owner,
+            getLoggedInUser().toNativePointer()
+          )
+        )
+          .notContainedIn(
+            ParseAlbum.COLUMNS.id,
+            getLoggedInUser().favoriteAlbums
+          )
+          .descending(ParseAlbum.COLUMNS.updatedAt)
+          .limit(options.pageSize)
+          .skip(options.page * options.pageSize)
+          .find();
+
+        return [...favoriteAlbums, ...nonFavoriteAlbums].map(
+          (album) => new ParseAlbum(album)
+        );
+      },
+      { errorMessage: Strings.noAlbums(), ...options }
+    );
+  };
+
   // #endregion
 
   return {
@@ -201,6 +270,9 @@ const useInfiniteQueryConfigs = () => {
     getImagesByOwnerInfiniteOptions,
     getImagesByIdInfiniteQueryKey,
     getAllImagesInfiniteFunction,
+    getAllModifyableAlbumsInfiniteFunction,
+    getAllModifyableAlbumsInfiniteQueryKey,
+    getAllModifyableAlbumsInfiniteOptions,
   };
 };
 

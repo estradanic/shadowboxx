@@ -4,6 +4,36 @@ import { createHtmlPlugin } from "vite-plugin-html";
 import { VitePWA } from "vite-plugin-pwa";
 import checker from "vite-plugin-checker";
 
+const manifest = {
+  short_name: "Shadowboxx",
+  name: "Collaborative Photo Albums",
+  start_url: "/",
+  display: "standalone",
+  theme_color: "#ffffff",
+  background_color: "#1B71B5",
+  icons: [
+    {
+      src: "/icon-512x512.png",
+      type: "image/png",
+      sizes: "512x512",
+      purpose: "any maskable",
+    },
+  ],
+  share_target: {
+    action: "/share_target",
+    method: "POST",
+    enctype: "multipart/form-data",
+    params: {
+      files: [
+        {
+          name: "media",
+          accept: ["image/*"],
+        },
+      ],
+    },
+  },
+};
+
 export default defineConfig(({ mode }) => ({
   publicDir: "public",
   build: {
@@ -55,22 +85,7 @@ export default defineConfig(({ mode }) => ({
       },
     }),
     VitePWA({
-      manifest: {
-        short_name: "Shadowboxx",
-        name: "Collaborative Photo Albums",
-        start_url: "/",
-        display: "standalone",
-        theme_color: "#ffffff",
-        background_color: "#1B71B5",
-        icons: [
-          {
-            src: "/icon-512x512.png",
-            type: "image/png",
-            sizes: "512x512",
-            purpose: "any maskable",
-          },
-        ],
-      },
+      manifest,
       strategies: "injectManifest",
       srcDir: "serviceWorker",
       filename: "serviceWorker.ts",

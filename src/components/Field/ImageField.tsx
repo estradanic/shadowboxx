@@ -70,10 +70,6 @@ const useStyles = makeStyles((theme: Theme) => ({
   success: {
     color: theme.palette.success.main,
   },
-  resizingImages: {
-    color: theme.palette.primary.contrastText,
-    fontSize: theme.typography.h3.fontSize,
-  },
 }));
 
 /** Interface defining props for ImageField */
@@ -124,15 +120,6 @@ export type ImageFieldProps = Omit<
       }
   );
 
-const ProcessingImagesLoaderContent = () => {
-  const classes = useStyles();
-  return (
-    <FancyTypography className={classes.resizingImages}>
-      {Strings.processingImages()}
-    </FancyTypography>
-  );
-};
-
 /** Component to input images from the filesystem or online */
 const ImageField = memo(
   ({
@@ -153,17 +140,13 @@ const ImageField = memo(
   }: ImageFieldProps) => {
     const classes = useStyles();
 
-    const { uploadImage, promptImageSelectionDialog } = useImageContext();
+    const {
+      promptImageSelectionDialog,
+      uploadImagesFromFiles,
+      uploadImageFromUrl,
+    } = useImageContext();
     const [showUrlInput, setShowUrlInput] = useState<boolean>(false);
     const [imageUrlRef, imageUrl, setImageUrl] = useRefState("");
-    const { startGlobalLoader, stopGlobalLoader } = useGlobalLoadingStore(
-      (state) => ({
-        startGlobalLoader: state.startGlobalLoader,
-        stopGlobalLoader: state.stopGlobalLoader,
-      })
-    );
-    const selectingImages = useRef<boolean>(false);
-    const { getLoggedInUser } = useUserContext();
 
     const [anchorEl, setAnchorEl] = useState<Element>();
     const closeMenu = () => setAnchorEl(undefined);
@@ -185,93 +168,31 @@ const ImageField = memo(
       });
     }, [promptImageSelectionDialog, value, onAdd, multiple]);
 
-    const processFiles = async (eventFiles: FileList) => {
-      const files: File[] = [];
-      for (let i = 0; i < eventFiles.length; i++) {
-        files[i] = eventFiles[i];
-      }
-      const max = multiple ? files.length : 1;
-      const resizeImagePromises: Promise<File>[] = [];
-      for (let i = 0; i < max; i++) {
-        let file = files[i];
-        if (file.size > 15000000) {
-          resizeImagePromises.push(
-            readAndCompressImage(file, {
-              quality: 1,
-              maxWidth: 2400,
-              maxHeight: 2400,
-              mimeType: "image/webp",
-            })
-          );
-        } else {
-          resizeImagePromises.push(Promise.resolve(file));
-        }
-      }
-      return await Promise.all(resizeImagePromises);
-    };
-
-    const uploadFiles = async (files: File[]) => {
-      const max = multiple ? files.length : 1;
-      const newImagePromises: Promise<ParseImage>[] = [];
-      for (let i = 0; i < max; i++) {
-        let file = files[i];
-        const fileName = makeValidFileName(files[i].name);
-        const parseFile = new Parse.File(fileName, file);
-        newImagePromises.push(
-          uploadImage(
-            {
-              file: parseFile,
-              owner: getLoggedInUser().toPointer(),
-              name: removeExtension(fileName),
-            },
-            acl
-          )
-        );
-      }
-      return Promise.all(newImagePromises);
-    };
-
     const addFromFile: ChangeEventHandler<HTMLInputElement> = async (event) => {
       if (event.target.files?.[0]) {
-        startGlobalLoader({
-          type: "determinate",
-          content: <ProcessingImagesLoaderContent />,
-        });
-        // Using setTimeout to prevent the loader from not showing up
-        setTimeout(async () => {
-          const files = await processFiles(event.target.files!);
-          try {
-            const newImages = await uploadFiles(files);
-            await onAdd(...newImages);
-          } catch (error: any) {
-            enqueueErrorSnackbar(error?.message ?? Strings.uploadImageError());
-          } finally {
-            // Clear the input so that the same file can be uploaded again
-            event.target.value = "";
-            stopGlobalLoader();
-          }
-        }, 10);
+        const files = [];
+        for (let i = 0; i < event.target.files.length; i++) {
+          files[i] = event.target.files[i];
+        }
+        try {
+          const newImages = await uploadImagesFromFiles(files, acl);
+          await onAdd(...newImages);
+        } catch (error: any) {
+          enqueueErrorSnackbar(error?.message ?? Strings.uploadImageError());
+        } finally {
+          // Clear the input so that the same file can be uploaded again
+          event.target.value = "";
+        }
       }
     };
 
     const addFromUrl = async () => {
-      const fileName = makeValidFileName(
-        imageUrlRef.current.substring(imageUrlRef.current.lastIndexOf("/") + 1)
-      );
-      const parseFile = new Parse.File(fileName, { uri: imageUrlRef.current });
       try {
-        const newImage = await uploadImage(
-          {
-            file: parseFile,
-            owner: getLoggedInUser().toPointer(),
-            name: removeExtension(fileName),
-          },
-          acl
-        );
+        const newImage = await uploadImageFromUrl(imageUrlRef.current, acl);
         await onAdd(newImage);
       } catch (error: any) {
         enqueueErrorSnackbar(
-          error?.message ?? Strings.uploadImageError(fileName)
+          error?.message ?? Strings.uploadImageError(imageUrlRef.current)
         );
       }
       setShowUrlInput(false);
@@ -367,7 +288,6 @@ const ImageField = memo(
                       disablePointerEvents={disabled}
                       position="end"
                       onClick={() => {
-                        selectingImages.current = true;
                         inputRef.current?.click?.();
                       }}
                     >
@@ -472,9 +392,6 @@ const ImageField = memo(
               accept="image/*"
               multiple={multiple}
               ref={inputRef}
-              onClick={() => {
-                selectingImages.current = true;
-              }}
             />
             <Menu open={!!anchorEl} anchorEl={anchorEl} onClose={closeMenu}>
               <MenuItem onClick={selectFromLibrary}>

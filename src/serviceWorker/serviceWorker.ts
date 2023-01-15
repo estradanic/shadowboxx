@@ -67,6 +67,24 @@ registerRoute(
 
 registerRoute(({ url }) => url.host === "httpbin.org", new NetworkOnly());
 
+const shareTargetHandler = async ({ event }: { event: FetchEvent }) => {
+  const formData = await event.request.formData();
+  const files = formData.getAll("media");
+  const allClients = await self.clients.matchAll({
+    includeUncontrolled: true,
+    type: "window",
+  });
+  const client = allClients[0];
+  if (client) {
+    client.postMessage({
+      files,
+    });
+  }
+  return Response.redirect("/share", 303);
+};
+
+registerRoute("/share_target", shareTargetHandler as any, "POST");
+
 registerRoute(
   ({ url }) =>
     url.host !== "httpbin.org" && url.host !== "parsefiles.back4app.com",

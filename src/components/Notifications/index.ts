@@ -1,2 +1,5 @@
-export { default as Notifications, Notification } from "./Notifications";
+export {
+  default as Notifications,
+  NotificationMenuItem,
+} from "./Notifications";
 export * from "./Detail";
