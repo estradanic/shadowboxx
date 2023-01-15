@@ -1,4 +1,4 @@
-import Parse from "parse"
+import Parse from "parse";
 import { useUserContext } from "../../contexts";
 import { Strings } from "../../resources";
 import { ParseAlbum, ParseImage, ParseUser } from "../../classes";
@@ -211,15 +211,15 @@ const useInfiniteQueryConfigs = () => {
         const favoriteAlbums =
           options.page === 0
             ? await Parse.Query.or(
-          ParseAlbum.query(online).contains(
-            ParseAlbum.COLUMNS.collaborators,
-            getLoggedInUser().email
-          ),
-          ParseAlbum.query(online).equalTo(
-            ParseAlbum.COLUMNS.owner,
-            getLoggedInUser().toNativePointer()
-          )
-        )
+                ParseAlbum.query(online).contains(
+                  ParseAlbum.COLUMNS.collaborators,
+                  getLoggedInUser().email
+                ),
+                ParseAlbum.query(online).equalTo(
+                  ParseAlbum.COLUMNS.owner,
+                  getLoggedInUser().toNativePointer()
+                )
+              )
                 .containedIn(
                   ParseAlbum.COLUMNS.id,
                   getLoggedInUser().favoriteAlbums

@@ -4,8 +4,8 @@ import {
   useLocation,
 } from "react-router-dom";
 import MuiLink, { LinkProps as MuiLinkProps } from "@material-ui/core/Link";
-import { makeStyles, Theme } from "@material-ui/core/styles";
-import { parsePath } from "history";
+import { makeStyles } from "@material-ui/core/styles";
+import { parsePath } from "react-router-dom";
 
 /**
  * Interface defining props for Link
@@ -17,7 +17,7 @@ export interface LinkProps
   to: string;
 }
 
-const useStyles = makeStyles((theme: Theme) => ({
+const useStyles = makeStyles(() => ({
   link: {
     textDecoration: "none",
     color: "inherit",

@@ -29,9 +29,7 @@ const NoAlbums = ({ text = Strings.noAlbums() }) => {
         {text}
       </Typography>
       <br />
-      <Typography variant="overline">
-        {Strings.tryAddingAlbum()}
-      </Typography>
+      <Typography variant="overline">{Strings.tryAddingAlbum()}</Typography>
     </Grid>
   );
 };

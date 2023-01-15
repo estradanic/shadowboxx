@@ -69,7 +69,7 @@ registerRoute(({ url }) => url.host === "httpbin.org", new NetworkOnly());
 
 const shareTargetHandler = async ({ event }: { event: FetchEvent }) => {
   const formData = await event.request.formData();
-  const files = formData.getAll("media[]");
+  const files = formData.getAll("media");
   const allClients = await self.clients.matchAll({
     includeUncontrolled: true,
     type: "window",

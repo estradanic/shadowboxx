@@ -19,7 +19,7 @@ export const isNullOrWhitespace = (input: string | null | undefined) => {
 export const elide = (
   input?: string,
   startLength?: number,
-  endLength: number = -1,
+  endLength: number = -1
 ) => {
   if (!input || !startLength) {
     return input;

@@ -12,7 +12,11 @@ import { FancyTypography, useSnackbar } from "../components";
 import { Strings } from "../resources";
 import { ParseImage, ImageAttributes } from "../classes";
 import { useGlobalLoadingStore } from "../stores";
-import { isNullOrWhitespace, makeValidFileName, removeExtension } from "../utils";
+import {
+  isNullOrWhitespace,
+  makeValidFileName,
+  removeExtension,
+} from "../utils";
 import { ImageSelectionDialog } from "../components/Images";
 import { readAndCompressImage } from "browser-image-resizer";
 import { useUserContext } from "./UserContext";
@@ -52,7 +56,10 @@ interface ImageContextValue {
   /** Function to open an ImageSelectionDialog prompt */
   promptImageSelectionDialog: (props: PromptImageSelectionDialogProps) => void;
   /** Function to upload images from files */
-  uploadImagesFromFiles: (files: File[], acl?: Parse.ACL) => Promise<ParseImage[]>;
+  uploadImagesFromFiles: (
+    files: File[],
+    acl?: Parse.ACL
+  ) => Promise<ParseImage[]>;
   /** Function to upload image from url */
   uploadImageFromUrl: (url: string, acl?: Parse.ACL) => Promise<ParseImage>;
 }
@@ -73,7 +80,7 @@ export const ImageContextProvider = ({
   const { addNotification } = useNotificationsContext();
   const { enqueueErrorSnackbar } = useSnackbar();
 
-  const {getLoggedInUser} = useUserContext();
+  const { getLoggedInUser } = useUserContext();
 
   const { startGlobalLoader, stopGlobalLoader, updateGlobalLoader } =
     useGlobalLoadingStore((state) => ({
@@ -234,34 +241,32 @@ export const ImageContextProvider = ({
   };
 
   const uploadImagesFromFiles = async (files: File[], acl?: Parse.ACL) => {
-      startGlobalLoader({
-        type: "determinate",
-        content: (
-          <FancyTypography variant="loading">
-            {Strings.processingImages()}
-          </FancyTypography>
-        ),
-      });
-      return new Promise<ParseImage[]>((resolve, reject) => {
-        // Using setTimeout to prevent the loader from not showing up
-        setTimeout(async () => {
-          const processedFiles = await processFiles(files);
-          try {
-            const newImages = await uploadFiles(processedFiles, acl);
-            resolve(newImages);
-          } catch (error: any) {
-            reject(error?.message);
-          } finally {
-            stopGlobalLoader();
-          }
-        }, 10);
-      });
+    startGlobalLoader({
+      type: "determinate",
+      content: (
+        <FancyTypography variant="loading">
+          {Strings.processingImages()}
+        </FancyTypography>
+      ),
+    });
+    return new Promise<ParseImage[]>((resolve, reject) => {
+      // Using setTimeout to prevent the loader from not showing up
+      setTimeout(async () => {
+        const processedFiles = await processFiles(files);
+        try {
+          const newImages = await uploadFiles(processedFiles, acl);
+          resolve(newImages);
+        } catch (error: any) {
+          reject(error?.message);
+        } finally {
+          stopGlobalLoader();
+        }
+      }, 10);
+    });
   };
 
   const uploadImageFromUrl = async (url: string, acl?: Parse.ACL) => {
-    const fileName = makeValidFileName(
-      url.substring(url.lastIndexOf("/") + 1)
-    );
+    const fileName = makeValidFileName(url.substring(url.lastIndexOf("/") + 1));
     const parseFile = new Parse.File(fileName, { uri: url });
     const newImage = await uploadImage(
       {

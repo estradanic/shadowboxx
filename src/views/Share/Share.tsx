@@ -17,7 +17,11 @@ import {
 import { ParseAlbum } from "../../classes";
 import { useInfiniteQuery } from "@tanstack/react-query";
 import { DEFAULT_PAGE_SIZE } from "../../constants";
-import { ImageContextProvider, useImageContext, useNetworkDetectionContext } from "../../contexts";
+import {
+  ImageContextProvider,
+  useImageContext,
+  useNetworkDetectionContext,
+} from "../../contexts";
 import { makeStyles } from "@material-ui/core/styles";
 import Grid from "@material-ui/core/Grid";
 import { Strings } from "../../resources";
@@ -55,15 +59,15 @@ interface AlbumsListProps {
   files: File[];
 }
 
-const AlbumsList = ({albums, classes, files}: AlbumsListProps) => {
+const AlbumsList = ({ albums, classes, files }: AlbumsListProps) => {
   const { virtualized: virtualizedAlbums } = useVirtualList({
     list: albums,
     interval: 10,
     enabled: !!albums?.length,
   });
   const borderColor = useRandomColor();
-  const {uploadImagesFromFiles} = useImageContext();
-  const {enqueueErrorSnackbar} = useSnackbar();
+  const { uploadImagesFromFiles } = useImageContext();
+  const { enqueueErrorSnackbar } = useSnackbar();
 
   return (
     <>
@@ -80,11 +84,16 @@ const AlbumsList = ({albums, classes, files}: AlbumsListProps) => {
               value={album}
               onClick={async () => {
                 try {
-                  const images = (await uploadImagesFromFiles(files)).map((image) => image.id!);
-                  album.update({
-                    ...album.attributes,
-                    images: [...album.images, ...images],
-                  }, {addedImages: images})
+                  const images = (await uploadImagesFromFiles(files)).map(
+                    (image) => image.id!
+                  );
+                  album.update(
+                    {
+                      ...album.attributes,
+                      images: [...album.images, ...images],
+                    },
+                    { addedImages: images }
+                  );
                 } catch (e) {
                   enqueueErrorSnackbar(Strings.commonError());
                 }

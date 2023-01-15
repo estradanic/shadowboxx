@@ -140,7 +140,11 @@ const ImageField = memo(
   }: ImageFieldProps) => {
     const classes = useStyles();
 
-    const { promptImageSelectionDialog, uploadImagesFromFiles, uploadImageFromUrl } = useImageContext();
+    const {
+      promptImageSelectionDialog,
+      uploadImagesFromFiles,
+      uploadImageFromUrl,
+    } = useImageContext();
     const [showUrlInput, setShowUrlInput] = useState<boolean>(false);
     const [imageUrlRef, imageUrl, setImageUrl] = useRefState("");
 

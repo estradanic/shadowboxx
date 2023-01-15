@@ -12,10 +12,7 @@ import ArrowDropUpIcon from "@material-ui/icons/ArrowDropUp";
 import CloseIcon from "@material-ui/icons/Close";
 import NotificationsIcon from "@material-ui/icons/Notifications";
 import cx from "classnames";
-import {
-  useNotificationsContext,
-  Notification,
-} from "../../contexts";
+import { useNotificationsContext, Notification } from "../../contexts";
 import { Strings } from "../../resources";
 import { elide } from "../../utils";
 import Tooltip from "../Tooltip/Tooltip";
@@ -87,7 +84,8 @@ interface NotificationProps extends Notification {
 /** Component to display notifications for the app */
 const Notifications = ({ className }: NotificationsProps) => {
   const classes = useStyles();
-  const { notifications, notificationMenuOpen, setNotificationMenuOpen } = useNotificationsContext();
+  const { notifications, notificationMenuOpen, setNotificationMenuOpen } =
+    useNotificationsContext();
   const empty = !Object.keys(notifications).length;
   const iconButtonRef = useRef(null);
 
@@ -130,7 +128,11 @@ const Notifications = ({ className }: NotificationsProps) => {
       >
         {Object.keys(notifications).length ? (
           Object.keys(notifications).map((key) => (
-            <NotificationMenuItem setNotificationMenuOpen={setNotificationMenuOpen} key={notifications[key].id} {...notifications[key]} />
+            <NotificationMenuItem
+              setNotificationMenuOpen={setNotificationMenuOpen}
+              key={notifications[key].id}
+              {...notifications[key]}
+            />
           ))
         ) : (
           <MenuItem className={classes.menuItem}>
@@ -144,7 +146,13 @@ const Notifications = ({ className }: NotificationsProps) => {
 
 export const NotificationMenuItem = forwardRef(
   (
-    { title, icon, detail, remove: onRemove, setNotificationMenuOpen }: NotificationProps,
+    {
+      title,
+      icon,
+      detail,
+      remove: onRemove,
+      setNotificationMenuOpen,
+    }: NotificationProps,
     ref: ForwardedRef<any>
   ) => {
     const classes = useStyles();
@@ -156,7 +164,7 @@ export const NotificationMenuItem = forwardRef(
     const remove = async () => {
       setNotificationMenuOpen(false);
       await onRemove();
-    }
+    };
 
     return (
       <>

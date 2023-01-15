@@ -26,7 +26,7 @@ const manifest = {
     params: {
       files: [
         {
-          name: "media[]",
+          name: "media",
           accept: ["image/*"],
         },
       ],

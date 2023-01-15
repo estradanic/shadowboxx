@@ -291,7 +291,8 @@ const Strings: {
   settings: () => "Settings",
   settingsNotSaved: () => `${Strings.commonError()} Settings not saved.`,
   settingsSaved: () => "Settings saved successfully",
-  shareTargetTitle: (num: number) => `Select album to add ${num} image${num > 1 ? "s" : ""} to.`,
+  shareTargetTitle: (num: number) =>
+    `Select album to add ${num} image${num > 1 ? "s" : ""} to.`,
   signup: () => "Sign Up",
   signupError: () => `${Strings.commonError()} Could not sign up.`,
   submit: () => "Submit",

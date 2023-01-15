@@ -1,4 +1,10 @@
-import { Card, CardContent, CardMedia, makeStyles, Theme } from "@material-ui/core";
+import {
+  Card,
+  CardContent,
+  CardMedia,
+  makeStyles,
+  Theme,
+} from "@material-ui/core";
 import { Skeleton } from "@material-ui/lab";
 
 const useStyles = makeStyles((theme: Theme) => ({
