@@ -83,10 +83,11 @@ const routes: { [key: string]: RouteProps } = {
   Share: {
     viewId: "Share",
     viewName: "Share",
-    view: Share,
+    View: Share,
     path: "/share",
     tryAuthenticate: true,
     redirectOnAuthFail: true,
+    queryCacheGroups: [QueryCacheGroups.GET_ALL_MODIFYABLE_ALBUMS_INFINITE],
   },
   Signup: {
     viewId: "Signup",

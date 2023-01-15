@@ -40,6 +40,10 @@ interface NotificationsContextValue {
    * If notification with id already exists, it is updated to the new one
    */
   addNotification: (params: AddNotificationParams) => Notification;
+  /** Whether the notification menu is open or not */
+  notificationMenuOpen: boolean;
+  /** React state setter for notificationMenuOpen */
+  setNotificationMenuOpen: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 /** Context to manage Notifications */
@@ -60,6 +64,7 @@ export const NotificationsContextProvider = ({
   const [notifications, setNotifications] = useState<
     Record<string, Notification>
   >({});
+  const [notificationMenuOpen, setNotificationMenuOpen] = useState(false);
   const addNotification = useCallback(
     ({
       id,
@@ -93,6 +98,8 @@ export const NotificationsContextProvider = ({
     notifications,
     setNotifications,
     addNotification,
+    notificationMenuOpen,
+    setNotificationMenuOpen,
   };
 
   return (

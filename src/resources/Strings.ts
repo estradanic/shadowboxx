@@ -89,15 +89,18 @@ export interface StringEntries {
   noAccount: string;
   noAlbumId: string;
   noAlbums: string;
+  noConnection: string;
   noEmailExists: string;
   noImageExists: string;
   noImages: string;
+  noImagesSelected: string;
   nonExistentUserWarning: string;
   noNotifications: string;
   noNotificationsDetail: string;
   noSessionId: string;
   notEnoughSpace: string;
   notInstalled: string;
+  noUploadWhileOffline: string;
   numOfPhotos: string;
   offline: string;
   okay: string;
@@ -117,6 +120,7 @@ export interface StringEntries {
   settings: string;
   settingsNotSaved: string;
   settingsSaved: string;
+  shareTargetTitle: string;
   signup: string;
   signupError: string;
   submit: string;
@@ -251,9 +255,11 @@ const Strings: {
   noAccount: () => "Don't have an account?",
   noAlbumId: () => "No album id provided.",
   noAlbums: () => "No Albums",
+  noConnection: () => "No Internet Connection. Please try again later.",
   noEmailExists: (email: string) => `Email doesn't exist (${email})`,
   noImageExists: (fileName: string) => `Image doesn't exist (${fileName})`,
   noImages: () => "No Images",
+  noImagesSelected: () => "No images have been selected",
   nonExistentUserWarning: () =>
     `You are saving this album with at least one user that does not currently have a Shadowboxx account.
     This will open up access to your album to the first person who creates an account with that email.
@@ -263,6 +269,7 @@ const Strings: {
   noSessionId: () => "No session id provided",
   notEnoughSpace: () => "Not enough storage space",
   notInstalled: () => "Not installed :(",
+  noUploadWhileOffline: () => "Cannot upload while offline",
   numOfPhotos: (numOfPhotos: number) => `${numOfPhotos} photos.`,
   offline: () => "You are offline. Viewing mode only",
   okay: () => "Okay",
@@ -284,6 +291,7 @@ const Strings: {
   settings: () => "Settings",
   settingsNotSaved: () => `${Strings.commonError()} Settings not saved.`,
   settingsSaved: () => "Settings saved successfully",
+  shareTargetTitle: (num: number) => `Select album to add ${num} image${num > 1 ? "s" : ""} to.`,
   signup: () => "Sign Up",
   signupError: () => `${Strings.commonError()} Could not sign up.`,
   submit: () => "Submit",

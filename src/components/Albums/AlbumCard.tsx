@@ -108,7 +108,7 @@ export interface AlbumCardProps {
   borderColor: VariableColor;
 }
 
-/** Component for displaying basic information about an album */
+/** Component for displaying detailed information about an album */
 const AlbumCard = memo(({ value, onChange, borderColor }: AlbumCardProps) => {
   const [anchorEl, setAnchorEl] = useState<Element>();
   const [editAlbumDialogOpen, setEditAlbumDialogOpen] =

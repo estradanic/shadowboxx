@@ -14,7 +14,7 @@ import NotificationsIcon from "@material-ui/icons/Notifications";
 import cx from "classnames";
 import {
   useNotificationsContext,
-  Notification as NotificationProps,
+  Notification,
 } from "../../contexts";
 import { Strings } from "../../resources";
 import { elide } from "../../utils";
@@ -79,20 +79,24 @@ interface NotificationsProps {
   className?: string;
 }
 
+interface NotificationProps extends Notification {
+  /** Function to set the notifications menu closed */
+  setNotificationMenuOpen: React.Dispatch<React.SetStateAction<boolean>>;
+}
+
 /** Component to display notifications for the app */
 const Notifications = ({ className }: NotificationsProps) => {
   const classes = useStyles();
-  const { notifications } = useNotificationsContext();
+  const { notifications, notificationMenuOpen, setNotificationMenuOpen } = useNotificationsContext();
   const empty = !Object.keys(notifications).length;
   const iconButtonRef = useRef(null);
-  const [open, setOpen] = useState(false);
 
   return (
     <>
       <IconButton
         className={className}
         ref={iconButtonRef}
-        onClick={() => setOpen((prev) => !prev)}
+        onClick={() => setNotificationMenuOpen((prev) => !prev)}
       >
         <Badge
           overlap="rectangular"
@@ -120,14 +124,13 @@ const Notifications = ({ className }: NotificationsProps) => {
         classes={{ paper: classes.menu }}
         elevation={0}
         keepMounted
-        onClose={() => setOpen(false)}
+        onClose={() => setNotificationMenuOpen(false)}
         anchorEl={iconButtonRef.current}
-        open={open}
-        onClick={() => setOpen(false)}
+        open={notificationMenuOpen}
       >
         {Object.keys(notifications).length ? (
           Object.keys(notifications).map((key) => (
-            <Notification key={notifications[key].id} {...notifications[key]} />
+            <NotificationMenuItem setNotificationMenuOpen={setNotificationMenuOpen} key={notifications[key].id} {...notifications[key]} />
           ))
         ) : (
           <MenuItem className={classes.menuItem}>
@@ -139,9 +142,9 @@ const Notifications = ({ className }: NotificationsProps) => {
   );
 };
 
-export const Notification = forwardRef(
+export const NotificationMenuItem = forwardRef(
   (
-    { title, icon, detail, remove }: NotificationProps,
+    { title, icon, detail, remove: onRemove, setNotificationMenuOpen }: NotificationProps,
     ref: ForwardedRef<any>
   ) => {
     const classes = useStyles();
@@ -149,6 +152,11 @@ export const Notification = forwardRef(
     const toggleOpen = () => {
       setOpen((prev) => !prev);
     };
+
+    const remove = async () => {
+      setNotificationMenuOpen(false);
+      await onRemove();
+    }
 
     return (
       <>
@@ -167,10 +175,10 @@ export const Notification = forwardRef(
             )}
           </IconButton>
           <IconButton
-            onClick={(e) => {
+            onClick={async (e) => {
               e.stopPropagation();
               e.preventDefault();
-              remove();
+              await remove();
             }}
           >
             <CloseIcon className={classes.close} />

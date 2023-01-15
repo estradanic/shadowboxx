@@ -1,5 +1,4 @@
 import React, { memo, useMemo, useState } from "react";
-import Typography from "@material-ui/core/Typography";
 import Grid from "@material-ui/core/Grid";
 import { makeStyles, Theme } from "@material-ui/core/styles";
 import AddIcon from "@material-ui/icons/Add";
@@ -9,7 +8,6 @@ import {
   AlbumCard,
   AlbumFormDialog,
   useSnackbar,
-  BlankCanvas,
   AlbumCardSkeleton,
   Fab,
   Online,
@@ -25,6 +23,7 @@ import {
   useVirtualList,
 } from "../../hooks";
 import { DEFAULT_PAGE_SIZE } from "../../constants";
+import NoAlbums from "../../components/Albums/NoAlbums";
 
 const useStyles = makeStyles((theme: Theme) => ({
   title: {
@@ -104,17 +103,7 @@ const Home = memo(() => {
         ) : (
           <>
             {status === "success" || status === "error" ? (
-              <Grid item className={classes.noAlbumsContainer}>
-                <BlankCanvas height="40vh" />
-                <br />
-                <Typography className={classes.noAlbums} variant="overline">
-                  {Strings.noAlbums()}
-                </Typography>
-                <br />
-                <Typography variant="overline">
-                  {Strings.tryAddingAlbum()}
-                </Typography>
-              </Grid>
+              <NoAlbums />
             ) : (
               <Grid
                 item

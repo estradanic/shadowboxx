@@ -40,6 +40,13 @@ Parse.setLocalDatastoreController({
 });
 Parse.enableLocalDatastore(false);
 
+const shareTargetStore = createStore("SHARE_TARGET", "SHARE_TARGET");
+window.addEventListener("message", async (event) => {
+  if (event.data?.files) {
+    await set("shareTargetFiles", event.data.files, shareTargetStore);
+  }
+});
+
 const App = () => {
   const { getLoggedInUser, isUserLoggedIn } = useUserContext();
   const { addNotification } = useNotificationsContext();
