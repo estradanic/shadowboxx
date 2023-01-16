@@ -46,14 +46,14 @@ export interface AlbumSaveContext {
 }
 
 class AlbumColumns extends Columns {
-  owner: "owner" = "owner";
-  images: "images" = "images";
-  name: "name" = "name";
-  description: "description" = "description";
-  collaborators: "collaborators" = "collaborators";
-  viewers: "viewers" = "viewers";
-  coverImage: "coverImage" = "coverImage";
-  captions: "captions" = "captions";
+  owner = "owner" as const;
+  images = "images" as const;
+  name = "name" as const;
+  description = "description" as const;
+  collaborators = "collaborators" as const;
+  viewers = "viewers" as const;
+  coverImage = "coverImage" as const;
+  captions = "captions" as const;
 }
 
 /**

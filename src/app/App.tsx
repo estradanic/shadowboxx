@@ -14,6 +14,11 @@ import { ActionDialogContextProvider, DefaultLayout } from "../components";
 import { Strings } from "../resources";
 import routes from "./routes";
 import { darkThemeSettings } from "./theme";
+import {
+  SHARE_TARGET_DB_NAME,
+  SHARE_TARGET_STORE_KEY,
+  SHARE_TARGET_STORE_NAME,
+} from "../constants";
 
 Parse.serverURL = window.__env__?.PARSE_HOST_URL;
 Parse.initialize(
@@ -40,10 +45,17 @@ Parse.setLocalDatastoreController({
 });
 Parse.enableLocalDatastore(false);
 
-const shareTargetStore = createStore("SHARE_TARGET", "SHARE_TARGET");
+const shareTargetStore = createStore(
+  SHARE_TARGET_DB_NAME,
+  SHARE_TARGET_STORE_NAME
+);
 window.addEventListener("message", async (event) => {
-  if (event.data?.files) {
-    await set("shareTargetFiles", event.data.files, shareTargetStore);
+  if (event.data[SHARE_TARGET_STORE_KEY]) {
+    await set(
+      SHARE_TARGET_STORE_KEY,
+      event.data[SHARE_TARGET_STORE_KEY],
+      shareTargetStore
+    );
   }
 });
 

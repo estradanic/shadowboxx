@@ -38,15 +38,15 @@ export enum UserUpdateReason {
 }
 
 class UserColumns extends Columns {
-  emailVerified: "emailVerified" = "emailVerified";
-  password: "password" = "password";
-  email: "email" = "email";
-  lastName: "lastName" = "lastName";
+  emailVerified = "emailVerified" as const;
+  password = "password" as const;
+  email = "email" as const;
+  lastName = "lastName" as const;
   firstName: "firstName" = "firstName";
-  isDarkThemeEnabled: "isDarkThemeEnabled" = "isDarkThemeEnabled";
-  profilePicture: "profilePicture" = "profilePicture";
-  username: "username" = "username";
-  favoriteAlbums: "favoriteAlbums" = "favoriteAlbums";
+  isDarkThemeEnabled = "isDarkThemeEnabled" as const;
+  profilePicture = "profilePicture" as const;
+  username = "username" as const;
+  favoriteAlbums = "favoriteAlbums" as const;
 }
 
 /**

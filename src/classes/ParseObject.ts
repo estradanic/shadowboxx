@@ -39,10 +39,10 @@ export type ParsifyPointers<C extends ClassName> = {
 };
 
 export class Columns {
-  objectId: "objectId" = "objectId";
-  createdAt: "createdAt" = "createdAt";
-  updatedAt: "updatedAt" = "updatedAt";
-  id: "objectId" = "objectId";
+  objectId = "objectId" as const;
+  createdAt = "createdAt" as const;
+  updatedAt = "updatedAt" as const;
+  id = "objectId" as const;
 }
 
 /**
