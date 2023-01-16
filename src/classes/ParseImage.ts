@@ -21,14 +21,13 @@ export interface ImageAttributes {
 }
 
 class ImageColumns extends Columns {
-  file: "file" = "file";
-  owner: "owner" = "owner";
-  name: "name" = "name";
-  fileMobile: "fileMobile" = "fileMobile";
-  fileThumb: "fileThumb" = "fileThumb";
-  fileLegacy: "fileLegacy" = "fileLegacy";
+  file = "file" as const;
+  owner = "owner" as const;
+  name = "name" as const;
+  fileMobile = "fileMobile" as const;
+  fileThumb = "fileThumb" as const;
+  fileLegacy = "fileLegacy" as const;
 }
-
 
 /**
  * Class wrapping the Parse.Image class and providing convenience methods/properties

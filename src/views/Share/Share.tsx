@@ -16,7 +16,12 @@ import {
 } from "../../hooks";
 import { ParseAlbum } from "../../classes";
 import { useInfiniteQuery } from "@tanstack/react-query";
-import { DEFAULT_PAGE_SIZE } from "../../constants";
+import {
+  DEFAULT_PAGE_SIZE,
+  SHARE_TARGET_DB_NAME,
+  SHARE_TARGET_STORE_KEY,
+  SHARE_TARGET_STORE_NAME,
+} from "../../constants";
 import {
   ImageContextProvider,
   useImageContext,
@@ -30,6 +35,7 @@ import { Offline } from "react-detect-offline";
 import SmallAlbumCardSkeleton from "../../components/Skeleton/SmallAlbumCardSkeleton";
 import NoAlbums from "../../components/Albums/NoAlbums";
 import NoConnection from "../../components/NetworkDetector/NoConnection";
+import { useGlobalLoadingStore } from "../../stores";
 
 const useStyles = makeStyles(() => ({
   title: {
@@ -51,7 +57,10 @@ const useStyles = makeStyles(() => ({
   },
 }));
 
-const shareTargetStore = createStore("SHARE_TARGET", "SHARE_TARGET");
+const shareTargetStore = createStore(
+  SHARE_TARGET_DB_NAME,
+  SHARE_TARGET_STORE_NAME
+);
 
 interface AlbumsListProps {
   albums: ParseAlbum[];
@@ -59,7 +68,7 @@ interface AlbumsListProps {
   files: File[];
 }
 
-const AlbumsList = ({ albums, classes, files }: AlbumsListProps) => {
+const AlbumsToShareTo = ({ albums, classes, files }: AlbumsListProps) => {
   const { virtualized: virtualizedAlbums } = useVirtualList({
     list: albums,
     interval: 10,
@@ -111,7 +120,7 @@ const Share = memo(() => {
 
   const classes = useStyles();
   const { online } = useNetworkDetectionContext();
-  const [files, setFiles] = useState<File[]>([new File([], "file1")]);
+  const [sharedFiles, setSharedFiles] = useState<File[]>([]);
   const {
     getAllModifyableAlbumsInfiniteFunction,
     getAllModifyableAlbumsInfiniteOptions,
@@ -130,6 +139,8 @@ const Share = memo(() => {
       }),
     getAllModifyableAlbumsInfiniteOptions()
   );
+  const { startGlobalLoader, stopGlobalLoader } = useGlobalLoadingStore();
+  const { enqueueErrorSnackbar } = useSnackbar();
 
   useInfiniteScroll(fetchNextPage, { canExecute: !isFetchingNextPage });
   const albums = useMemo(
@@ -138,20 +149,50 @@ const Share = memo(() => {
   );
 
   useLayoutEffect(() => {
-    get("files", shareTargetStore).then((files: File[]) => {
-      setFiles(files);
-      del("files", shareTargetStore);
-    });
-  }, [setFiles]);
+    startGlobalLoader();
+    navigator.serviceWorker.controller?.postMessage(SHARE_TARGET_STORE_KEY);
+    let count = 0;
+    const timer = setInterval(() => {
+      get(SHARE_TARGET_STORE_KEY, shareTargetStore)
+        .then((files: File[]) => {
+          if (count > 10) {
+            enqueueErrorSnackbar(Strings.noImagesSelected());
+            clearInterval(timer);
+            stopGlobalLoader();
+            return;
+          }
+          if (!files) {
+            return;
+          }
+          setSharedFiles(files);
+          del("files", shareTargetStore);
+          clearInterval(timer);
+          stopGlobalLoader();
+        })
+        .catch((error: any) => {
+          console.warn(error);
+        })
+        .finally(() => count++);
+    }, 1000);
+  }, [
+    setSharedFiles,
+    startGlobalLoader,
+    stopGlobalLoader,
+    enqueueErrorSnackbar,
+  ]);
 
   return (
     <PageContainer>
       <Online>
-        {files?.length ? (
+        {sharedFiles?.length ? (
           <>
             {status === "success" && !!albums.length ? (
               <ImageContextProvider>
-                <AlbumsList files={files} albums={albums} classes={classes} />
+                <AlbumsToShareTo
+                  files={sharedFiles}
+                  albums={albums}
+                  classes={classes}
+                />
               </ImageContextProvider>
             ) : (
               <>

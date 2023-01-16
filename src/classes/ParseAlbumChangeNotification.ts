@@ -15,10 +15,10 @@ export interface AlbumChangeNotificationAttributes {
 }
 
 class AlbumChangeNotificationColumns extends Columns {
-  album: "album" = "album";
-  user: "user" = "user";
-  count: "count" = "count";
-  owner: "owner" = "owner";
+  album = "album" as const;
+  user = "user" as const;
+  count = "count" as const;
+  owner = "owner" as const;
 }
 
 /**

@@ -21,11 +21,11 @@ export interface DuplicateAttributes {
 }
 
 class DuplicateColumns extends Columns {
-  owner: "owner" = "owner";
-  image1: "image1" = "image1";
-  image2: "image2" = "image2";
-  similarity: "similarity" = "similarity";
-  acknowledged: "acknowledged" = "acknowledged";
+  owner = "owner" as const;
+  image1 = "image1" as const;
+  image2 = "image2" as const;
+  similarity = "similarity" as const;
+  acknowledged = "acknowledged" as const;
 }
 
 /**

@@ -6,8 +6,18 @@ import {
 } from "workbox-routing";
 import { NetworkFirst, NetworkOnly } from "workbox-strategies";
 import type { ManifestEntry } from "workbox-build";
+import { createStore, get, set } from "idb-keyval";
 
 declare let self: ServiceWorkerGlobalScope;
+
+const SHARE_TARGET_DB_NAME = "shareTargetDB";
+const SHARE_TARGET_STORE_NAME = "shareTargetStore";
+const SHARE_TARGET_STORE_KEY = "sharedFiles";
+
+const shareTargetStore = createStore(
+  SHARE_TARGET_DB_NAME,
+  SHARE_TARGET_STORE_NAME
+);
 
 const manifest = (self as any).__WB_MANIFEST as Array<ManifestEntry>;
 
@@ -46,6 +56,17 @@ self.addEventListener("activate", (event: ExtendableEvent) => {
   );
 });
 
+self.addEventListener("message", (event: ExtendableMessageEvent) => {
+  if (event.data === SHARE_TARGET_STORE_KEY) {
+    get(SHARE_TARGET_STORE_KEY, shareTargetStore).then((files) => {
+      (event.source as MessagePort).postMessage({
+        message: SHARE_TARGET_STORE_KEY,
+        sharedFiles: files,
+      });
+    });
+  }
+});
+
 registerRoute(
   ({ url }) => manifestURLs.includes(url.href),
   new NetworkFirst({ cacheName: cacheNames.precache, networkTimeoutSeconds: 3 })
@@ -70,16 +91,7 @@ registerRoute(({ url }) => url.host === "httpbin.org", new NetworkOnly());
 const shareTargetHandler = async ({ event }: { event: FetchEvent }) => {
   const formData = await event.request.formData();
   const files = formData.getAll("media");
-  const allClients = await self.clients.matchAll({
-    includeUncontrolled: true,
-    type: "window",
-  });
-  const client = allClients[0];
-  if (client) {
-    client.postMessage({
-      files,
-    });
-  }
+  await set("sharedFiles", files, shareTargetStore);
   return Response.redirect("/share", 303);
 };
 
