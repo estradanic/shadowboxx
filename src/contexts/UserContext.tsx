@@ -15,11 +15,13 @@ import {
   UserAttributes,
   ParseImage,
   ParsifyPointers,
+  Attributes,
 } from "../classes";
 import { Strings } from "../resources";
 import { routes } from "../app";
 import { useNavigate } from "../hooks";
 import { useNetworkDetectionContext } from "./NetworkDetectionContext";
+import { UnpersistedParseUser } from "../classes/ParseUser";
 
 /**
  * Interface defining the return value of the UserContext
@@ -68,7 +70,7 @@ export const UserContextProvider = ({ children }: UserContextProviderProps) => {
   const [profilePicture, setProfilePicture] = useState<
     ParseImage | undefined
   >();
-  const [attributes, setAttributes] = useState<UserAttributes | undefined>(
+  const [attributes, setAttributes] = useState<Attributes<"_User"> | undefined>(
     loggedInUser ? { ...loggedInUser.attributes } : undefined
   );
 
@@ -131,12 +133,7 @@ export const UserContextProvider = ({ children }: UserContextProviderProps) => {
   );
 
   const saveLoggedInUserUpdates = async () => {
-    if (
-      initialized &&
-      loggedInUser?.attributes &&
-      attributes &&
-      !loggedInUser.equals(ParseUser.fromAttributes(attributes))
-    ) {
+    if (initialized && loggedInUser?.attributes && attributes && loggedInUser) {
       setLoggedInUser(await loggedInUser.update(updateLoggedInUser));
       setAttributes({ ...loggedInUser.attributes });
     }
@@ -156,17 +153,7 @@ export const UserContextProvider = ({ children }: UserContextProviderProps) => {
     if (loggedInUser) {
       return loggedInUser;
     }
-    return new ParseUser(
-      new Parse.User<ParsifyPointers<"_User">>({
-        username: "",
-        email: "",
-        firstName: "",
-        lastName: "",
-        password: "",
-        favoriteAlbums: [],
-        isDarkThemeEnabled: false,
-      })
-    );
+    return new UnpersistedParseUser();
   };
 
   const value = {

@@ -24,6 +24,7 @@ import {
 } from "../../hooks";
 import { DEFAULT_PAGE_SIZE } from "../../constants";
 import NoAlbums from "../../components/Albums/NoAlbums";
+import { UnpersistedParseAlbum } from "../../classes/ParseAlbum";
 
 const useStyles = makeStyles((theme: Theme) => ({
   title: {
@@ -141,7 +142,7 @@ const Home = memo(() => {
         handleConfirm={async (attributes) => {
           setAddAlbumDialogOpen(false);
           try {
-            const response = await ParseAlbum.fromAttributes(
+            const response = await new UnpersistedParseAlbum(
               attributes
             ).saveNew();
             await refetchAlbums();

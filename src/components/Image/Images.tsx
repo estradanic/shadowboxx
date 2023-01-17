@@ -46,14 +46,14 @@ const Images = ({
           const decorations = await getDecorations(image);
           setDecorations((prev) => ({
             ...prev,
-            [image.id!]: decorations,
+            [image.id]: decorations,
           }));
         }
         if (getCaption) {
           const caption = await getCaption(image);
           setCaptions((prev) => ({
             ...prev,
-            [image.id!]: caption,
+            [image.id]: caption,
           }));
         }
       });
@@ -76,8 +76,8 @@ const Images = ({
         {virtualizedImages?.map((image) => (
           <Grid key={image.id} item xs={12} md={6} lg={4} xl={3}>
             <Image
-              decorations={decorations[image.id!]}
-              caption={captions[image.id!]}
+              decorations={decorations[image.id]}
+              caption={captions[image.id]}
               borderColor={outlineColor}
               parseImage={image}
               showFullResolutionOnClick

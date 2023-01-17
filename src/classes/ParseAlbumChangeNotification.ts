@@ -66,17 +66,13 @@ export default class ParseAlbumChangeNotification extends ParseObject<"AlbumChan
     return new ParsePointer(this._albumChangeNotification.get(ParseAlbumChangeNotification.COLUMNS.owner));
   }
 
-  get id(): Attributes<"AlbumChangeNotification">["objectId"] {
-    return this._albumChangeNotification.id;
-  }
-
   get attributes(): Attributes<"AlbumChangeNotification"> {
     return {
+      ...this._albumChangeNotification.attributes,
       album: this.album,
       user: this.user,
       count: this.count,
       owner: this.owner,
-      objectId: this.id,
     };
   }
 }

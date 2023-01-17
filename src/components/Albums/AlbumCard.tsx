@@ -402,7 +402,7 @@ const AlbumCard = memo(({ value, onChange, borderColor }: AlbumCardProps) => {
                     if (!value.id) {
                       return;
                     }
-                    const imageIds = images.map((image) => image.id!);
+                    const imageIds = images.map((image) => image.id);
                     const newAttributes = { ...value.attributes };
                     newAttributes.images.push(...imageIds);
                     await save(newAttributes, { addedImages: imageIds });

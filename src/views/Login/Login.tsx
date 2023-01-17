@@ -17,6 +17,7 @@ import { useView } from "../View";
 import { ParseUser } from "../../classes";
 import { useUserContext } from "../../contexts";
 import { useGlobalLoadingStore } from "../../stores";
+import { UnpersistedParseUser } from "../../classes/ParseUser";
 
 const useStyles = makeStyles((theme: Theme) => ({
   cardTitle: {
@@ -81,11 +82,10 @@ const Login = memo(() => {
   const login = () => {
     if (validate()) {
       startGlobalLoader();
-      const user = ParseUser.fromAttributes({
+      new UnpersistedParseUser({
         username: email.toLocaleLowerCase(),
         password,
-      });
-      user
+      })
         .login(updateLoggedInUser)
         .catch((error) => {
           enqueueErrorSnackbar(error?.message ?? Strings.loginError());

@@ -82,17 +82,6 @@ export default class ParseAlbum extends ParseObject<"Album"> {
     return new Parse.Query<Parse.Object<ParsifyPointers<"Album">>>("Album").fromLocalDatastore();
   }
 
-  static fromAttributes(attributes: Attributes<"Album">): ParseAlbum {
-    const newAttributes: ParsifyPointers<"Album"> = {
-      ...attributes,
-      owner: attributes.owner._pointer,
-      coverImage: attributes.coverImage?._pointer,
-    };
-    return new ParseAlbum(
-      new Parse.Object<ParsifyPointers<"Album">>("Album", newAttributes)
-    );
-  }
-
   _album: Parse.Object<ParsifyPointers<"Album">>;
 
   constructor(album: Parse.Object<ParsifyPointers<"Album">>) {
@@ -113,11 +102,14 @@ export default class ParseAlbum extends ParseObject<"Album"> {
     return this.save({});
   }
 
-  async update(attributes: Attributes<"Album">, changes: AlbumSaveContext) {
+  async update(attributes: AlbumAttributes, changes: AlbumSaveContext) {
     const newAttributes: ParsifyPointers<"Album"> = {
       ...attributes,
       owner: attributes.owner._pointer,
       coverImage: attributes.coverImage?._pointer,
+      objectId: this.id,
+      createdAt: this.createdAt,
+      updatedAt: this.updatedAt,
     };
     this._album.set(newAttributes);
     return this.save(changes);
@@ -221,5 +213,35 @@ export default class ParseAlbum extends ParseObject<"Album"> {
       owner: this.owner,
       coverImage: this.coverImage,
     };
+  }
+}
+
+export class UnpersistedParseAlbum extends ParseAlbum {
+  constructor(attributes: Partial<Attributes<"Album">> = {}) {
+    super(new Parse.Object<ParsifyPointers<"Album">>("Album", {
+      images: [],
+      name: "",
+      collaborators: [],
+      viewers: [],
+      captions: {},
+      objectId: "",
+      createdAt: new Date(),
+      updatedAt: new Date(),
+      ...attributes,
+      owner: attributes.owner?._pointer ?? {__type: "pointer", className: "_User", objectId: ""},
+      coverImage: attributes.coverImage?._pointer,
+    }));
+  }
+
+  get id(): Attributes<"Album">["objectId"] {
+    throw new Error("Cannot get id on unpersisted ParseAlbum");
+  }
+
+  get createdAt(): Attributes<"Album">["createdAt"] {
+    throw new Error("Cannot get createdAt on unpersisted ParseAlbum");
+  }
+
+  get updatedAt(): Attributes<"Album">["updatedAt"] {
+    throw new Error("Cannot get updatedAt on unpersisted ParseAlbum");
   }
 }

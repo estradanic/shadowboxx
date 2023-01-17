@@ -50,13 +50,13 @@ const useAlbumChangeNotifications = () => {
   useEffect(() => {
     if (albumChangeNotifications?.length) {
       albumChangeNotifications.forEach((albumChangeNotification) => {
-        if (!notificationRef.current[albumChangeNotification.id!]?.current) {
-          notificationRef.current[albumChangeNotification.id!] = {
+        if (!notificationRef.current[albumChangeNotification.id]?.current) {
+          notificationRef.current[albumChangeNotification.id] = {
             current: undefined,
           };
-          notificationRef.current[albumChangeNotification.id!].current =
+          notificationRef.current[albumChangeNotification.id].current =
             addNotification({
-              id: albumChangeNotification.id!,
+              id: albumChangeNotification.id,
               title: Strings.albumChangeNotificationTitle(
                 albumChangeNotification.count
               ),
@@ -64,7 +64,7 @@ const useAlbumChangeNotifications = () => {
                 <AlbumChangesNotificationDetail
                   albumChange={albumChangeNotification}
                   notificationRef={
-                    notificationRef.current[albumChangeNotification.id!]
+                    notificationRef.current[albumChangeNotification.id]
                   }
                 />
               ),

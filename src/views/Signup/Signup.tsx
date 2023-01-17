@@ -25,6 +25,7 @@ import { ParseUser } from "../../classes";
 import { useUserContext } from "../../contexts";
 import { useGlobalLoadingStore } from "../../stores";
 import { useView } from "../View";
+import { UnpersistedParseUser } from "../../classes/ParseUser";
 
 const useStyles = makeStyles((theme: Theme) => ({
   card: {
@@ -124,7 +125,7 @@ const Signup = memo(() => {
   const signup = async () => {
     if (validate()) {
       startGlobalLoader();
-      const user = ParseUser.fromAttributes({
+      const user = new UnpersistedParseUser({
         username: email.toLocaleLowerCase(),
         password,
         firstName,

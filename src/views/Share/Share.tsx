@@ -94,7 +94,7 @@ const AlbumsToShareTo = ({ albums, classes, files }: AlbumsListProps) => {
               onClick={async () => {
                 try {
                   const images = (await uploadImagesFromFiles(files)).map(
-                    (image) => image.id!
+                    (image) => image.id
                   );
                   album.update(
                     {

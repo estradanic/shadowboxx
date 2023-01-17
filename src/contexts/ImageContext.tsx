@@ -20,6 +20,7 @@ import {
 import { ImageSelectionDialog } from "../components/Images";
 import { readAndCompressImage } from "browser-image-resizer";
 import { useUserContext } from "./UserContext";
+import { UnpersistedParseImage } from "../classes/ParseImage";
 
 export enum ImageActionCommand {
   DELETE,
@@ -141,7 +142,10 @@ export const ImageContextProvider = ({
     updateGlobalLoader({ progress: newProgress });
   };
 
-  const uploadImage = async (image: ImageAttributes, acl?: Parse.ACL) => {
+  const uploadImage = async (
+    image: ImageAttributes,
+    acl?: Parse.ACL
+  ): Promise<ParseImage> => {
     startGlobalLoader({
       type: "determinate",
       content: (
@@ -154,34 +158,19 @@ export const ImageContextProvider = ({
     const action: ImageAction = { image, command: ImageActionCommand.UPLOAD };
     actions.current.push(action);
 
-    let failed = false;
-    let error = null;
     try {
       image.file = await image.file.save();
-    } catch (e: any) {
-      failed = true;
-      error = e;
-    }
-
-    let parseImage: ParseImage = ParseImage.fromAttributes(image);
-    if (acl) {
-      parseImage.setACL(acl);
-    }
-    if (!failed) {
-      try {
-        parseImage = await parseImage.save();
-      } catch (e: any) {
-        failed = true;
-        error = e;
+      const unpersistedParseImage = new UnpersistedParseImage(image);
+      if (acl) {
+        unpersistedParseImage.setACL(acl);
       }
-    }
-
-    action.completed = true;
-    recalculateProgress();
-
-    if (!failed) {
+      const parseImage = await unpersistedParseImage.save();
+      action.completed = true;
+      recalculateProgress();
       return parseImage;
-    } else {
+    } catch (error: any) {
+      action.completed = true;
+      recalculateProgress();
       if (isNullOrWhitespace(error.message)) {
         error.message = Strings.uploadImageError();
       }

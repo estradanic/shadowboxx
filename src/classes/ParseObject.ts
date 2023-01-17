@@ -12,11 +12,11 @@ export type ClassName = "Album" | "Image" | "_User" | "_Role" | "Duplicate" | "A
 /** Type defining basic attributes of all ParseObjects */
 export interface ObjectAttributes {
   /** Unique id of the object in the database */
-  objectId?: string;
+  objectId: string;
   /** Date object is first persisted to the database */
-  createdAt?: Date;
+  createdAt: Date;
   /** Date object has been last updated in the database */
-  updatedAt?: Date;
+  updatedAt: Date;
 }
 
 /** Type encompassing the attributes of all kinds of ParseObjects */
