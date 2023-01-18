@@ -1,5 +1,6 @@
 import React from "react";
 import {
+  OptionsObject,
   SnackbarProvider as NotistackSnackbarProvider,
   SnackbarProviderProps as NotistackSnackbarProviderProps,
   useSnackbar as notistackUseSnackbar,
@@ -37,31 +38,47 @@ const useStyles = makeStyles((theme: Theme) => ({
 
 /** Hook providing easy access to enqueuing different kinds of Snackbars */
 export const useSnackbar = () => {
-  const { enqueueSnackbar } = notistackUseSnackbar();
+  const { enqueueSnackbar, closeSnackbar } = notistackUseSnackbar();
   const classes = useStyles();
 
-  const enqueueSuccessSnackbar = (message: string) => {
-    enqueueSnackbar(<Typography>{message}</Typography>, {
+  const enqueueSuccessSnackbar = (
+    message: string,
+    options: OptionsObject = {}
+  ) => {
+    return enqueueSnackbar(<Typography>{message}</Typography>, {
       variant: "success",
       className: classes.variantSuccess,
+      ...options,
     });
   };
-  const enqueueInfoSnackbar = (message: string) => {
-    enqueueSnackbar(<Typography>{message}</Typography>, {
+  const enqueueInfoSnackbar = (
+    message: string,
+    options: OptionsObject = {}
+  ) => {
+    return enqueueSnackbar(<Typography>{message}</Typography>, {
       variant: "info",
       className: classes.variantInfo,
+      ...options,
     });
   };
-  const enqueueWarningSnackbar = (message: string) => {
-    enqueueSnackbar(<Typography>{message}</Typography>, {
+  const enqueueWarningSnackbar = (
+    message: string,
+    options: OptionsObject = {}
+  ) => {
+    return enqueueSnackbar(<Typography>{message}</Typography>, {
       variant: "warning",
       className: classes.variantWarning,
+      ...options,
     });
   };
-  const enqueueErrorSnackbar = (message: string) => {
-    enqueueSnackbar(<Typography>{message}</Typography>, {
+  const enqueueErrorSnackbar = (
+    message: string,
+    options: OptionsObject = {}
+  ) => {
+    return enqueueSnackbar(<Typography>{message}</Typography>, {
       variant: "error",
       className: classes.variantError,
+      ...options,
     });
   };
 
@@ -70,6 +87,7 @@ export const useSnackbar = () => {
     enqueueInfoSnackbar,
     enqueueWarningSnackbar,
     enqueueErrorSnackbar,
+    closeSnackbar,
   };
 };
 

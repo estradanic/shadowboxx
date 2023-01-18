@@ -13,7 +13,7 @@ import {
 /**
  * Hook that handles navigation, query invalidation, and authentication at the beginning of every View component.
  */
-export const useView = (currentViewId: string) => {
+export const useView = (currentViewId: keyof typeof routes) => {
   const navigate = useNavigate();
   const location = useLocation();
   const queryClient = useQueryClient();

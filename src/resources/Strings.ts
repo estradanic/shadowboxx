@@ -8,6 +8,7 @@ export interface StringEntries {
   addFromLibrary: string;
   addFromUrl: string;
   addOrEditCaption: string;
+  addToAlbum: string;
   albumChangeNotificationDetail: string;
   albumChangeNotificationTitle: string;
   albumNotFound: string;
@@ -16,6 +17,7 @@ export interface StringEntries {
   aUser: string;
   back: string;
   cancel: string;
+  cannotEditWhileOffline: string;
   caption: string;
   captionImage: string;
   checkEmailVerified: string;
@@ -39,6 +41,8 @@ export interface StringEntries {
   deleteAlbumError: string;
   deleteAlbumSuccess: string;
   deleteDirectoryError: string;
+  delete: string;
+  deleteImagesConfirm: string;
   description: string;
   dragOrBrowse: string;
   duplicatesNotificationTitle: string;
@@ -48,6 +52,7 @@ export interface StringEntries {
   email: string;
   emailExists: string;
   endpointNotFound: string;
+  enteringEditMode: string;
   favorite: string;
   favoriteTooltip: string;
   firstName: string;
@@ -60,6 +65,7 @@ export interface StringEntries {
   goSee: string;
   home: string;
   ignoreDuplicatesConfirm: string;
+  imageDeleted: string;
   imageNotDeleted: string;
   imageNotFound: string;
   imageNotSaved: string;
@@ -115,6 +121,7 @@ export interface StringEntries {
   resolve: string;
   resolveDuplicates: string;
   processingImages: string;
+  selectImage: string;
   selectImages: string;
   sessionExpired: string;
   setImageAsCover: string;
@@ -156,6 +163,7 @@ const Strings: {
   addFromLibrary: () => "Add from existing library",
   addFromUrl: () => "Add from URL",
   addOrEditCaption: () => "Add/Edit caption",
+  addToAlbum: () => "Add to album",
   albumChangeNotificationDetail: (userName: string, albumName: string) =>
     `${userName} changed ${albumName}`,
   albumChangeNotificationTitle: (count: number) =>
@@ -167,6 +175,7 @@ const Strings: {
   aUser: () => "User",
   back: () => "Back",
   cancel: () => "Cancel",
+  cannotEditWhileOffline: () => "Connection lost. Cannot edit while offline.",
   caption: () => "Caption",
   captionImage: () => "Caption Image",
   checkEmailVerified: () => "Check Verification Status",
@@ -189,6 +198,7 @@ const Strings: {
     `Could not write image (${fileName})`,
   createdAt: (createdAt: Date) => `Created: ${createdAt.toLocaleDateString()}`,
   darkMode: () => "Dark Mode",
+  delete: () => "Delete",
   deleteAccount: () => "Delete Account",
   deleteAccountConfirmation: () =>
     "Are you sure? This action is irreversible. All your photos and information will be deleted.",
@@ -199,6 +209,7 @@ const Strings: {
   deleteAlbumSuccess: () => "Album deleted successfully",
   deleteDirectoryError: (directory: string) =>
     `Could not delete directory ${directory}`,
+  deleteImagesConfirm: () => "Are you sure? This action is irreversible.",
   description: () => "Description",
   dragOrBrowse: (what: string) => `Drag ${what} here or click to browse`,
   duplicatesNotificationTitle: () => "You may have uploaded duplicate images!",
@@ -212,6 +223,7 @@ const Strings: {
   emailExists: (email: string) => `User with email already exists (${email})`,
   endpointNotFound: (endpoint: string) =>
     `404. Endpoint not found (${endpoint})`,
+  enteringEditMode: () => "Edit Mode",
   favorite: () => "Favorite",
   favoriteTooltip: () => "Album will appear at the top of your Home page",
   firstName: () => "First Name",
@@ -224,8 +236,8 @@ const Strings: {
   goSee: () => "Go See",
   home: () => "Home",
   ignoreDuplicatesConfirm: () => "Are you sure? This action is irreversible.",
-  imageNotDeleted: (image: string) =>
-    `Image not deleted ${JSON.stringify(image)}`,
+  imageDeleted: (image: string) => `Image deleted (${image})`,
+  imageNotDeleted: (image: string) => `Image not deleted (${image})`,
   imageNotFound: (imageId) =>
     `${Strings.commonError()} Image not found. Image Id: ${imageId}`,
   imageNotSaved: () => `${Strings.commonError()} Image not saved`,
@@ -287,6 +299,7 @@ const Strings: {
   resolve: () => "Resolve",
   resolveDuplicates: () => "Resolve Duplicates",
   processingImages: () => "Processing...",
+  selectImage: () => "Select Image",
   selectImages: () => "Select Images",
   sessionExpired: () => "Session Expired. Please log in again.",
   setImageAsCover: () => "Set this image as the album cover",

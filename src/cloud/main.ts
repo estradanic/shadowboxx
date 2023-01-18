@@ -7,6 +7,7 @@ import {
   hashImage,
   isUserWhitelisted,
   notifyOfAlbumChange,
+  deleteImageFromAlbums,
 } from "./triggers";
 import { findDuplicateImages, hashImages } from "./jobs";
 import { resolveDuplicates, ResolveDuplicatesParams } from "./functions";
@@ -62,6 +63,10 @@ Parse.Cloud.beforeSave("Album", async (request) => {
 
 Parse.Cloud.beforeDelete("Album", async (request) => {
   await deleteRoles(request.object);
+});
+
+Parse.Cloud.beforeDelete("Image", async (request) => {
+  await deleteImageFromAlbums(request.object);
 });
 
 Parse.Cloud.job("findDuplicates", async (request) => {

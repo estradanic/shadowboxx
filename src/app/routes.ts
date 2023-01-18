@@ -7,8 +7,19 @@ const Login = lazy(() => import("../views/Login/Login"));
 const Settings = lazy(() => import("../views/Settings/Settings"));
 const Signup = lazy(() => import("../views/Signup/Signup"));
 const Album = lazy(() => import("../views/Album/Album"));
-const Images = lazy(() => import("../views/Images/Images"));
+const Pictures = lazy(() => import("../views/Pictures/Pictures"));
 const Share = lazy(() => import("../views/Share/Share"));
+
+/** Union type of all the allowed Route ids */
+export type RouteId =
+  | "Album"
+  | "Home"
+  | "Login"
+  | "Pictures"
+  | "Settings"
+  | "Signup"
+  | "Share"
+  | "Root";
 
 /**
  * Interface defining a route object
@@ -17,15 +28,15 @@ export interface RouteProps {
   /** Name of View to appear in header */
   viewName: string;
   /** Id of View. Should be same as key in the routes object */
-  viewId: string;
+  viewId: RouteId;
   /** React Component to render in the layout */
   View: ComponentType<any>;
   /** React Router path */
   path: string;
   /** Whether to try to sessionId authenticate on page load */
-  tryAuthenticate?: boolean;
+  tryAuthenticate: boolean;
   /** Redirect to login page if not authenticated */
-  redirectOnAuthFail?: boolean;
+  redirectOnAuthFail: boolean;
   /** Query Cache Groups to make stale on page load */
   queryCacheGroups: QueryCacheGroups[];
 }
@@ -33,7 +44,7 @@ export interface RouteProps {
 /**
  * Universal routes map containing all pages for the site
  */
-const routes: { [key: string]: RouteProps } = {
+const routes = {
   Album: {
     viewId: "Album",
     viewName: "Album",
@@ -60,13 +71,15 @@ const routes: { [key: string]: RouteProps } = {
     viewName: "Login",
     View: Login,
     path: "/login",
+    tryAuthenticate: false,
+    redirectOnAuthFail: false,
     queryCacheGroups: [],
   },
-  Images: {
-    viewId: "Images",
+  Pictures: {
+    viewId: "Pictures",
     viewName: "Pictures",
-    View: Images,
-    path: "/images",
+    View: Pictures,
+    path: "/pictures",
     tryAuthenticate: true,
     redirectOnAuthFail: true,
     queryCacheGroups: [QueryCacheGroups.GET_ALL_IMAGES_INFINITE],
@@ -94,6 +107,8 @@ const routes: { [key: string]: RouteProps } = {
     viewName: "Signup",
     View: Signup,
     path: "/signup",
+    tryAuthenticate: false,
+    redirectOnAuthFail: false,
     queryCacheGroups: [],
   },
   Root: {
@@ -105,6 +120,6 @@ const routes: { [key: string]: RouteProps } = {
     redirectOnAuthFail: true,
     queryCacheGroups: [QueryCacheGroups.GET_ALL_ALBUMS_INFINITE],
   },
-};
+} satisfies { [key in RouteId]: RouteProps };
 
 export default routes;

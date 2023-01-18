@@ -1,4 +1,4 @@
-import React, { memo, useCallback, useMemo, useState } from "react";
+import React, { memo, useCallback, useState } from "react";
 import {
   AlbumFormDialog,
   BackButton,
@@ -14,11 +14,7 @@ import Grid from "@material-ui/core/Grid";
 import Typography from "@material-ui/core/Typography";
 import { makeStyles, Theme } from "@material-ui/core/styles";
 import EditIcon from "@material-ui/icons/Edit";
-import {
-  useInfiniteQuery,
-  useQuery,
-  useQueryClient,
-} from "@tanstack/react-query";
+import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
 import { Strings } from "../../resources";
 import { ParseImage, ParseAlbum } from "../../classes";
 import { FancyTitleTypography, Void, Images } from "../../components";
@@ -32,6 +28,7 @@ import {
 import { useView } from "../View";
 import OwnerImageDecoration from "../../components/Image/Decoration/OwnerImageDecoration";
 import { useNetworkDetectionContext } from "../../contexts";
+import useFlatInfiniteQueryData from "../../hooks/Query/useFlatInfiniteQueryData";
 
 const useStyles = makeStyles((theme: Theme) => ({
   svgContainer: {
@@ -59,7 +56,6 @@ const Album = memo(() => {
     getImagesByIdInfiniteQueryKey,
     getImagesByIdInfiniteOptions,
   } = useInfiniteQueryConfigs();
-  const queryClient = useQueryClient();
   const { data: album, status: albumStatus } = useQuery<ParseAlbum, Error>(
     getAlbumQueryKey(id),
     () => getAlbumFunction(online, id, { showErrorsInSnackbar: true }),
@@ -70,6 +66,8 @@ const Album = memo(() => {
     status: imagesStatus,
     fetchNextPage,
     isFetchingNextPage,
+    refetch,
+    isRefetching,
   } = useInfiniteQuery<ParseImage[], Error>(
     getImagesByIdInfiniteQueryKey(album?.images ?? []),
     ({ pageParam: page = 0 }) =>
@@ -84,11 +82,7 @@ const Album = memo(() => {
   const [editMode, setEditMode] = useState<boolean>(false);
   const { enqueueSuccessSnackbar, enqueueErrorSnackbar } = useSnackbar();
 
-  const images = useMemo(
-    () => data?.pages?.flatMap((page) => page),
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [data?.pages?.length]
-  );
+  const images = useFlatInfiniteQueryData(data);
 
   const getImageDecorations = useCallback(async (image: ParseImage) => {
     return [
@@ -105,6 +99,18 @@ const Album = memo(() => {
       return album?.captions?.[image.id] ?? "";
     },
     [album?.captions]
+  );
+
+  const getImageProps = useCallback(
+    async (image: ParseImage) => {
+      const decorations = await getImageDecorations(image);
+      const caption = await getImageCaption(image);
+      return {
+        decorations,
+        caption,
+      };
+    },
+    [getImageDecorations, getImageCaption]
   );
 
   return (
@@ -124,8 +130,8 @@ const Album = memo(() => {
             handleConfirm={async (attributes, changes) => {
               setEditMode(false);
               try {
-                const newAlbum = await album.update(attributes, changes);
-                queryClient.setQueryData(getAlbumQueryKey(id), newAlbum);
+                await album.update(attributes, changes);
+                await refetch();
                 enqueueSuccessSnackbar(Strings.commonSaved());
               } catch (error: any) {
                 enqueueErrorSnackbar(
@@ -140,9 +146,8 @@ const Album = memo(() => {
             </FancyTitleTypography>
           </Grid>
           <Images
-            getDecorations={getImageDecorations}
-            getCaption={getImageCaption}
-            status={imagesStatus}
+            getImageProps={getImageProps}
+            status={isRefetching ? "refetching" : imagesStatus}
             images={images}
             outlineColor={randomColor}
           />
