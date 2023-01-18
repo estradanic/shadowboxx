@@ -175,6 +175,7 @@ const Pictures = memo(() => {
   const onDelete = async () => {
     setSelectedImages([]);
     setEditMode(false);
+    closeSnackbar(snackbarKey);
     await refetch();
   };
 
