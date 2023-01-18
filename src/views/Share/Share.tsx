@@ -20,7 +20,7 @@ import {
   SHARE_TARGET_DB_NAME,
   SHARE_TARGET_STORE_KEY,
   SHARE_TARGET_STORE_NAME,
-} from "../../serviceWorker/constants";
+} from "../../serviceWorker/sharedExports";
 import { DEFAULT_PAGE_SIZE } from "../../constants";
 import {
   ImageContextProvider,
