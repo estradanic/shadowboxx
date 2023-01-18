@@ -79,6 +79,7 @@ export interface StringEntries {
   updatedAt: string;
   lastName: string;
   limitedOffline: string;
+  loadingSharedImages: string;
   login: string;
   loginError: string;
   logout: string;
@@ -245,6 +246,7 @@ const Strings: {
   updatedAt: (updatedAt: Date) => `Edited: ${updatedAt.toLocaleDateString()}`,
   lastName: () => "Last Name",
   limitedOffline: () => "Offline functionality will be limited.",
+  loadingSharedImages: () => "Loading selected images...",
   login: () => "Login",
   loginError: () => `${Strings.commonError()} Could not log in.`,
   logout: () => "Logout",

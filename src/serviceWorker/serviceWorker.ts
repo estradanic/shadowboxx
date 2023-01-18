@@ -7,12 +7,13 @@ import {
 import { NetworkFirst, NetworkOnly } from "workbox-strategies";
 import type { ManifestEntry } from "workbox-build";
 import { createStore, get, set } from "idb-keyval";
+import {
+  SHARE_TARGET_DB_NAME,
+  SHARE_TARGET_STORE_NAME,
+  SHARE_TARGET_STORE_KEY,
+} from "./sharedExports";
 
 declare let self: ServiceWorkerGlobalScope;
-
-const SHARE_TARGET_DB_NAME = "shareTargetDB";
-const SHARE_TARGET_STORE_NAME = "shareTargetStore";
-const SHARE_TARGET_STORE_KEY = "sharedFiles";
 
 const shareTargetStore = createStore(
   SHARE_TARGET_DB_NAME,
@@ -56,14 +57,11 @@ self.addEventListener("activate", (event: ExtendableEvent) => {
   );
 });
 
-self.addEventListener("message", (event: ExtendableMessageEvent) => {
+self.addEventListener("message", async (event: ExtendableMessageEvent) => {
   if (event.data === SHARE_TARGET_STORE_KEY) {
-    get(SHARE_TARGET_STORE_KEY, shareTargetStore).then((files) => {
-      (event.source as MessagePort).postMessage({
-        message: SHARE_TARGET_STORE_KEY,
-        sharedFiles: files,
-      });
-    });
+    const files = await get(SHARE_TARGET_STORE_KEY, shareTargetStore);
+    const channel = new BroadcastChannel(SHARE_TARGET_STORE_KEY);
+    channel.postMessage(files);
   }
 });
 

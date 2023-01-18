@@ -70,32 +70,6 @@ export default class ParseUser extends ParseObject<"_User"> {
     return new Parse.Query<Parse.User<ParsifyPointers<"_User">>>("User").fromLocalDatastore();
   }
 
-  /**
-   * Creates a new ParseUser from attributes
-   * @param attributes Attributes to create the ParseUser from
-   * @returns A new ParseUser
-   */
-  static fromAttributes = (attributes: Partial<Attributes<"_User">>): ParseUser => {
-    const fullAttributes: ParsifyPointers<"_User"> = {
-      username: attributes.username ?? attributes.email ?? "",
-      password: attributes.password ?? "",
-      email: attributes.email ?? attributes.username ?? "",
-      isDarkThemeEnabled: attributes.isDarkThemeEnabled ?? false,
-      firstName:
-        attributes.firstName ?? attributes.email ?? attributes.username ?? "",
-      lastName: attributes.lastName ?? "",
-      profilePicture: attributes.profilePicture?._pointer,
-      favoriteAlbums: attributes.favoriteAlbums ?? [],
-    };
-    const newParseUser = new ParseUser(
-      new Parse.User<ParsifyPointers<"_User">>(fullAttributes)
-    );
-
-    // Set this again to make sure that the pointer is the right type
-    newParseUser.profilePicture = attributes.profilePicture;
-    return newParseUser;
-  };
-
   _user: Parse.User<ParsifyPointers<"_User">>;
 
   constructor(user: Parse.User<ParsifyPointers<"_User">>) {
@@ -300,5 +274,39 @@ export default class ParseUser extends ParseObject<"_User"> {
       ...this._user.attributes,
       profilePicture: this.profilePicture,
     };
+  }
+}
+
+/**
+ * Class wrapping the ParseUser class for when an unpersisted user is needed
+ */
+export class UnpersistedParseUser extends ParseUser {
+  constructor(attributes: Partial<Attributes<"_User">> = {}) {
+    super(new Parse.User<ParsifyPointers<"_User">>({
+      username: "",
+      email: "",
+      firstName: "",
+      lastName: "",
+      password: "",
+      favoriteAlbums: [],
+      isDarkThemeEnabled: false,
+      objectId: "",
+      createdAt: new Date(),
+      updatedAt: new Date(),
+      ...attributes,
+      profilePicture: attributes.profilePicture?._pointer,
+    }));
+  }
+
+  get id(): Attributes<"_User">["objectId"] {
+    throw new Error("Cannot get id on unpersisted ParseUser");
+  }
+
+  get createdAt(): Attributes<"_User">["createdAt"] {
+    throw new Error("Cannot get createdAt on unpersisted ParseUser");
+  }
+
+  get updatedAt(): Attributes<"_User">["updatedAt"] {
+    throw new Error("Cannot get updatedAt on unpersisted ParseUser");
   }
 }

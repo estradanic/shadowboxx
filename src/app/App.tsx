@@ -18,7 +18,7 @@ import {
   SHARE_TARGET_DB_NAME,
   SHARE_TARGET_STORE_KEY,
   SHARE_TARGET_STORE_NAME,
-} from "../constants";
+} from "../serviceWorker/sharedExports";
 
 Parse.serverURL = window.__env__?.PARSE_HOST_URL;
 Parse.initialize(
@@ -49,14 +49,9 @@ const shareTargetStore = createStore(
   SHARE_TARGET_DB_NAME,
   SHARE_TARGET_STORE_NAME
 );
-window.addEventListener("message", async (event) => {
-  if (event.data[SHARE_TARGET_STORE_KEY]) {
-    await set(
-      SHARE_TARGET_STORE_KEY,
-      event.data[SHARE_TARGET_STORE_KEY],
-      shareTargetStore
-    );
-  }
+const channel = new BroadcastChannel(SHARE_TARGET_STORE_KEY);
+channel.addEventListener("message", async (event) => {
+  await set(SHARE_TARGET_STORE_KEY, event.data, shareTargetStore);
 });
 
 const App = () => {

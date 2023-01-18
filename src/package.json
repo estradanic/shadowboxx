@@ -30,7 +30,7 @@
     "react-router-dom": "^6.6.2",
     "use-debounce": "^9.0.3",
     "uuid": "^9.0.0",
-    "zustand": "^4.3.1"
+    "zustand": "^4.3.2"
   },
   "scripts": {
     "build": "vite build --mode development",
@@ -75,9 +75,9 @@
     "@types/uuid": "^9.0.0",
     "@vitejs/plugin-react": "^3.0.1",
     "blockhash-core": "^0.1.0",
-    "eslint": "^8.31.0",
+    "eslint": "^8.32.0",
     "eslint-config-react-app": "^7.0.1",
-    "prettier": "^2.8.2",
+    "prettier": "^2.8.3",
     "rollup-plugin-typescript": "^1.0.1",
     "tslib": "^2.4.1",
     "typescript": "^4.9.4",

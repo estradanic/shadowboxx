@@ -1,4 +1,4 @@
-import React, { memo, useLayoutEffect, useMemo, useState } from "react";
+import React, { memo, useEffect, useMemo, useRef, useState } from "react";
 import {
   FancyTypography,
   NoImages,
@@ -17,11 +17,11 @@ import {
 import { ParseAlbum } from "../../classes";
 import { useInfiniteQuery } from "@tanstack/react-query";
 import {
-  DEFAULT_PAGE_SIZE,
   SHARE_TARGET_DB_NAME,
   SHARE_TARGET_STORE_KEY,
   SHARE_TARGET_STORE_NAME,
-} from "../../constants";
+} from "../../serviceWorker/sharedExports";
+import { DEFAULT_PAGE_SIZE } from "../../constants";
 import {
   ImageContextProvider,
   useImageContext,
@@ -94,7 +94,7 @@ const AlbumsToShareTo = ({ albums, classes, files }: AlbumsListProps) => {
               onClick={async () => {
                 try {
                   const images = (await uploadImagesFromFiles(files)).map(
-                    (image) => image.id!
+                    (image) => image.id
                   );
                   album.update(
                     {
@@ -141,39 +141,62 @@ const Share = memo(() => {
   );
   const { startGlobalLoader, stopGlobalLoader } = useGlobalLoadingStore();
   const { enqueueErrorSnackbar } = useSnackbar();
+  const initialized = useRef(false);
 
   useInfiniteScroll(fetchNextPage, { canExecute: !isFetchingNextPage });
   const albums = useMemo(
     () => data?.pages?.flatMap((page) => page) ?? [],
     [data?.pages]
   );
+  const [failed, setFailed] = useState(false);
 
-  useLayoutEffect(() => {
-    startGlobalLoader();
-    navigator.serviceWorker.controller?.postMessage(SHARE_TARGET_STORE_KEY);
+  useEffect(() => {
+    if (initialized.current) {
+      return;
+    }
+    initialized.current = true;
+    navigator.serviceWorker.ready.then((registration) =>
+      registration.active?.postMessage(SHARE_TARGET_STORE_KEY)
+    );
+    startGlobalLoader({
+      type: "indeterminate",
+      content: (
+        <FancyTypography variant="loading">
+          {Strings.loadingSharedImages()}
+        </FancyTypography>
+      ),
+    });
     let count = 0;
+    let getting = false;
     const timer = setInterval(() => {
+      if (getting) {
+        return;
+      }
+      count++;
+      getting = true;
       get(SHARE_TARGET_STORE_KEY, shareTargetStore)
-        .then((files: File[]) => {
-          if (count > 10) {
-            enqueueErrorSnackbar(Strings.noImagesSelected());
-            clearInterval(timer);
-            stopGlobalLoader();
-            return;
-          }
+        .then(async (files: File[]) => {
           if (!files) {
             return;
           }
           setSharedFiles(files);
-          del("files", shareTargetStore);
+          await del("files", shareTargetStore);
           clearInterval(timer);
           stopGlobalLoader();
         })
         .catch((error: any) => {
           console.warn(error);
         })
-        .finally(() => count++);
-    }, 1000);
+        .finally(() => {
+          getting = false;
+        });
+      if (count > 9) {
+        enqueueErrorSnackbar(Strings.noImagesSelected());
+        clearInterval(timer);
+        stopGlobalLoader();
+        setFailed(true);
+      }
+    }, 500);
   }, [
     setSharedFiles,
     startGlobalLoader,
@@ -216,7 +239,7 @@ const Share = memo(() => {
             )}
           </>
         ) : (
-          <NoImages text={Strings.noImagesSelected()} />
+          failed && <NoImages text={Strings.noImagesSelected()} />
         )}
       </Online>
       <Offline>

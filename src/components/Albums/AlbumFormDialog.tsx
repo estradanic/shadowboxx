@@ -176,11 +176,11 @@ const AlbumFormDialog = ({
         <Grid item xs={12}>
           <ImageContextProvider>
             <ImageField
-              getCaption={(image) => captions[image.id!]}
+              getCaption={(image) => captions[image.id]}
               setCaption={(image, caption) => {
                 setCaptions((captions) => ({
                   ...captions,
-                  [image.id!]: caption,
+                  [image.id]: caption,
                 }));
               }}
               coverImage={coverImage ?? images?.[0]?.toPointer()}
@@ -189,14 +189,14 @@ const AlbumFormDialog = ({
               multiple
               value={
                 images?.filter?.(
-                  (image) => !removedImageIds.includes(image.id!)
+                  (image) => !removedImageIds.includes(image.id)
                 ) ?? []
               }
               onRemove={async (...images) => {
-                await onRemove(...images.map((image) => image.id!));
+                await onRemove(...images.map((image) => image.id));
               }}
               onAdd={async (...images) => {
-                await onAdd(...images.map((image) => image.id!));
+                await onAdd(...images.map((image) => image.id));
               }}
             />
           </ImageContextProvider>

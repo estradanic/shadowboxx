@@ -102,7 +102,7 @@ const Album = memo(() => {
 
   const getImageCaption = useCallback(
     async (image: ParseImage) => {
-      return album?.captions?.[image.id!] ?? "";
+      return album?.captions?.[image.id] ?? "";
     },
     [album?.captions]
   );

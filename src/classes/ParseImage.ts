@@ -33,23 +33,6 @@ class ImageColumns extends Columns {
  * Class wrapping the Parse.Image class and providing convenience methods/properties
  */
 export default class ParseImage extends ParseObject<"Image"> {
-
-  /**
-   * Create a new image from attributes
-   * @param attributes Attributes to create the image with
-   * @returns The created image
-   */
-  static fromAttributes(attributes: Attributes<"Image">): ParseImage {
-    const newAttributes: ParsifyPointers<"Image"> = {
-      ...attributes,
-      owner: attributes.owner._pointer,
-      name: attributes.name,
-    };
-    return new ParseImage(
-      new Parse.Object<ParsifyPointers<"Image">>("Image", newAttributes)
-    );
-  }
-
   /**
    * Get a Parse.Query for the "Image" class
    * @param online Whether to query online or not, defaults to true
@@ -180,5 +163,31 @@ export default class ParseImage extends ParseObject<"Image"> {
       ...this._image.attributes,
       owner: this.owner,
     }
+  }
+}
+
+export class UnpersistedParseImage extends ParseImage {
+  constructor(attributes: Partial<Attributes<"Image">> = {}) {
+    super(new Parse.Object<ParsifyPointers<"Image">>("Image", {
+      name: "",
+      file: new Parse.File("", [0]),
+      objectId: "",
+      createdAt: new Date(),
+      updatedAt: new Date(),
+      ...attributes,
+      owner: attributes.owner?._pointer ?? {__type: "pointer", className: "_User", objectId: ""},
+    }));
+  }
+
+  get id(): Attributes<"Image">["objectId"] {
+    throw new Error("Cannot get id on unpersisted ParseImage");
+  }
+
+  get createdAt(): Attributes<"Image">["createdAt"] {
+    throw new Error("Cannot get createdAt on unpersisted ParseImage");
+  }
+
+  get updatedAt(): Attributes<"Image">["updatedAt"] {
+    throw new Error("Cannot get updatedAt on unpersisted ParseImage");
   }
 }

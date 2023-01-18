@@ -14,10 +14,6 @@ export interface DuplicateAttributes {
   similarity: number,
   /** Whether the duplicate has been acknowledged by the user */
   acknowledged: boolean,
-  /** The objectId of the duplicate.
-   * Overridden here to be required because these are never created on the frontend
-   */
-  objectId: string,
 }
 
 class DuplicateColumns extends Columns {
@@ -76,11 +72,6 @@ export default class ParseDuplicate extends ParseObject<"Duplicate"> {
   /** Whether the duplicate has been acknowledged by the user */
   get acknowledged(): Attributes<"Duplicate">["acknowledged"] {
     return this._duplicate.get(ParseDuplicate.COLUMNS.acknowledged);
-  }
-
-  /** The objectId. Overridden because these are always retrieved from the db */
-  get id(): Attributes<"Duplicate">["objectId"] {
-    return this._duplicate.id;
   }
 
   get attributes(): Attributes<"Duplicate"> {
