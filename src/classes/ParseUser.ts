@@ -256,7 +256,7 @@ export default class ParseUser extends ParseObject<"_User"> {
   }
 
   set profilePicture(profilePicture) {
-    this._user.set(ParseUser.COLUMNS.profilePicture, profilePicture?._pointer);
+    this._user.set(ParseUser.COLUMNS.profilePicture, profilePicture?.toNativePointer());
   }
 
   /** This user's list of favorited albums */
@@ -294,7 +294,7 @@ export class UnpersistedParseUser extends ParseUser {
       createdAt: new Date(),
       updatedAt: new Date(),
       ...attributes,
-      profilePicture: attributes.profilePicture?._pointer,
+      profilePicture: attributes.profilePicture?.toNativePointer(),
     }));
   }
 

@@ -145,7 +145,7 @@ export const ImageContextProvider = ({
   const uploadImage = async (
     image: ImageAttributes,
     acl?: Parse.ACL
-  ): Promise<ParseImage> => {
+  ): Promise<ParseImage | undefined> => {
     startGlobalLoader({
       type: "determinate",
       content: (
@@ -179,7 +179,9 @@ export const ImageContextProvider = ({
         title: Strings.uploadImageError(),
         icon: <ErrorIcon />,
       });
-      throw error;
+      console.error(error);
+      enqueueErrorSnackbar(Strings.uploadImageError());
+      return undefined;
     }
   };
 
@@ -210,7 +212,7 @@ export const ImageContextProvider = ({
 
   const uploadFiles = async (files: File[], acl?: Parse.ACL) => {
     const max = multiple ? files.length : 1;
-    const newImagePromises: Promise<ParseImage>[] = [];
+    const newImagePromises: Promise<ParseImage | undefined>[] = [];
     for (let i = 0; i < max; i++) {
       let file = files[i];
       const fileName = makeValidFileName(files[i].name);
@@ -244,7 +246,7 @@ export const ImageContextProvider = ({
         const processedFiles = await processFiles(files);
         try {
           const newImages = await uploadFiles(processedFiles, acl);
-          resolve(newImages);
+          resolve(newImages.filter((image) => image !== undefined) as ParseImage[]);
         } catch (error: any) {
           reject(error?.message);
         } finally {
@@ -265,6 +267,9 @@ export const ImageContextProvider = ({
       },
       acl
     );
+    if (!newImage) {
+      throw new Error(Strings.uploadImageError());
+    }
     return newImage;
   };
 

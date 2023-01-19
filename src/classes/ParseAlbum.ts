@@ -24,25 +24,25 @@ export interface AlbumAttributes {
 
 export interface AlbumSaveContext {
   /** Array of image ids removed from the album */
-  removedImages?: string[];
+  removedImages?: ParsifyPointers<"Album">["images"];
   /** Array of image ids added to the album */
-  addedImages?: string[];
+  addedImages?: ParsifyPointers<"Album">["images"];
   /** Array of collaborator emails removed from the album */
-  removedCollaborators?: string[];
+  removedCollaborators?: ParsifyPointers<"Album">["collaborators"];
   /** Array of collaborator emails added to the album */
-  addedCollaborators?: string[];
+  addedCollaborators?: ParsifyPointers<"Album">["collaborators"];
   /** Array of viewer emails added to the album */
-  removedViewers?: string[];
+  removedViewers?: ParsifyPointers<"Album">["viewers"];
   /** Array of viewer emails removed from the album */
-  addedViewers?: string[];
+  addedViewers?: ParsifyPointers<"Album">["viewers"];
   /** New cover image for the album */
-  coverImage?: AlbumAttributes["coverImage"];
+  coverImage?: ParsifyPointers<"Album">["coverImage"];
   /** New name for the album */
-  name?: AlbumAttributes["name"];
+  name?: ParsifyPointers<"Album">["name"];
   /** New description for the album */
-  description?: AlbumAttributes["description"];
+  description?: ParsifyPointers<"Album">["description"];
   /** New captions for the album */
-  captions?: AlbumAttributes["captions"];
+  captions?: ParsifyPointers<"Album">["captions"];
 }
 
 class AlbumColumns extends Columns {
@@ -99,14 +99,22 @@ export default class ParseAlbum extends ParseObject<"Album"> {
   }
 
   async saveNew() {
-    return this.save({});
+    return this.save({
+      addedImages: this.images,
+      addedCollaborators: this.collaborators,
+      addedViewers: this.viewers,
+      coverImage: this.coverImage?.toNativePointer(),
+      name: this.name,
+      description: this.description,
+      captions: this.captions,
+    });
   }
 
   async update(attributes: AlbumAttributes, changes: AlbumSaveContext) {
     const newAttributes: ParsifyPointers<"Album"> = {
       ...attributes,
-      owner: attributes.owner._pointer,
-      coverImage: attributes.coverImage?._pointer,
+      owner: attributes.owner.toNativePointer(),
+      coverImage: attributes.coverImage?.toNativePointer(),
       objectId: this.id,
       createdAt: this.createdAt,
       updatedAt: this.updatedAt,
@@ -121,7 +129,7 @@ export default class ParseAlbum extends ParseObject<"Album"> {
   }
 
   set owner(owner) {
-    this._album.set(ParseAlbum.COLUMNS.owner, owner._pointer);
+    this._album.set(ParseAlbum.COLUMNS.owner, owner.toNativePointer());
   }
 
   /** List of image ids */
@@ -183,7 +191,7 @@ export default class ParseAlbum extends ParseObject<"Album"> {
   }
 
   set coverImage(coverImage) {
-    this._album.set(ParseAlbum.COLUMNS.coverImage, coverImage?._pointer);
+    this._album.set(ParseAlbum.COLUMNS.coverImage, coverImage?.toNativePointer());
   }
 
   /** Map of image ids to captions */
@@ -228,8 +236,8 @@ export class UnpersistedParseAlbum extends ParseAlbum {
       createdAt: new Date(),
       updatedAt: new Date(),
       ...attributes,
-      owner: attributes.owner?._pointer ?? {__type: "pointer", className: "_User", objectId: ""},
-      coverImage: attributes.coverImage?._pointer,
+      owner: attributes.owner?.toNativePointer() ?? {__type: "Pointer", className: "_User", objectId: ""},
+      coverImage: attributes.coverImage?.toNativePointer(),
     }));
   }
 

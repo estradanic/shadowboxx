@@ -4,7 +4,7 @@ import { makeStyles, Theme } from "@material-ui/core/styles";
 import Grid from "@material-ui/core/Grid";
 import Typography from "@material-ui/core/Typography";
 import Button from "@material-ui/core/Button";
-import { Notification } from "../../../contexts";
+import { Notification, useNotificationsContext } from "../../../contexts";
 import { Strings } from "../../../resources";
 import {
   ParseAlbum,
@@ -44,6 +44,7 @@ const AlbumChangesNotificationDetail = ({
   const [userName, setUserName] = useState<string>();
   const [albumName, setAlbumName] = useState<string>();
   const queryClient = useQueryClient();
+  const {setNotificationMenuOpen} = useNotificationsContext();
 
   useEffect(() => {
     albumChange.user.fetch<ParseUser>().then((user) => {
@@ -68,6 +69,7 @@ const AlbumChangesNotificationDetail = ({
       }
     );
     notificationRef.current?.remove();
+    setNotificationMenuOpen(false);
     navigate(routes.Album.path.replace(":id", albumChange.album.id));
   };
 

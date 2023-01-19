@@ -44,11 +44,9 @@ export const useView = (currentViewId: keyof typeof routes) => {
   }, [currentRoute, redirectToLogin, isUserLoggedIn]);
 
   useEffect(() => {
-    const position = getScrollPosition(location.pathname);
-    const wait = (10 * position) / 100;
     setTimeout(() => {
-      document.body.scrollTo(0, position);
-    }, wait);
+      document.body.scrollTo(0, getScrollPosition(location.pathname));
+    });
   }, [location.pathname, getScrollPosition]);
 
   useDuplicatesNotifications();

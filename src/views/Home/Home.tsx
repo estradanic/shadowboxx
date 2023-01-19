@@ -76,8 +76,7 @@ const Home = memo(() => {
   const { getLoggedInUser } = useUserContext();
 
   const albums = useFlatInfiniteQueryData(data);
-  const { virtualized: virtualizedAlbums, reset: resetVirtualList } =
-    useVirtualList({ list: albums, interval: 10, enabled: !!albums?.length });
+  const virtualizedAlbums = useVirtualList(albums);
 
   const randomColor = useRandomColor();
 
@@ -92,7 +91,6 @@ const Home = memo(() => {
                   borderColor={randomColor}
                   onChange={async (_) => {
                     await refetchAlbums();
-                    resetVirtualList();
                   }}
                   value={album}
                 />

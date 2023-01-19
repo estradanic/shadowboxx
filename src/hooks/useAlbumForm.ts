@@ -137,7 +137,7 @@ const useAlbumForm = (
       changes.removedViewers = removedViewers;
     }
     if (coverImage?.id !== album.coverImage?.id) {
-      changes.coverImage = coverImage;
+      changes.coverImage = coverImage?.toNativePointer();
     }
     if (name !== album.name) {
       changes.name = name;

@@ -45,17 +45,7 @@ const Images = ({
     }
   }, [images, getImageProps, setImageProps]);
 
-  const { virtualized: virtualizedImages, reset } = useVirtualList<ParseImage>({
-    list: images,
-    interval: 10,
-    enabled: !!images && status === "success",
-  });
-
-  useEffect(() => {
-    if (status !== "success") {
-      reset();
-    }
-  }, [status, reset]);
+  const virtualizedImages = useVirtualList(images);
 
   if (status === "loading" || (!images && status !== "error")) {
     return <ImagesSkeleton />;
