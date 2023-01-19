@@ -168,12 +168,10 @@ export default class ParseImage extends ParseObject<"Image"> {
 
 export class UnpersistedParseImage extends ParseImage {
   constructor(attributes: Partial<Attributes<"Image">> = {}) {
+    // @ts-expect-error
     super(new Parse.Object<ParsifyPointers<"Image">>("Image", {
       name: "",
       file: new Parse.File("", [0]),
-      objectId: "",
-      createdAt: new Date(),
-      updatedAt: new Date(),
       ...attributes,
       owner: attributes.owner?.toNativePointer() ?? {__type: "Pointer", className: "_User", objectId: ""},
     }));

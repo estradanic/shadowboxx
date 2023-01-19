@@ -282,6 +282,7 @@ export default class ParseUser extends ParseObject<"_User"> {
  */
 export class UnpersistedParseUser extends ParseUser {
   constructor(attributes: Partial<Attributes<"_User">> = {}) {
+    // @ts-expect-error
     super(new Parse.User<ParsifyPointers<"_User">>({
       username: "",
       email: "",
@@ -290,9 +291,6 @@ export class UnpersistedParseUser extends ParseUser {
       password: "",
       favoriteAlbums: [],
       isDarkThemeEnabled: false,
-      objectId: "",
-      createdAt: new Date(),
-      updatedAt: new Date(),
       ...attributes,
       profilePicture: attributes.profilePicture?.toNativePointer(),
     }));

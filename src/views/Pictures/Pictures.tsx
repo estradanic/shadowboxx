@@ -40,10 +40,11 @@ import { useActionDialogContext } from "../../components/Dialog/ActionDialog";
 const useStyles = makeStyles((theme: Theme) => ({
   actionContainer: {
     backgroundColor: theme.palette.background.paper,
-    marginTop: theme.spacing(4),
     padding: theme.spacing(0.5, 1),
-    marginBottom: theme.spacing(-5),
     borderRadius: theme.spacing(0.5),
+    position: "absolute",
+    bottom: theme.spacing(7),
+    zIndex: theme.zIndex.modal,
   },
 }));
 

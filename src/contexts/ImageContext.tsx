@@ -228,7 +228,7 @@ export const ImageContextProvider = ({
         )
       );
     }
-    return Promise.all(newImagePromises);
+    return Promise.allSettled(newImagePromises);
   };
 
   const uploadImagesFromFiles = async (files: File[], acl?: Parse.ACL) => {
@@ -245,10 +245,14 @@ export const ImageContextProvider = ({
       setTimeout(async () => {
         const processedFiles = await processFiles(files);
         try {
-          const newImages = await uploadFiles(processedFiles, acl);
-          resolve(
-            newImages.filter((image) => image !== undefined) as ParseImage[]
-          );
+          const result = await uploadFiles(processedFiles, acl);
+          const newImages: ParseImage[] = [];
+          for (const promise of result) {
+            if (promise.status === "fulfilled" && promise.value) {
+              newImages.push(promise.value);
+            }
+          }
+          resolve(newImages);
         } catch (error: any) {
           reject(error?.message);
         } finally {

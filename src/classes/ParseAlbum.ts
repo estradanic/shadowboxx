@@ -226,15 +226,13 @@ export default class ParseAlbum extends ParseObject<"Album"> {
 
 export class UnpersistedParseAlbum extends ParseAlbum {
   constructor(attributes: Partial<Attributes<"Album">> = {}) {
+    // @ts-expect-error
     super(new Parse.Object<ParsifyPointers<"Album">>("Album", {
       images: [],
       name: "",
       collaborators: [],
       viewers: [],
       captions: {},
-      objectId: "",
-      createdAt: new Date(),
-      updatedAt: new Date(),
       ...attributes,
       owner: attributes.owner?.toNativePointer() ?? {__type: "Pointer", className: "_User", objectId: ""},
       coverImage: attributes.coverImage?.toNativePointer(),
