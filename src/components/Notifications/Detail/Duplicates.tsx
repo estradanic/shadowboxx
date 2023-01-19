@@ -10,7 +10,11 @@ import { createHtmlPortalNode, InPortal } from "react-reverse-portal";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { ParseDuplicate, ParseImage } from "../../../classes";
 import { Strings } from "../../../resources";
-import { Notification, useNetworkDetectionContext, useNotificationsContext } from "../../../contexts";
+import {
+  Notification,
+  useNetworkDetectionContext,
+  useNotificationsContext,
+} from "../../../contexts";
 import { useGlobalLoadingStore } from "../../../stores";
 import { useActionDialogContext } from "../../Dialog/ActionDialog";
 import { useQueryConfigs, useRandomColor } from "../../../hooks";
@@ -50,7 +54,7 @@ const DuplicatesNotificationDetail = ({
       stopGlobalLoader: state.stopGlobalLoader,
     })
   );
-  const {setNotificationMenuOpen} = useNotificationsContext();
+  const { setNotificationMenuOpen } = useNotificationsContext();
 
   const [duplicateIds, setDuplicateIds] = useState<string[]>([]);
 

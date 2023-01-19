@@ -11,11 +11,14 @@ const mergeAlbumChanges = async (
     !(
       album.dirty("images") ||
       album.dirty("collaborators") ||
-      album.dirty("viewers")
+      album.dirty("viewers") ||
+      album.dirty("coverImage")
     )
   ) {
+    console.log("No changes to merge in album", album.id);
     return;
   }
+  console.log("Merging changes in album", album.id);
 
   const attributes = album.attributes;
 
@@ -26,9 +29,11 @@ const mergeAlbumChanges = async (
   const viewers: string[] = album.get("viewers");
 
   if (context.addedImages) {
+    console.log("Adding images", context.addedImages);
     images.push(...context.addedImages);
   }
   if (context.removedImages) {
+    console.log("Removing images", context.removedImages);
     for (let i = 0; i < context.removedImages.length; i++) {
       images.splice(
         images.findIndex(
@@ -39,9 +44,11 @@ const mergeAlbumChanges = async (
     }
   }
   if (context.addedCollaborators) {
+    console.log("Adding collaborators", context.addedCollaborators);
     collaborators.push(...context.addedCollaborators);
   }
   if (context.removedCollaborators) {
+    console.log("Removing collaborators", context.removedCollaborators);
     for (let i = 0; i < context.removedCollaborators.length; i++) {
       collaborators.splice(
         collaborators.findIndex(
@@ -53,9 +60,11 @@ const mergeAlbumChanges = async (
     }
   }
   if (context.addedViewers) {
+    console.log("Adding viewers", context.addedViewers);
     viewers.push(...context.addedViewers);
   }
   if (context.removedViewers) {
+    console.log("Removing viewers", context.removedViewers);
     for (let i = 0; i < context.removedViewers.length; i++) {
       viewers.splice(
         viewers.findIndex(
@@ -68,12 +77,14 @@ const mergeAlbumChanges = async (
 
   let coverImage = attributes.coverImage;
   if (images && (!coverImage || !images.includes(coverImage.id))) {
+    console.log("Setting fallback for cover image");
     const image = await new Parse.Query("Image")
       .equalTo("objectId", images[0])
       .first({ useMasterKey: true });
     coverImage = image?.toPointer();
   }
 
+  console.log("Saving album", album.id);
   album.set({ ...attributes, images, collaborators, viewers, coverImage });
 };
 

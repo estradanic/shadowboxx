@@ -76,7 +76,7 @@ interface NotificationsProps {
   className?: string;
 }
 
-interface NotificationProps extends Notification { }
+interface NotificationProps extends Notification {}
 
 /** Component to display notifications for the app */
 const Notifications = ({ className }: NotificationsProps) => {
@@ -142,12 +142,7 @@ const Notifications = ({ className }: NotificationsProps) => {
 
 export const NotificationMenuItem = forwardRef(
   (
-    {
-      title,
-      icon,
-      detail,
-      remove: onRemove,
-    }: NotificationProps,
+    { title, icon, detail, remove: onRemove }: NotificationProps,
     ref: ForwardedRef<any>
   ) => {
     const classes = useStyles();

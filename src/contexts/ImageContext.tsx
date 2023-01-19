@@ -246,7 +246,9 @@ export const ImageContextProvider = ({
         const processedFiles = await processFiles(files);
         try {
           const newImages = await uploadFiles(processedFiles, acl);
-          resolve(newImages.filter((image) => image !== undefined) as ParseImage[]);
+          resolve(
+            newImages.filter((image) => image !== undefined) as ParseImage[]
+          );
         } catch (error: any) {
           reject(error?.message);
         } finally {

@@ -298,15 +298,22 @@ export class UnpersistedParseUser extends ParseUser {
     }));
   }
 
+  private redirectToLogin() {
+    window.location.href = "/login";
+  }
+
   get id(): Attributes<"_User">["objectId"] {
-    throw new Error("Cannot get id on unpersisted ParseUser");
+    this.redirectToLogin();
+    return "";
   }
 
   get createdAt(): Attributes<"_User">["createdAt"] {
-    throw new Error("Cannot get createdAt on unpersisted ParseUser");
+    this.redirectToLogin();
+    return new Date();
   }
 
   get updatedAt(): Attributes<"_User">["updatedAt"] {
-    throw new Error("Cannot get updatedAt on unpersisted ParseUser");
+    this.redirectToLogin();
+    return new Date();
   }
 }

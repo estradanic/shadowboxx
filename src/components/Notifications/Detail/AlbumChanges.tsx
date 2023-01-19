@@ -44,7 +44,7 @@ const AlbumChangesNotificationDetail = ({
   const [userName, setUserName] = useState<string>();
   const [albumName, setAlbumName] = useState<string>();
   const queryClient = useQueryClient();
-  const {setNotificationMenuOpen} = useNotificationsContext();
+  const { setNotificationMenuOpen } = useNotificationsContext();
 
   useEffect(() => {
     albumChange.user.fetch<ParseUser>().then((user) => {
