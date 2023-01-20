@@ -1,6 +1,4 @@
 import React, { useCallback, useMemo, useState } from "react";
-import Grid from "@material-ui/core/Grid";
-import Typography from "@material-ui/core/Typography";
 import useMediaQuery from "@material-ui/core/useMediaQuery";
 import { makeStyles, Theme, useTheme } from "@material-ui/core/styles";
 import classNames from "classnames";
@@ -15,49 +13,10 @@ import {
 } from "../../hooks";
 import { ParseImage } from "../../classes";
 import ActionDialog, { ActionDialogProps } from "../Dialog/ActionDialog";
-import Image from "../Image/Image";
-import Empty from "../Svgs/Empty";
-import CheckIcon from "@material-ui/icons/Check";
-import ImagesSkeleton from "../Skeleton/ImagesSkeleton";
+import { ImageProps } from "../Image/Image";
 import { DEFAULT_PAGE_SIZE } from "../../constants";
-
-const useStyles = makeStyles((theme: Theme) => ({
-  svgContainer: {
-    textAlign: "center",
-  },
-  svgText: {
-    fontSize: "medium",
-  },
-  imageContainer: {
-    display: "flex",
-    flexDirection: "row",
-    marginTop: theme.spacing(7),
-  },
-  imageWrapper: {
-    position: "relative",
-  },
-  imageOverlay: {
-    cursor: "pointer",
-    opacity: 0,
-    backgroundColor: theme.palette.success.light,
-    position: "absolute",
-    top: theme.spacing(1),
-    bottom: theme.spacing(1),
-    left: theme.spacing(1),
-    right: theme.spacing(1),
-    borderRadius: theme.spacing(0.5),
-    border: `2px solid ${theme.palette.success.dark}`,
-  },
-  selected: {
-    "&&": {
-      opacity: 0.7,
-    },
-  },
-  check: {
-    color: theme.palette.success.contrastText,
-    fontSize: theme.spacing(8),
-  },
-}));
+import Images from "../Image/Images";
+import useImageStyles from "../Image/useImageStyles";
 
 export interface ImageSelectionDialogProps
   extends Pick<ActionDialogProps, "open" | "handleCancel"> {
@@ -78,7 +37,7 @@ const ImageSelectionDialog = ({
   multiple = true,
 }: ImageSelectionDialogProps) => {
   const [value, setValue] = useState<ParseImage[]>([]);
-  const classes = useStyles();
+  const classes = useImageStyles();
   const { getLoggedInUser } = useUserContext();
   const randomColor = useRandomColor();
   const theme = useTheme();
@@ -139,6 +98,30 @@ const ImageSelectionDialog = ({
     [value]
   );
 
+  const getImageProps = useCallback(
+    async (image: ParseImage): Promise<Partial<ImageProps>> => ({
+      className: classNames({
+        [classes.selected]: isSelected(image.id),
+        [classes.unselected]: !isSelected(image.id),
+      }),
+      showFullResolutionOnClick: false,
+      onClick: () => {
+        if (multiple) {
+          if (isSelected(image.id)) {
+            setValue((prev) =>
+              prev.filter((selectedImage) => selectedImage.id !== image.id)
+            );
+          } else {
+            setValue((prev) => [...prev, image]);
+          }
+        } else {
+          setValue([image]);
+        }
+      },
+    }),
+    [classes.unselected, classes.selected, multiple, isSelected]
+  );
+
   return (
     <ActionDialog
       fullScreen={sm}
@@ -153,56 +136,12 @@ const ImageSelectionDialog = ({
       confirmButtonColor="success"
       DialogContentProps={{ id: SCROLLABLE_ELEMENT_ID }}
     >
-      {status === "success" && images.length ? (
-        <Grid container className={classes.imageContainer}>
-          {images?.map((image) => (
-            <Grid
-              key={image.id}
-              item
-              xs={12}
-              md={6}
-              lg={4}
-              xl={3}
-              className={classes.imageWrapper}
-            >
-              <Image borderColor={randomColor} parseImage={image} />
-              <div
-                className={classNames({
-                  [classes.selected]: isSelected(image.id),
-                  [classes.imageOverlay]: true,
-                })}
-                onClick={() => {
-                  if (multiple) {
-                    if (isSelected(image.id)) {
-                      setValue((prev) =>
-                        prev.filter(
-                          (selectedImage) => selectedImage.id !== image.id
-                        )
-                      );
-                    } else {
-                      setValue((prev) => [...prev, image]);
-                    }
-                  } else {
-                    setValue([image]);
-                  }
-                }}
-              >
-                <CheckIcon className={classes.check} />
-              </div>
-            </Grid>
-          ))}
-        </Grid>
-      ) : status === "loading" ? (
-        <ImagesSkeleton />
-      ) : (
-        <Grid item className={classes.svgContainer}>
-          <Empty height="40vh" />
-          <br />
-          <Typography className={classes.svgText} variant="overline">
-            {Strings.noImages()}
-          </Typography>
-        </Grid>
-      )}
+      <Images
+        status={status}
+        images={images}
+        outlineColor={randomColor}
+        getImageProps={getImageProps}
+      />
     </ActionDialog>
   );
 };

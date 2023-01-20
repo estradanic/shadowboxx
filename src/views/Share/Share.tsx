@@ -69,11 +69,7 @@ interface AlbumsListProps {
 }
 
 const AlbumsToShareTo = ({ albums, classes, files }: AlbumsListProps) => {
-  const { virtualized: virtualizedAlbums } = useVirtualList({
-    list: albums,
-    interval: 10,
-    enabled: !!albums?.length,
-  });
+  const virtualizedAlbums = useVirtualList(albums);
   const borderColor = useRandomColor();
   const { uploadImagesFromFiles } = useImageContext();
   const { enqueueErrorSnackbar } = useSnackbar();

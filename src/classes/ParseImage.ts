@@ -142,7 +142,7 @@ export default class ParseImage extends ParseObject<"Image"> {
   }
 
   set owner(owner) {
-    this._image.set(ParseImage.COLUMNS.owner, owner._pointer);
+    this._image.set(ParseImage.COLUMNS.owner, owner.toNativePointer());
   }
 
   /** Image name */
@@ -168,14 +168,12 @@ export default class ParseImage extends ParseObject<"Image"> {
 
 export class UnpersistedParseImage extends ParseImage {
   constructor(attributes: Partial<Attributes<"Image">> = {}) {
+    // @ts-expect-error
     super(new Parse.Object<ParsifyPointers<"Image">>("Image", {
       name: "",
       file: new Parse.File("", [0]),
-      objectId: "",
-      createdAt: new Date(),
-      updatedAt: new Date(),
       ...attributes,
-      owner: attributes.owner?._pointer ?? {__type: "pointer", className: "_User", objectId: ""},
+      owner: attributes.owner?.toNativePointer() ?? {__type: "Pointer", className: "_User", objectId: ""},
     }));
   }
 

@@ -1,4 +1,4 @@
-import React, { memo, useMemo, useState } from "react";
+import React, { memo, useState } from "react";
 import Grid from "@material-ui/core/Grid";
 import { makeStyles, Theme } from "@material-ui/core/styles";
 import AddIcon from "@material-ui/icons/Add";
@@ -25,6 +25,7 @@ import {
 import { DEFAULT_PAGE_SIZE } from "../../constants";
 import NoAlbums from "../../components/Albums/NoAlbums";
 import { UnpersistedParseAlbum } from "../../classes/ParseAlbum";
+import useFlatInfiniteQueryData from "../../hooks/Query/useFlatInfiniteQueryData";
 
 const useStyles = makeStyles((theme: Theme) => ({
   title: {
@@ -74,12 +75,8 @@ const Home = memo(() => {
   useInfiniteScroll(fetchNextPage, { canExecute: !isFetchingNextPage });
   const { getLoggedInUser } = useUserContext();
 
-  const albums = useMemo(
-    () => data?.pages?.flatMap((page) => page) ?? [],
-    [data?.pages]
-  );
-  const { virtualized: virtualizedAlbums, reset: resetVirtualList } =
-    useVirtualList({ list: albums, interval: 10, enabled: !!albums?.length });
+  const albums = useFlatInfiniteQueryData(data);
+  const virtualizedAlbums = useVirtualList(albums);
 
   const randomColor = useRandomColor();
 
@@ -94,7 +91,6 @@ const Home = memo(() => {
                   borderColor={randomColor}
                   onChange={async (_) => {
                     await refetchAlbums();
-                    resetVirtualList();
                   }}
                   value={album}
                 />

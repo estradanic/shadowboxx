@@ -76,10 +76,7 @@ interface NotificationsProps {
   className?: string;
 }
 
-interface NotificationProps extends Notification {
-  /** Function to set the notifications menu closed */
-  setNotificationMenuOpen: React.Dispatch<React.SetStateAction<boolean>>;
-}
+interface NotificationProps extends Notification {}
 
 /** Component to display notifications for the app */
 const Notifications = ({ className }: NotificationsProps) => {
@@ -129,7 +126,6 @@ const Notifications = ({ className }: NotificationsProps) => {
         {Object.keys(notifications).length ? (
           Object.keys(notifications).map((key) => (
             <NotificationMenuItem
-              setNotificationMenuOpen={setNotificationMenuOpen}
               key={notifications[key].id}
               {...notifications[key]}
             />
@@ -146,13 +142,7 @@ const Notifications = ({ className }: NotificationsProps) => {
 
 export const NotificationMenuItem = forwardRef(
   (
-    {
-      title,
-      icon,
-      detail,
-      remove: onRemove,
-      setNotificationMenuOpen,
-    }: NotificationProps,
+    { title, icon, detail, remove: onRemove }: NotificationProps,
     ref: ForwardedRef<any>
   ) => {
     const classes = useStyles();
@@ -162,7 +152,6 @@ export const NotificationMenuItem = forwardRef(
     };
 
     const remove = async () => {
-      setNotificationMenuOpen(false);
       await onRemove();
     };
 

@@ -256,7 +256,7 @@ export default class ParseUser extends ParseObject<"_User"> {
   }
 
   set profilePicture(profilePicture) {
-    this._user.set(ParseUser.COLUMNS.profilePicture, profilePicture?._pointer);
+    this._user.set(ParseUser.COLUMNS.profilePicture, profilePicture?.toNativePointer());
   }
 
   /** This user's list of favorited albums */
@@ -282,6 +282,7 @@ export default class ParseUser extends ParseObject<"_User"> {
  */
 export class UnpersistedParseUser extends ParseUser {
   constructor(attributes: Partial<Attributes<"_User">> = {}) {
+    // @ts-expect-error
     super(new Parse.User<ParsifyPointers<"_User">>({
       username: "",
       email: "",
@@ -290,23 +291,27 @@ export class UnpersistedParseUser extends ParseUser {
       password: "",
       favoriteAlbums: [],
       isDarkThemeEnabled: false,
-      objectId: "",
-      createdAt: new Date(),
-      updatedAt: new Date(),
       ...attributes,
-      profilePicture: attributes.profilePicture?._pointer,
+      profilePicture: attributes.profilePicture?.toNativePointer(),
     }));
   }
 
+  private redirectToLogin() {
+    window.location.href = "/login";
+  }
+
   get id(): Attributes<"_User">["objectId"] {
-    throw new Error("Cannot get id on unpersisted ParseUser");
+    this.redirectToLogin();
+    return "";
   }
 
   get createdAt(): Attributes<"_User">["createdAt"] {
-    throw new Error("Cannot get createdAt on unpersisted ParseUser");
+    this.redirectToLogin();
+    return new Date();
   }
 
   get updatedAt(): Attributes<"_User">["updatedAt"] {
-    throw new Error("Cannot get updatedAt on unpersisted ParseUser");
+    this.redirectToLogin();
+    return new Date();
   }
 }

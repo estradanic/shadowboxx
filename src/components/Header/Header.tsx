@@ -64,7 +64,7 @@ const useStyles = makeStyles((theme: Theme) => ({
  */
 export interface HeaderProps extends AppBarProps {
   /** Key for the current route */
-  viewId: string;
+  viewId: keyof typeof routes;
 }
 
 /**

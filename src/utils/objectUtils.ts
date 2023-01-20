@@ -3,6 +3,9 @@ export type Hashable = {
 };
 
 const hashString = <T extends Hashable | string>(entry: T) => {
+  if (!entry) {
+    return "";
+  }
   if (typeof entry === "string") {
     return entry;
   }

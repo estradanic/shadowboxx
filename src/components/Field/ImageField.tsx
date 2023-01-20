@@ -22,21 +22,18 @@ import { makeStyles, Theme } from "@material-ui/core/styles";
 import Parse from "parse";
 import classNames from "classnames";
 import { createHtmlPortalNode, InPortal } from "react-reverse-portal";
-import { readAndCompressImage } from "browser-image-resizer";
-import { elide, makeValidFileName, removeExtension } from "../../utils";
+import { elide } from "../../utils";
 import { Strings } from "../../resources";
 import { ParseImage, ParsePointer } from "../../classes";
-import { useRandomColor, useRefState } from "../../hooks";
-import { useGlobalLoadingStore } from "../../stores";
+import { useRandomColor, useRefState, useVirtualList } from "../../hooks";
 import TextField, { TextFieldProps } from "../Field/TextField";
 import Tooltip from "../Tooltip/Tooltip";
 import { useSnackbar } from "../Snackbar/Snackbar";
-import { useImageContext, useUserContext } from "../../contexts";
+import { useImageContext } from "../../contexts";
 import Image from "../Image/Image";
 import RemoveImageDecoration from "../Image/Decoration/RemoveImageDecoration";
 import CoverImageDecoration from "../Image/Decoration/CoverImageDecoration";
 import { useActionDialogContext } from "../Dialog/ActionDialog";
-import { FancyTypography } from "../Typography";
 import { CaptionImageDecoration } from "../Image";
 
 const useStyles = makeStyles((theme: Theme) => ({
@@ -209,6 +206,8 @@ const ImageField = memo(
       []
     );
 
+    const virtualizedImages = useVirtualList(value);
+
     return (
       <>
         {variant === "field" ? (
@@ -325,7 +324,7 @@ const ImageField = memo(
             />
             {multiple && !!value.length && (
               <Grid container className={classes.multiImageContainer}>
-                {value?.map((image: ParseImage) => {
+                {virtualizedImages.map((image: ParseImage) => {
                   const imageDecorations = [
                     <RemoveImageDecoration
                       onClick={async () => {

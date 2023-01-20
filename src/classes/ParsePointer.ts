@@ -46,4 +46,8 @@ export default class ParsePointer<C extends ClassName> {
     // Check for either objectId or id here.
     return this._pointer?.objectId ?? (this._pointer as any)?.id ?? "";
   }
+
+  toNativePointer(): Parse.Pointer {
+    return this._pointer;
+  }
 }

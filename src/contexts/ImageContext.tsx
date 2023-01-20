@@ -145,7 +145,7 @@ export const ImageContextProvider = ({
   const uploadImage = async (
     image: ImageAttributes,
     acl?: Parse.ACL
-  ): Promise<ParseImage> => {
+  ): Promise<ParseImage | undefined> => {
     startGlobalLoader({
       type: "determinate",
       content: (
@@ -179,7 +179,9 @@ export const ImageContextProvider = ({
         title: Strings.uploadImageError(),
         icon: <ErrorIcon />,
       });
-      throw error;
+      console.error(error);
+      enqueueErrorSnackbar(Strings.uploadImageError());
+      return undefined;
     }
   };
 
@@ -210,7 +212,7 @@ export const ImageContextProvider = ({
 
   const uploadFiles = async (files: File[], acl?: Parse.ACL) => {
     const max = multiple ? files.length : 1;
-    const newImagePromises: Promise<ParseImage>[] = [];
+    const newImagePromises: Promise<ParseImage | undefined>[] = [];
     for (let i = 0; i < max; i++) {
       let file = files[i];
       const fileName = makeValidFileName(files[i].name);
@@ -226,7 +228,7 @@ export const ImageContextProvider = ({
         )
       );
     }
-    return Promise.all(newImagePromises);
+    return Promise.allSettled(newImagePromises);
   };
 
   const uploadImagesFromFiles = async (files: File[], acl?: Parse.ACL) => {
@@ -243,7 +245,13 @@ export const ImageContextProvider = ({
       setTimeout(async () => {
         const processedFiles = await processFiles(files);
         try {
-          const newImages = await uploadFiles(processedFiles, acl);
+          const result = await uploadFiles(processedFiles, acl);
+          const newImages: ParseImage[] = [];
+          for (const promise of result) {
+            if (promise.status === "fulfilled" && promise.value) {
+              newImages.push(promise.value);
+            }
+          }
           resolve(newImages);
         } catch (error: any) {
           reject(error?.message);
@@ -265,6 +273,9 @@ export const ImageContextProvider = ({
       },
       acl
     );
+    if (!newImage) {
+      throw new Error(Strings.uploadImageError());
+    }
     return newImage;
   };
 

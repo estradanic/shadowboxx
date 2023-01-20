@@ -12,9 +12,7 @@ import {
   ParseUser,
   UpdateLoggedInUser,
   UpdateReason,
-  UserAttributes,
   ParseImage,
-  ParsifyPointers,
   Attributes,
 } from "../classes";
 import { Strings } from "../resources";
