@@ -1,41 +1,43 @@
 import React, { memo, useEffect, useMemo, useRef, useState } from "react";
+import { get, del, createStore } from "idb-keyval";
+import { useInfiniteQuery } from "@tanstack/react-query";
+import { makeStyles } from "@material-ui/core/styles";
+import Grid from "@material-ui/core/Grid";
 import {
   FancyTypography,
   NoImages,
+  Offline,
   Online,
   PageContainer,
   useSnackbar,
+  SmallAlbumCard,
+  SmallAlbumCardSkeleton,
+  NoAlbums,
+  NoConnection,
 } from "../../components";
 import { useView } from "../View";
-import { get, del, createStore } from "idb-keyval";
 import {
   useInfiniteQueryConfigs,
   useInfiniteScroll,
   useRandomColor,
   useVirtualList,
+  useNavigate,
 } from "../../hooks";
 import { ParseAlbum } from "../../classes";
-import { useInfiniteQuery } from "@tanstack/react-query";
-import {
-  SHARE_TARGET_DB_NAME,
-  SHARE_TARGET_STORE_KEY,
-  SHARE_TARGET_STORE_NAME,
-} from "../../serviceWorker/sharedExports";
 import { DEFAULT_PAGE_SIZE } from "../../constants";
 import {
   ImageContextProvider,
   useImageContext,
   useNetworkDetectionContext,
 } from "../../contexts";
-import { makeStyles } from "@material-ui/core/styles";
-import Grid from "@material-ui/core/Grid";
 import { Strings } from "../../resources";
-import SmallAlbumCard from "../../components/Albums/SmallAlbumCard";
-import { Offline } from "react-detect-offline";
-import SmallAlbumCardSkeleton from "../../components/Skeleton/SmallAlbumCardSkeleton";
-import NoAlbums from "../../components/Albums/NoAlbums";
-import NoConnection from "../../components/NetworkDetector/NoConnection";
 import { useGlobalLoadingStore } from "../../stores";
+import { routes } from "../../app";
+import {
+  SHARE_TARGET_DB_NAME,
+  SHARE_TARGET_STORE_KEY,
+  SHARE_TARGET_STORE_NAME,
+} from "../../serviceWorker/sharedExports";
 
 const useStyles = makeStyles(() => ({
   title: {
@@ -72,7 +74,8 @@ const AlbumsToShareTo = ({ albums, classes, files }: AlbumsListProps) => {
   const virtualizedAlbums = useVirtualList(albums);
   const borderColor = useRandomColor();
   const { uploadImagesFromFiles } = useImageContext();
-  const { enqueueErrorSnackbar } = useSnackbar();
+  const { enqueueErrorSnackbar, enqueueSuccessSnackbar } = useSnackbar();
+  const navigate = useNavigate();
 
   return (
     <>
@@ -92,13 +95,15 @@ const AlbumsToShareTo = ({ albums, classes, files }: AlbumsListProps) => {
                   const images = (await uploadImagesFromFiles(files)).map(
                     (image) => image.id
                   );
-                  album.update(
+                  const newAlbum = await album.update(
                     {
                       ...album.attributes,
                       images: [...album.images, ...images],
                     },
                     { addedImages: images }
                   );
+                  enqueueSuccessSnackbar(Strings.commonSaved());
+                  navigate(routes.Album.path.replace(":id", newAlbum.id));
                 } catch (e) {
                   enqueueErrorSnackbar(Strings.commonError());
                 }
