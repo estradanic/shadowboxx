@@ -67,7 +67,7 @@ self.addEventListener("message", async (event: ExtendableMessageEvent) => {
 
 registerRoute(
   ({ url }) => manifestURLs.includes(url.href),
-  new NetworkFirst({ cacheName: cacheNames.precache, networkTimeoutSeconds: 3 })
+  new NetworkFirst({ cacheName: cacheNames.precache })
 );
 
 registerRoute(
