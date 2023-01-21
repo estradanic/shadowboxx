@@ -115,6 +115,7 @@ export interface StringEntries {
   passwordHelperText: string;
   pictures: string;
   pleaseEnterA: string;
+  pleaseLogin: string;
   profilePicture: string;
   removeImage: string;
   removeImageError: string;
@@ -292,6 +293,7 @@ const Strings: {
     "Password must be at least 8 characters, contain a capital, lowercase, number, and special character",
   pictures: () => "Pictures",
   pleaseEnterA: (field: string) => `Please enter a ${field}`,
+  pleaseLogin: () => "Please login first",
   profilePicture: () => "Profile Picture",
   removeImage: () => "Remove image from album",
   removeImageError: (fileName: string) =>

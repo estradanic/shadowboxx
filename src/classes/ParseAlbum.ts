@@ -240,14 +240,17 @@ export class UnpersistedParseAlbum extends ParseAlbum {
   }
 
   get id(): Attributes<"Album">["objectId"] {
-    throw new Error("Cannot get id on unpersisted ParseAlbum");
+    console.warn("Unpersisted album has no id");
+    return "";
   }
 
   get createdAt(): Attributes<"Album">["createdAt"] {
-    throw new Error("Cannot get createdAt on unpersisted ParseAlbum");
+    console.warn("Unpersisted album has no createdAt")
+    return new Date();
   }
 
   get updatedAt(): Attributes<"Album">["updatedAt"] {
-    throw new Error("Cannot get updatedAt on unpersisted ParseAlbum");
+    console.warn("Unpersisted album has no updatedAt")
+    return new Date();
   }
 }

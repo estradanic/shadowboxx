@@ -178,14 +178,17 @@ export class UnpersistedParseImage extends ParseImage {
   }
 
   get id(): Attributes<"Image">["objectId"] {
-    throw new Error("Cannot get id on unpersisted ParseImage");
+    console.warn("Unpersisted image has no id");
+    return "";
   }
 
   get createdAt(): Attributes<"Image">["createdAt"] {
-    throw new Error("Cannot get createdAt on unpersisted ParseImage");
+    console.warn("Unpersisted image has no createdAt")
+    return new Date();
   }
 
   get updatedAt(): Attributes<"Image">["updatedAt"] {
-    throw new Error("Cannot get updatedAt on unpersisted ParseImage");
+    console.warn("Unpersisted image has no updatedAt")
+    return new Date();
   }
 }
