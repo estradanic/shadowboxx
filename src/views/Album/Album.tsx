@@ -9,6 +9,7 @@ import {
   useSnackbar,
   Online,
   Timeline,
+  FancyTypography,
 } from "../../components";
 import { useLocation, useParams } from "react-router-dom";
 import Grid from "@material-ui/core/Grid";
@@ -30,7 +31,12 @@ import { useView } from "../View";
 import OwnerImageDecoration from "../../components/Image/Decoration/OwnerImageDecoration";
 import { useNetworkDetectionContext } from "../../contexts";
 import useFlatInfiniteQueryData from "../../hooks/Query/useFlatInfiniteQueryData";
-import { Switch } from "@material-ui/core";
+import { FormControlLabel, Switch } from "@material-ui/core";
+import { VariableColor } from "../../types";
+
+type UseStylesParams = {
+  randomColor: VariableColor;
+};
 
 const useStyles = makeStyles((theme: Theme) => ({
   svgContainer: {
@@ -38,6 +44,26 @@ const useStyles = makeStyles((theme: Theme) => ({
   },
   svgText: {
     fontSize: "medium",
+  },
+  controls: {
+    marginTop: theme.spacing(4),
+  },
+  switchText: {
+    fontSize: "x-large",
+  },
+  switchBase: {
+    "&&": {
+      color: ({ randomColor }: UseStylesParams) =>
+        theme.palette[randomColor ?? "primary"].light,
+    },
+  },
+  switchChecked: {},
+  switchTrack: {
+    "&&&": {
+      backgroundColor: ({ randomColor }: UseStylesParams) =>
+        theme.palette[randomColor ?? "primary"].dark,
+      opacity: 1,
+    },
   },
 }));
 
@@ -47,9 +73,9 @@ const useStyles = makeStyles((theme: Theme) => ({
 const Album = memo(() => {
   useView("Album");
   const { id } = useParams<{ id: string }>();
-  const classes = useStyles();
   const location = useLocation() as { state: { previousLocation?: Location } };
   const randomColor = useRandomColor();
+  const classes = useStyles({ randomColor });
   const { online } = useNetworkDetectionContext();
   const { getAlbumFunction, getAlbumQueryKey, getAlbumOptions } =
     useQueryConfigs();
@@ -87,15 +113,21 @@ const Album = memo(() => {
 
   const images = useFlatInfiniteQueryData(data);
 
-  const getImageDecorations = useCallback(async (image: ParseImage) => {
-    return [
-      <OwnerImageDecoration
-        UserAvatarProps={{
-          UseUserInfoParams: { userPointer: image.owner },
-        }}
-      />,
-    ];
-  }, []);
+  const getImageDecorations = useCallback(
+    async (image: ParseImage) => {
+      if (timelineView) {
+        return [];
+      }
+      return [
+        <OwnerImageDecoration
+          UserAvatarProps={{
+            UseUserInfoParams: { userPointer: image.owner },
+          }}
+        />,
+      ];
+    },
+    [timelineView]
+  );
 
   const getImageCaption = useCallback(
     async (image: ParseImage) => {
@@ -148,8 +180,25 @@ const Album = memo(() => {
               {album.name}
             </FancyTitleTypography>
           </Grid>
-          <Grid item sm={8} style={{marginTop: "4rem"}}>
-            <Switch checked={timelineView} onClick={() => setTimelineView((prev) => !prev)} />
+          <Grid item sm={8} className={classes.controls}>
+            <FormControlLabel
+              control={
+                <Switch
+                  classes={{
+                    switchBase: classes.switchBase,
+                    checked: classes.switchChecked,
+                    track: classes.switchTrack,
+                  }}
+                  checked={timelineView}
+                  onClick={() => setTimelineView((prev) => !prev)}
+                />
+              }
+              label={
+                <FancyTypography className={classes.switchText}>
+                  {Strings.timelineView()}
+                </FancyTypography>
+              }
+            />
           </Grid>
           {timelineView ? (
             <Timeline
@@ -158,7 +207,6 @@ const Album = memo(() => {
               images={images}
               outlineColor={randomColor}
             />
-
           ) : (
             <Images
               getImageProps={getImageProps}

@@ -22,6 +22,9 @@ const useStyles = makeStyles((theme: Theme) => ({
     padding: theme.spacing(2),
     position: "relative",
   },
+  rootNoPadding: {
+    position: "relative",
+  },
   image: {
     boxShadow: theme.shadows[5],
     display: "block",
@@ -103,7 +106,7 @@ export type ImageProps = ImgHTMLAttributes<HTMLImageElement> & {
   /** Whether to show full resolution popup when the image is clicked */
   showFullResolutionOnClick?: boolean;
   /** Style variant */
-  variant?: "bordered" | "contained";
+  variant?: "bordered" | "contained" | "bordered-no-padding";
   /** Caption text */
   caption?: string;
 };
@@ -127,6 +130,8 @@ const Image = memo(
       classes.image = "";
       classes.pointer = "";
       classes.root = "";
+    } else if (variant === "bordered-no-padding") {
+      classes.root = classes.rootNoPadding;
     }
     const [fullResolutionOpen, setFullResolutionOpen] = useState(false);
     const ref = useRef(null);
@@ -205,7 +210,9 @@ const Image = memo(
               })}
             >
               <NotesIcon className={classes.captionIcon} />
-              {`${caption ? caption : ""} ${parseImage.dateTaken.toLocaleDateString()}`}
+              {`${
+                caption ? caption : ""
+              } ${parseImage.dateTaken.toLocaleDateString()}`}
             </Typography>
             {!isFullResolutionLoaded && (
               <Skeleton

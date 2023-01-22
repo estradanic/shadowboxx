@@ -20,19 +20,30 @@ import FancyTypography from "../Typography/FancyTypography";
 
 type UseStylesParams = {
   color: VariableColor;
-}
+};
 
 const useStyles = makeStyles((theme: Theme) => ({
   timelineSeparator: {
     "& *": {
-      backgroundColor: ({color}: UseStylesParams) => theme.palette[color ?? "primary"].main,
-    }
+      backgroundColor: ({ color }: UseStylesParams) =>
+        theme.palette[color ?? "primary"].main,
+    },
   },
   content: {
-    transform: `translateY(${theme.spacing(-6)}px)`,
+    transform: `translateY(-10%)`,
   },
   timeline: {
-    paddingTop: theme.spacing(6),
+    paddingTop: theme.spacing(4),
+  },
+  caption: {
+    lineHeight: "normal",
+  },
+  oppositeContent: {
+    paddingBottom: theme.spacing(3),
+  },
+  date: {
+    fontSize: "x-large",
+    fontWeight: "bolder",
   },
 }));
 
@@ -55,7 +66,7 @@ const Timeline = ({
   getImageProps,
 }: TimelineProps) => {
   const imageClasses = useImageStyles();
-  const classes = useStyles({color: outlineColor})
+  const classes = useStyles({ color: outlineColor });
   const [imageProps, setImageProps] = useState<
     Record<string, Partial<ImageProps>>
   >({});
@@ -86,14 +97,17 @@ const Timeline = ({
         <MuiTimeline align="alternate" className={classes.timeline}>
           {virtualizedImages?.map((image, i) => (
             <TimelineItem key={image.id}>
-              <TimelineOppositeContent>
-                {
-                  virtualizedImages[i - 1]?.dateTaken?.toLocaleDateString() !== image.dateTaken.toLocaleDateString() &&
-                    <FancyTypography style={{fontSize: "x-large"}}>
-                      {image.dateTaken.toLocaleDateString()}
-                    </FancyTypography>
-                }
-                <Typography variant="overline">
+              <TimelineOppositeContent
+                className={classes.oppositeContent}
+                style={i % 2 ? { paddingRight: 0 } : { paddingLeft: 0 }}
+              >
+                {virtualizedImages[i - 1]?.dateTaken?.toLocaleDateString() !==
+                  image.dateTaken.toLocaleDateString() && (
+                  <FancyTypography className={classes.date}>
+                    {image.dateTaken.toLocaleDateString()}
+                  </FancyTypography>
+                )}
+                <Typography variant="overline" className={classes.caption}>
                   {imageProps[image.id]?.caption}
                 </Typography>
               </TimelineOppositeContent>
@@ -101,11 +115,15 @@ const Timeline = ({
                 <TimelineDot />
                 <TimelineConnector />
               </TimelineSeparator>
-              <TimelineContent className={classes.content}>
+              <TimelineContent
+                className={classes.content}
+                style={i % 2 ? { paddingLeft: 0 } : { paddingRight: 0 }}
+              >
                 <Image
                   borderColor={outlineColor}
                   parseImage={image}
                   showFullResolutionOnClick={true}
+                  variant="bordered-no-padding"
                   {...imageProps[image.id]}
                 />
               </TimelineContent>

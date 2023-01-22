@@ -164,6 +164,7 @@ const Strings = {
   signup: () => "Sign Up",
   signupError: () => `${Strings.commonError()} Could not sign up.`,
   submit: () => "Submit",
+  timelineView: () => "Timeline View",
   tryAddingAlbum: () => "Try adding one below",
   unlockPassword: () => "Change Password",
   unsetCoverImage: () => "Unset this image as the album cover",
