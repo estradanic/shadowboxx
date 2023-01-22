@@ -11,12 +11,19 @@ import DialogActions from "@material-ui/core/DialogActions";
 import DialogContent, {
   DialogContentProps,
 } from "@material-ui/core/DialogContent";
+import classNames from "classnames";
 import DialogContentText from "@material-ui/core/DialogContentText";
 import DialogTitle from "@material-ui/core/DialogTitle";
 import Typography from "@material-ui/core/Typography";
 import { HtmlPortalNode, OutPortal } from "react-reverse-portal";
 import { makeStyles, Theme } from "@material-ui/core/styles";
 import { Strings } from "../../resources";
+import { useRandomColor } from "../../hooks";
+import { VariableColor } from "../../types";
+
+interface UseStylesParams {
+  borderColor: VariableColor;
+}
 
 const useStyles = makeStyles((theme: Theme) => ({
   confirmButtonError: {
@@ -48,6 +55,13 @@ const useStyles = makeStyles((theme: Theme) => ({
   },
   content: {
     textAlign: "center",
+  },
+  dialog: {
+    "& [role='dialog']": {
+      border: ({ borderColor }: UseStylesParams) =>
+        `2px solid ${theme.palette[borderColor ?? "primary"].main}`,
+      borderRadius: "4px",
+    },
   },
 }));
 
@@ -241,12 +255,14 @@ const ActionDialog = ({
   confirmButtonText,
   children,
   DialogContentProps = {},
+  className,
   ...rest
 }: ActionDialogProps) => {
-  const classes = useStyles();
+  const randomColor = useRandomColor();
+  const classes = useStyles({ borderColor: randomColor });
 
   return (
-    <Dialog {...rest}>
+    <Dialog className={classNames(className, classes.dialog)} {...rest}>
       <DialogTitle disableTypography className={classes.title}>
         <Typography className={classes.titleText} variant="overline">
           {title}

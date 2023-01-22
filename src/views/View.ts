@@ -11,7 +11,7 @@ import {
 } from "../hooks";
 import { useSnackbar } from "../components";
 import { Strings } from "../resources";
-import { useDebounce } from 'use-debounce';
+import { useDebounce } from "use-debounce";
 
 /**
  * Hook that handles navigation, query invalidation, and authentication at the beginning of every View component.

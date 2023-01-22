@@ -18,6 +18,8 @@ export interface ImageAttributes {
   owner: ParsePointer<"_User">;
   /** Name of the image */
   name: string;
+  /** Date that the image was taken */
+  dateTaken?: Date;
 }
 
 class ImageColumns extends Columns {
@@ -27,6 +29,7 @@ class ImageColumns extends Columns {
   fileMobile = "fileMobile" as const;
   fileThumb = "fileThumb" as const;
   fileLegacy = "fileLegacy" as const;
+  dateTaken = "dateTaken" as const;
 }
 
 /**
@@ -155,6 +158,15 @@ export default class ParseImage extends ParseObject<"Image"> {
 
   set name(name) {
     this._image.set(ParseImage.COLUMNS.name, name);
+  }
+
+  /** Date that the image was taken */
+  get dateTaken(): Required<Attributes<"Image">>["dateTaken"] {
+    return this._image.get(ParseImage.COLUMNS.dateTaken) ?? this.createdAt;
+  }
+
+  set dateTaken(dateTaken) {
+    this._image.set(ParseImage.COLUMNS.dateTaken, dateTaken);
   }
 
   /** All attributes of the image */

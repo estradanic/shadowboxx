@@ -1,160 +1,8 @@
-export interface StringEntries {
-  accountNotDeleted: string;
-  actionUnauthorized: string;
-  addAlbum: string;
-  addAlbumError: string;
-  addAlbumSuccess: string;
-  addFromFile: string;
-  addFromLibrary: string;
-  addFromUrl: string;
-  addOrEditCaption: string;
-  addToAlbum: string;
-  albumChangeNotificationDetail: string;
-  albumChangeNotificationTitle: string;
-  albumNotFound: string;
-  alreadyHaveAccount: string;
-  appName: string;
-  aUser: string;
-  back: string;
-  cancel: string;
-  cannotEditWhileOffline: string;
-  caption: string;
-  captionImage: string;
-  checkEmailVerified: string;
-  collaborators: string;
-  collaboratorsTooltip: string;
-  commonError: string;
-  commonSaved: string;
-  confirm: string;
-  copyright: string;
-  couldNotGetCollaborators: string;
-  couldNotGetDuplicates: string;
-  couldNotGetUserInfo: string;
-  couldNotResolveDuplicates: string;
-  couldNotWriteImage: string;
-  createdAt: string;
-  darkMode: string;
-  deleteAccount: string;
-  deleteAccountConfirmation: string;
-  deleteAlbum: string;
-  deleteAlbumConfirmation: string;
-  deleteAlbumError: string;
-  deleteAlbumSuccess: string;
-  deleteDirectoryError: string;
-  delete: string;
-  deleteImagesConfirm: string;
-  description: string;
-  dragOrBrowse: string;
-  duplicatesNotificationTitle: string;
-  duplicatesNotificationDetail: string;
-  editAlbum: string;
-  editAlbumError: string;
-  email: string;
-  emailExists: string;
-  endpointNotFound: string;
-  enteringEditMode: string;
-  favorite: string;
-  favoriteTooltip: string;
-  firstName: string;
-  fullName: string;
-  getAlbumError: string;
-  getAlbumsError: string;
-  getImageError: string;
-  getImagesError: string;
-  goBack: string;
-  goSee: string;
-  home: string;
-  ignoreDuplicatesConfirm: string;
-  imageDeleted: string;
-  imageNotDeleted: string;
-  imageNotFound: string;
-  imageNotSaved: string;
-  imageNotUpdated: string;
-  images: string;
-  imageUrl: string;
-  incorrectPassword: string;
-  insertCollaboratorsError: string;
-  install: string;
-  installed: string;
-  installPrompt: string;
-  invalidEmail: string;
-  invalidEmptyFilename: string;
-  invalidImage: string;
-  invalidPassword: string;
-  isDuplicate: string;
-  updatedAt: string;
-  lastName: string;
-  limitedOffline: string;
-  loadingSharedImages: string;
-  login: string;
-  loginError: string;
-  logout: string;
-  loginSignup: string;
-  multipleImages: string;
-  name: string;
-  newPassword: string;
-  noAccount: string;
-  noAlbumId: string;
-  noAlbums: string;
-  noConnection: string;
-  noEmailExists: string;
-  noImageExists: string;
-  noImages: string;
-  noImagesSelected: string;
-  nonExistentUserWarning: string;
-  noNotifications: string;
-  noNotificationsDetail: string;
-  noSessionId: string;
-  notEnoughSpace: string;
-  notInstalled: string;
-  noUploadWhileOffline: string;
-  numOfPhotos: string;
-  offline: string;
-  okay: string;
-  password: string;
-  passwordHelperText: string;
-  pictures: string;
-  pleaseEnterA: string;
-  pleaseLogin: string;
-  profilePicture: string;
-  removeImage: string;
-  removeImageError: string;
-  resolve: string;
-  resolveDuplicates: string;
-  processingImages: string;
-  selectImage: string;
-  selectImages: string;
-  sessionExpired: string;
-  setImageAsCover: string;
-  settings: string;
-  settingsNotSaved: string;
-  settingsSaved: string;
-  shareTargetTitle: string;
-  signup: string;
-  signupError: string;
-  submit: string;
-  tryAddingAlbum: string;
-  unlockPassword: string;
-  unsetCoverImage: string;
-  untitledAlbum: string;
-  updateImageError: string;
-  uploadImageError: string;
-  uploadingImage: string;
-  uploadingImages: string;
-  verifyEmail: string;
-  viewers: string;
-  viewersTooltip: string;
-  welcomeUser: string;
-  wrongSessionId: string;
-}
-
 /**
  * Object providing dynamic access to strings used throughout the site.
  * Needed to avoid string literals for consistency.
  */
-const Strings: {
-  [key in keyof StringEntries]: (...params: any[]) => string;
-} = {
+const Strings = {
   accountNotDeleted: () => `${Strings.commonError()} Could not delete account.`,
   actionUnauthorized: () => "Action Unauthorized",
   addAlbum: () => "Add Album",
@@ -164,12 +12,13 @@ const Strings: {
   addFromLibrary: () => "Add from existing library",
   addFromUrl: () => "Add from URL",
   addOrEditCaption: () => "Add/Edit caption",
+  addOrEditDate: () => "Add/Edit date",
   addToAlbum: () => "Add to album",
   albumChangeNotificationDetail: (userName: string, albumName: string) =>
     `${userName} changed ${albumName}`,
   albumChangeNotificationTitle: (count: number) =>
     `${count} album change${count > 1 ? "s" : ""} to see!`,
-  albumNotFound: (album: string) =>
+  albumNotFound: (album?: string) =>
     `Album not found${album ? ` (${album})` : ""}`,
   alreadyHaveAccount: () => "Already have an account?",
   appName: () => "Shadowboxx",
@@ -199,6 +48,8 @@ const Strings: {
     `Could not write image (${fileName})`,
   createdAt: (createdAt: Date) => `Created: ${createdAt.toLocaleDateString()}`,
   darkMode: () => "Dark Mode",
+  dateTaken: () => "Date Taken",
+  dateImage: () => "Date Image",
   delete: () => "Delete",
   deleteAccount: () => "Delete Account",
   deleteAccountConfirmation: () =>
@@ -239,7 +90,7 @@ const Strings: {
   ignoreDuplicatesConfirm: () => "Are you sure? This action is irreversible.",
   imageDeleted: (image: string) => `Image deleted (${image})`,
   imageNotDeleted: (image: string) => `Image not deleted (${image})`,
-  imageNotFound: (imageId) =>
+  imageNotFound: (imageId?: string) =>
     `${Strings.commonError()} Image not found. Image Id: ${imageId}`,
   imageNotSaved: () => `${Strings.commonError()} Image not saved`,
   imageNotUpdated: () => `${Strings.commonError()} Image not updated`,
@@ -330,6 +181,6 @@ const Strings: {
   welcomeUser: (name: { firstName: string; lastName: string }) =>
     `Welcome, ${name.firstName} ${name.lastName}!`,
   wrongSessionId: () => "Wrong session id or session id has expired",
-};
+} as const;
 
 export default Strings;

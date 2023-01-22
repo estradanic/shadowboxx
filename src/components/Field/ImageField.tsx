@@ -35,6 +35,7 @@ import RemoveImageDecoration from "../Image/Decoration/RemoveImageDecoration";
 import CoverImageDecoration from "../Image/Decoration/CoverImageDecoration";
 import { useActionDialogContext } from "../Dialog/ActionDialog";
 import { CaptionImageDecoration } from "../Image";
+import DateImageDecoration from "../Image/Decoration/DateImageDecoration";
 
 const useStyles = makeStyles((theme: Theme) => ({
   endAdornment: {
@@ -58,6 +59,7 @@ const useStyles = makeStyles((theme: Theme) => ({
   },
   imageWrapper: {
     marginBottom: theme.spacing(2),
+    padding: theme.spacing(0, 1),
   },
   main: {
     "& > div": {
@@ -312,7 +314,7 @@ const ImageField = memo(
                   <InputAdornment position="start">
                     <Typography variant="body1">
                       {value.length > 1 && multiple
-                        ? Strings.multipleImages(value.length)
+                        ? Strings.multipleImages()
                         : elide(value[0].name, 20, 3)}
                     </Typography>
                   </InputAdornment>
@@ -329,6 +331,13 @@ const ImageField = memo(
                     <RemoveImageDecoration
                       onClick={async () => {
                         await onRemove!(image);
+                      }}
+                    />,
+                    <DateImageDecoration
+                      initialDate={image.dateTaken}
+                      onConfirm={async (date) => {
+                        image.dateTaken = date;
+                        await image.save();
                       }}
                     />,
                   ];

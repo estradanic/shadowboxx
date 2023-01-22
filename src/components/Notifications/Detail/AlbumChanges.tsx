@@ -41,8 +41,8 @@ const AlbumChangesNotificationDetail = ({
 }: AlbumChangesNotificationDetailProps) => {
   const classes = useStyles();
   const navigate = useNavigate();
-  const [userName, setUserName] = useState<string>();
-  const [albumName, setAlbumName] = useState<string>();
+  const [userName, setUserName] = useState<string>("");
+  const [albumName, setAlbumName] = useState<string>("");
   const queryClient = useQueryClient();
   const { setNotificationMenuOpen } = useNotificationsContext();
 
