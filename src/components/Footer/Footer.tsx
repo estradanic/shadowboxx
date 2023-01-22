@@ -123,7 +123,11 @@ const Footer = () => {
               </Button>
             </>
           ) : (
-            <Typography className={classes.centeredText} color="inherit">
+            <Typography
+              className={classes.centeredText}
+              color="inherit"
+              variant="overline"
+            >
               {Strings.copyright()}
             </Typography>
           )}
@@ -131,7 +135,7 @@ const Footer = () => {
       </Online>
       <Offline>
         <Toolbar variant="dense" className={classes.offlineIndicator}>
-          <Typography className={classes.centeredText}>
+          <Typography className={classes.centeredText} variant="overline">
             {Strings.offline()}
           </Typography>
         </Toolbar>
