@@ -112,7 +112,7 @@ const useInfiniteQueryConfigs = () => {
     return await runFunctionInTryCatch<ParseImage[]>(
       async () => {
         const images = await ParseImage.query(online)
-          .descending(ParseImage.COLUMNS.createdAt)
+          .descending(ParseImage.COLUMNS.dateTaken)
           .limit(options.pageSize)
           .skip(options.page * options.pageSize)
           .find();
@@ -144,7 +144,7 @@ const useInfiniteQueryConfigs = () => {
       async () => {
         const images = await ParseImage.query(online)
           .containedIn(ParseImage.COLUMNS.id, imageIds)
-          .descending(ParseImage.COLUMNS.createdAt)
+          .descending(ParseImage.COLUMNS.dateTaken)
           .limit(options.pageSize)
           .skip(options.page * options.pageSize)
           .find();
@@ -177,7 +177,7 @@ const useInfiniteQueryConfigs = () => {
       async () => {
         const images = await ParseImage.query(online)
           .equalTo(ParseImage.COLUMNS.owner, owner.toNativePointer())
-          .descending(ParseImage.COLUMNS.createdAt)
+          .descending(ParseImage.COLUMNS.dateTaken)
           .limit(options.pageSize)
           .skip(options.page * options.pageSize)
           .find();

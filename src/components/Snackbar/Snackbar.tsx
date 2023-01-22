@@ -46,9 +46,10 @@ export const useSnackbar = () => {
     options: OptionsObject = {}
   ) => {
     return enqueueSnackbar(<Typography>{message}</Typography>, {
-      variant: "success",
       className: classes.variantSuccess,
+      preventDuplicate: true,
       ...options,
+      variant: "success",
     });
   };
   const enqueueInfoSnackbar = (
@@ -56,9 +57,10 @@ export const useSnackbar = () => {
     options: OptionsObject = {}
   ) => {
     return enqueueSnackbar(<Typography>{message}</Typography>, {
-      variant: "info",
       className: classes.variantInfo,
+      preventDuplicate: true,
       ...options,
+      variant: "info",
     });
   };
   const enqueueWarningSnackbar = (
@@ -66,9 +68,10 @@ export const useSnackbar = () => {
     options: OptionsObject = {}
   ) => {
     return enqueueSnackbar(<Typography>{message}</Typography>, {
-      variant: "warning",
       className: classes.variantWarning,
+      preventDuplicate: true,
       ...options,
+      variant: "warning",
     });
   };
   const enqueueErrorSnackbar = (
@@ -76,9 +79,10 @@ export const useSnackbar = () => {
     options: OptionsObject = {}
   ) => {
     return enqueueSnackbar(<Typography>{message}</Typography>, {
-      variant: "error",
       className: classes.variantError,
+      preventDuplicate: true,
       ...options,
+      variant: "error",
     });
   };
 

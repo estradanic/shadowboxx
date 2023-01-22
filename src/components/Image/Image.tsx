@@ -199,11 +199,13 @@ const Image = memo(
             </picture>
             <Typography
               className={classNames(classes.caption, {
-                [classes.displayNone]: !isFullResolutionLoaded || !caption,
+                [classes.displayNone]:
+                  !isFullResolutionLoaded ||
+                  (!caption && !parseImage.dateTaken),
               })}
             >
               <NotesIcon className={classes.captionIcon} />
-              {caption}
+              {`${caption} ${parseImage.dateTaken.toLocaleDateString()}`}
             </Typography>
             {!isFullResolutionLoaded && (
               <Skeleton

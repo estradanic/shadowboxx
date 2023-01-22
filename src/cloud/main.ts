@@ -11,6 +11,7 @@ import {
 } from "./triggers";
 import { findDuplicateImages, hashImages } from "./jobs";
 import { resolveDuplicates, ResolveDuplicatesParams } from "./functions";
+import populateDateTaken from "./jobs/populateDateTaken";
 
 Parse.Cloud.beforeLogin(async (request) => {
   if (!(await isUserWhitelisted(request.object))) {
@@ -76,6 +77,11 @@ Parse.Cloud.job("findDuplicates", async (request) => {
 
 Parse.Cloud.job("hashImages", async (request) => {
   await hashImages();
+  request.message("Done");
+});
+
+Parse.Cloud.job("populateDateTaken", async (request) => {
+  await populateDateTaken();
   request.message("Done");
 });
 

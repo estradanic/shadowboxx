@@ -198,6 +198,7 @@ const Share = memo(() => {
         setFailed(true);
       }
     }, 500);
+    return () => clearInterval(timer);
   }, [
     setSharedFiles,
     startGlobalLoader,
