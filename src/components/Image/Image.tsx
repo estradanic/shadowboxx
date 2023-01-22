@@ -205,7 +205,7 @@ const Image = memo(
               })}
             >
               <NotesIcon className={classes.captionIcon} />
-              {`${caption} ${parseImage.dateTaken.toLocaleDateString()}`}
+              {`${caption ? caption : ""} ${parseImage.dateTaken.toLocaleDateString()}`}
             </Typography>
             {!isFullResolutionLoaded && (
               <Skeleton

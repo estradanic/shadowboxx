@@ -8,11 +8,12 @@ import {
   Fab,
   useSnackbar,
   Online,
+  Timeline,
 } from "../../components";
 import { useLocation, useParams } from "react-router-dom";
 import Grid from "@material-ui/core/Grid";
 import Typography from "@material-ui/core/Typography";
-import { makeStyles, Theme } from "@material-ui/core/styles";
+import { makeStyles, Theme, ThemeProvider } from "@material-ui/core/styles";
 import EditIcon from "@material-ui/icons/Edit";
 import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
 import { Strings } from "../../resources";
@@ -29,6 +30,7 @@ import { useView } from "../View";
 import OwnerImageDecoration from "../../components/Image/Decoration/OwnerImageDecoration";
 import { useNetworkDetectionContext } from "../../contexts";
 import useFlatInfiniteQueryData from "../../hooks/Query/useFlatInfiniteQueryData";
+import { Switch } from "@material-ui/core";
 
 const useStyles = makeStyles((theme: Theme) => ({
   svgContainer: {
@@ -81,6 +83,7 @@ const Album = memo(() => {
   useInfiniteScroll(fetchNextPage, { canExecute: !isFetchingNextPage });
   const [editMode, setEditMode] = useState<boolean>(false);
   const { enqueueSuccessSnackbar, enqueueErrorSnackbar } = useSnackbar();
+  const [timelineView, setTimelineView] = useState(false);
 
   const images = useFlatInfiniteQueryData(data);
 
@@ -145,12 +148,25 @@ const Album = memo(() => {
               {album.name}
             </FancyTitleTypography>
           </Grid>
-          <Images
-            getImageProps={getImageProps}
-            status={isRefetching ? "refetching" : imagesStatus}
-            images={images}
-            outlineColor={randomColor}
-          />
+          <Grid item sm={8} style={{marginTop: "4rem"}}>
+            <Switch checked={timelineView} onClick={() => setTimelineView((prev) => !prev)} />
+          </Grid>
+          {timelineView ? (
+            <Timeline
+              getImageProps={getImageProps}
+              status={isRefetching ? "refetching" : imagesStatus}
+              images={images}
+              outlineColor={randomColor}
+            />
+
+          ) : (
+            <Images
+              getImageProps={getImageProps}
+              status={isRefetching ? "refetching" : imagesStatus}
+              images={images}
+              outlineColor={randomColor}
+            />
+          )}
           <Online>
             <Fab onClick={() => setEditMode(true)}>
               <EditIcon />
