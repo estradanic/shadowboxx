@@ -108,6 +108,9 @@ export default class ParseImage extends ParseObject<"Image"> {
       const acl = new Parse.ACL(owner);
       this._image.setACL(acl);
     }
+    if (!this.dateTaken) {
+      this.dateTaken = new Date();
+    }
     return new ParseImage(await this._image.save());
   }
 
