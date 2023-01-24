@@ -18,7 +18,6 @@ const useStyles = makeStyles((theme: Theme) => ({
     display: "flex",
     "& > svg": {
       margin: "auto",
-      marginRight: "5px",
     },
   },
 }));
@@ -54,11 +53,19 @@ const ShareImageDecoration = ({
 
   const { enqueueErrorSnackbar } = useSnackbar();
 
+  const download = () => {
+    const a = document.createElement("a");
+    a.href = image.fileLegacy.url();
+    a.download = image.name;
+    a.target = "_blank";
+    a.download = image.name + ".png";
+    a.click();
+  };
+
   const onClick = async () => {
     const base64 = await image.fileLegacy.getData();
-    const file = new File([base64], image.name, {
-      type: "image/png",
-    });
+    const buffer = await (await fetch(base64)).arrayBuffer();
+    const file = new File([buffer], image.name, { type: "image/png" });
     if (navigator?.canShare?.({ files: [file] })) {
       try {
         await navigator.share({
@@ -68,15 +75,11 @@ const ShareImageDecoration = ({
         });
       } catch (error) {
         console.error(error);
-        enqueueErrorSnackbar(Strings.commonError());
+        enqueueErrorSnackbar(Strings.cantShare());
+        download();
       }
     } else {
-      const a = document.createElement("a");
-      a.href = image.fileLegacy.url();
-      a.download = image.name;
-      a.target = "_blank";
-      a.download = image.name + ".png";
-      a.click();
+      download();
     }
     piOnClick?.(image);
   };
