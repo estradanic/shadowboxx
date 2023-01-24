@@ -49,7 +49,7 @@ const useStyles = makeStyles((theme: Theme) => ({
     bottom: 0,
     left: 0,
     right: 0,
-    paddingBottom: theme.spacing(2),
+    padding: theme.spacing(2, 0),
     display: "flex",
     backgroundColor: opacity(theme.palette.background.default, 0.7),
     flexDirection: "column",

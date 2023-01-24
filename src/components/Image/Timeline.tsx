@@ -56,9 +56,12 @@ const useStyles = makeStyles((theme: Theme) => ({
   },
   date: {
     textShadow: "0px 3px 2px black",
-    fontSize: "x-large",
+    fontSize: "large",
     fontWeight: "bolder",
     marginBottom: theme.spacing(2),
+    [theme.breakpoints.up("sm")]: {
+      fontSize: "x-large",
+    },
     [theme.breakpoints.up("md")]: {
       fontSize: "xx-large",
     },
@@ -113,49 +116,56 @@ const Timeline = ({
     return (
       <Grid item container className={imageClasses.imageContainer} xs={12}>
         <MuiTimeline align="alternate" className={classes.timeline}>
-          {virtualizedImages?.map((image, i) => (
-            <TimelineItem key={image.id}>
-              <TimelineOppositeContent
-                className={classes.oppositeContent}
-                style={i % 2 ? { paddingRight: 0 } : { paddingLeft: 0 }}
-              >
-                {virtualizedImages[i - 1]?.dateTaken?.toLocaleDateString() !==
-                  image.dateTaken.toLocaleDateString() && (
-                  <FancyTypography className={classes.date}>
-                    {image.dateTaken.toLocaleDateString()}
-                  </FancyTypography>
-                )}
-                {imageProps[image.id]?.caption && (
-                  <div className={classes.captionContainer}>
-                    <Typography
-                      className={classes.caption}
-                      style={
-                        i % 2 ? { marginRight: "auto" } : { marginLeft: "auto" }
-                      }
-                    >
-                      {imageProps[image.id]?.caption}
-                    </Typography>
-                  </div>
-                )}
-              </TimelineOppositeContent>
-              <TimelineSeparator className={classes.timelineSeparator}>
-                <TimelineDot />
-                <TimelineConnector />
-              </TimelineSeparator>
-              <TimelineContent
-                className={classes.content}
-                style={i % 2 ? { paddingLeft: 0 } : { paddingRight: 0 }}
-              >
-                <Image
-                  borderColor={outlineColor}
-                  parseImage={image}
-                  showFullResolutionOnClick={true}
-                  variant="bordered-no-padding"
-                  {...imageProps[image.id]}
-                />
-              </TimelineContent>
-            </TimelineItem>
-          ))}
+          {virtualizedImages?.map((image, i) => {
+            const right = i % 2;
+            const isNewDay =
+              virtualizedImages[i - 1]?.dateTaken?.toLocaleDateString() !==
+              image.dateTaken.toLocaleDateString();
+            return (
+              <TimelineItem key={image.id}>
+                <TimelineOppositeContent
+                  className={classes.oppositeContent}
+                  style={right ? { paddingRight: 0 } : { paddingLeft: 0 }}
+                >
+                  {isNewDay && (
+                    <FancyTypography className={classes.date}>
+                      {image.dateTaken.toLocaleDateString()}
+                    </FancyTypography>
+                  )}
+                </TimelineOppositeContent>
+                <TimelineSeparator className={classes.timelineSeparator}>
+                  {isNewDay && <TimelineDot />}
+                  <TimelineConnector />
+                </TimelineSeparator>
+                <TimelineContent
+                  className={classes.content}
+                  style={right ? { paddingLeft: 0 } : { paddingRight: 0 }}
+                >
+                  <Image
+                    borderColor={outlineColor}
+                    parseImage={image}
+                    showFullResolutionOnClick={true}
+                    variant="bordered-no-padding"
+                    {...imageProps[image.id]}
+                  />
+                  {imageProps[image.id]?.caption && (
+                    <div className={classes.captionContainer}>
+                      <Typography
+                        className={classes.caption}
+                        style={
+                          right
+                            ? { marginLeft: "auto" }
+                            : { marginRight: "auto" }
+                        }
+                      >
+                        {imageProps[image.id]?.caption}
+                      </Typography>
+                    </div>
+                  )}
+                </TimelineContent>
+              </TimelineItem>
+            );
+          })}
         </MuiTimeline>
       </Grid>
     );
