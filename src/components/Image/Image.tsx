@@ -156,19 +156,13 @@ const Image = memo(
                 [classes.displayNone]: !isLoaded,
               })}
             >
-              <source
-                srcSet={parseImage.fileMobile?.url?.()}
-                type="image/webp"
-              />
-              <source
-                srcSet={parseImage.fileLegacy?.url?.()}
-                type="image/png"
-              />
+              <source srcSet={parseImage.fileMobile.url()} type="image/webp" />
+              <source srcSet={parseImage.fileLegacy.url()} type="image/png" />
               <img
                 className={classes.width100}
                 onLoad={() => setIsLoaded(true)}
                 alt={parseImage.name}
-                src={parseImage.fileLegacy?.url()}
+                src={parseImage.fileLegacy.url()}
                 onClick={onClick}
                 {...rest}
               />
@@ -198,12 +192,12 @@ const Image = memo(
               })}
             >
               <source srcSet={parseImage.file.url()} type="image/webp" />
-              <source srcSet={parseImage.fileLegacy?.url()} type="image/png" />
+              <source srcSet={parseImage.fileLegacy.url()} type="image/png" />
               <img
                 className={classes.fullResolutionImage}
                 alt={parseImage.name}
                 onLoad={() => setIsFullResolutionLoaded(true)}
-                src={parseImage.fileLegacy?.url()}
+                src={parseImage.fileLegacy.url()}
               />
             </picture>
             <Typography

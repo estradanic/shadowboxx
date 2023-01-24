@@ -33,6 +33,7 @@ import { useNetworkDetectionContext } from "../../contexts";
 import useFlatInfiniteQueryData from "../../hooks/Query/useFlatInfiniteQueryData";
 import { FormControlLabel, Switch } from "@material-ui/core";
 import { VariableColor } from "../../types";
+import ShareImageDecoration from "../../components/Image/Decoration/ShareImageDecoration";
 
 type UseStylesParams = {
   randomColor: VariableColor;
@@ -125,6 +126,7 @@ const Album = memo(() => {
             UseUserInfoParams: { userPointer: image.owner },
           }}
         />,
+        <ShareImageDecoration image={image} />,
       ];
     },
     [timelineView]
