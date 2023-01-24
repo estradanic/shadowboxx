@@ -8,6 +8,8 @@ import ImageDecoration, { ImageDecorationProps } from "./ImageDecoration";
 import { forwardRef } from "react";
 import { ParseImage } from "../../../classes";
 import { useSnackbar } from "../../Snackbar/Snackbar";
+import { useGlobalLoadingStore } from "../../../stores";
+import { readAndCompressImage } from "browser-image-resizer";
 
 const useStyles = makeStyles((theme: Theme) => ({
   root: {
@@ -52,10 +54,17 @@ const ShareImageDecoration = ({
   const classes = useStyles();
 
   const { enqueueErrorSnackbar } = useSnackbar();
+  const { startGlobalLoader, stopGlobalLoader } = useGlobalLoadingStore(
+    (state) => ({
+      startGlobalLoader: state.startGlobalLoader,
+      stopGlobalLoader: state.stopGlobalLoader,
+    })
+  );
 
-  const download = () => {
+  const download = (file: File) => {
+    const base64 = URL.createObjectURL(file);
     const a = document.createElement("a");
-    a.href = image.fileLegacy.url();
+    a.href = base64;
     a.download = image.name;
     a.target = "_blank";
     a.download = image.name + ".png";
@@ -63,24 +72,29 @@ const ShareImageDecoration = ({
   };
 
   const onClick = async () => {
-    const base64 = await image.fileLegacy.getData();
-    const buffer = await (await fetch(base64)).arrayBuffer();
-    const file = new File([buffer], image.name, { type: "image/png" });
-    if (navigator?.canShare?.({ files: [file] })) {
+    startGlobalLoader();
+    const buffer = await (await fetch(image.file.url())).arrayBuffer();
+    const file = new File([buffer], image.name, { type: "image/webp" });
+    const pngFile = await readAndCompressImage(file, {
+      quality: 1,
+      mimeType: "image/png",
+    });
+    if (navigator?.canShare?.({ files: [pngFile] })) {
       try {
         await navigator.share({
-          files: [file],
+          files: [pngFile],
           title: image.name,
           text: image.name,
         });
       } catch (error) {
         console.error(error);
         enqueueErrorSnackbar(Strings.cantShare());
-        download();
+        download(pngFile);
       }
     } else {
-      download();
+      download(pngFile);
     }
+    stopGlobalLoader();
     piOnClick?.(image);
   };
 
