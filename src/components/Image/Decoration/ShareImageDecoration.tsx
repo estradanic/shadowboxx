@@ -61,13 +61,17 @@ const ShareImageDecoration = ({
     })
   );
 
-  const download = (file: File) => {
-    const base64 = URL.createObjectURL(file);
+  const download = (input: File | string) => {
     const a = document.createElement("a");
-    a.href = base64;
     a.download = image.name;
     a.target = "_blank";
     a.download = image.name + ".png";
+    if (typeof input !== "string") {
+      const base64 = URL.createObjectURL(input);
+      a.href = base64;
+    } else {
+      a.href = input;
+    }
     a.click();
   };
 
@@ -99,6 +103,7 @@ const ShareImageDecoration = ({
     } catch (error) {
       console.error(error);
       enqueueErrorSnackbar(Strings.cantShare());
+      download(image.fileLegacy.url())
     } finally {
       stopGlobalLoader();
     }
