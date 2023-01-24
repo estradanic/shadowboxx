@@ -73,29 +73,35 @@ const ShareImageDecoration = ({
 
   const onClick = async () => {
     startGlobalLoader();
-    const buffer = await (await fetch(image.file.url())).arrayBuffer();
-    const file = new File([buffer], image.name, { type: "image/webp" });
-    const pngFile = await readAndCompressImage(file, {
-      quality: 1,
-      mimeType: "image/png",
-    });
-    if (navigator?.canShare?.({ files: [pngFile] })) {
-      try {
-        await navigator.share({
-          files: [pngFile],
-          title: image.name,
-          text: image.name,
-        });
-      } catch (error) {
-        console.error(error);
-        enqueueErrorSnackbar(Strings.cantShare());
+    try {
+      const buffer = await (await fetch(image.file.url())).arrayBuffer();
+      const file = new File([buffer], image.name, { type: "image/webp" });
+      const pngFile = await readAndCompressImage(file, {
+        quality: 1,
+        mimeType: "image/png",
+      });
+      if (navigator?.canShare?.({ files: [pngFile] })) {
+        try {
+          await navigator.share({
+            files: [pngFile],
+            title: image.name,
+            text: image.name,
+          });
+        } catch (error) {
+          console.error(error);
+          enqueueErrorSnackbar(Strings.cantShare());
+          download(pngFile);
+        }
+      } else {
         download(pngFile);
       }
-    } else {
-      download(pngFile);
+      piOnClick?.(image);
+    } catch (error) {
+      console.error(error);
+      enqueueErrorSnackbar(Strings.cantShare());
+    } finally {
+      stopGlobalLoader();
     }
-    stopGlobalLoader();
-    piOnClick?.(image);
   };
 
   return (
