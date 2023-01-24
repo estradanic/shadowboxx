@@ -37,13 +37,31 @@ const useStyles = makeStyles((theme: Theme) => ({
   },
   caption: {
     lineHeight: "normal",
+    backgroundColor: theme.palette.background.paper,
+    color: theme.palette.text.primary,
+    padding: theme.spacing(2),
+    borderRadius: "4px",
+    border: ({ color }: UseStylesParams) =>
+      `2px solid ${theme.palette[color ?? "primary"].main}`,
+    [theme.breakpoints.up("md")]: {
+      fontSize: "large",
+    },
+    boxShadow: theme.shadows[3],
+  },
+  captionContainer: {
+    display: "flex",
   },
   oppositeContent: {
     paddingBottom: theme.spacing(3),
   },
   date: {
+    textShadow: "0px 3px 2px black",
     fontSize: "x-large",
     fontWeight: "bolder",
+    marginBottom: theme.spacing(2),
+    [theme.breakpoints.up("md")]: {
+      fontSize: "xx-large",
+    },
   },
 }));
 
@@ -107,9 +125,18 @@ const Timeline = ({
                     {image.dateTaken.toLocaleDateString()}
                   </FancyTypography>
                 )}
-                <Typography variant="overline" className={classes.caption}>
-                  {imageProps[image.id]?.caption}
-                </Typography>
+                {imageProps[image.id]?.caption && (
+                  <div className={classes.captionContainer}>
+                    <Typography
+                      className={classes.caption}
+                      style={
+                        i % 2 ? { marginRight: "auto" } : { marginLeft: "auto" }
+                      }
+                    >
+                      {imageProps[image.id]?.caption}
+                    </Typography>
+                  </div>
+                )}
               </TimelineOppositeContent>
               <TimelineSeparator className={classes.timelineSeparator}>
                 <TimelineDot />
