@@ -11,7 +11,6 @@ import { Strings } from "../../resources";
 import { useUserContext } from "../../contexts";
 import { useNavigate, useHideOnScroll } from "../../hooks";
 import Link from "../Link/Link";
-import BackButton from "../Button/BackButton";
 import AppMenu from "../Menu/AppMenu";
 import UserAvatar from "../User/UserAvatar";
 import Notifications from "../Notifications/Notifications";
@@ -30,9 +29,6 @@ const useStyles = makeStyles((theme: Theme) => ({
   },
   hidden: {
     top: ({ xs }: UseStylesParams) => theme.spacing(xs ? -6.5 : -9),
-  },
-  backButton: {
-    marginRight: theme.spacing(3),
   },
   loginButton: {
     marginLeft: "auto",
@@ -107,19 +103,11 @@ const Header = ({ viewId, className, ...rest }: HeaderProps) => {
         )}
       </Toolbar>
       <Toolbar variant="dense">
-        {!!location.state?.previousLocation && (
-          <BackButton
-            className={classes.backButton}
-            variant="outlined"
-            color="inherit"
-            size="small"
-          />
-        )}
         <Typography variant="overline">{routes[viewId].viewName}</Typography>
         {isUserLoggedIn && (
           <>
             <Notifications className={classes.notifications} />
-            {!!profilePicture?.fileThumb?.url() && (
+            {!!profilePicture?.fileThumb.url() && (
               <UserAvatar
                 UseUserInfoParams={{ user: getLoggedInUser() }}
                 className={classes.profile}

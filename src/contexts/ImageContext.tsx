@@ -20,7 +20,10 @@ import {
 import { ImageSelectionDialog } from "../components/Images";
 import { readAndCompressImage } from "browser-image-resizer";
 import { useUserContext } from "./UserContext";
-import { UnpersistedParseImage } from "../classes/ParseImage";
+import {
+  UnpersistedParseImage,
+  UnpersistedParseImageAttributes,
+} from "../classes/ParseImage";
 
 export enum ImageActionCommand {
   DELETE,
@@ -30,7 +33,7 @@ export enum ImageActionCommand {
 /** Interface defining an action being done to an image */
 export interface ImageAction {
   /** The image being worked on */
-  image: ImageAttributes;
+  image: UnpersistedParseImageAttributes | ImageAttributes;
   /** The command being performed on the image */
   command: ImageActionCommand;
   /** Whether action is completed or not */
@@ -143,7 +146,7 @@ export const ImageContextProvider = ({
   };
 
   const uploadImage = async (
-    image: ImageAttributes,
+    image: UnpersistedParseImageAttributes,
     acl?: Parse.ACL
   ): Promise<ParseImage | undefined> => {
     startGlobalLoader({

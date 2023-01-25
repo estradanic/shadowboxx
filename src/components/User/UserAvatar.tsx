@@ -57,7 +57,7 @@ const UserAvatar = forwardRef(
           <Avatar
             {...rest}
             className={cx(classes.avatar, piClassName)}
-            src={profilePicture?.fileThumb?.url()}
+            src={profilePicture?.fileThumb.url()}
             alt={userName}
           />
         </div>

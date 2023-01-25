@@ -26,6 +26,7 @@ const Strings = {
   back: () => "Back",
   cancel: () => "Cancel",
   cannotEditWhileOffline: () => "Connection lost. Cannot edit while offline.",
+  cantShare: () => "Something went wrong. Cannot share.",
   caption: () => "Caption",
   captionImage: () => "Caption Image",
   checkEmailVerified: () => "Check Verification Status",

@@ -140,7 +140,12 @@ const Share = memo(() => {
       }),
     getAllModifyableAlbumsInfiniteOptions()
   );
-  const { startGlobalLoader, stopGlobalLoader } = useGlobalLoadingStore();
+  const { startGlobalLoader, stopGlobalLoader } = useGlobalLoadingStore(
+    (state) => ({
+      startGlobalLoader: state.startGlobalLoader,
+      stopGlobalLoader: state.stopGlobalLoader,
+    })
+  );
   const { enqueueErrorSnackbar } = useSnackbar();
   const initialized = useRef(false);
 

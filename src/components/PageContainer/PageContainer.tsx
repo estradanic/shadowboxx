@@ -31,7 +31,12 @@ const PageContainer = ({ children, ...rest }: PageContainerProps) => {
     globalProgress,
     globalLoaderType,
     globalLoaderContent,
-  } = useGlobalLoadingStore();
+  } = useGlobalLoadingStore((state) => ({
+    globalLoading: state.globalLoading,
+    globalProgress: state.globalProgress,
+    globalLoaderType: state.globalLoaderType,
+    globalLoaderContent: state.globalLoaderContent,
+  }));
 
   return (
     <LoadingWrapper

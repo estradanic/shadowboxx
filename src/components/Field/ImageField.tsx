@@ -303,7 +303,7 @@ const ImageField = memo(
                       >
                         <Avatar
                           className={classes.endAdornmentAvatar}
-                          src={value[0].fileThumb?.url?.()}
+                          src={value[0].fileThumb.url()}
                           alt={value[0].name}
                         />
                       </InputAdornment>

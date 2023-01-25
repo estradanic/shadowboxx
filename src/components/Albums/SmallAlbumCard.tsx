@@ -80,7 +80,7 @@ const SmallAlbumCard = ({
       </CardContent>
       <CardMedia
         className={classes.coverImage}
-        src={coverImage?.fileMobile?.url()}
+        src={coverImage?.fileMobile.url()}
         component="img"
       />
     </Card>

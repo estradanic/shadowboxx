@@ -11,10 +11,10 @@ import {
   Timeline,
   FancyTypography,
 } from "../../components";
-import { useLocation, useParams } from "react-router-dom";
+import { useLocation, useParams, useSearchParams } from "react-router-dom";
 import Grid from "@material-ui/core/Grid";
 import Typography from "@material-ui/core/Typography";
-import { makeStyles, Theme, ThemeProvider } from "@material-ui/core/styles";
+import { makeStyles, Theme } from "@material-ui/core/styles";
 import EditIcon from "@material-ui/icons/Edit";
 import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
 import { Strings } from "../../resources";
@@ -33,6 +33,7 @@ import { useNetworkDetectionContext } from "../../contexts";
 import useFlatInfiniteQueryData from "../../hooks/Query/useFlatInfiniteQueryData";
 import { FormControlLabel, Switch } from "@material-ui/core";
 import { VariableColor } from "../../types";
+import ShareImageDecoration from "../../components/Image/Decoration/ShareImageDecoration";
 
 type UseStylesParams = {
   randomColor: VariableColor;
@@ -73,6 +74,8 @@ const useStyles = makeStyles((theme: Theme) => ({
 const Album = memo(() => {
   useView("Album");
   const { id } = useParams<{ id: string }>();
+  const [search, setSearch] = useSearchParams();
+  const timelineView = search.get("timeline") === "true";
   const location = useLocation() as { state: { previousLocation?: Location } };
   const randomColor = useRandomColor();
   const classes = useStyles({ randomColor });
@@ -109,7 +112,6 @@ const Album = memo(() => {
   useInfiniteScroll(fetchNextPage, { canExecute: !isFetchingNextPage });
   const [editMode, setEditMode] = useState<boolean>(false);
   const { enqueueSuccessSnackbar, enqueueErrorSnackbar } = useSnackbar();
-  const [timelineView, setTimelineView] = useState(false);
 
   const images = useFlatInfiniteQueryData(data);
 
@@ -124,6 +126,7 @@ const Album = memo(() => {
             UseUserInfoParams: { userPointer: image.owner },
           }}
         />,
+        <ShareImageDecoration image={image} />,
       ];
     },
     [timelineView]
@@ -189,8 +192,10 @@ const Album = memo(() => {
                     checked: classes.switchChecked,
                     track: classes.switchTrack,
                   }}
-                  checked={timelineView}
-                  onClick={() => setTimelineView((prev) => !prev)}
+                  checked={!!timelineView}
+                  onClick={() =>
+                    setSearch({ timeline: timelineView ? "false" : "true" })
+                  }
                 />
               }
               label={

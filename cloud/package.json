@@ -2,6 +2,7 @@
   "dependencies": {
     "sharp": "0.31.1",
     "@canvas/image": "1.0.1",
-    "blockhash-core": "0.1.0"
+    "blockhash-core": "0.1.0",
+    "node-fetch": "3.3.0"
   }
 }

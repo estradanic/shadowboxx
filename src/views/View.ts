@@ -22,7 +22,9 @@ export const useView = (currentViewId: keyof typeof routes) => {
   const queryClient = useQueryClient();
   const currentRoute = routes[currentViewId];
   const { isUserLoggedIn, setRedirectPath } = useUserContext();
-  const { stopGlobalLoader } = useGlobalLoadingStore();
+  const { stopGlobalLoader } = useGlobalLoadingStore((state) => ({
+    stopGlobalLoader: state.stopGlobalLoader,
+  }));
   const { enqueueWarningSnackbar, closeSnackbar } = useSnackbar();
   const getScrollPosition = useScrollPositionStore(
     (state) => state.getScrollPosition

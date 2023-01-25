@@ -9,11 +9,11 @@ export interface ImageAttributes {
   /** The actual saved file */
   file: Parse.File;
   /** The file resized for mobile */
-  fileMobile?: Parse.File;
+  fileMobile: Parse.File;
   /** The file resized for thumbnails */
-  fileThumb?: Parse.File;
+  fileThumb: Parse.File;
   /** The file in png format for older iPhones */
-  fileLegacy?: Parse.File;
+  fileLegacy: Parse.File;
   /** User that owns this picture */
   owner: ParsePointer<"_User">;
   /** Name of the image */
@@ -181,6 +181,8 @@ export default class ParseImage extends ParseObject<"Image"> {
   }
 }
 
+export interface UnpersistedParseImageAttributes extends Omit<ImageAttributes, "fileMobile" | "fileLegacy" | "fileThumb"> {}
+
 export class UnpersistedParseImage extends ParseImage {
   constructor(attributes: Partial<Attributes<"Image">> = {}) {
     // @ts-expect-error
@@ -205,5 +207,20 @@ export class UnpersistedParseImage extends ParseImage {
   get updatedAt(): Attributes<"Image">["updatedAt"] {
     console.warn("Unpersisted image has no updatedAt")
     return new Date();
+  }
+
+  get fileLegacy(): Attributes<"Image">["fileLegacy"] {
+    console.warn("Unpersisted image has no fileLegacy")
+    return new Parse.File("", [0]);
+  }
+
+  get fileMobile(): Attributes<"Image">["fileMobile"] {
+    console.warn("Unpersisted image has no fileMobile")
+    return new Parse.File("", [0]);
+  }
+
+  get fileThumb(): Attributes<"Image">["fileThumb"] {
+    console.warn("Unpersisted image has no fileThumb")
+    return new Parse.File("", [0]);
   }
 }
