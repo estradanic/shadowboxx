@@ -1,15 +1,17 @@
 import React, { ForwardedRef } from "react";
+import Parse from "parse";
 import { makeStyles, Theme } from "@material-ui/core/styles";
 import ShareIcon from "@material-ui/icons/Share";
 import Icon, { IconProps } from "@material-ui/core/Icon";
 import classNames from "classnames";
+import { Buffer } from "buffer";
+import { readAndCompressImage } from "browser-image-resizer";
 import { Strings } from "../../../resources";
 import ImageDecoration, { ImageDecorationProps } from "./ImageDecoration";
 import { forwardRef } from "react";
 import { ParseImage } from "../../../classes";
 import { useSnackbar } from "../../Snackbar/Snackbar";
 import { useGlobalLoadingStore } from "../../../stores";
-import { readAndCompressImage } from "browser-image-resizer";
 
 const useStyles = makeStyles((theme: Theme) => ({
   root: {
@@ -78,19 +80,24 @@ const ShareImageDecoration = ({
   const onClick = async () => {
     startGlobalLoader();
     try {
-      const buffer = await (await fetch(image.file.url())).arrayBuffer();
+      const base64 = await Parse.Cloud.run("getImage", { imageId: image.id });
+      const buffer = Buffer.from(base64, "base64");
       const file = new File([buffer], image.name, { type: "image/webp" });
       const pngFile = await readAndCompressImage(file, {
         quality: 1,
+        maxHeight: 2400,
+        maxWidth: 2400,
         mimeType: "image/png",
       });
-      if (navigator?.canShare?.({ files: [pngFile] })) {
+      const shareData = {
+        files: [
+          new File([pngFile], `${image.name}.png`, { type: "image/png" }),
+        ],
+        title: image.name,
+      };
+      if (navigator?.canShare?.(shareData)) {
         try {
-          await navigator.share({
-            files: [pngFile],
-            title: image.name,
-            text: image.name,
-          });
+          await navigator.share(shareData);
         } catch (error) {
           console.error(error);
           enqueueErrorSnackbar(Strings.cantShare());
@@ -103,7 +110,7 @@ const ShareImageDecoration = ({
     } catch (error) {
       console.error(error);
       enqueueErrorSnackbar(Strings.cantShare());
-      download(image.fileLegacy.url())
+      download(image.fileLegacy.url());
     } finally {
       stopGlobalLoader();
     }

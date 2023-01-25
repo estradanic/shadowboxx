@@ -10,7 +10,12 @@ import {
   deleteImageFromAlbums,
 } from "./triggers";
 import { findDuplicateImages, hashImages } from "./jobs";
-import { resolveDuplicates, ResolveDuplicatesParams } from "./functions";
+import {
+  getImage,
+  GetImageParams,
+  resolveDuplicates,
+  ResolveDuplicatesParams,
+} from "./functions";
 import populateDateTaken from "./jobs/populateDateTaken";
 
 Parse.Cloud.beforeLogin(async (request) => {
@@ -89,5 +94,12 @@ Parse.Cloud.define<(request: ResolveDuplicatesParams) => Promise<void>>(
   "resolveDuplicates",
   async (request) => {
     await resolveDuplicates(request.params, request.user);
+  }
+);
+
+Parse.Cloud.define<(request: GetImageParams) => Promise<any>>(
+  "getImage",
+  async (request) => {
+    return await getImage(request.params);
   }
 );

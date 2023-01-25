@@ -76,6 +76,7 @@
     "@types/sharp": "^0.31.1",
     "@types/uuid": "^9.0.0",
     "@vitejs/plugin-react": "^3.0.1",
+    "axios": "^1.2.4",
     "blockhash-core": "^0.1.0",
     "eslint": "^8.32.0",
     "eslint-config-react-app": "^7.0.1",
