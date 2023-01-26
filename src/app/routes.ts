@@ -118,7 +118,7 @@ const routes = {
     viewName: "Verify Email",
     View: VerifyEmail,
     path: "/verify",
-    tryAuthenticate: true,
+    tryAuthenticate: false,
     redirectOnAuthFail: false,
     queryCacheGroups: [],
   },

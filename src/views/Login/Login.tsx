@@ -65,7 +65,7 @@ const Login = memo(() => {
       stopGlobalLoader: state.stopGlobalLoader,
     })
   );
-  const { enqueueErrorSnackbar } = useSnackbar();
+  const { enqueueErrorSnackbar, enqueueWarningSnackbar } = useSnackbar();
   const { updateLoggedInUser } = useUserContext();
 
   const validate = (): boolean => {
@@ -91,9 +91,11 @@ const Login = memo(() => {
         .login(updateLoggedInUser)
         .catch((error) => {
           if (error?.message === "Email not verified") {
-            const verifyEmailUrl = new URL(routes.VerifyEmail.path);
-            verifyEmailUrl.searchParams.append("email", email);
-            navigate(verifyEmailUrl);
+            const params = new URLSearchParams();
+            params.append("email", email);
+            navigate(`${routes.VerifyEmail.path}?${params.toString()}}`);
+            enqueueWarningSnackbar(error.message);
+            return;
           }
           enqueueErrorSnackbar(error?.message ?? Strings.loginError());
         })
