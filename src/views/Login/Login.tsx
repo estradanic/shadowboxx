@@ -13,10 +13,11 @@ import {
   useSnackbar,
   EmailField,
 } from "../../components";
+import { useNavigate } from "../../hooks";
 import { useView } from "../View";
-import { ParseUser } from "../../classes";
 import { useUserContext } from "../../contexts";
 import { useGlobalLoadingStore } from "../../stores";
+import { routes } from "../../app";
 import { UnpersistedParseUser } from "../../classes/ParseUser";
 
 const useStyles = makeStyles((theme: Theme) => ({
@@ -52,6 +53,7 @@ const DefaultErrorState = {
 const Login = memo(() => {
   useView("Login");
 
+  const navigate = useNavigate();
   const classes = useStyles();
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
@@ -88,6 +90,11 @@ const Login = memo(() => {
       })
         .login(updateLoggedInUser)
         .catch((error) => {
+          if (error?.message === "Email not verified") {
+            const verifyEmailUrl = new URL(routes.VerifyEmail.path);
+            verifyEmailUrl.searchParams.append("email", email);
+            navigate(verifyEmailUrl);
+          }
           enqueueErrorSnackbar(error?.message ?? Strings.loginError());
         })
         .finally(() => {

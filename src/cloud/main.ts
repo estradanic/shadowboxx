@@ -8,6 +8,8 @@ import {
   isUserWhitelisted,
   notifyOfAlbumChange,
   deleteImageFromAlbums,
+  sendVerificationEmail,
+  isEmailVerified,
 } from "./triggers";
 import { findDuplicateImages, hashImages } from "./jobs";
 import {
@@ -24,6 +26,9 @@ Parse.Cloud.beforeLogin(async (request) => {
       403,
       "User not whitelisted and public logins are disabled"
     );
+  }
+  if (!(await isEmailVerified(request.object))) {
+    throw new Parse.Error(403, "Email not verified");
   }
 });
 
@@ -52,6 +57,8 @@ Parse.Cloud.beforeSave(Parse.User, async (request) => {
       403,
       "User not whitelisted and public signups are disabled"
     );
+  } else if (request.object.isNew() || request.object.dirty("email")) {
+    await sendVerificationEmail(request.object);
   }
 });
 
