@@ -122,6 +122,7 @@ const Login = memo(() => {
                 id="email"
                 error={errors.email.isError}
                 helperText={errors.email.errorMessage}
+                onEnterKey={login}
               />
             </Grid>
             <Grid item xs={12}>

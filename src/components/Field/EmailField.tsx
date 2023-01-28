@@ -7,8 +7,6 @@ import TextField, { TextFieldProps } from "./TextField";
  * Interface defining props for EmailField
  */
 export interface EmailFieldProps extends Omit<TextFieldProps, "type"> {
-  /** Handler to run when the enter/return key is pressed */
-  onEnterKey?: () => void | Promise<void>;
   /** Whether to validate input or not */
   validate?: boolean;
 }
@@ -17,7 +15,6 @@ export interface EmailFieldProps extends Omit<TextFieldProps, "type"> {
  * Component for entering email addresses
  */
 const EmailField = ({
-  onEnterKey,
   validate,
   onChange: piOnChange,
   value: piValue,
@@ -51,11 +48,6 @@ const EmailField = ({
       onChange={onChange}
       value={value}
       type="email"
-      onKeyUp={(e) => {
-        if (e.key === "Enter") {
-          onEnterKey?.();
-        }
-      }}
       {...rest}
     />
   );

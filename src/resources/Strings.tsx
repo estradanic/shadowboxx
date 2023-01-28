@@ -177,9 +177,12 @@ const Strings = {
     `Error uploading image${fileName ? ` ${fileName}` : ""}.`,
   uploadingImage: (fileName: string) => `Uploading image (${fileName})`,
   uploadingImages: () => "Uploading...",
+  verify: () => "Verify",
   verifyEmail: (email: ReactNode) => (
     <>
-      Please check <b>{email}</b> for the verification code.
+      Please check your email <br />
+      <b>{email}</b>
+      <br /> for the verification code.
     </>
   ),
   verifyEmailTitle: () => "Verify Email",

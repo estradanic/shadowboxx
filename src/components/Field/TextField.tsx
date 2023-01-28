@@ -22,15 +22,32 @@ const useStyles = makeStyles((theme: Theme) => ({
 
 /** Interface defining props for TextField */
 export interface TextFieldProps
-  extends Omit<FilledTextFieldProps, "variant" | "classes"> {}
+  extends Omit<FilledTextFieldProps, "variant" | "classes"> {
+  /** Handler to run when the enter/return key is pressed */
+  onEnterKey?: () => void | Promise<void>;
+}
 
 /** Component to input text */
 const TextField = forwardRef(
-  (props: TextFieldProps, ref: ForwardedRef<any>) => {
+  (
+    { onEnterKey, onKeyUp, ...rest }: TextFieldProps,
+    ref: ForwardedRef<any>
+  ) => {
     const classes = useStyles();
 
     return (
-      <MuiTextField variant="filled" classes={classes} {...props} ref={ref} />
+      <MuiTextField
+        onKeyUp={(e) => {
+          if (e.key === "Enter") {
+            onEnterKey?.();
+          }
+          onKeyUp?.(e);
+        }}
+        variant="filled"
+        classes={classes}
+        {...rest}
+        ref={ref}
+      />
     );
   }
 );
