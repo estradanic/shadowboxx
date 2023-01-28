@@ -1,14 +1,14 @@
-import React, { ForwardedRef } from "react";
+import React, { ForwardedRef, forwardRef } from "react";
 import MuiTextField, {
   FilledTextFieldProps,
 } from "@material-ui/core/TextField";
 import { makeStyles, Theme } from "@material-ui/core/styles";
-import { forwardRef } from "react";
 
 const useStyles = makeStyles((theme: Theme) => ({
   root: {
     "&& > div": {
       backgroundColor: theme.palette.background.paper,
+      borderRadius: "4px",
     },
     "&& > label": {
       color: theme.palette.text.primary,
@@ -16,6 +16,7 @@ const useStyles = makeStyles((theme: Theme) => ({
     "&& > label.Mui-focused": {
       color: theme.palette.primary.dark,
     },
+    borderRadius: "4px",
   },
 }));
 

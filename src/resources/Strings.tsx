@@ -1,3 +1,5 @@
+import React, { ReactNode } from "react";
+
 /**
  * Object providing dynamic access to strings used throughout the site.
  * Needed to avoid string literals for consistency.
@@ -175,8 +177,12 @@ const Strings = {
     `Error uploading image${fileName ? ` ${fileName}` : ""}.`,
   uploadingImage: (fileName: string) => `Uploading image (${fileName})`,
   uploadingImages: () => "Uploading...",
-  verifyEmail: (email: string) =>
-    `Please check ${email} for the verification message, then return here.`,
+  verifyEmail: (email: ReactNode) => (
+    <>
+      Please check <b>{email}</b> for the verification code.
+    </>
+  ),
+  verifyEmailTitle: () => "Verify Email",
   viewers: () => "Viewers",
   viewersTooltip: () =>
     "Users who will be allowed to view this album. (Enter email)",

@@ -93,7 +93,7 @@ const Login = memo(() => {
           if (error?.message === "Email not verified") {
             const params = new URLSearchParams();
             params.append("email", email);
-            navigate(`${routes.VerifyEmail.path}?${params.toString()}}`);
+            navigate(`${routes.VerifyEmail.path}?${params.toString()}`);
             enqueueWarningSnackbar(error.message);
             return;
           }

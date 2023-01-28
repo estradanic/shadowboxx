@@ -1,6 +1,12 @@
 import React, { memo } from "react";
+import Typography from "@material-ui/core/Typography";
 import { useSearchParams } from "react-router-dom";
-import { PageContainer } from "../../components";
+import {
+  PageContainer,
+  FancyTitleTypography,
+  OtpField,
+} from "../../components";
+import { Strings } from "../../resources";
 import { useView } from "../View";
 
 const VerifyEmail = memo(() => {
@@ -10,7 +16,18 @@ const VerifyEmail = memo(() => {
 
   return (
     <PageContainer>
-      <h1>Placeholder. Page under construction</h1>
+      {!!email && (
+        <>
+          <FancyTitleTypography>
+            {Strings.verifyEmailTitle()}
+          </FancyTitleTypography>
+          <br />
+          <br />
+          <Typography>{Strings.verifyEmail(email)}</Typography>
+          <br />
+          <OtpField onCompleted={(otp) => alert(otp)} />
+        </>
+      )}
     </PageContainer>
   );
 });
