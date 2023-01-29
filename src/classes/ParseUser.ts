@@ -72,10 +72,12 @@ export default class ParseUser extends ParseObject<"_User"> {
 
   _user: Parse.User<ParsifyPointers<"_User">>;
 
-  constructor(user: Parse.User<ParsifyPointers<"_User">>) {
+  constructor(user: Parse.User<ParsifyPointers<"_User">>, noPin: boolean = false) {
     super(user);
     this._user = user;
-    this.pin();
+    if (!noPin) {
+      this.pin();
+    }
   }
 
   /**
@@ -169,10 +171,10 @@ export default class ParseUser extends ParseObject<"_User"> {
         Parse.User<ParsifyPointers<"_User">>
       >();
       await updateLoggedInUser(
-        new ParseUser(loggedOutUser),
+        new ParseUser(loggedOutUser, true),
         UserUpdateReason.LOG_OUT
       );
-      return new ParseUser(loggedOutUser);
+      return new ParseUser(loggedOutUser, true);
     } catch (error: any) {
       console.error(error?.message ?? Strings.commonError());
       await updateLoggedInUser(this, UserUpdateReason.LOG_OUT);
