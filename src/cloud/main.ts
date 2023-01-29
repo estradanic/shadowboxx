@@ -10,6 +10,7 @@ import {
   deleteImageFromAlbums,
   sendVerificationEmail,
   isEmailVerified,
+  updateEmail,
 } from "./triggers";
 import { findDuplicateImages, hashImages, populateDateTaken } from "./jobs";
 import {
@@ -68,6 +69,9 @@ Parse.Cloud.beforeSave(Parse.User, async (request) => {
     );
   } else if (request.object.isNew() || request.object.dirty("email")) {
     await sendVerificationEmail(request.object);
+    if (!request.object.isNew()) {
+      await updateEmail(request.object);
+    }
   }
 });
 
