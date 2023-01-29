@@ -71,10 +71,11 @@ export const useStyles = makeStyles((theme: Theme) => ({
     outline: ({ outlineColor }: UseStylesParams) =>
       `2px dashed ${theme.palette[outlineColor].dark}`,
     outlineOffset: theme.spacing(-1),
-    padding: theme.spacing(4, 8),
+    padding: theme.spacing(3, 3),
     textAlign: "center",
     position: "relative",
     color: theme.palette.text.primary,
+    margin: 0,
   },
 }));
 

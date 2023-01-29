@@ -1,3 +1,5 @@
+import React, { ReactNode } from "react";
+
 /**
  * Object providing dynamic access to strings used throughout the site.
  * Needed to avoid string literals for consistency.
@@ -74,6 +76,7 @@ const Strings = {
   editAlbumError: () => `${Strings.commonError()}. Could not edit album.`,
   email: () => "Email",
   emailExists: (email: string) => `User with email already exists (${email})`,
+  emailVerified: () => "Email Verified",
   endpointNotFound: (endpoint: string) =>
     `404. Endpoint not found (${endpoint})`,
   enteringEditMode: () => "Edit Mode",
@@ -102,6 +105,7 @@ const Strings = {
   install: () => "Install App",
   installed: () => "Installed! :)",
   installPrompt: () => "Use Shadowboxx offline!",
+  invalidCode: () => "Invalid code",
   invalidEmail: (email: string) => `Invalid email${email ? ` (${email})` : ""}`,
   invalidEmptyFilename: () => "File name cannot be empty!",
   invalidImage: (image: { src: string; fileName: string }) =>
@@ -150,6 +154,8 @@ const Strings = {
   removeImage: () => "Remove image from album",
   removeImageError: (fileName: string) =>
     `Could not remove image ${fileName} from album.`,
+  resend: () => "Resend",
+  resent: () => "Resent!",
   resolve: () => "Resolve",
   resolveDuplicates: () => "Resolve Duplicates",
   processingImages: () => "Processing...",
@@ -175,8 +181,16 @@ const Strings = {
     `Error uploading image${fileName ? ` ${fileName}` : ""}.`,
   uploadingImage: (fileName: string) => `Uploading image (${fileName})`,
   uploadingImages: () => "Uploading...",
-  verifyEmail: (email: string) =>
-    `Please check ${email} for the verification message, then return here.`,
+  verify: () => "Verify",
+  verifyEmail: (email: ReactNode) => (
+    <>
+      Please check your email <br />
+      <b>{email}</b>
+      <br /> for the verification code.
+    </>
+  ),
+  verifyEmailResend: () => "Didn't receive code?",
+  verifyEmailTitle: () => "Verify Email",
   viewers: () => "Viewers",
   viewersTooltip: () =>
     "Users who will be allowed to view this album. (Enter email)",

@@ -9,6 +9,7 @@ const Signup = lazy(() => import("../views/Signup/Signup"));
 const Album = lazy(() => import("../views/Album/Album"));
 const Pictures = lazy(() => import("../views/Pictures/Pictures"));
 const Share = lazy(() => import("../views/Share/Share"));
+const VerifyEmail = lazy(() => import("../views/VerifyEmail/VerifyEmail"));
 
 /** Union type of all the allowed Route ids */
 export type RouteId =
@@ -19,6 +20,7 @@ export type RouteId =
   | "Settings"
   | "Signup"
   | "Share"
+  | "VerifyEmail"
   | "Root";
 
 /**
@@ -107,6 +109,15 @@ const routes = {
     viewName: "Signup",
     View: Signup,
     path: "/signup",
+    tryAuthenticate: false,
+    redirectOnAuthFail: false,
+    queryCacheGroups: [],
+  },
+  VerifyEmail: {
+    viewId: "VerifyEmail",
+    viewName: "Verify Email",
+    View: VerifyEmail,
+    path: "/verify",
     tryAuthenticate: false,
     redirectOnAuthFail: false,
     queryCacheGroups: [],

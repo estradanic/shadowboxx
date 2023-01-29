@@ -1,14 +1,14 @@
-import React, { ForwardedRef } from "react";
+import React, { ForwardedRef, forwardRef } from "react";
 import MuiTextField, {
   FilledTextFieldProps,
 } from "@material-ui/core/TextField";
 import { makeStyles, Theme } from "@material-ui/core/styles";
-import { forwardRef } from "react";
 
 const useStyles = makeStyles((theme: Theme) => ({
   root: {
     "&& > div": {
       backgroundColor: theme.palette.background.paper,
+      borderRadius: "4px",
     },
     "&& > label": {
       color: theme.palette.text.primary,
@@ -16,20 +16,38 @@ const useStyles = makeStyles((theme: Theme) => ({
     "&& > label.Mui-focused": {
       color: theme.palette.primary.dark,
     },
+    borderRadius: "4px",
   },
 }));
 
 /** Interface defining props for TextField */
 export interface TextFieldProps
-  extends Omit<FilledTextFieldProps, "variant" | "classes"> {}
+  extends Omit<FilledTextFieldProps, "variant" | "classes"> {
+  /** Handler to run when the enter/return key is pressed */
+  onEnterKey?: () => void | Promise<void>;
+}
 
 /** Component to input text */
 const TextField = forwardRef(
-  (props: TextFieldProps, ref: ForwardedRef<any>) => {
+  (
+    { onEnterKey, onKeyUp, ...rest }: TextFieldProps,
+    ref: ForwardedRef<any>
+  ) => {
     const classes = useStyles();
 
     return (
-      <MuiTextField variant="filled" classes={classes} {...props} ref={ref} />
+      <MuiTextField
+        onKeyUp={(e) => {
+          if (e.key === "Enter") {
+            onEnterKey?.();
+          }
+          onKeyUp?.(e);
+        }}
+        variant="filled"
+        classes={classes}
+        {...rest}
+        ref={ref}
+      />
     );
   }
 );

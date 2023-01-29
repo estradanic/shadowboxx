@@ -13,10 +13,11 @@ import {
   useSnackbar,
   EmailField,
 } from "../../components";
+import { useNavigate } from "../../hooks";
 import { useView } from "../View";
-import { ParseUser } from "../../classes";
 import { useUserContext } from "../../contexts";
 import { useGlobalLoadingStore } from "../../stores";
+import { routes } from "../../app";
 import { UnpersistedParseUser } from "../../classes/ParseUser";
 
 const useStyles = makeStyles((theme: Theme) => ({
@@ -52,6 +53,7 @@ const DefaultErrorState = {
 const Login = memo(() => {
   useView("Login");
 
+  const navigate = useNavigate();
   const classes = useStyles();
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
@@ -63,7 +65,7 @@ const Login = memo(() => {
       stopGlobalLoader: state.stopGlobalLoader,
     })
   );
-  const { enqueueErrorSnackbar } = useSnackbar();
+  const { enqueueErrorSnackbar, enqueueWarningSnackbar } = useSnackbar();
   const { updateLoggedInUser } = useUserContext();
 
   const validate = (): boolean => {
@@ -88,6 +90,13 @@ const Login = memo(() => {
       })
         .login(updateLoggedInUser)
         .catch((error) => {
+          if (error?.message === "Email not verified") {
+            const params = new URLSearchParams();
+            params.append("email", email);
+            navigate(`${routes.VerifyEmail.path}?${params.toString()}`);
+            enqueueWarningSnackbar(error.message);
+            return;
+          }
           enqueueErrorSnackbar(error?.message ?? Strings.loginError());
         })
         .finally(() => {
@@ -113,6 +122,7 @@ const Login = memo(() => {
                 id="email"
                 error={errors.email.isError}
                 helperText={errors.email.errorMessage}
+                onEnterKey={login}
               />
             </Grid>
             <Grid item xs={12}>

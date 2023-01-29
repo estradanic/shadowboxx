@@ -7,12 +7,16 @@ import { useGlobalLoadingStore } from "../../stores";
 import LoadingWrapper from "../Loader/LoadingWrapper";
 
 const useStyles = makeStyles((theme: Theme) => ({
+  wrapper: {
+    maxWidth: "100vw",
+  },
   container: {
     backgroundColor: theme.palette.background.default,
     color: theme.palette.primary.contrastText,
     overflowY: "hidden",
     overflowX: "hidden",
     minHeight: `calc(100vh - 8rem)`,
+    maxWidth: "100vw",
   },
   grid: {
     paddingTop: theme.spacing(6),
@@ -44,6 +48,7 @@ const PageContainer = ({ children, ...rest }: PageContainerProps) => {
       type={globalLoaderType}
       progress={globalProgress}
       content={globalLoaderContent}
+      className={classes.wrapper}
     >
       <Container maxWidth={false} className={classes.container} {...rest}>
         <Grid

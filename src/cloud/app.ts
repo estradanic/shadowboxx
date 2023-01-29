@@ -11,6 +11,7 @@ const frontendRoutes = [
   "settings",
   "signup",
   "share",
+  "verify",
   "",
 ];
 

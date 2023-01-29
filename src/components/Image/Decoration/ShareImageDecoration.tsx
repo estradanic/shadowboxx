@@ -80,7 +80,9 @@ const ShareImageDecoration = ({
   const onClick = async () => {
     startGlobalLoader();
     try {
-      const base64 = await Parse.Cloud.run("getImage", { imageId: image.id });
+      const base64: string = await Parse.Cloud.run("getImage", {
+        imageId: image.id,
+      });
       const buffer = Buffer.from(base64, "base64");
       const file = new File([buffer], image.name, { type: "image/webp" });
       const pngFile = await readAndCompressImage(file, {
