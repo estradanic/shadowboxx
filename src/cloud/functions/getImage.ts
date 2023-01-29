@@ -13,7 +13,7 @@ const getImage = async ({ imageId }: GetImageParams) => {
   if (!image) {
     throw new Parse.Error(404, "Image not found");
   }
-  const data = image.get("file").getData();
+  const data: string = image.get("file").getData();
   return data;
 };
 

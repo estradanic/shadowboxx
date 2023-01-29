@@ -11,14 +11,17 @@ import {
   sendVerificationEmail,
   isEmailVerified,
 } from "./triggers";
-import { findDuplicateImages, hashImages } from "./jobs";
+import { findDuplicateImages, hashImages, populateDateTaken } from "./jobs";
 import {
   getImage,
   GetImageParams,
+  resendVerificationEmail,
+  ResendVerificationEmailParams,
   resolveDuplicates,
   ResolveDuplicatesParams,
+  verifyEmail,
+  VerifyEmailParams,
 } from "./functions";
-import populateDateTaken from "./jobs/populateDateTaken";
 
 Parse.Cloud.beforeLogin(async (request) => {
   if (!(await isUserWhitelisted(request.object))) {
@@ -28,30 +31,36 @@ Parse.Cloud.beforeLogin(async (request) => {
     );
   }
   if (!(await isEmailVerified(request.object))) {
-    throw new Parse.Error(403, "Email not verified");
+    throw new Parse.Error(401, "Email not verified");
   }
 });
 
 Parse.Cloud.afterSave("Image", async (request) => {
-  if (!request.master || !request.context?.noTrigger) {
-    await hashImage(request.object);
+  if (request.master && request.context?.noTrigger) {
+    return;
   }
+  await hashImage(request.object);
 });
 
 Parse.Cloud.afterSave("Album", async (request) => {
-  if (!request.master || !request.context?.noTrigger) {
-    await setAlbumPermissions(request.object);
-    await notifyOfAlbumChange(request.object, request.user);
+  if (request.master && request.context?.noTrigger) {
+    return;
   }
+  await setAlbumPermissions(request.object);
+  await notifyOfAlbumChange(request.object, request.user);
 });
 
 Parse.Cloud.afterSave(Parse.User, async (request) => {
-  if (!request.master || !request.context?.noTrigger) {
-    await setUserPermissions(request.object);
+  if (request.master && request.context?.noTrigger) {
+    return;
   }
+  await setUserPermissions(request.object);
 });
 
 Parse.Cloud.beforeSave(Parse.User, async (request) => {
+  if (request.master && request.context?.noTrigger) {
+    return;
+  }
   if (request.object.isNew() && !(await isUserWhitelisted(request.object))) {
     throw new Parse.Error(
       403,
@@ -63,15 +72,17 @@ Parse.Cloud.beforeSave(Parse.User, async (request) => {
 });
 
 Parse.Cloud.beforeSave("Image", async (request) => {
-  if (!request.master || !request.context?.noTrigger) {
-    await resizeImage(request.object);
+  if (request.master && request.context?.noTrigger) {
+    return;
   }
+  await resizeImage(request.object);
 });
 
 Parse.Cloud.beforeSave("Album", async (request) => {
-  if (!request.master || !request.context?.noTrigger) {
-    await mergeAlbumChanges(request.object, request.context);
+  if (request.master && request.context?.noTrigger) {
+    return;
   }
+  await mergeAlbumChanges(request.object, request.context);
 });
 
 Parse.Cloud.beforeDelete("Album", async (request) => {
@@ -97,16 +108,30 @@ Parse.Cloud.job("populateDateTaken", async (request) => {
   request.message("Done");
 });
 
-Parse.Cloud.define<(request: ResolveDuplicatesParams) => Promise<void>>(
+Parse.Cloud.define<(params: ResolveDuplicatesParams) => Promise<void>>(
   "resolveDuplicates",
   async (request) => {
     await resolveDuplicates(request.params, request.user);
   }
 );
 
-Parse.Cloud.define<(request: GetImageParams) => Promise<any>>(
+Parse.Cloud.define<(params: GetImageParams) => Promise<string>>(
   "getImage",
   async (request) => {
     return await getImage(request.params);
+  }
+);
+
+Parse.Cloud.define<(params: VerifyEmailParams) => Promise<void>>(
+  "verifyEmail",
+  async (request) => {
+    return await verifyEmail(request.params);
+  }
+);
+
+Parse.Cloud.define<(params: ResendVerificationEmailParams) => Promise<void>>(
+  "resendVerificationEmail",
+  async (request) => {
+    await resendVerificationEmail(request.params);
   }
 );

@@ -76,6 +76,7 @@ const Strings = {
   editAlbumError: () => `${Strings.commonError()}. Could not edit album.`,
   email: () => "Email",
   emailExists: (email: string) => `User with email already exists (${email})`,
+  emailVerified: () => "Email Verified",
   endpointNotFound: (endpoint: string) =>
     `404. Endpoint not found (${endpoint})`,
   enteringEditMode: () => "Edit Mode",
@@ -104,6 +105,7 @@ const Strings = {
   install: () => "Install App",
   installed: () => "Installed! :)",
   installPrompt: () => "Use Shadowboxx offline!",
+  invalidCode: () => "Invalid code",
   invalidEmail: (email: string) => `Invalid email${email ? ` (${email})` : ""}`,
   invalidEmptyFilename: () => "File name cannot be empty!",
   invalidImage: (image: { src: string; fileName: string }) =>
@@ -152,6 +154,8 @@ const Strings = {
   removeImage: () => "Remove image from album",
   removeImageError: (fileName: string) =>
     `Could not remove image ${fileName} from album.`,
+  resend: () => "Resend",
+  resent: () => "Resent!",
   resolve: () => "Resolve",
   resolveDuplicates: () => "Resolve Duplicates",
   processingImages: () => "Processing...",
@@ -185,6 +189,7 @@ const Strings = {
       <br /> for the verification code.
     </>
   ),
+  verifyEmailResend: () => "Didn't receive code?",
   verifyEmailTitle: () => "Verify Email",
   viewers: () => "Viewers",
   viewersTooltip: () =>

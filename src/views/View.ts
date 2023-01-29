@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useLayoutEffect } from "react";
+import { useCallback, useEffect, useLayoutEffect, useRef } from "react";
 import { useLocation, createPath } from "react-router-dom";
 import { useQueryClient } from "@tanstack/react-query";
 import { useUserContext } from "../contexts";
@@ -11,7 +11,6 @@ import {
 } from "../hooks";
 import { useSnackbar } from "../components";
 import { Strings } from "../resources";
-import { useDebounce } from "use-debounce";
 
 /**
  * Hook that handles navigation, query invalidation, and authentication at the beginning of every View component.
@@ -21,6 +20,7 @@ export const useView = (currentViewId: keyof typeof routes) => {
   const location = useLocation();
   const queryClient = useQueryClient();
   const currentRoute = routes[currentViewId];
+  const showingSnackbarAlready = useRef(false);
   const { isUserLoggedIn, setRedirectPath } = useUserContext();
   const { stopGlobalLoader } = useGlobalLoadingStore((state) => ({
     stopGlobalLoader: state.stopGlobalLoader,
@@ -37,9 +37,13 @@ export const useView = (currentViewId: keyof typeof routes) => {
   }, [currentRoute.queryCacheGroups, queryClient]);
 
   const redirectToLogin = useCallback(() => {
-    closeSnackbar();
     stopGlobalLoader();
-    enqueueWarningSnackbar(Strings.pleaseLogin());
+    // Stupid hack to prevent duplicate snackbar
+    if (!showingSnackbarAlready.current) {
+      closeSnackbar();
+      enqueueWarningSnackbar(Strings.pleaseLogin());
+      showingSnackbarAlready.current = true;
+    }
     if (currentRoute.redirectOnAuthFail) {
       const loginRoute = routes.Login;
       setRedirectPath(createPath(location));

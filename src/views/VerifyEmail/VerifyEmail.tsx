@@ -1,4 +1,11 @@
-import React, { memo, useEffect, useRef, useState } from "react";
+import React, {
+  memo,
+  useEffect,
+  useLayoutEffect,
+  useRef,
+  useState,
+} from "react";
+import Parse from "parse";
 import Typography from "@material-ui/core/Typography";
 import { useSearchParams } from "react-router-dom";
 import { makeStyles, Theme } from "@material-ui/core/styles";
@@ -7,9 +14,12 @@ import {
   FancyTitleTypography,
   OtpField,
   Button,
+  useSnackbar,
 } from "../../components";
 import { Strings } from "../../resources";
-import { useView } from "../View";
+import { routes } from "../../app";
+import { useNavigate } from "../../hooks";
+import { useUserContext } from "../../contexts";
 
 const useStyles = makeStyles((theme: Theme) => ({
   message: {
@@ -23,9 +33,17 @@ const useStyles = makeStyles((theme: Theme) => ({
 }));
 
 const VerifyEmail = memo(() => {
-  useView("VerifyEmail");
-
   const classes = useStyles();
+
+  const { enqueueErrorSnackbar, enqueueSuccessSnackbar } = useSnackbar();
+  const navigate = useNavigate();
+  const { isUserLoggedIn } = useUserContext();
+
+  useLayoutEffect(() => {
+    if (isUserLoggedIn) {
+      navigate(routes.Home.path);
+    }
+  }, [isUserLoggedIn, navigate]);
 
   const [search] = useSearchParams();
   const email = search.get("email");
@@ -33,7 +51,26 @@ const VerifyEmail = memo(() => {
 
   const buttonRef = useRef<HTMLButtonElement>(null);
 
-  const verify = () => {};
+  const verify = async () => {
+    try {
+      await Parse.Cloud.run("verifyEmail", { code: otp, email });
+    } catch (error: any) {
+      enqueueErrorSnackbar(error?.message ?? Strings.commonError());
+      return;
+    }
+    enqueueSuccessSnackbar(Strings.emailVerified());
+    navigate(routes.Home.path);
+  };
+
+  const resend = async () => {
+    try {
+      await Parse.Cloud.run("resendVerificationEmail", { email });
+    } catch (error: any) {
+      enqueueErrorSnackbar(error?.message ?? Strings.commonError());
+      return;
+    }
+    enqueueSuccessSnackbar(Strings.resent());
+  };
 
   return (
     <PageContainer>
@@ -72,6 +109,12 @@ const VerifyEmail = memo(() => {
               {Strings.verify()}
             </Button>
           </div>
+          <br />
+          <br />
+          <Typography>{Strings.verifyEmailResend()}</Typography>
+          <Button onClick={resend} variant="text" color="warning">
+            {Strings.resend()}
+          </Button>
         </>
       )}
     </PageContainer>

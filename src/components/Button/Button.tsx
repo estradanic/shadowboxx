@@ -44,7 +44,7 @@ const useStyles = makeStyles((theme: Theme) => ({
         }
         return "none";
       },
-      opacity: 0.5,
+      opacity: 0.7,
     },
     "&:hover,&:focus": {
       color: ({ color, variant }: UseStylesParams) => {

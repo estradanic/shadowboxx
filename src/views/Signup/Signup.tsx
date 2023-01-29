@@ -21,8 +21,6 @@ import {
   isNullOrWhitespace,
 } from "../../utils";
 import { routes } from "../../app";
-import { ParseUser } from "../../classes";
-import { useUserContext } from "../../contexts";
 import { useGlobalLoadingStore } from "../../stores";
 import { useView } from "../View";
 import { UnpersistedParseUser } from "../../classes/ParseUser";
@@ -83,7 +81,6 @@ const Signup = memo(() => {
   );
   const navigate = useNavigate();
   const { enqueueErrorSnackbar } = useSnackbar();
-  const { updateLoggedInUser } = useUserContext();
 
   const validate = (): boolean => {
     const newErrors = { ...DefaultErrorState };
@@ -132,8 +129,10 @@ const Signup = memo(() => {
         lastName,
       });
       try {
-        await user.signup(updateLoggedInUser);
-        navigate(routes.Home.path);
+        (await user.signup(async () => {})).logout(async () => {});
+        const params = new URLSearchParams();
+        params.append("email", email);
+        navigate(`${routes.VerifyEmail.path}?${params.toString()}`);
       } catch (error: any) {
         enqueueErrorSnackbar(error?.message ?? Strings.signupError());
       } finally {
