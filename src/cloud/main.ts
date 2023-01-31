@@ -80,6 +80,9 @@ Parse.Cloud.beforeSave("Image", async (request) => {
     return;
   }
   await resizeImage(request.object);
+  if (request.object.isNew()) {
+    request.object.set("dateTaken", new Date());
+  }
 });
 
 Parse.Cloud.beforeSave("Album", async (request) => {
