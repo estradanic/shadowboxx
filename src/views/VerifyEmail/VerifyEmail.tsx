@@ -72,6 +72,17 @@ const VerifyEmail = memo(() => {
     enqueueSuccessSnackbar(Strings.resent());
   };
 
+  const undo = async () => {
+    try {
+      await Parse.Cloud.run("undoEmailChange", { email });
+    } catch (error: any) {
+      enqueueErrorSnackbar(error?.message ?? Strings.commonError());
+      return;
+    }
+    enqueueSuccessSnackbar(Strings.commonSaved());
+    navigate(routes.Home.path);
+  };
+
   return (
     <PageContainer>
       {!!email && (
@@ -114,6 +125,12 @@ const VerifyEmail = memo(() => {
           <Typography>{Strings.verifyEmailResend()}</Typography>
           <Button onClick={resend} variant="text" color="warning">
             {Strings.resend()}
+          </Button>
+          <br />
+          <br />
+          <Typography variant="caption">{Strings.undoEmailChange()}</Typography>
+          <Button onClick={undo} variant="text" size="small" color="warning">
+            {Strings.undo()}
           </Button>
         </>
       )}

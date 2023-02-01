@@ -5,14 +5,14 @@ import ParsePointer from "./ParsePointer";
 
 /** Interface defining User-specific attributes */
 export interface UserAttributes {
-  /** Whether email has been verified or not */
-  emailVerified?: boolean;
   /** Username (email) for login */
   username: string;
   /** Password for login */
   password: string;
   /** Email address */
   email: string;
+  /** Old email address in case of email change */
+  oldEmail?: string;
   /** Last name */
   lastName: string;
   /** First name */
@@ -38,7 +38,6 @@ export enum UserUpdateReason {
 }
 
 class UserColumns extends Columns {
-  emailVerified = "emailVerified" as const;
   password = "password" as const;
   email = "email" as const;
   lastName = "lastName" as const;
@@ -47,6 +46,7 @@ class UserColumns extends Columns {
   profilePicture = "profilePicture" as const;
   username = "username" as const;
   favoriteAlbums = "favoriteAlbums" as const;
+  oldEmail = "oldEmail" as const;
 }
 
 /**
@@ -181,17 +181,8 @@ export default class ParseUser extends ParseObject<"_User"> {
     }
   }
 
-  /** Whether this user's email has been verified */
-  get emailVerified(): boolean | undefined {
-    return this._user.get(ParseUser.COLUMNS.emailVerified);
-  }
-
-  set emailVerified(emailVerified) {
-    this._user.set(ParseUser.COLUMNS.emailVerified, emailVerified);
-  }
-
   /** This user's username */
-  get username(): string {
+  get username(): UserAttributes["username"] {
     return this._user.get(ParseUser.COLUMNS.username);
   }
 
@@ -204,7 +195,7 @@ export default class ParseUser extends ParseObject<"_User"> {
   }
 
   /** This user's email */
-  get email(): string {
+  get email(): UserAttributes["email"] {
     return (
       this._user.get(ParseUser.COLUMNS.email) ??
       this._user.getEmail() ??
@@ -217,7 +208,7 @@ export default class ParseUser extends ParseObject<"_User"> {
   }
 
   /** This user's last name */
-  get lastName(): string {
+  get lastName(): UserAttributes["lastName"] {
     return this._user.get(ParseUser.COLUMNS.lastName);
   }
 
@@ -226,7 +217,7 @@ export default class ParseUser extends ParseObject<"_User"> {
   }
 
   /** This user's first name */
-  get firstName(): string {
+  get firstName(): UserAttributes["firstName"] {
     return this._user.get(ParseUser.COLUMNS.firstName);
   }
 
@@ -243,7 +234,7 @@ export default class ParseUser extends ParseObject<"_User"> {
   }
 
   /** Whether the user has dark theme enabled */
-  get isDarkThemeEnabled(): boolean {
+  get isDarkThemeEnabled(): UserAttributes["isDarkThemeEnabled"] {
     return this._user.get(ParseUser.COLUMNS.isDarkThemeEnabled);
   }
 
@@ -252,7 +243,7 @@ export default class ParseUser extends ParseObject<"_User"> {
   }
 
   /** This user's profile picture, if it exists */
-  get profilePicture(): ParsePointer<"Image"> | undefined {
+  get profilePicture(): UserAttributes["profilePicture"] {
     const profilePicture = this._user.get(ParseUser.COLUMNS.profilePicture);
     return profilePicture ? new ParsePointer(profilePicture) : undefined;
   }
@@ -262,12 +253,17 @@ export default class ParseUser extends ParseObject<"_User"> {
   }
 
   /** This user's list of favorited albums */
-  get favoriteAlbums(): string[] {
+  get favoriteAlbums(): UserAttributes["favoriteAlbums"] {
     return this._user.get(ParseUser.COLUMNS.favoriteAlbums);
   }
 
   set favoriteAlbums(favoriteAlbums) {
     this._user.set(ParseUser.COLUMNS.favoriteAlbums, favoriteAlbums);
+  }
+
+  /** Old email in case of email change */
+  get oldEmail(): UserAttributes["oldEmail"] {
+    return this._user.get(ParseUser.COLUMNS.oldEmail);
   }
 
   /** Alias to _user.attributes but with the pointers as ParsePointer objects */
