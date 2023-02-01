@@ -25,6 +25,11 @@ const sendVerificationEmail = async (user: Parse.User) => {
 
   if (user.isNew()) {
     user.set("email", user.getUsername());
+  } else {
+    const oldUser = await new Parse.Query(Parse.User).get(user.id, {
+      useMasterKey: true,
+    });
+    user.set("oldEmail", oldUser.get("email"));
   }
 
   const mailOptions = {

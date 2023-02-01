@@ -20,6 +20,8 @@ import {
   ResendVerificationEmailParams,
   resolveDuplicates,
   ResolveDuplicatesParams,
+  undoEmailChange,
+  UndoEmailChangeParams,
   verifyEmail,
   VerifyEmailParams,
 } from "./functions";
@@ -140,5 +142,12 @@ Parse.Cloud.define<(params: ResendVerificationEmailParams) => Promise<void>>(
   "resendVerificationEmail",
   async (request) => {
     await resendVerificationEmail(request.params);
+  }
+);
+
+Parse.Cloud.define<(params: UndoEmailChangeParams) => Promise<void>>(
+  "undoEmailChange",
+  async (request) => {
+    await undoEmailChange(request.params);
   }
 );
