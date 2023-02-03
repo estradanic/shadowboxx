@@ -19,7 +19,6 @@ import {
   SHARE_TARGET_STORE_KEY,
   SHARE_TARGET_STORE_NAME,
 } from "../serviceWorker/sharedExports";
-import useNetworkLogger from "../hooks/useNetworkLogger";
 
 Parse.serverURL = window.__env__?.PARSE_HOST_URL;
 Parse.initialize(
@@ -50,14 +49,12 @@ const shareTargetStore = createStore(
   SHARE_TARGET_DB_NAME,
   SHARE_TARGET_STORE_NAME
 );
+const channel = new BroadcastChannel(SHARE_TARGET_STORE_KEY);
+channel.addEventListener("message", async (event) => {
+  await set(SHARE_TARGET_STORE_KEY, event.data, shareTargetStore);
+});
 
 const App = () => {
-  const logger = useNetworkLogger("App.tsx");
-  const channel = new BroadcastChannel(SHARE_TARGET_STORE_KEY);
-  channel.addEventListener("message", async (event) => {
-    logger.info("Received message from share target", event.data);
-    await set(SHARE_TARGET_STORE_KEY, event.data, shareTargetStore);
-  });
   const { getLoggedInUser, isUserLoggedIn } = useUserContext();
   const { addNotification } = useNotificationsContext();
 
@@ -69,9 +66,6 @@ const App = () => {
     );
 
   useEffect(() => {
-    if (window.location.host.match(/^www\./) !== null) {
-      window.location.host = window.location.host.substring(4);
-    }
     navigator?.storage?.persisted?.()?.then?.((initialIsPersisted) => {
       if (!initialIsPersisted) {
         navigator.storage

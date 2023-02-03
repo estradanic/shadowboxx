@@ -109,7 +109,7 @@ const Home = memo(() => {
                 className={classes.albumsContainer}
               >
                 {[1, 2, 3, 4, 5].map((i) => (
-                  <Grid key={`album-card-skeleton-${i}`} item xs={12} md={6} lg={4} xl={3}>
+                  <Grid key={`skeleton-${i}`} item xs={12} md={6} lg={4} xl={3}>
                     <AlbumCardSkeleton />
                   </Grid>
                 ))}

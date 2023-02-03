@@ -28,6 +28,7 @@ const useStyles = makeStyles((theme: Theme) => ({
       `2px solid ${theme.palette[borderColor ?? "primary"].dark}`,
     width: theme.spacing(60),
     maxWidth: "100%",
+    margin: theme.spacing(0, 2),
   },
   info: {
     flexShrink: 1,

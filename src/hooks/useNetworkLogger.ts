@@ -5,7 +5,7 @@ import { useUserContext } from "../contexts";
 type Timestamp = string;
 
 /** Hook for getting a logger that will send data to the server to be logged */
-const useNetworkLogger = (name: string, enabled = false) => {
+const useNetworkLogger = (name: string) => {
   const { getLoggedInUser } = useUserContext();
 
   const infoQueue = useRef<Record<Timestamp, any[]>>({});
@@ -61,29 +61,38 @@ const useNetworkLogger = (name: string, enabled = false) => {
     return () => clearInterval(logTimer);
   }, [name, getLoggedInUser]);
 
-  const info = useCallback((...data: any[]) => {
-    console.info(name, ...data);
-    if (!enabled) {
-      return;
-    }
-    infoQueue.current[Date.now().toString()] = data;
-  }, [name, enabled]);
+  const info = useCallback(
+    (...data: any[]) => {
+      console.info(name, ...data);
+      if (!getLoggedInUser().isLoggingEnabled) {
+        return;
+      }
+      infoQueue.current[Date.now().toLocaleString()] = data;
+    },
+    [name, getLoggedInUser]
+  );
 
-  const error = useCallback((...data: any[]) => {
-    console.error(name, ...data);
-    if (!enabled) {
-      return;
-    }
-    errorQueue.current[Date.now().toString()] = data;
-  }, [name, enabled]);
+  const error = useCallback(
+    (...data: any[]) => {
+      console.error(name, ...data);
+      if (!getLoggedInUser().isLoggingEnabled) {
+        return;
+      }
+      errorQueue.current[Date.now().toLocaleString()] = data;
+    },
+    [name, getLoggedInUser]
+  );
 
-  const warn = useCallback((...data: any[]) => {
-    console.warn(name, ...data);
-    if (!enabled) {
-      return;
-    }
-    warnQueue.current[Date.now().toString()] = data;
-  }, [name, enabled]);
+  const warn = useCallback(
+    (...data: any[]) => {
+      console.warn(name, ...data);
+      if (!getLoggedInUser().isLoggingEnabled) {
+        return;
+      }
+      warnQueue.current[Date.now().toLocaleString()] = data;
+    },
+    [name, getLoggedInUser]
+  );
 
   const logger = useMemo(() => ({ info, error, warn }), [info, error, warn]);
 
