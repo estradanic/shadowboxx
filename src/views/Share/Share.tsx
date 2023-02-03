@@ -120,7 +120,7 @@ const AlbumsToShareTo = ({ albums, classes, files }: AlbumsListProps) => {
 const Share = memo(() => {
   useView("Share");
 
-  const logger = useNetworkLogger("Share.tsx");
+  const logger = useNetworkLogger("Share.tsx", true);
 
   const classes = useStyles();
   const { online } = useNetworkDetectionContext();
@@ -161,7 +161,7 @@ const Share = memo(() => {
 
   useEffect(() => {
     if (initialized.current) {
-      logger.info("Already initialized, not running effect");
+      logger.info("Already mounted, not running effect");
       return;
     }
     logger.info("Running effect");
@@ -221,16 +221,12 @@ const Share = memo(() => {
         setFailed(true);
       }
     }, 500);
-    return () => {
-      logger.info("unmounted. clearing timer");
-      clearInterval(timer);
-    };
   }, [
     setSharedFiles,
     startGlobalLoader,
     stopGlobalLoader,
     enqueueErrorSnackbar,
-    logger,
+    logger
   ]);
 
   return (
@@ -258,7 +254,7 @@ const Share = memo(() => {
                     className={classes.albumsContainer}
                   >
                     {[1, 2, 3, 4, 5].map((i) => (
-                      <Grid key={i} item xs={12} md={6} lg={4} xl={3}>
+                      <Grid key={`small-album-card-skeleton-${i}`} item xs={12} md={6} lg={4} xl={3}>
                         <SmallAlbumCardSkeleton />
                       </Grid>
                     ))}

@@ -166,7 +166,7 @@ Parse.Cloud.define<
       : request.params.type === "warn"
       ? console.warn
       : console.error;
-  Object.keys(request.params.logs).forEach((key) => {
+  Object.keys(request.params.logs).sort().reverse().forEach((key) => {
     log(
       `[${request.params.user}] [${request.params.name}] ${key}`,
       ...request.params.logs[key]
