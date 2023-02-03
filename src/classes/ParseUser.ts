@@ -23,6 +23,8 @@ export interface UserAttributes {
   profilePicture?: ParsePointer<"Image">;
   /** List of favorited album ids */
   favoriteAlbums: string[];
+  /** Whether detailed logging is turned on for this user */
+  isLoggingEnabled: boolean;
 }
 
 export type UpdateLoggedInUser = (
@@ -47,6 +49,7 @@ class UserColumns extends Columns {
   username = "username" as const;
   favoriteAlbums = "favoriteAlbums" as const;
   oldEmail = "oldEmail" as const;
+  isLoggingEnabled = "isLoggingEnabled" as const;
 }
 
 /**
@@ -264,6 +267,10 @@ export default class ParseUser extends ParseObject<"_User"> {
   /** Old email in case of email change */
   get oldEmail(): UserAttributes["oldEmail"] {
     return this._user.get(ParseUser.COLUMNS.oldEmail);
+  }
+
+  get isLoggingEnabled(): UserAttributes["isLoggingEnabled"] {
+    return this._user.get(ParseUser.COLUMNS.isLoggingEnabled);
   }
 
   /** Alias to _user.attributes but with the pointers as ParsePointer objects */

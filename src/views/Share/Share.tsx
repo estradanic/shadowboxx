@@ -38,7 +38,6 @@ import {
   SHARE_TARGET_STORE_KEY,
   SHARE_TARGET_STORE_NAME,
 } from "../../serviceWorker/sharedExports";
-import useNetworkLogger from "../../hooks/useNetworkLogger";
 
 const useStyles = makeStyles(() => ({
   title: {
@@ -120,8 +119,6 @@ const AlbumsToShareTo = ({ albums, classes, files }: AlbumsListProps) => {
 const Share = memo(() => {
   useView("Share");
 
-  const logger = useNetworkLogger("Share.tsx", true);
-
   const classes = useStyles();
   const { online } = useNetworkDetectionContext();
   const [sharedFiles, setSharedFiles] = useState<File[]>([]);
@@ -161,13 +158,10 @@ const Share = memo(() => {
 
   useEffect(() => {
     if (initialized.current) {
-      logger.info("Already mounted, not running effect");
       return;
     }
-    logger.info("Running effect");
     initialized.current = true;
     navigator.serviceWorker.ready.then((registration) => {
-      logger.info("Posting message to service worker");
       registration.active?.postMessage(SHARE_TARGET_STORE_KEY);
     });
     startGlobalLoader({
@@ -180,53 +174,43 @@ const Share = memo(() => {
     });
     let count = 0;
     let getting = false;
-    logger.info("creating timer");
     const timer = setInterval(() => {
       if (getting) {
-        logger.info("Already getting, not running timer");
         return;
       }
-      logger.info("Running timer", count);
       count++;
       getting = true;
-      logger.info("getting");
       get(SHARE_TARGET_STORE_KEY, shareTargetStore)
         .then(async (files: File[]) => {
-          logger.info("got");
           if (!files) {
-            logger.info("no files");
             return;
           }
-          logger.info("files", files);
           setSharedFiles(files);
-          logger.info("deleting files");
           await del("files", shareTargetStore);
-          logger.info("deleted files. Ending timer");
           clearInterval(timer);
           stopGlobalLoader();
         })
         .catch((error: any) => {
-          logger.error("error getting", error);
           console.warn(error);
         })
         .finally(() => {
-          logger.info("finally. done getting");
           getting = false;
         });
       if (count > 9) {
-        logger.info("count > 9. Ending timer");
         enqueueErrorSnackbar(Strings.noImagesSelected());
         clearInterval(timer);
         stopGlobalLoader();
         setFailed(true);
       }
     }, 500);
+    return () => {
+      clearInterval(timer);
+    };
   }, [
     setSharedFiles,
     startGlobalLoader,
     stopGlobalLoader,
     enqueueErrorSnackbar,
-    logger
   ]);
 
   return (
