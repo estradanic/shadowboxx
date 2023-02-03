@@ -66,9 +66,6 @@ const App = () => {
     );
 
   useEffect(() => {
-    if (window.location.host.match(/^www\./) !== null) {
-      window.location.host = window.location.host.substring(4);
-    }
     navigator?.storage?.persisted?.()?.then?.((initialIsPersisted) => {
       if (!initialIsPersisted) {
         navigator.storage
