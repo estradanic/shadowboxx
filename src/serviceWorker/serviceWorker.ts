@@ -6,7 +6,7 @@ import {
 } from "workbox-routing";
 import { NetworkFirst, NetworkOnly } from "workbox-strategies";
 import type { ManifestEntry } from "workbox-build";
-import { createStore, get, set } from "idb-keyval";
+import { createStore, get, set, del } from "idb-keyval";
 import {
   SHARE_TARGET_DB_NAME,
   SHARE_TARGET_STORE_NAME,
@@ -62,6 +62,7 @@ self.addEventListener("message", async (event: ExtendableMessageEvent) => {
     const files = await get(SHARE_TARGET_STORE_KEY, shareTargetStore);
     const channel = new BroadcastChannel(SHARE_TARGET_STORE_KEY);
     channel.postMessage(files);
+    await del(SHARE_TARGET_STORE_KEY, shareTargetStore);
   }
 });
 
@@ -89,7 +90,7 @@ registerRoute(({ url }) => url.host === "httpbin.org", new NetworkOnly());
 const shareTargetHandler = async ({ event }: { event: FetchEvent }) => {
   const formData = await event.request.formData();
   const files = formData.getAll("media");
-  await set("sharedFiles", files, shareTargetStore);
+  await set(SHARE_TARGET_STORE_KEY, files, shareTargetStore);
   return Response.redirect("/share", 303);
 };
 

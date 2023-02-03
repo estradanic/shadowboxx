@@ -6,3 +6,5 @@ export { default as verifyEmail } from "./verifyEmail";
 export type { VerifyEmailParams } from "./verifyEmail";
 export { default as resendVerificationEmail } from "./resendVerificationEmail";
 export type { ResendVerificationEmailParams } from "./resendVerificationEmail";
+export { default as undoEmailChange } from "./undoEmailChange";
+export type { UndoEmailChangeParams } from "./undoEmailChange";
