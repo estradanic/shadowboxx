@@ -151,3 +151,26 @@ Parse.Cloud.define<(params: UndoEmailChangeParams) => Promise<void>>(
     await undoEmailChange(request.params);
   }
 );
+
+Parse.Cloud.define<
+  (params: {
+    name: string;
+    type: "info" | "warn" | "error";
+    user: string;
+    logs: Record<string, any[]>;
+  }) => Promise<void>
+>("log", async (request) => {
+  const log =
+    request.params.type === "info"
+      ? console.info
+      : request.params.type === "warn"
+      ? console.warn
+      : console.error;
+  Object.keys(request.params.logs).sort().reverse().forEach((key) => {
+    log(
+      `[${request.params.user}] [${request.params.name}] ${key}`,
+      ...request.params.logs[key]
+    );
+  });
+});
+
