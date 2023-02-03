@@ -61,29 +61,38 @@ const useNetworkLogger = (name: string) => {
     return () => clearInterval(logTimer);
   }, [name, getLoggedInUser]);
 
-  const info = useCallback((...data: any[]) => {
-    console.info(name, ...data);
-    if (!getLoggedInUser().isLoggingEnabled) {
-      return;
-    }
-    infoQueue.current[Date.now().toLocaleString()] = data;
-  }, [name, getLoggedInUser]);
+  const info = useCallback(
+    (...data: any[]) => {
+      console.info(name, ...data);
+      if (!getLoggedInUser().isLoggingEnabled) {
+        return;
+      }
+      infoQueue.current[Date.now().toLocaleString()] = data;
+    },
+    [name, getLoggedInUser]
+  );
 
-  const error = useCallback((...data: any[]) => {
-    console.error(name, ...data);
-    if (!getLoggedInUser().isLoggingEnabled) {
-      return;
-    }
-    errorQueue.current[Date.now().toLocaleString()] = data;
-  }, [name, getLoggedInUser]);
+  const error = useCallback(
+    (...data: any[]) => {
+      console.error(name, ...data);
+      if (!getLoggedInUser().isLoggingEnabled) {
+        return;
+      }
+      errorQueue.current[Date.now().toLocaleString()] = data;
+    },
+    [name, getLoggedInUser]
+  );
 
-  const warn = useCallback((...data: any[]) => {
-    console.warn(name, ...data);
-    if (!getLoggedInUser().isLoggingEnabled) {
-      return;
-    }
-    warnQueue.current[Date.now().toLocaleString()] = data;
-  }, [name, getLoggedInUser]);
+  const warn = useCallback(
+    (...data: any[]) => {
+      console.warn(name, ...data);
+      if (!getLoggedInUser().isLoggingEnabled) {
+        return;
+      }
+      warnQueue.current[Date.now().toLocaleString()] = data;
+    },
+    [name, getLoggedInUser]
+  );
 
   const logger = useMemo(() => ({ info, error, warn }), [info, error, warn]);
 
