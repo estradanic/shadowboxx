@@ -49,12 +49,13 @@ const shareTargetStore = createStore(
   SHARE_TARGET_DB_NAME,
   SHARE_TARGET_STORE_NAME
 );
-const channel = new BroadcastChannel(SHARE_TARGET_STORE_KEY);
-channel.addEventListener("message", async (event) => {
-  await set(SHARE_TARGET_STORE_KEY, event.data, shareTargetStore);
-});
 
 const App = () => {
+  const channel = new BroadcastChannel(SHARE_TARGET_STORE_KEY);
+  channel.addEventListener("message", async (event) => {
+    await set(SHARE_TARGET_STORE_KEY, event.data, shareTargetStore);
+  });
+
   const { getLoggedInUser, isUserLoggedIn } = useUserContext();
   const { addNotification } = useNotificationsContext();
 
