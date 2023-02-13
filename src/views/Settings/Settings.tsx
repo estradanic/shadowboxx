@@ -1,5 +1,4 @@
 import React, { memo, useEffect, useMemo, useState } from "react";
-import Parse from "parse";
 import Card from "@material-ui/core/Card";
 import Grid from "@material-ui/core/Grid";
 import Button from "@material-ui/core/Button";
@@ -202,7 +201,7 @@ const Settings = memo(() => {
   };
 
   const profilePictureACL = useMemo(() => {
-    const acl = new Parse.ACL(getLoggedInUser()._user);
+    const acl = getLoggedInUser().acl();
     acl.setPublicReadAccess(true);
     return acl;
   }, [getLoggedInUser]);
