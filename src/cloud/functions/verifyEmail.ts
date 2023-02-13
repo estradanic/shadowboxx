@@ -1,3 +1,5 @@
+import { updateEmail } from "../triggers";
+
 export interface VerifyEmailParams {
   code: string;
   email: string;
@@ -16,6 +18,8 @@ const verifyEmail = async ({ code, email }: VerifyEmailParams) => {
   }
   user.set("verificationCode", "");
   await user.save(null, { useMasterKey: true });
+
+  await updateEmail(user);
 };
 
 export default verifyEmail;

@@ -82,7 +82,7 @@ export default class ParseAlbum extends ParseObject<"Album"> {
     return new Parse.Query<Parse.Object<ParsifyPointers<"Album">>>("Album").fromLocalDatastore();
   }
 
-  _album: Parse.Object<ParsifyPointers<"Album">>;
+  private _album: Parse.Object<ParsifyPointers<"Album">>;
 
   constructor(album: Parse.Object<ParsifyPointers<"Album">>) {
     super(album);

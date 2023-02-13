@@ -74,7 +74,7 @@ export default class ParseImage extends ParseObject<"Image"> {
    */
   static COLUMNS = new ImageColumns();
 
-  _image: Parse.Object<ParsifyPointers<"Image">>;
+  private _image: Parse.Object<ParsifyPointers<"Image">>;
 
   constructor(image: Parse.Object<ParsifyPointers<"Image">>) {
     super(image);

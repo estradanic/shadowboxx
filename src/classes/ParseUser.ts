@@ -73,7 +73,7 @@ export default class ParseUser extends ParseObject<"_User"> {
     return new Parse.Query<Parse.User<ParsifyPointers<"_User">>>("User").fromLocalDatastore();
   }
 
-  _user: Parse.User<ParsifyPointers<"_User">>;
+  private _user: Parse.User<ParsifyPointers<"_User">>;
 
   constructor(user: Parse.User<ParsifyPointers<"_User">>, noPin: boolean = false) {
     super(user);
@@ -81,6 +81,14 @@ export default class ParseUser extends ParseObject<"_User"> {
     if (!noPin) {
       this.pin();
     }
+  }
+
+  /** Gets acl from this user */
+  acl(): Parse.ACL {
+    if (this instanceof UnpersistedParseUser) {
+      return new Parse.ACL();
+    }
+    return new Parse.ACL(this._user);
   }
 
   /**

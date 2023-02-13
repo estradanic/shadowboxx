@@ -34,7 +34,7 @@ export default class ParseAlbumChangeNotification extends ParseObject<"AlbumChan
     return new Parse.Query<Parse.Object<ParsifyPointers<"AlbumChangeNotification">>>("AlbumChangeNotification").fromLocalDatastore();
   }
 
-  _albumChangeNotification: Parse.Object<ParsifyPointers<"AlbumChangeNotification">>;
+  private _albumChangeNotification: Parse.Object<ParsifyPointers<"AlbumChangeNotification">>;
 
   constructor(albumChangeNotification: Parse.Object<ParsifyPointers<"AlbumChangeNotification">>) {
     super(albumChangeNotification);

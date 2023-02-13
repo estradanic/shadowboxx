@@ -9,7 +9,7 @@ import ParseUser from "./ParseUser";
  * Class wrapping the Parse.Pointer class and providing convenience methods/properties
  */
 export default class ParsePointer<C extends ClassName> {
-  _pointer: Parse.Pointer;
+  private _pointer: Parse.Pointer;
 
   constructor(pointer: Parse.Pointer) {
     this._pointer = pointer;
