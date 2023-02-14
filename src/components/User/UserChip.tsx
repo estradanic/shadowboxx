@@ -7,7 +7,7 @@ import { UseUserInfoParams } from "../../hooks";
 
 const useStyles = makeStyles((theme: Theme) => ({
   root: {
-    borderRadius: theme.spacing(0.5),
+    borderRadius: "4px",
     backgroundColor: theme.palette.primary.main,
     color: theme.palette.primary.contrastText,
     height: theme.spacing(3),

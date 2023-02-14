@@ -37,7 +37,7 @@ export default class ParseDuplicate extends ParseObject<"Duplicate"> {
     return new Parse.Query<Parse.Object<ParsifyPointers<"Duplicate">>>("Duplicate").fromLocalDatastore();
   }
 
-  _duplicate: Parse.Object<ParsifyPointers<"Duplicate">>;
+  private _duplicate: Parse.Object<ParsifyPointers<"Duplicate">>;
 
   constructor(duplicate: Parse.Object<ParsifyPointers<"Duplicate">>) {
     super(duplicate);

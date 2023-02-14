@@ -2,6 +2,13 @@ import { createTransport } from "nodemailer";
 
 /** Function to send verification email when email changes */
 const sendVerificationEmail = async (user: Parse.User) => {
+  const oldUser = await new Parse.Query(Parse.User).get(user.id, {
+    useMasterKey: true,
+  });
+  if (oldUser.get("email") === user.get("email")) {
+    return;
+  }
+
   const config = await new Parse.Query("Config").first({ useMasterKey: true });
   if (!config?.get("zohoPassword")) {
     console.error("Failed to send verification email: no Zoho password");
@@ -26,9 +33,6 @@ const sendVerificationEmail = async (user: Parse.User) => {
   if (user.isNew()) {
     user.set("email", user.getUsername());
   } else {
-    const oldUser = await new Parse.Query(Parse.User).get(user.id, {
-      useMasterKey: true,
-    });
     user.set("oldEmail", oldUser.get("email"));
   }
 

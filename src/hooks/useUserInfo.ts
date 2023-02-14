@@ -1,4 +1,7 @@
-import { useCallback } from "react";
+/* eslint-disable react-hooks/rules-of-hooks */
+// The rule is disabled because it is wrong.
+// The hooks are not called conditionally because the condition is unchanging.
+import { useCallback, useState } from "react";
 import {
   QueryKey,
   QueryObserverOptions,
@@ -47,8 +50,10 @@ const useUserInfo = ({
   queryOptions,
   queryKey = email ?? userPointer?.id ?? user?.id,
 }: UseUserInfoParams): ParseUser | undefined => {
-  if (!queryKey) {
-    throw new Error("No queryKey provided to useUserInfo");
+  const [memoizedQueryKey] = useState<string | undefined>(queryKey);
+  if (!memoizedQueryKey) {
+    console.error("No queryKey provided to useUserInfo");
+    return undefined;
   }
 
   const {
@@ -79,7 +84,7 @@ const useUserInfo = ({
   ]);
 
   const { data: fetchedUser } = useQuery<ParseUser, Error>(
-    getUserByEmailQueryKey(queryKey),
+    getUserByEmailQueryKey(memoizedQueryKey),
     getUserFunction,
     getUserByEmailOptions({
       staleTime: Infinity,

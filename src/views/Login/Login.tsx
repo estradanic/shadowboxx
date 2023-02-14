@@ -115,6 +115,7 @@ const Login = memo(() => {
             </Grid>
             <Grid item xs={12}>
               <EmailField
+                validate
                 fullWidth
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
@@ -153,8 +154,14 @@ const Login = memo(() => {
       <br />
       <br />
       <Typography variant="h6">{Strings.noAccount()}</Typography>
-      <Link saveHistory={false} to="/signup">
+      <Link saveHistory={false} to={routes.Signup.path}>
         {Strings.signup()}
+      </Link>
+      <br />
+      <br />
+      <Typography variant="h6">{Strings.forgotPassword()}</Typography>
+      <Link saveHistory={false} to={routes.ForgotPassword.path}>
+        {Strings.resetPassword()}
       </Link>
     </PageContainer>
   );

@@ -1,27 +1,22 @@
-import React, {
-  memo,
-  useEffect,
-  useLayoutEffect,
-  useRef,
-  useState,
-} from "react";
+import React, { memo, useLayoutEffect, useRef, useState } from "react";
 import Parse from "parse";
 import Typography from "@material-ui/core/Typography";
 import { useSearchParams } from "react-router-dom";
-import { makeStyles, Theme } from "@material-ui/core/styles";
+import { makeStyles } from "@material-ui/core/styles";
 import {
   PageContainer,
   FancyTitleTypography,
   OtpField,
   Button,
   useSnackbar,
+  Void,
 } from "../../components";
 import { Strings } from "../../resources";
 import { routes } from "../../app";
-import { useNavigate } from "../../hooks";
+import { useNavigate, useUserInfo } from "../../hooks";
 import { useUserContext } from "../../contexts";
 
-const useStyles = makeStyles((theme: Theme) => ({
+const useStyles = makeStyles(() => ({
   message: {
     wordBreak: "break-word",
     textAlign: "center",
@@ -38,16 +33,19 @@ const VerifyEmail = memo(() => {
   const { enqueueErrorSnackbar, enqueueSuccessSnackbar } = useSnackbar();
   const navigate = useNavigate();
   const { isUserLoggedIn } = useUserContext();
+  const [search] = useSearchParams();
+  const email = search.get("email") ?? "";
+  const [otp, setOtp] = useState("");
+  const user = useUserInfo({ email });
 
   useLayoutEffect(() => {
     if (isUserLoggedIn) {
       navigate(routes.Home.path);
+    } else if (user?.oldEmail === email) {
+      enqueueSuccessSnackbar(Strings.emailAlreadyVerified());
+      navigate(routes.Login.path);
     }
-  }, [isUserLoggedIn, navigate]);
-
-  const [search] = useSearchParams();
-  const email = search.get("email");
-  const [otp, setOtp] = useState("");
+  }, [email, isUserLoggedIn, navigate, user, enqueueSuccessSnackbar]);
 
   const buttonRef = useRef<HTMLButtonElement>(null);
 
@@ -85,7 +83,7 @@ const VerifyEmail = memo(() => {
 
   return (
     <PageContainer>
-      {!!email && (
+      {email ? (
         <>
           <FancyTitleTypography>
             {Strings.verifyEmailTitle()}
@@ -126,12 +124,31 @@ const VerifyEmail = memo(() => {
           <Button onClick={resend} variant="text" color="warning">
             {Strings.resend()}
           </Button>
+          {user?.oldEmail && (
+            <>
+              <br />
+              <br />
+              <Typography variant="caption">
+                {Strings.undoEmailChange()}
+              </Typography>
+              <Button
+                onClick={undo}
+                variant="text"
+                size="small"
+                color="warning"
+              >
+                {Strings.undo()}
+              </Button>
+            </>
+          )}
+        </>
+      ) : (
+        <>
+          <Void height="40vh" />
           <br />
-          <br />
-          <Typography variant="caption">{Strings.undoEmailChange()}</Typography>
-          <Button onClick={undo} variant="text" size="small" color="warning">
-            {Strings.undo()}
-          </Button>
+          <Typography variant="overline">
+            {Strings.couldNotGetUserInfo()}
+          </Typography>
         </>
       )}
     </PageContainer>

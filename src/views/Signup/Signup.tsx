@@ -27,7 +27,7 @@ import { UnpersistedParseUser } from "../../classes/ParseUser";
 
 const useStyles = makeStyles((theme: Theme) => ({
   card: {
-    borderRadius: theme.spacing(0.5),
+    borderRadius: "4px",
   },
   cardTitle: {
     "& *": {

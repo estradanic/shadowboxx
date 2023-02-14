@@ -1,6 +1,6 @@
 import React, { useCallback, useMemo, useState } from "react";
 import useMediaQuery from "@material-ui/core/useMediaQuery";
-import { makeStyles, Theme, useTheme } from "@material-ui/core/styles";
+import { useTheme } from "@material-ui/core/styles";
 import classNames from "classnames";
 import { useInfiniteQuery } from "@tanstack/react-query";
 import { difference } from "../../utils";
@@ -128,7 +128,7 @@ const ImageSelectionDialog = ({
       fullWidth
       maxWidth="lg"
       open={open}
-      title={Strings.selectImages()}
+      title={multiple ? Strings.selectImages() : Strings.selectImage()}
       message=""
       handleConfirm={handleConfirm}
       handleCancel={handleCancel}
