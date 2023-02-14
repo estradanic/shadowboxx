@@ -10,10 +10,14 @@ const Album = lazy(() => import("../views/Album/Album"));
 const Pictures = lazy(() => import("../views/Pictures/Pictures"));
 const Share = lazy(() => import("../views/Share/Share"));
 const VerifyEmail = lazy(() => import("../views/VerifyEmail/VerifyEmail"));
+const ForgotPassword = lazy(
+  () => import("../views/ForgotPassword/ForgotPassword")
+);
 
 /** Union type of all the allowed Route ids */
 export type RouteId =
   | "Album"
+  | "ForgotPassword"
   | "Home"
   | "Login"
   | "Pictures"
@@ -58,6 +62,15 @@ const routes = {
       QueryCacheGroups.GET_IMAGES_BY_ID_INFINITE,
       QueryCacheGroups.GET_ALBUM,
     ],
+  },
+  ForgotPassword: {
+    viewId: "ForgotPassword",
+    viewName: "Forgot Password",
+    View: ForgotPassword,
+    path: "/forgot-password",
+    tryAuthenticate: false,
+    redirectOnAuthFail: false,
+    queryCacheGroups: [],
   },
   Home: {
     viewId: "Home",

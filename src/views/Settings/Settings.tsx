@@ -350,7 +350,7 @@ const Settings = memo(() => {
                   disabled={!online}
                   fullWidth
                   variant="contained"
-                  color="info"
+                  color="primary"
                   className={classes.submitButton}
                   size="large"
                   onClick={changeUserInfo}

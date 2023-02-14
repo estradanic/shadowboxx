@@ -12,6 +12,7 @@ const frontendRoutes = [
   "signup",
   "share",
   "verify",
+  "forgot-password",
   "",
 ];
 

@@ -17,6 +17,14 @@ const useStyles = makeStyles((theme: Theme) => ({
       color: theme.palette.primary.dark,
     },
     borderRadius: "4px",
+    "&& p.Mui-error": {
+      color: theme.palette.error.contrastText,
+      backgroundColor: theme.palette.error.main,
+      margin: 0,
+      paddingLeft: "14px",
+      paddingRight: "14px",
+      paddingTop: "3px",
+    },
   },
 }));
 

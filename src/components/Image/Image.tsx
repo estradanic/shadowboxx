@@ -28,7 +28,7 @@ const useStyles = makeStyles((theme: Theme) => ({
   image: {
     boxShadow: theme.shadows[5],
     display: "block",
-    borderRadius: theme.spacing(0.5),
+    borderRadius: "4px",
     overflow: "hidden",
     border: ({ borderColor }: UseStylesParams) =>
       `2px solid ${theme.palette[borderColor].dark}`,
@@ -56,7 +56,7 @@ const useStyles = makeStyles((theme: Theme) => ({
     overflowY: "auto",
   },
   fullResolutionImage: {
-    borderRadius: theme.spacing(0.5),
+    borderRadius: "4px",
     overflow: "hidden",
     border: ({ borderColor }: UseStylesParams) =>
       `2px solid ${theme.palette[borderColor].dark}`,
@@ -87,7 +87,7 @@ const useStyles = makeStyles((theme: Theme) => ({
     maxWidth: "90vw",
     width: "max-content",
     padding: theme.spacing(2),
-    borderRadius: theme.spacing(0.5),
+    borderRadius: "4px",
     border: ({ borderColor }: UseStylesParams) =>
       `2px solid ${theme.palette[borderColor].dark}`,
   },

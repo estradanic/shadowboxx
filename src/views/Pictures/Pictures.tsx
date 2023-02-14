@@ -41,7 +41,7 @@ const useStyles = makeStyles((theme: Theme) => ({
   actionContainer: {
     backgroundColor: theme.palette.background.paper,
     padding: theme.spacing(0.5, 1),
-    borderRadius: theme.spacing(0.5),
+    borderRadius: "4px",
     position: "absolute",
     bottom: theme.spacing(7),
     zIndex: theme.zIndex.modal,

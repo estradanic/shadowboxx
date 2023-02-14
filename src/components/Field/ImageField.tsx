@@ -54,7 +54,7 @@ const useStyles = makeStyles((theme: Theme) => ({
     textAlign: "center",
     border: `1px solid ${theme.palette.divider}`,
     margin: theme.spacing(2, 0),
-    borderRadius: theme.spacing(0.5),
+    borderRadius: "4px",
     padding: theme.spacing(2),
   },
   imageWrapper: {
