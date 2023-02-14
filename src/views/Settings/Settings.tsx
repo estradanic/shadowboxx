@@ -1,7 +1,7 @@
 import React, { memo, useEffect, useMemo, useState } from "react";
+import Parse from "parse";
 import Card from "@material-ui/core/Card";
 import Grid from "@material-ui/core/Grid";
-import Button from "@material-ui/core/Button";
 import FormControlLabel from "@material-ui/core/FormControlLabel";
 import Switch from "@material-ui/core/Switch";
 import FormControl from "@material-ui/core/FormControl";
@@ -14,6 +14,8 @@ import {
   TextField,
   useSnackbar,
   FancyTypography,
+  LockedButton,
+  Button,
 } from "../../components";
 import { Strings } from "../../resources";
 import { ErrorState, validateEmail, isNullOrWhitespace } from "../../utils";
@@ -39,13 +41,7 @@ const useStyles = makeStyles((theme: Theme) => ({
     boxShadow: theme.shadows[5],
   },
   submitButton: {
-    backgroundColor: theme.palette.primary.main,
-    color: theme.palette.primary.contrastText,
-    margin: "auto",
     borderRadius: 0,
-    "&:hover, &:focus, &:active": {
-      backgroundColor: theme.palette.primary.dark,
-    },
   },
   deleteAccountButton: {
     backgroundColor: theme.palette.error.main,
@@ -89,6 +85,9 @@ const useStyles = makeStyles((theme: Theme) => ({
   },
   darkTheme: {
     height: theme.spacing(7),
+  },
+  changePasswordButton: {
+    borderRadius: 0,
   },
 }));
 
@@ -147,7 +146,8 @@ const Settings = memo(() => {
     }
   }, [getLoggedInUser, isUserLoggedIn, profilePicture]);
 
-  const { enqueueErrorSnackbar, enqueueSuccessSnackbar } = useSnackbar();
+  const { enqueueErrorSnackbar, enqueueSuccessSnackbar, enqueueInfoSnackbar } =
+    useSnackbar();
 
   const validate = (): boolean => {
     const newErrors = { ...DefaultErrorState };
@@ -331,9 +331,26 @@ const Settings = memo(() => {
                 />
               </Grid>
               <Grid item xs={12}>
+                <LockedButton
+                  disabled={!online}
+                  fullWidth
+                  className={classes.changePasswordButton}
+                  size="large"
+                  variant="text"
+                  onClick={async () => {
+                    await Parse.User.requestPasswordReset(settings.email);
+                    enqueueInfoSnackbar(Strings.passwordChangeEmailSent());
+                  }}
+                >
+                  {Strings.changePassword()}
+                </LockedButton>
+              </Grid>
+              <Grid item xs={12}>
                 <Button
                   disabled={!online}
                   fullWidth
+                  variant="contained"
+                  color="info"
                   className={classes.submitButton}
                   size="large"
                   onClick={changeUserInfo}

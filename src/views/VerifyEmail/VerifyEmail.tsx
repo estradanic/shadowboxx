@@ -1,9 +1,4 @@
-import React, {
-  memo,
-  useLayoutEffect,
-  useRef,
-  useState,
-} from "react";
+import React, { memo, useLayoutEffect, useRef, useState } from "react";
 import Parse from "parse";
 import Typography from "@material-ui/core/Typography";
 import { useSearchParams } from "react-router-dom";
@@ -133,8 +128,15 @@ const VerifyEmail = memo(() => {
             <>
               <br />
               <br />
-              <Typography variant="caption">{Strings.undoEmailChange()}</Typography>
-              <Button onClick={undo} variant="text" size="small" color="warning">
+              <Typography variant="caption">
+                {Strings.undoEmailChange()}
+              </Typography>
+              <Button
+                onClick={undo}
+                variant="text"
+                size="small"
+                color="warning"
+              >
                 {Strings.undo()}
               </Button>
             </>
@@ -144,7 +146,9 @@ const VerifyEmail = memo(() => {
         <>
           <Void height="40vh" />
           <br />
-          <Typography variant="overline">{Strings.couldNotGetUserInfo()}</Typography>
+          <Typography variant="overline">
+            {Strings.couldNotGetUserInfo()}
+          </Typography>
         </>
       )}
     </PageContainer>

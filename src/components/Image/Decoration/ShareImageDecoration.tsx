@@ -122,7 +122,7 @@ const ShareImageDecoration = ({
     <ImageDecoration<IconProps>
       corner={corner}
       Component={ShareImageDecorationIcon}
-      description={Strings.removeImage()}
+      description={Strings.shareImage()}
       ComponentProps={{
         fontSize: "large",
         ...IconProps,
