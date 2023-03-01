@@ -57,7 +57,7 @@ const useAlbumChangeNotifications = () => {
           notificationRef.current[albumChangeNotification.id].current =
             addNotification({
               id: albumChangeNotification.id,
-              title: Strings.albumChangeNotificationTitle(
+              title: Strings.message.albumChangeNotificationTitle(
                 albumChangeNotification.count
               ),
               detail: (

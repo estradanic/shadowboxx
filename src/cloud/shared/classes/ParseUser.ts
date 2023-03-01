@@ -1,6 +1,9 @@
 import Parse, { FullOptions } from "parse";
-import { Strings } from "../resources";
-import ParseObject, { Attributes, Columns, ParsifyPointers } from "./ParseObject";
+import ParseObject, {
+  Attributes,
+  Columns,
+  ParsifyPointers,
+} from "./ParseObject";
 import ParsePointer from "./ParsePointer";
 
 /** Interface defining User-specific attributes */
@@ -25,6 +28,8 @@ export interface UserAttributes {
   favoriteAlbums: string[];
   /** Whether detailed logging is turned on for this user */
   isLoggingEnabled: boolean;
+  /** Ephemeral verification code for email changes */
+  verificationCode?: string;
 }
 
 export type UpdateLoggedInUser = (
@@ -50,6 +55,7 @@ class UserColumns extends Columns {
   favoriteAlbums = "favoriteAlbums" as const;
   oldEmail = "oldEmail" as const;
   isLoggingEnabled = "isLoggingEnabled" as const;
+  verificationCode = "verificationCode" as const;
 }
 
 /**
@@ -70,12 +76,17 @@ export default class ParseUser extends ParseObject<"_User"> {
     if (online) {
       return new Parse.Query<Parse.User<ParsifyPointers<"_User">>>("User");
     }
-    return new Parse.Query<Parse.User<ParsifyPointers<"_User">>>("User").fromLocalDatastore();
+    return new Parse.Query<Parse.User<ParsifyPointers<"_User">>>(
+      "User"
+    ).fromLocalDatastore();
   }
 
   private _user: Parse.User<ParsifyPointers<"_User">>;
 
-  constructor(user: Parse.User<ParsifyPointers<"_User">>, noPin: boolean = false) {
+  constructor(
+    user: Parse.User<ParsifyPointers<"_User">>,
+    noPin: boolean = false
+  ) {
     super(user);
     this._user = user;
     if (!noPin) {
@@ -130,7 +141,10 @@ export default class ParseUser extends ParseObject<"_User"> {
    */
   async login(updateLoggedInUser: UpdateLoggedInUser, options?: FullOptions) {
     const loggedInUser = await this._user.logIn(options);
-    await updateLoggedInUser(new ParseUser(loggedInUser), UserUpdateReason.LOG_IN);
+    await updateLoggedInUser(
+      new ParseUser(loggedInUser),
+      UserUpdateReason.LOG_IN
+    );
     return new ParseUser(loggedInUser);
   }
 
@@ -167,7 +181,7 @@ export default class ParseUser extends ParseObject<"_User"> {
       );
       return new ParseUser(loggedInUser);
     } catch (error: any) {
-      console.error(error?.message ?? Strings.commonError());
+      console.error(error);
     }
   }
 
@@ -187,7 +201,7 @@ export default class ParseUser extends ParseObject<"_User"> {
       );
       return new ParseUser(loggedOutUser, true);
     } catch (error: any) {
-      console.error(error?.message ?? Strings.commonError());
+      console.error(error);
       await updateLoggedInUser(this, UserUpdateReason.LOG_OUT);
     }
   }
@@ -260,7 +274,10 @@ export default class ParseUser extends ParseObject<"_User"> {
   }
 
   set profilePicture(profilePicture) {
-    this._user.set(ParseUser.COLUMNS.profilePicture, profilePicture?.toNativePointer());
+    this._user.set(
+      ParseUser.COLUMNS.profilePicture,
+      profilePicture?.toNativePointer()
+    );
   }
 
   /** This user's list of favorited albums */
@@ -295,18 +312,20 @@ export default class ParseUser extends ParseObject<"_User"> {
  */
 export class UnpersistedParseUser extends ParseUser {
   constructor(attributes: Partial<Attributes<"_User">> = {}) {
-    // @ts-expect-error
-    super(new Parse.User<ParsifyPointers<"_User">>({
-      username: "",
-      email: "",
-      firstName: "",
-      lastName: "",
-      password: "",
-      favoriteAlbums: [],
-      isDarkThemeEnabled: false,
-      ...attributes,
-      profilePicture: attributes.profilePicture?.toNativePointer(),
-    }));
+    super(
+      // @ts-expect-error
+      new Parse.User<ParsifyPointers<"_User">>({
+        username: "",
+        email: "",
+        firstName: "",
+        lastName: "",
+        password: "",
+        favoriteAlbums: [],
+        isDarkThemeEnabled: false,
+        ...attributes,
+        profilePicture: attributes.profilePicture?.toNativePointer(),
+      })
+    );
   }
 
   get id(): Attributes<"_User">["objectId"] {
@@ -315,12 +334,12 @@ export class UnpersistedParseUser extends ParseUser {
   }
 
   get createdAt(): Attributes<"_User">["createdAt"] {
-    console.warn("Unpersisted user has no createdAt")
+    console.warn("Unpersisted user has no createdAt");
     return new Date();
   }
 
   get updatedAt(): Attributes<"_User">["updatedAt"] {
-    console.warn("Unpersisted user has no updatedAt")
+    console.warn("Unpersisted user has no updatedAt");
     return new Date();
   }
 }

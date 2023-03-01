@@ -86,7 +86,7 @@ const useAlbumForm = (
     if (isNullOrWhitespace(name)) {
       errors.name = {
         isError: true,
-        errorMessage: Strings.pleaseEnterA("name"),
+        errorMessage: Strings.prompt.pleaseEnterA(Strings.label.name),
       };
       valid = false;
     }
@@ -164,7 +164,7 @@ const useAlbumForm = (
         .containedIn(ParseUser.COLUMNS.email, [...viewers, ...collaborators])
         .count();
       if (signedUpUserCount < userEmails.size) {
-        openConfirm(Strings.nonExistentUserWarning(), async () => {
+        openConfirm(Strings.message.nonExistentUserWarning, async () => {
           await piOnSubmit(
             {
               ...album,

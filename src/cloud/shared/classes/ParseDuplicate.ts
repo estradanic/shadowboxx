@@ -1,19 +1,23 @@
 import Parse from "parse";
 import ParsePointer from "./ParsePointer";
-import ParseObject, {Attributes, Columns, ParsifyPointers} from "./ParseObject";
+import ParseObject, {
+  Attributes,
+  Columns,
+  ParsifyPointers,
+} from "./ParseObject";
 
 /** Interface defining Duplicate-specific attributes */
 export interface DuplicateAttributes {
   /** User that owns image1 and image2 */
-  owner: ParsePointer<"Duplicate">,
+  owner: ParsePointer<"Duplicate">;
   /** The first image */
-  image1: ParsePointer<"Duplicate">,
+  image1: ParsePointer<"Duplicate">;
   /** The second image */
-  image2: ParsePointer<"Duplicate">,
+  image2: ParsePointer<"Duplicate">;
   /** How similar the images are (0 - 1) */
-  similarity: number,
+  similarity: number;
   /** Whether the duplicate has been acknowledged by the user */
-  acknowledged: boolean,
+  acknowledged: boolean;
 }
 
 class DuplicateColumns extends Columns {
@@ -32,9 +36,13 @@ export default class ParseDuplicate extends ParseObject<"Duplicate"> {
 
   static query(online = true) {
     if (online) {
-      return new Parse.Query<Parse.Object<ParsifyPointers<"Duplicate">>>("Duplicate");
+      return new Parse.Query<Parse.Object<ParsifyPointers<"Duplicate">>>(
+        "Duplicate"
+      );
     }
-    return new Parse.Query<Parse.Object<ParsifyPointers<"Duplicate">>>("Duplicate").fromLocalDatastore();
+    return new Parse.Query<Parse.Object<ParsifyPointers<"Duplicate">>>(
+      "Duplicate"
+    ).fromLocalDatastore();
   }
 
   private _duplicate: Parse.Object<ParsifyPointers<"Duplicate">>;
@@ -80,6 +88,6 @@ export default class ParseDuplicate extends ParseObject<"Duplicate"> {
       image1: this.image1,
       image2: this.image2,
       owner: this.owner,
-    }
+    };
   }
 }

@@ -50,7 +50,7 @@ const useQueryConfigs = () => {
         const album = await ParseAlbum.query(online).get(albumId);
         return new ParseAlbum(album);
       },
-      { errorMessage: Strings.albumNotFound(), ...options }
+      { errorMessage: Strings.error.albumNotFound(), ...options }
     );
   };
 
@@ -78,7 +78,7 @@ const useQueryConfigs = () => {
           .findAll();
         return images.map((image) => new ParseImage(image));
       },
-      { errorMessage: Strings.getImagesError(), ...options }
+      { errorMessage: Strings.error.gettingImages, ...options }
     );
   };
 
@@ -109,11 +109,11 @@ const useQueryConfigs = () => {
           .equalTo(ParseImage.COLUMNS.id, imageId)
           .first();
         if (!image) {
-          throw new Error(Strings.imageNotFound(imageId));
+          throw new Error(Strings.error.imageNotFound(imageId));
         }
         return new ParseImage(image);
       },
-      { errorMessage: Strings.imageNotFound(), ...options }
+      { errorMessage: Strings.error.imageNotFound(), ...options }
     );
   };
 
@@ -143,7 +143,7 @@ const useQueryConfigs = () => {
         const user = await ParseUser.query(online).get(userId);
         return new ParseUser(user);
       },
-      { errorMessage: Strings.couldNotGetUserInfo(), ...options }
+      { errorMessage: Strings.error.gettingUserInfo, ...options }
     );
   };
 
@@ -172,7 +172,7 @@ const useQueryConfigs = () => {
           .findAll();
         return users.map((user) => new ParseUser(user));
       },
-      { errorMessage: Strings.couldNotGetUserInfo(), ...options }
+      { errorMessage: Strings.error.gettingUserInfo, ...options }
     );
   };
 
@@ -203,11 +203,11 @@ const useQueryConfigs = () => {
           .equalTo(ParseUser.COLUMNS.email, email)
           .first();
         if (!user) {
-          throw new Error(Strings.couldNotGetUserInfo());
+          throw new Error(Strings.error.gettingUserInfo);
         }
         return new ParseUser(user);
       },
-      { errorMessage: Strings.couldNotGetUserInfo(), ...options }
+      { errorMessage: Strings.error.gettingUserInfo, ...options }
     );
   };
 
@@ -268,7 +268,7 @@ const useQueryConfigs = () => {
           )
         );
       },
-      { errorMessage: Strings.couldNotGetUserInfo(), ...options }
+      { errorMessage: Strings.error.gettingUserInfo, ...options }
     );
   };
 
@@ -300,7 +300,7 @@ const useQueryConfigs = () => {
         ).findAll();
         return duplicates.map((duplicate) => new ParseDuplicate(duplicate));
       },
-      { errorMessage: Strings.couldNotGetDuplicates(), ...options }
+      { errorMessage: Strings.error.gettingDuplicates, ...options }
     );
   };
 
@@ -334,7 +334,7 @@ const useQueryConfigs = () => {
             new ParseAlbumChangeNotification(albumChangeNotification)
         );
       },
-      { errorMessage: Strings.couldNotGetDuplicates(), ...options }
+      { errorMessage: Strings.error.gettingDuplicates, ...options }
     );
   };
 

@@ -70,20 +70,20 @@ const DateImageDecoration = ({
         <TextField
           value={date.toISO({ includeOffset: false })}
           onChange={(e) => setDate(DateTime.fromISO(e.target.value))}
-          label={Strings.dateTaken()}
+          label={Strings.label.dateTaken}
           type="datetime-local"
         />
       </InPortal>
       <ImageDecoration<IconProps>
         onClick={() => {
           openPrompt(datePortalNode, handleConfirm, handleCancel, {
-            title: Strings.addOrEditDate(),
+            title: Strings.action.addOrEditDate,
             confirmButtonColor: "success",
           });
         }}
         corner={corner}
         Component={DateImageDecorationIcon}
-        description={Strings.dateImage()}
+        description={Strings.action.dateImage}
         ComponentProps={{
           fontSize: "large",
           ...IconProps,

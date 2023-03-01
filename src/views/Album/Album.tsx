@@ -170,11 +170,9 @@ const Album = memo(() => {
               try {
                 await album.update(attributes, changes);
                 await refetch();
-                enqueueSuccessSnackbar(Strings.commonSaved());
+                enqueueSuccessSnackbar(Strings.success.saved);
               } catch (error: any) {
-                enqueueErrorSnackbar(
-                  error?.message ?? Strings.editAlbumError()
-                );
+                enqueueErrorSnackbar(error?.message ?? Strings.error.editingAlbum);
               }
             }}
           />
@@ -200,7 +198,7 @@ const Album = memo(() => {
               }
               label={
                 <FancyTypography className={classes.switchText}>
-                  {Strings.timelineView()}
+                  {Strings.label.timelineView}
                 </FancyTypography>
               }
             />
@@ -231,7 +229,7 @@ const Album = memo(() => {
           <Void height="40vh" />
           <br />
           <Typography className={classes.svgText} variant="overline">
-            {Strings.albumNotFound()}
+            {Strings.error.albumNotFound()}
           </Typography>
           <br />
           {!!location.state?.previousLocation && (

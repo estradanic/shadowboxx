@@ -89,7 +89,7 @@ const useInfiniteQueryConfigs = () => {
           (album) => new ParseAlbum(album)
         );
       },
-      { errorMessage: Strings.noAlbums(), ...options }
+      { errorMessage: Strings.message.noAlbums, ...options }
     );
   };
 
@@ -118,7 +118,7 @@ const useInfiniteQueryConfigs = () => {
           .find();
         return images.map((image) => new ParseImage(image));
       },
-      { errorMessage: Strings.noImages(), ...options }
+      { errorMessage: Strings.message.noImages, ...options }
     );
   };
 
@@ -150,7 +150,7 @@ const useInfiniteQueryConfigs = () => {
           .find();
         return images.map((image) => new ParseImage(image));
       },
-      { errorMessage: Strings.getImagesError(), ...options }
+      { errorMessage: Strings.error.gettingImages, ...options }
     );
   };
 
@@ -183,7 +183,7 @@ const useInfiniteQueryConfigs = () => {
           .find();
         return images.map((image) => new ParseImage(image));
       },
-      { errorMessage: Strings.getImageError(), ...options }
+      { errorMessage: Strings.error.gettingImage, ...options }
     );
   };
 
@@ -251,7 +251,7 @@ const useInfiniteQueryConfigs = () => {
           (album) => new ParseAlbum(album)
         );
       },
-      { errorMessage: Strings.noAlbums(), ...options }
+      { errorMessage: Strings.message.noAlbums, ...options }
     );
   };
 

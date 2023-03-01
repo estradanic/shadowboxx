@@ -42,7 +42,7 @@ const VerifyEmail = memo(() => {
     if (isUserLoggedIn) {
       navigate(routes.Home.path);
     } else if (user?.oldEmail === email) {
-      enqueueSuccessSnackbar(Strings.emailAlreadyVerified());
+      enqueueSuccessSnackbar(Strings.message.emailAlreadyVerified);
       navigate(routes.Login.path);
     }
   }, [email, isUserLoggedIn, navigate, user, enqueueSuccessSnackbar]);
@@ -53,10 +53,11 @@ const VerifyEmail = memo(() => {
     try {
       await Parse.Cloud.run("verifyEmail", { code: otp, email });
     } catch (error: any) {
-      enqueueErrorSnackbar(error?.message ?? Strings.commonError());
+      console.error(error);
+      enqueueErrorSnackbar(Strings.error.verifyingEmail);
       return;
     }
-    enqueueSuccessSnackbar(Strings.emailVerified());
+    enqueueSuccessSnackbar(Strings.success.emailVerified);
     navigate(routes.Home.path);
   };
 
@@ -64,20 +65,22 @@ const VerifyEmail = memo(() => {
     try {
       await Parse.Cloud.run("resendVerificationEmail", { email });
     } catch (error: any) {
-      enqueueErrorSnackbar(error?.message ?? Strings.commonError());
+      console.error(error);
+      enqueueErrorSnackbar(Strings.error.resendingVerificationEmail);
       return;
     }
-    enqueueSuccessSnackbar(Strings.resent());
+    enqueueSuccessSnackbar(Strings.success.resent);
   };
 
   const undo = async () => {
     try {
       await Parse.Cloud.run("undoEmailChange", { email });
     } catch (error: any) {
-      enqueueErrorSnackbar(error?.message ?? Strings.commonError());
+      console.error(error);
+      enqueueErrorSnackbar(Strings.error.undoingEmailChange);
       return;
     }
-    enqueueSuccessSnackbar(Strings.commonSaved());
+    enqueueSuccessSnackbar(Strings.success.common);
     navigate(routes.Home.path);
   };
 
@@ -86,12 +89,12 @@ const VerifyEmail = memo(() => {
       {email ? (
         <>
           <FancyTitleTypography>
-            {Strings.verifyEmailTitle()}
+            {Strings.label.verifyEmailTitle}
           </FancyTitleTypography>
           <br />
           <br />
           <Typography className={classes.message}>
-            {Strings.verifyEmail(email)}
+            {Strings.message.verifyEmail(email)}
           </Typography>
           <br />
           <br />
@@ -115,21 +118,21 @@ const VerifyEmail = memo(() => {
               onClick={verify}
               ref={buttonRef}
             >
-              {Strings.verify()}
+              {Strings.action.verify}
             </Button>
           </div>
           <br />
           <br />
-          <Typography>{Strings.verifyEmailResend()}</Typography>
+          <Typography>{Strings.prompt.didntReceiveCode}</Typography>
           <Button onClick={resend} variant="text" color="warning">
-            {Strings.resend()}
+            {Strings.action.resend}
           </Button>
           {user?.oldEmail && (
             <>
               <br />
               <br />
               <Typography variant="caption">
-                {Strings.undoEmailChange()}
+                {Strings.prompt.undoEmailChange}
               </Typography>
               <Button
                 onClick={undo}
@@ -137,7 +140,7 @@ const VerifyEmail = memo(() => {
                 size="small"
                 color="warning"
               >
-                {Strings.undo()}
+                {Strings.action.undo}
               </Button>
             </>
           )}
@@ -147,7 +150,7 @@ const VerifyEmail = memo(() => {
           <Void height="40vh" />
           <br />
           <Typography variant="overline">
-            {Strings.couldNotGetUserInfo()}
+            {Strings.error.gettingUserInfo}
           </Typography>
         </>
       )}

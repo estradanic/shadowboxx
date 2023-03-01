@@ -18,7 +18,7 @@ export type NoImagesProps = {
   text?: string;
 };
 
-const NoImages = ({ text = Strings.noImages() }) => {
+const NoImages = ({ text = Strings.message.noImages }: NoImagesProps) => {
   const classes = useStyles();
 
   return (

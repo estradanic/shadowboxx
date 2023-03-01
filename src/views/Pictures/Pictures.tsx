@@ -67,7 +67,7 @@ const ActionBar = ({ selectedImages, images, onDelete }: ActionBarProps) => {
         disabled={selectedImages.length === 0}
         onClick={() => {
           openConfirm(
-            Strings.deleteImagesConfirm(),
+            Strings.message.deleteImagesConfirm,
             async () => {
               const imagesToDelete = images.filter((image) =>
                 selectedImages.includes(image.id)
@@ -79,14 +79,14 @@ const ActionBar = ({ selectedImages, images, onDelete }: ActionBarProps) => {
             },
             () => {},
             {
-              confirmButtonText: Strings.delete(),
+              confirmButtonText: Strings.action.delete,
               confirmButtonColor: "error",
             }
           );
         }}
       >
         <DeleteIcon fontSize="small" />
-        {Strings.delete()}
+        {Strings.action.delete}
       </Button>
       <Button
         variant="text"
@@ -95,7 +95,7 @@ const ActionBar = ({ selectedImages, images, onDelete }: ActionBarProps) => {
         onClick={() => enqueueInfoSnackbar("Feature coming soon!")}
       >
         <AddIcon fontSize="small" />
-        {Strings.addToAlbum()}
+        {Strings.action.addToAlbum}
       </Button>
     </Grid>
   );
@@ -184,7 +184,7 @@ const Pictures = memo(() => {
     <PageContainer>
       <Grid item sm={8}>
         <FancyTitleTypography outlineColor={randomColor}>
-          {Strings.pictures()}
+          {Strings.label.pictures}
         </FancyTitleTypography>
       </Grid>
       {editMode && (
@@ -207,7 +207,7 @@ const Pictures = memo(() => {
           onClick={() => {
             if (!editMode) {
               setSnackbarKey(
-                enqueueWarningSnackbar(Strings.enteringEditMode(), {
+                enqueueWarningSnackbar(Strings.label.editMode, {
                   persist: true,
                 })
               );

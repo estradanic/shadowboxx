@@ -7,7 +7,13 @@ import ParsePointer from "./ParsePointer";
 import { UserAttributes } from "./ParseUser";
 
 /** Type encompassing the classNames allowed for ParseObjects */
-export type ClassName = "Album" | "Image" | "_User" | "_Role" | "Duplicate" | "AlbumChangeNotification";
+export type ClassName =
+  | "Album"
+  | "Image"
+  | "_User"
+  | "_Role"
+  | "Duplicate"
+  | "AlbumChangeNotification";
 
 /** Type defining basic attributes of all ParseObjects */
 export interface ObjectAttributes {
@@ -20,23 +26,35 @@ export interface ObjectAttributes {
 }
 
 /** Type encompassing the attributes of all kinds of ParseObjects */
-export type Attributes<C extends ClassName> = ObjectAttributes & (
-  C extends "Album" ? AlbumAttributes
-    : C extends "Image" ? ImageAttributes
-    : C extends "_User" ? UserAttributes
-    : C extends "Duplicate" ? DuplicateAttributes
-    : C extends "AlbumChangeNotification" ? AlbumChangeNotificationAttributes
-    : {}
-);
+export type Attributes<C extends ClassName> = ObjectAttributes &
+  (C extends "Album"
+    ? AlbumAttributes
+    : C extends "Image"
+    ? ImageAttributes
+    : C extends "_User"
+    ? UserAttributes
+    : C extends "Duplicate"
+    ? DuplicateAttributes
+    : C extends "AlbumChangeNotification"
+    ? AlbumChangeNotificationAttributes
+    : {});
 
 /**
  * Type for converting an Attributes type to one with native Parse Pointers
  */
 export type ParsifyPointers<C extends ClassName> = {
-  [key in keyof Attributes<C>]: Attributes<C>[key] extends (ParsePointer<ClassName> | undefined)
+  [key in keyof Attributes<C>]: Attributes<C>[key] extends
+    | ParsePointer<ClassName>
+    | undefined
     ? Parse.Pointer
     : Attributes<C>[key];
 };
+
+/** Type for directly working with native parse attributes */
+export type NativeAttributes<C extends ClassName> = Omit<
+  ParsifyPointers<C>,
+  "objectId" | "createdAt" | "updatedAt"
+>;
 
 export class Columns {
   objectId = "objectId" as const;
@@ -52,7 +70,7 @@ export default class ParseObject<C extends ClassName> {
   /** Basic columns for any class */
   static COLUMNS = new Columns();
 
-  protected _object: Parse.Object<ParsifyPointers<C>>;
+  _object: Parse.Object<ParsifyPointers<C>>;
 
   constructor(object: Parse.Object<ParsifyPointers<C>>) {
     this._object = object;
@@ -72,7 +90,11 @@ export default class ParseObject<C extends ClassName> {
    */
   toNativePointer(): Parse.Pointer {
     if (this._object.isNew()) {
-      return { className: this._object.className, objectId: "null", __type: "Pointer" };
+      return {
+        className: this._object.className,
+        objectId: "null",
+        __type: "Pointer",
+      };
     }
     return this._object.toPointer();
   }
@@ -120,7 +142,7 @@ export default class ParseObject<C extends ClassName> {
 
   /** ObjectId for this object */
   get id(): ObjectAttributes["objectId"] {
-    return this._object.id || (this._object as any).objectId;
+    return this._object.id;
   }
 
   /** Date that the object was saved to the db */

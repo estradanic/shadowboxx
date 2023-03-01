@@ -1,7 +1,6 @@
-import { InfiniteData } from "@tanstack/react-query";
 import { useEffect, useRef, useState } from "react";
-import { ParseObject } from "../../classes";
-import { ClassName } from "../../classes/ParseObject";
+import { InfiniteData } from "@tanstack/react-query";
+import { ParseObject, ClassName } from "../../classes";
 
 type In<T> = InfiniteData<T[]> | undefined;
 

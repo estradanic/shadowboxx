@@ -33,7 +33,7 @@ const useDuplicatesNotifications = () => {
     if (duplicates?.length && !notificationRef.current) {
       notificationRef.current = addNotification({
         id: "duplicates-notification",
-        title: Strings.duplicatesNotificationTitle(),
+        title: Strings.message.duplicatesNotificationTitle,
         detail: (
           <DuplicatesNotificationDetail
             duplicates={duplicates}

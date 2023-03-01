@@ -1,1 +1,1 @@
-export { default as Strings } from "./Strings";
+export { Strings } from "../cloud/shared";

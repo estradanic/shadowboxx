@@ -2,7 +2,7 @@ import React, { memo, useState } from "react";
 import Parse from "parse";
 import { makeStyles, Theme } from "@material-ui/core/styles";
 import Grid from "@material-ui/core/Grid";
-import Strings from "../../resources/Strings";
+import { Strings } from "../../resources";
 import { ErrorState, validateEmail } from "../../utils";
 import {
   PageContainer,
@@ -54,7 +54,7 @@ const ForgotPassword = memo(() => {
     if (!validateEmail(email)) {
       newErrors.email = {
         isError: true,
-        errorMessage: Strings.invalidEmail(email),
+        errorMessage: Strings.error.invalidEmail(email),
       };
     }
     setErrors(newErrors);
@@ -66,19 +66,19 @@ const ForgotPassword = memo(() => {
       return;
     }
     await Parse.User.requestPasswordReset(email);
-    enqueueInfoSnackbar(Strings.passwordChangeEmailSent());
+    enqueueInfoSnackbar(Strings.message.passwordChangeEmailSent);
     navigate(routes.Login.path);
   };
 
   return (
     <PageContainer>
-      <FancyTitleTypography>{Strings.forgotPassword()}</FancyTitleTypography>
+      <FancyTitleTypography>{Strings.prompt.forgotPassword}</FancyTitleTypography>
       <Grid item sm={8} className={classes.container}>
         <EmailField
           validate
           value={email}
           onChange={(e) => setEmail(e.target.value)}
-          label={Strings.email()}
+          label={Strings.label.email}
           id="email"
           error={errors.email.isError}
           helperText={errors.email.errorMessage}
@@ -93,7 +93,7 @@ const ForgotPassword = memo(() => {
           fullWidth
           size="large"
         >
-          {Strings.resetPassword()}
+          {Strings.action.resetPassword}
         </Button>
       </Grid>
     </PageContainer>

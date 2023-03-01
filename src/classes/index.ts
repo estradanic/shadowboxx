@@ -1,14 +1,27 @@
-export type { ParsifyPointers } from "./ParseObject";
-export { default as ParseAlbum } from "./ParseAlbum";
-export type { AlbumAttributes, AlbumSaveContext } from "./ParseAlbum";
-export {default as ParseDuplicate} from "./ParseDuplicate";
-export type {DuplicateAttributes} from "./ParseDuplicate";
-export { default as ParseImage } from "./ParseImage";
-export type { ImageAttributes } from "./ParseImage";
-export { default as ParseObject } from "./ParseObject";
-export type { Attributes } from "./ParseObject";
-export { default as ParsePointer } from "./ParsePointer";
-export { default as ParseUser, UserUpdateReason as UpdateReason } from "./ParseUser";
-export type { UserAttributes, UpdateLoggedInUser } from "./ParseUser";
-export {default as ParseAlbumChangeNotification} from "./ParseAlbumChangeNotification";
-export type {AlbumChangeNotificationAttributes} from "./ParseAlbumChangeNotification";
+export {
+  ParseAlbum,
+  ParseDuplicate,
+  ParseImage,
+  ParseObject,
+  ParsePointer,
+  ParseUser,
+  ParseAlbumChangeNotification,
+  UnpersistedParseUser,
+  UnpersistedParseImage,
+  UnpersistedParseAlbum,
+  UpdateReason,
+} from "../cloud/shared/classes";
+
+export type {
+  AlbumAttributes,
+  AlbumSaveContext,
+  DuplicateAttributes,
+  ImageAttributes,
+  Attributes,
+  UserAttributes,
+  UpdateLoggedInUser,
+  AlbumChangeNotificationAttributes,
+  ParsifyPointers,
+  ClassName,
+  UnpersistedParseImageAttributes,
+} from "../cloud/shared/classes";

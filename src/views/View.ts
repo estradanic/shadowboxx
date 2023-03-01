@@ -41,7 +41,7 @@ export const useView = (currentViewId: keyof typeof routes) => {
     // Stupid hack to prevent duplicate snackbar
     if (!showingSnackbarAlready.current) {
       closeSnackbar();
-      enqueueWarningSnackbar(Strings.pleaseLogin());
+      enqueueWarningSnackbar(Strings.message.pleaseLogin);
       showingSnackbarAlready.current = true;
     }
     if (currentRoute.redirectOnAuthFail) {

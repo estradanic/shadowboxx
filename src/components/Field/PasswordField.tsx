@@ -59,7 +59,7 @@ const PasswordField = ({
       event.target.value?.length > 0
     ) {
       setError(true);
-      setHelperText(Strings.passwordHelperText());
+      setHelperText(Strings.message.passwordHelperText);
     } else {
       setError(piError);
       setHelperText(piHelperText);

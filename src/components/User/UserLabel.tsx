@@ -16,7 +16,7 @@ const UserLabel = ({ UseUserInfoParams, ...rest }: UserLabelProps) => {
     user?.name ??
     UseUserInfoParams.email ??
     UseUserInfoParams.user?.name ??
-    Strings.aUser();
+    Strings.label.aUser;
 
   return (
     <Typography variant="overline" {...rest}>

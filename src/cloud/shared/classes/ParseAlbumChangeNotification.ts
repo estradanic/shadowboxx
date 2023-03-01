@@ -1,17 +1,21 @@
 import Parse from "parse";
 import ParsePointer from "./ParsePointer";
-import ParseObject, {Attributes, Columns, ParsifyPointers} from "./ParseObject";
+import ParseObject, {
+  Attributes,
+  Columns,
+  ParsifyPointers,
+} from "./ParseObject";
 
 /** Interface defining AlbumChangeNotification-specific attributes */
 export interface AlbumChangeNotificationAttributes {
   /** Album that was changed */
-  album: ParsePointer<"Album">,
+  album: ParsePointer<"Album">;
   /** User that changed the album */
-  user: ParsePointer<"_User">,
+  user: ParsePointer<"_User">;
   /** The number of unacknowledged changes */
-  count: number,
+  count: number;
   /** User that "owns" this notification */
-  owner: ParsePointer<"_User">,
+  owner: ParsePointer<"_User">;
 }
 
 class AlbumChangeNotificationColumns extends Columns {
@@ -29,14 +33,24 @@ export default class ParseAlbumChangeNotification extends ParseObject<"AlbumChan
 
   static query(online = true) {
     if (online) {
-      return new Parse.Query<Parse.Object<ParsifyPointers<"AlbumChangeNotification">>>("AlbumChangeNotification");
+      return new Parse.Query<
+        Parse.Object<ParsifyPointers<"AlbumChangeNotification">>
+      >("AlbumChangeNotification");
     }
-    return new Parse.Query<Parse.Object<ParsifyPointers<"AlbumChangeNotification">>>("AlbumChangeNotification").fromLocalDatastore();
+    return new Parse.Query<
+      Parse.Object<ParsifyPointers<"AlbumChangeNotification">>
+    >("AlbumChangeNotification").fromLocalDatastore();
   }
 
-  private _albumChangeNotification: Parse.Object<ParsifyPointers<"AlbumChangeNotification">>;
+  private _albumChangeNotification: Parse.Object<
+    ParsifyPointers<"AlbumChangeNotification">
+  >;
 
-  constructor(albumChangeNotification: Parse.Object<ParsifyPointers<"AlbumChangeNotification">>) {
+  constructor(
+    albumChangeNotification: Parse.Object<
+      ParsifyPointers<"AlbumChangeNotification">
+    >
+  ) {
     super(albumChangeNotification);
     this._albumChangeNotification = albumChangeNotification;
   }
@@ -47,23 +61,40 @@ export default class ParseAlbumChangeNotification extends ParseObject<"AlbumChan
   }
 
   get album(): Attributes<"AlbumChangeNotification">["album"] {
-    return new ParsePointer(this._albumChangeNotification.get(ParseAlbumChangeNotification.COLUMNS.album));
+    return new ParsePointer(
+      this._albumChangeNotification.get(
+        ParseAlbumChangeNotification.COLUMNS.album
+      )
+    );
   }
 
   get user(): Attributes<"AlbumChangeNotification">["user"] {
-    return new ParsePointer(this._albumChangeNotification.get(ParseAlbumChangeNotification.COLUMNS.user));
+    return new ParsePointer(
+      this._albumChangeNotification.get(
+        ParseAlbumChangeNotification.COLUMNS.user
+      )
+    );
   }
 
   get count(): Attributes<"AlbumChangeNotification">["count"] {
-    return this._albumChangeNotification.get(ParseAlbumChangeNotification.COLUMNS.count);
+    return this._albumChangeNotification.get(
+      ParseAlbumChangeNotification.COLUMNS.count
+    );
   }
 
   set count(count) {
-    this._albumChangeNotification.set(ParseAlbumChangeNotification.COLUMNS.count, count);
+    this._albumChangeNotification.set(
+      ParseAlbumChangeNotification.COLUMNS.count,
+      count
+    );
   }
 
   get owner(): Attributes<"AlbumChangeNotification">["owner"] {
-    return new ParsePointer(this._albumChangeNotification.get(ParseAlbumChangeNotification.COLUMNS.owner));
+    return new ParsePointer(
+      this._albumChangeNotification.get(
+        ParseAlbumChangeNotification.COLUMNS.owner
+      )
+    );
   }
 
   get attributes(): Attributes<"AlbumChangeNotification"> {

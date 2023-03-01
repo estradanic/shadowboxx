@@ -1,5 +1,7 @@
+import { NativeAttributes } from "../../shared";
+
 /** Function to delete roles associated with this album */
-const deleteRoles = async (album: Parse.Object) => {
+const deleteRoles = async (album: Parse.Object<NativeAttributes<"Album">>) => {
   const readRole = await new Parse.Query(Parse.Role)
     .equalTo("name", `${album.id}_r`)
     .first({ useMasterKey: true });

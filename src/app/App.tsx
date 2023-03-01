@@ -93,8 +93,8 @@ const App = () => {
         if (estimate.quota - estimate.usage < 500000000) {
           addNotification({
             id: "low-storage-notification",
-            title: Strings.notEnoughSpace(),
-            detail: Strings.limitedOffline(),
+            title: Strings.message.notEnoughSpace,
+            detail: Strings.message.limitedOffline,
             icon: <DiscFullIcon />,
           });
         }

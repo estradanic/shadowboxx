@@ -155,19 +155,19 @@ const Settings = memo(() => {
     if (!validateEmail(settings.email)) {
       newErrors.email = {
         isError: true,
-        errorMessage: Strings.invalidEmail(settings.email),
+        errorMessage: Strings.error.invalidEmail(settings.email),
       };
     }
     if (isNullOrWhitespace(settings.firstName)) {
       newErrors.firstName = {
         isError: true,
-        errorMessage: Strings.pleaseEnterA(Strings.firstName()),
+        errorMessage: Strings.prompt.pleaseEnterA(Strings.label.firstName),
       };
     }
     if (isNullOrWhitespace(settings.lastName)) {
       newErrors.lastName = {
         isError: true,
-        errorMessage: Strings.pleaseEnterA(Strings.firstName()),
+        errorMessage: Strings.prompt.pleaseEnterA(Strings.label.firstName),
       };
     }
 
@@ -191,9 +191,10 @@ const Settings = memo(() => {
       getLoggedInUser().isDarkThemeEnabled = settings.isDarkThemeEnabled;
       try {
         await saveLoggedInUserUpdates();
-        enqueueSuccessSnackbar(Strings.settingsSaved());
+        enqueueSuccessSnackbar(Strings.success.savingSettings);
       } catch (error: any) {
-        enqueueErrorSnackbar(error?.message ?? Strings.settingsNotSaved());
+        console.log(error);
+        enqueueErrorSnackbar(Strings.error.savingSettings);
       } finally {
         stopGlobalLoader();
       }
@@ -214,7 +215,7 @@ const Settings = memo(() => {
             <Grid container direction="row">
               <Grid className={classes.cardTitle} item xs={12}>
                 <FancyTypography variant="h4">
-                  {Strings.settings()}
+                  {Strings.label.settings}
                 </FancyTypography>
               </Grid>
               <Grid item xs={12}>
@@ -246,7 +247,7 @@ const Settings = memo(() => {
                         checkedIcon={<MoonIcon />}
                       />
                     }
-                    label={Strings.darkMode()}
+                    label={Strings.label.darkMode}
                     labelPlacement="start"
                     className={classes.darkThemeLabel}
                   />
@@ -269,7 +270,7 @@ const Settings = memo(() => {
                       }))
                     }
                     multiple={false}
-                    label={Strings.profilePicture()}
+                    label={Strings.label.profilePicture}
                   />
                 </ImageContextProvider>
               </Grid>
@@ -287,7 +288,7 @@ const Settings = memo(() => {
                       firstName: e.target.value,
                     }))
                   }
-                  label={Strings.firstName()}
+                  label={Strings.label.firstName}
                   id="firstName"
                   type="text"
                 />
@@ -306,7 +307,7 @@ const Settings = memo(() => {
                       lastName: e.target.value,
                     }))
                   }
-                  label={Strings.lastName()}
+                  label={Strings.label.lastName}
                   id="lastName"
                   type="text"
                 />
@@ -325,7 +326,7 @@ const Settings = memo(() => {
                       email: e.target.value,
                     }))
                   }
-                  label={Strings.email()}
+                  label={Strings.label.email}
                   id="email"
                   type="email"
                 />
@@ -339,10 +340,10 @@ const Settings = memo(() => {
                   variant="text"
                   onClick={async () => {
                     await Parse.User.requestPasswordReset(settings.email);
-                    enqueueInfoSnackbar(Strings.passwordChangeEmailSent());
+                    enqueueInfoSnackbar(Strings.message.passwordChangeEmailSent);
                   }}
                 >
-                  {Strings.changePassword()}
+                  {Strings.action.changePassword}
                 </LockedButton>
               </Grid>
               <Grid item xs={12}>
@@ -355,7 +356,7 @@ const Settings = memo(() => {
                   size="large"
                   onClick={changeUserInfo}
                 >
-                  {Strings.submit()}
+                  {Strings.action.submit}
                 </Button>
               </Grid>
             </Grid>

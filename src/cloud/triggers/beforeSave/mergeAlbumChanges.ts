@@ -1,18 +1,25 @@
+import {
+  getObjectId,
+  NativeAttributes,
+  ParseAlbum,
+  ParseImage,
+} from "../../shared";
+
 /**
  * Function to avoid a race condition when saving an album.
  * Applies changes to the album in the db rather than just blindly saving the uploaded object.
  */
 const mergeAlbumChanges = async (
-  album: Parse.Object,
+  album: Parse.Object<NativeAttributes<"Album">>,
   context: Record<string, any>
 ) => {
   if (
     album.isNew() ||
     !(
-      album.dirty("images") ||
-      album.dirty("collaborators") ||
-      album.dirty("viewers") ||
-      album.dirty("coverImage")
+      album.dirty(ParseAlbum.COLUMNS.images) ||
+      album.dirty(ParseAlbum.COLUMNS.collaborators) ||
+      album.dirty(ParseAlbum.COLUMNS.viewers) ||
+      album.dirty(ParseAlbum.COLUMNS.coverImage)
     )
   ) {
     console.log("No changes to merge in album", album.id);
@@ -24,9 +31,9 @@ const mergeAlbumChanges = async (
 
   await album.fetch({ useMasterKey: true });
 
-  const images: string[] = album.get("images");
-  const collaborators: string[] = album.get("collaborators");
-  const viewers: string[] = album.get("viewers");
+  const images: string[] = album.get(ParseAlbum.COLUMNS.images);
+  const collaborators: string[] = album.get(ParseAlbum.COLUMNS.collaborators);
+  const viewers: string[] = album.get(ParseAlbum.COLUMNS.viewers);
 
   if (context.addedImages) {
     console.log("Adding images", context.addedImages);
@@ -76,10 +83,10 @@ const mergeAlbumChanges = async (
   }
 
   let coverImage = attributes.coverImage;
-  if (images && (!coverImage || !images.includes(coverImage.id))) {
+  if (images && (!coverImage || !images.includes(getObjectId(coverImage)))) {
     console.log("Setting fallback for cover image");
-    const image = await new Parse.Query("Image")
-      .equalTo("objectId", images[0])
+    const image = await ParseImage.query()
+      .equalTo(ParseImage.COLUMNS.objectId, images[0])
       .first({ useMasterKey: true });
     coverImage = image?.toPointer();
   }

@@ -1,12 +1,23 @@
+import {
+  getObjectId,
+  NativeAttributes,
+  ParseAlbum,
+  ParseImage,
+  ParseUser,
+} from "../../shared";
+
 /** Function to get all images in this album */
-const getAllImages = async (album: Parse.Object) => {
+const getAllImages = async (album: Parse.Object<NativeAttributes<"Album">>) => {
   const images = [];
   let exhausted = false;
   let offset = 0;
   const limit = 1000;
   while (!exhausted) {
-    const partialImages = await new Parse.Query("Image")
-      .containedIn("objectId", album.get("images"))
+    const partialImages = await ParseImage.query()
+      .containedIn(
+        ParseImage.COLUMNS.objectId,
+        album.get(ParseAlbum.COLUMNS.images)
+      )
       .limit(limit)
       .skip(offset)
       .find({ useMasterKey: true });
@@ -27,8 +38,8 @@ const getAllUsersByEmails = async (emails: string[]) => {
   let offset = 0;
   const limit = 1000;
   while (!exhausted) {
-    const partialUsers = await new Parse.Query(Parse.User)
-      .containedIn("email", emails)
+    const partialUsers = await ParseUser.query()
+      .containedIn(ParseUser.COLUMNS.email, emails)
       .limit(limit)
       .skip(offset)
       .find({ useMasterKey: true });
@@ -43,9 +54,14 @@ const getAllUsersByEmails = async (emails: string[]) => {
 };
 
 /** Function to set permissions for this album and the images within it */
-const setAlbumPermissions = async (album: Parse.Object) => {
-  const owner = await new Parse.Query(Parse.User)
-    .equalTo("objectId", album.get("owner").id)
+const setAlbumPermissions = async (
+  album: Parse.Object<NativeAttributes<"Album">>
+) => {
+  const owner = await ParseUser.query()
+    .equalTo(
+      ParseUser.COLUMNS.objectId,
+      getObjectId(album.get(ParseAlbum.COLUMNS.owner))
+    )
     .first({ useMasterKey: true });
   const readRoleName = `${album.id}_r`;
   const readWriteRoleName = `${album.id}_rw`;
@@ -62,16 +78,22 @@ const setAlbumPermissions = async (album: Parse.Object) => {
         .first({ useMasterKey: true })) ?? readWriteRole;
   }
 
-  if (album.get("viewers").length > 0) {
-    const viewers = await getAllUsersByEmails(album.get("viewers"));
+  if (album.get(ParseAlbum.COLUMNS.viewers).length > 0) {
+    const viewers = await getAllUsersByEmails(
+      album.get(ParseAlbum.COLUMNS.viewers)
+    );
     readRole.getUsers().add(viewers);
   }
-  if (album.get("collaborators").length > 0) {
-    const collaborators = await getAllUsersByEmails(album.get("collaborators"));
+  if (album.get(ParseAlbum.COLUMNS.collaborators).length > 0) {
+    const collaborators = await getAllUsersByEmails(
+      album.get(ParseAlbum.COLUMNS.collaborators)
+    );
     readWriteRole.getUsers().add(collaborators);
   }
 
-  readWriteRole.getUsers().add(owner!);
+  if (owner) {
+    readWriteRole.getUsers().add(owner);
+  }
   await readRole.save(null, {
     useMasterKey: true,
     context: { noTrigger: true },
@@ -81,7 +103,7 @@ const setAlbumPermissions = async (album: Parse.Object) => {
     context: { noTrigger: true },
   });
 
-  if (album.get("images").length > 0) {
+  if (album.get(ParseAlbum.COLUMNS.images).length > 0) {
     const images = await getAllImages(album);
     images.forEach((image) => {
       let imageACL = image.getACL() ?? new Parse.ACL();

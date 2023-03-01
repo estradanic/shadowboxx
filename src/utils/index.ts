@@ -1,4 +1,4 @@
 export * from "./formUtils";
 export * from "./objectUtils";
-export * from "./stringUtils";
 export * from "./themeUtils";
+export * from "../cloud/shared/utils";

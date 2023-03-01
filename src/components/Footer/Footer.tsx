@@ -90,9 +90,9 @@ const Footer = () => {
     installPrompt!.prompt();
     const { outcome } = await installPrompt!.userChoice;
     if (outcome === "accepted") {
-      enqueueSuccessSnackbar(Strings.installed());
+      enqueueSuccessSnackbar(Strings.success.installed);
     } else {
-      enqueueErrorSnackbar(Strings.notInstalled());
+      enqueueErrorSnackbar(Strings.error.notInstalled);
     }
   };
 
@@ -111,7 +111,7 @@ const Footer = () => {
           {showInstallPrompt ? (
             <>
               <Typography className={classes.installLabel} variant="overline">
-                {Strings.installPrompt()}
+                {Strings.prompt.installPrompt}
               </Typography>
               <Button
                 className={classes.installButton}
@@ -119,7 +119,7 @@ const Footer = () => {
                 variant="contained"
                 size="small"
               >
-                {Strings.install()}
+                {Strings.action.install}
               </Button>
             </>
           ) : (
@@ -128,7 +128,7 @@ const Footer = () => {
               color="inherit"
               variant="overline"
             >
-              {Strings.copyright()}
+              {Strings.label.copyright}
             </Typography>
           )}
         </Toolbar>
@@ -136,7 +136,7 @@ const Footer = () => {
       <Offline>
         <Toolbar variant="dense" className={classes.offlineIndicator}>
           <Typography className={classes.centeredText} variant="overline">
-            {Strings.offline()}
+            {Strings.message.offline}
           </Typography>
         </Toolbar>
       </Offline>

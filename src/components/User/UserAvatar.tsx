@@ -49,7 +49,7 @@ const UserAvatar = forwardRef(
       user?.name ??
       UseUserInfoParams.email ??
       UseUserInfoParams.user?.name ??
-      Strings.profilePicture();
+      Strings.label.profilePicture;
 
     return (
       <Tooltip ref={ref} title={userName}>

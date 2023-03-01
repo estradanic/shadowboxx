@@ -77,7 +77,7 @@ const AlbumChangesNotificationDetail = ({
     <Grid container>
       <Grid item xs={7} className={classes.textContainer}>
         <Typography>
-          {Strings.albumChangeNotificationDetail(userName, albumName)}
+          {Strings.message.albumChangeNotificationDetail(userName, albumName)}
         </Typography>
       </Grid>
       <Grid item xs={5} className={classes.buttonContainer}>
@@ -87,7 +87,7 @@ const AlbumChangesNotificationDetail = ({
           className={classes.resolveButton}
           size="small"
         >
-          {Strings.goSee()}
+          {Strings.action.goSee}
         </Button>
       </Grid>
     </Grid>

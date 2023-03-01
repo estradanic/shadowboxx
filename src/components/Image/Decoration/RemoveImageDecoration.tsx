@@ -45,7 +45,7 @@ const RemoveImageDecoration = ({
     <ImageDecoration<IconProps>
       corner={corner}
       Component={RemoveImageDecorationIcon}
-      description={Strings.removeImage()}
+      description={Strings.action.removeImage}
       ComponentProps={{
         fontSize: "large",
         ...IconProps,

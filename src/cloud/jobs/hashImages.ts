@@ -1,3 +1,4 @@
+import { ParseImage } from "../shared";
 import { hashImage } from "../triggers";
 
 /** Function to hash all images */
@@ -7,8 +8,8 @@ const hashImages = async () => {
   let exhausted = false;
   while (!exhausted) {
     console.log(`Getting batch ${page}`);
-    const images = await new Parse.Query("Image")
-      .ascending("createdAt")
+    const images = await ParseImage.query()
+      .ascending(ParseImage.COLUMNS.createdAt)
       .limit(pageSize)
       .skip(page * pageSize)
       .find({ useMasterKey: true });
@@ -16,7 +17,7 @@ const hashImages = async () => {
       exhausted = true;
     }
     for (const image of images) {
-      console.log("Hashing image", image.get("name"));
+      console.log("Hashing image", image.get(ParseImage.COLUMNS.name));
       await hashImage(image);
     }
     page++;

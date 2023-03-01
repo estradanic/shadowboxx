@@ -18,7 +18,7 @@ export type NoAlbumsProps = {
   text?: string;
 };
 
-const NoAlbums = ({ text = Strings.noAlbums() }) => {
+const NoAlbums = ({ text = Strings.message.noAlbums }) => {
   const classes = useStyles();
 
   return (
@@ -29,7 +29,7 @@ const NoAlbums = ({ text = Strings.noAlbums() }) => {
         {text}
       </Typography>
       <br />
-      <Typography variant="overline">{Strings.tryAddingAlbum()}</Typography>
+      <Typography variant="overline">{Strings.prompt.tryAddingAlbum}</Typography>
     </Grid>
   );
 };

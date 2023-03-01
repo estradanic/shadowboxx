@@ -1,7 +1,11 @@
 import Parse from "parse";
 import { removeExtension } from "../utils";
 import ParsePointer from "./ParsePointer";
-import ParseObject, { Attributes, Columns, ParsifyPointers } from "./ParseObject";
+import ParseObject, {
+  Attributes,
+  Columns,
+  ParsifyPointers,
+} from "./ParseObject";
 import ParseUser from "./ParseUser";
 
 /** Interface defining Image-specific attributes */
@@ -20,6 +24,8 @@ export interface ImageAttributes {
   name: string;
   /** Date that the image was taken */
   dateTaken?: Date;
+  /** Hash of the image for comparisons */
+  hash?: string;
 }
 
 class ImageColumns extends Columns {
@@ -30,6 +36,7 @@ class ImageColumns extends Columns {
   fileThumb = "fileThumb" as const;
   fileLegacy = "fileLegacy" as const;
   dateTaken = "dateTaken" as const;
+  hash = "hash" as const;
 }
 
 /**
@@ -45,7 +52,9 @@ export default class ParseImage extends ParseObject<"Image"> {
     if (online) {
       return new Parse.Query<Parse.Object<ParsifyPointers<"Image">>>("Image");
     }
-    return new Parse.Query<Parse.Object<ParsifyPointers<"Image">>>("Image").fromLocalDatastore();
+    return new Parse.Query<Parse.Object<ParsifyPointers<"Image">>>(
+      "Image"
+    ).fromLocalDatastore();
   }
 
   /**
@@ -54,7 +63,10 @@ export default class ParseImage extends ParseObject<"Image"> {
    * @param coverImage Image to sort to the top
    * @returns Sorted list of images
    */
-  static sort(images: ParseImage[], coverImage?: ParsePointer<"Image">): ParseImage[] {
+  static sort(
+    images: ParseImage[],
+    coverImage?: ParsePointer<"Image">
+  ): ParseImage[] {
     if (coverImage) {
       return [...images].sort((a, b) => {
         if (a.id === coverImage.id) {
@@ -177,21 +189,28 @@ export default class ParseImage extends ParseObject<"Image"> {
     return {
       ...this._image.attributes,
       owner: this.owner,
-    }
+    };
   }
 }
 
-export interface UnpersistedParseImageAttributes extends Omit<ImageAttributes, "fileMobile" | "fileLegacy" | "fileThumb"> {}
+export interface UnpersistedParseImageAttributes
+  extends Omit<ImageAttributes, "fileMobile" | "fileLegacy" | "fileThumb"> {}
 
 export class UnpersistedParseImage extends ParseImage {
   constructor(attributes: Partial<Attributes<"Image">> = {}) {
-    // @ts-expect-error
-    super(new Parse.Object<ParsifyPointers<"Image">>("Image", {
-      name: "",
-      file: new Parse.File("", [0]),
-      ...attributes,
-      owner: attributes.owner?.toNativePointer() ?? {__type: "Pointer", className: "_User", objectId: ""},
-    }));
+    super(
+      // @ts-expect-error
+      new Parse.Object<ParsifyPointers<"Image">>("Image", {
+        name: "",
+        file: new Parse.File("", [0]),
+        ...attributes,
+        owner: attributes.owner?.toNativePointer() ?? {
+          __type: "Pointer",
+          className: "_User",
+          objectId: "",
+        },
+      })
+    );
   }
 
   get id(): Attributes<"Image">["objectId"] {
@@ -200,27 +219,27 @@ export class UnpersistedParseImage extends ParseImage {
   }
 
   get createdAt(): Attributes<"Image">["createdAt"] {
-    console.warn("Unpersisted image has no createdAt")
+    console.warn("Unpersisted image has no createdAt");
     return new Date();
   }
 
   get updatedAt(): Attributes<"Image">["updatedAt"] {
-    console.warn("Unpersisted image has no updatedAt")
+    console.warn("Unpersisted image has no updatedAt");
     return new Date();
   }
 
   get fileLegacy(): Attributes<"Image">["fileLegacy"] {
-    console.warn("Unpersisted image has no fileLegacy")
+    console.warn("Unpersisted image has no fileLegacy");
     return new Parse.File("", [0]);
   }
 
   get fileMobile(): Attributes<"Image">["fileMobile"] {
-    console.warn("Unpersisted image has no fileMobile")
+    console.warn("Unpersisted image has no fileMobile");
     return new Parse.File("", [0]);
   }
 
   get fileThumb(): Attributes<"Image">["fileThumb"] {
-    console.warn("Unpersisted image has no fileThumb")
+    console.warn("Unpersisted image has no fileThumb");
     return new Parse.File("", [0]);
   }
 }

@@ -18,7 +18,7 @@ export type NoConnectionProps = {
   text?: string;
 };
 
-const NoConnection = ({ text = Strings.noConnection() }) => {
+const NoConnection = ({ text = Strings.error.noConnection }) => {
   const classes = useStyles();
 
   return (

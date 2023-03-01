@@ -80,7 +80,7 @@ const AlbumsToShareTo = ({ albums, classes, files }: AlbumsListProps) => {
   return (
     <>
       <FancyTypography variant="h3">
-        {Strings.shareTargetTitle(files.length)}
+        {Strings.message.shareTargetTitle(files.length)}
       </FancyTypography>
       <br />
       <Grid item spacing={2} container className={classes.albumsContainer}>
@@ -102,10 +102,11 @@ const AlbumsToShareTo = ({ albums, classes, files }: AlbumsListProps) => {
                     },
                     { addedImages: images }
                   );
-                  enqueueSuccessSnackbar(Strings.commonSaved());
+                  enqueueSuccessSnackbar(Strings.success.saved);
                   navigate(routes.Album.path.replace(":id", newAlbum.id));
                 } catch (e) {
-                  enqueueErrorSnackbar(Strings.commonError());
+                  console.error(e);
+                  enqueueErrorSnackbar(Strings.error.editingAlbum);
                 }
               }}
             />
@@ -168,7 +169,7 @@ const Share = memo(() => {
       type: "indeterminate",
       content: (
         <FancyTypography variant="loading">
-          {Strings.loadingSharedImages()}
+          {Strings.message.loadingSharedImages}
         </FancyTypography>
       ),
     });
@@ -197,7 +198,7 @@ const Share = memo(() => {
           getting = false;
         });
       if (count > 9) {
-        enqueueErrorSnackbar(Strings.noImagesSelected());
+        enqueueErrorSnackbar(Strings.message.noImagesSelected);
         clearInterval(timer);
         stopGlobalLoader();
         setFailed(true);
@@ -252,7 +253,7 @@ const Share = memo(() => {
             )}
           </>
         ) : (
-          failed && <NoImages text={Strings.noImagesSelected()} />
+          failed && <NoImages text={Strings.message.noImagesSelected} />
         )}
       </Online>
       <Offline>

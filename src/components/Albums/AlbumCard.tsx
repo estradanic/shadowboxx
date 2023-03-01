@@ -211,14 +211,15 @@ const AlbumCard = memo(({ value, onChange, borderColor }: AlbumCardProps) => {
   const deleteAlbum = () => {
     closeMenu();
     openConfirm(
-      Strings.deleteAlbumConfirmation(),
+      Strings.message.deleteAlbumConfirmation,
       async () => {
         try {
           await value.destroy();
           await onChange(null);
-          enqueueSuccessSnackbar(Strings.deleteAlbumSuccess());
+          enqueueSuccessSnackbar(Strings.success.deletingAlbum(value.name));
         } catch (error: any) {
-          enqueueErrorSnackbar(error?.message ?? Strings.deleteAlbumError());
+          console.error(error);
+          enqueueErrorSnackbar(Strings.error.deletingAlbum(value.name));
         }
       },
       undefined,
@@ -249,7 +250,7 @@ const AlbumCard = memo(({ value, onChange, borderColor }: AlbumCardProps) => {
   ) => {
     await value.update(attributes, changes);
     await onChange(value);
-    enqueueSuccessSnackbar(Strings.commonSaved());
+    enqueueSuccessSnackbar(Strings.success.saved);
   };
 
   return status !== "loading" ? (
@@ -273,10 +274,10 @@ const AlbumCard = memo(({ value, onChange, borderColor }: AlbumCardProps) => {
                   onClose={closeMenu}
                   onClick={closeMenu}
                 >
-                  <MenuItem onClick={editAlbum}>{Strings.editAlbum()}</MenuItem>
+                  <MenuItem onClick={editAlbum}>{Strings.action.editAlbum}</MenuItem>
                   {isOwner && (
                     <MenuItem onClick={deleteAlbum}>
-                      {Strings.deleteAlbum()}
+                      {Strings.action.deleteAlbum}
                     </MenuItem>
                   )}
                 </Menu>
@@ -284,7 +285,7 @@ const AlbumCard = memo(({ value, onChange, borderColor }: AlbumCardProps) => {
             )
           }
           title={value?.name}
-          subheader={`${Strings.numOfPhotos(value.images.length)} ${
+          subheader={`${Strings.label.numOfPhotos(value.images.length)} ${
             value?.description ?? ""
           }`}
         />
@@ -308,7 +309,7 @@ const AlbumCard = memo(({ value, onChange, borderColor }: AlbumCardProps) => {
                 variant="body2"
                 component="p"
               >
-                {Strings.createdAt(value?.createdAt)}
+                {Strings.label.createdAt(value?.createdAt)}
               </Typography>
             </Grid>
             <Grid item xs={6}>
@@ -317,7 +318,7 @@ const AlbumCard = memo(({ value, onChange, borderColor }: AlbumCardProps) => {
                 variant="body2"
                 component="p"
               >
-                {Strings.updatedAt(value?.updatedAt)}
+                {Strings.label.updatedAt(value?.updatedAt)}
               </Typography>
             </Grid>
             {(!!collaborators?.length || !!viewers?.length) && (
@@ -422,9 +423,9 @@ const AlbumCard = memo(({ value, onChange, borderColor }: AlbumCardProps) => {
           try {
             const response = await value.update(attributes, changes);
             await onChange(response);
-            enqueueSuccessSnackbar(Strings.commonSaved());
+            enqueueSuccessSnackbar(Strings.success.saved);
           } catch (error: any) {
-            enqueueErrorSnackbar(error?.message ?? Strings.editAlbumError());
+            enqueueErrorSnackbar(error?.message ?? Strings.error.editingAlbum);
           }
         }}
       />

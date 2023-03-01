@@ -4,7 +4,7 @@ import Typography from "@material-ui/core/Typography";
 import Grid from "@material-ui/core/Grid";
 import Button from "@material-ui/core/Button";
 import Card from "@material-ui/core/Card";
-import Strings from "../../resources/Strings";
+import { Strings } from "../../resources";
 import { ErrorState, validateEmail } from "../../utils";
 import {
   PasswordField,
@@ -17,8 +17,8 @@ import { useNavigate } from "../../hooks";
 import { useView } from "../View";
 import { useUserContext } from "../../contexts";
 import { useGlobalLoadingStore } from "../../stores";
+import { UnpersistedParseUser } from "../../classes";
 import { routes } from "../../app";
-import { UnpersistedParseUser } from "../../classes/ParseUser";
 
 const useStyles = makeStyles((theme: Theme) => ({
   cardTitle: {
@@ -74,7 +74,7 @@ const Login = memo(() => {
     if (!validateEmail(email)) {
       newErrors.email = {
         isError: true,
-        errorMessage: Strings.invalidEmail(email),
+        errorMessage: Strings.error.invalidEmail(email),
       };
     }
     setErrors(newErrors);
@@ -97,7 +97,7 @@ const Login = memo(() => {
             enqueueWarningSnackbar(error.message);
             return;
           }
-          enqueueErrorSnackbar(error?.message ?? Strings.loginError());
+          enqueueErrorSnackbar(error?.message ?? Strings.error.loggingIn);
         })
         .finally(() => {
           stopGlobalLoader();
@@ -111,7 +111,7 @@ const Login = memo(() => {
         <Card>
           <Grid container direction="row">
             <Grid className={classes.cardTitle} item xs={12}>
-              <Typography variant="h4">{Strings.login()}</Typography>
+              <Typography variant="h4">{Strings.action.login}</Typography>
             </Grid>
             <Grid item xs={12}>
               <EmailField
@@ -119,7 +119,7 @@ const Login = memo(() => {
                 fullWidth
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                label={Strings.email()}
+                label={Strings.label.email}
                 id="email"
                 error={errors.email.isError}
                 helperText={errors.email.errorMessage}
@@ -131,7 +131,7 @@ const Login = memo(() => {
                 fullWidth
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                label={Strings.password()}
+                label={Strings.label.password}
                 id="password"
                 error={errors.password.isError}
                 helperText={errors.password.errorMessage}
@@ -145,7 +145,7 @@ const Login = memo(() => {
                 className={classes.submitButton}
                 size="large"
               >
-                {Strings.submit()}
+                {Strings.action.submit}
               </Button>
             </Grid>
           </Grid>
@@ -153,15 +153,15 @@ const Login = memo(() => {
       </Grid>
       <br />
       <br />
-      <Typography variant="h6">{Strings.noAccount()}</Typography>
+      <Typography variant="h6">{Strings.prompt.noAccount}</Typography>
       <Link saveHistory={false} to={routes.Signup.path}>
-        {Strings.signup()}
+        {Strings.action.signup}
       </Link>
       <br />
       <br />
-      <Typography variant="h6">{Strings.forgotPassword()}</Typography>
+      <Typography variant="h6">{Strings.prompt.forgotPassword}</Typography>
       <Link saveHistory={false} to={routes.ForgotPassword.path}>
-        {Strings.resetPassword()}
+        {Strings.action.resetPassword}
       </Link>
     </PageContainer>
   );

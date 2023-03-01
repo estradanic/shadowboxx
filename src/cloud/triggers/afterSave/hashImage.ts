@@ -1,5 +1,6 @@
 import { bmvbhash } from "blockhash-core";
-import Image, { imageFromBuffer, getImageData } from "@canvas/image";
+import { imageFromBuffer, getImageData } from "@canvas/image";
+import { NativeAttributes, ParseImage } from "../../shared";
 
 /** Function to convert hexadecimal to binary */
 const hexToBinary = (hex: string) => {
@@ -10,14 +11,19 @@ const hexToBinary = (hex: string) => {
 };
 
 /** Function to hash an image for finding duplicates */
-const hashImage = async (image: Parse.Object) => {
-  if (!image.dirty("file") && image.get("hash")) {
+const hashImage = async (image: Parse.Object<NativeAttributes<"Image">>) => {
+  if (
+    !image.dirty(ParseImage.COLUMNS.file) &&
+    image.get(ParseImage.COLUMNS.hash)
+  ) {
     // If the image file hasn't changed and the hash already exists,
     // then don't do anything
     return;
   }
   const file =
-    image.get("fileThumb") ?? image.get("fileMobile") ?? image.get("file");
+    image.get(ParseImage.COLUMNS.fileThumb) ??
+    image.get(ParseImage.COLUMNS.fileMobile) ??
+    image.get(ParseImage.COLUMNS.file);
   if (!file) {
     console.error("No file found for image", image.id);
     return;
@@ -36,7 +42,7 @@ const hashImage = async (image: Parse.Object) => {
   }
   const hash = hexToBinary(await bmvbhash(imageData, 16));
 
-  image.set("hash", hash);
+  image.set(ParseImage.COLUMNS.hash, hash);
   await image.save(null, { useMasterKey: true, context: { noTrigger: true } });
 };
 

@@ -102,7 +102,7 @@ const ShareImageDecoration = ({
           await navigator.share(shareData);
         } catch (error) {
           console.error(error);
-          enqueueErrorSnackbar(Strings.cantShare());
+          enqueueErrorSnackbar(Strings.error.sharingImage);
           download(pngFile);
         }
       } else {
@@ -111,7 +111,7 @@ const ShareImageDecoration = ({
       piOnClick?.(image);
     } catch (error) {
       console.error(error);
-      enqueueErrorSnackbar(Strings.cantShare());
+      enqueueErrorSnackbar(Strings.error.sharingImage);
       download(image.fileLegacy.url());
     } finally {
       stopGlobalLoader();
@@ -122,7 +122,7 @@ const ShareImageDecoration = ({
     <ImageDecoration<IconProps>
       corner={corner}
       Component={ShareImageDecorationIcon}
-      description={Strings.shareImage()}
+      description={Strings.action.shareImage}
       ComponentProps={{
         fontSize: "large",
         ...IconProps,

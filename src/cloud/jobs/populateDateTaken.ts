@@ -1,12 +1,15 @@
-/** Function to hash all images */
-const hashImages = async () => {
+import { ParseImage } from "../shared";
+
+/** Function to populate dateTaken with "createdAt" */
+const populateDateTaken = async () => {
   let page = 0;
   const pageSize = 100;
   let exhausted = false;
   while (!exhausted) {
     console.log(`Getting batch ${page}`);
-    const images = await new Parse.Query("Image")
-      .ascending("createdAt")
+    const images = await ParseImage.query()
+      .doesNotExist(ParseImage.COLUMNS.dateTaken)
+      .ascending(ParseImage.COLUMNS.createdAt)
       .limit(pageSize)
       .skip(page * pageSize)
       .find({ useMasterKey: true });
@@ -14,8 +17,11 @@ const hashImages = async () => {
       exhausted = true;
     }
     for (const image of images) {
-      console.log("Populating dateTaken for image", image.get("name"));
-      image.set("dateTaken", image.createdAt);
+      console.log(
+        "Populating dateTaken for image",
+        image.get(ParseImage.COLUMNS.name)
+      );
+      image.set(ParseImage.COLUMNS.dateTaken, image.createdAt);
     }
     page++;
     console.log("Saving batch", page);
@@ -23,4 +29,4 @@ const hashImages = async () => {
   }
 };
 
-export default hashImages;
+export default populateDateTaken;

@@ -57,19 +57,19 @@ const AppMenuList = ({ collapse = false }: AppMenuListProps) => {
         <ListItemIcon className={classes.listItemIcon}>
           <HomeIcon />
         </ListItemIcon>
-        <ListItemText primary={Strings.home()} />
+        <ListItemText primary={Strings.label.home} />
       </ListItemLink>
       <ListItemLink to={routes.Pictures.path}>
         <ListItemIcon className={classes.listItemIcon}>
           <InsertPhotoIcon />
         </ListItemIcon>
-        <ListItemText primary={Strings.pictures()} />
+        <ListItemText primary={Strings.label.pictures} />
       </ListItemLink>
       <ListItemLink to={routes.Settings.path}>
         <ListItemIcon className={classes.listItemIcon}>
           <SettingsIcon />
         </ListItemIcon>
-        <ListItemText primary={Strings.settings()} />
+        <ListItemText primary={Strings.label.settings} />
       </ListItemLink>
       <ListItemLink
         onClick={() => {
@@ -80,7 +80,7 @@ const AppMenuList = ({ collapse = false }: AppMenuListProps) => {
         <ListItemIcon className={classes.listItemIcon}>
           <ExitToAppIcon />
         </ListItemIcon>
-        <ListItemText primary={Strings.logout()} />
+        <ListItemText primary={Strings.action.logout} />
       </ListItemLink>
     </List>
   );

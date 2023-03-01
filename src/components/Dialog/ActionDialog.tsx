@@ -278,10 +278,10 @@ const ActionDialog = ({
       </ActionDialogContent>
       <DialogActions>
         {type === "alert" ? (
-          <Button onClick={handleClose}>{Strings.okay()}</Button>
+          <Button onClick={handleClose}>{Strings.action.okay}</Button>
         ) : (
           <>
-            <Button onClick={handleCancel}>{Strings.cancel()}</Button>
+            <Button onClick={handleCancel}>{Strings.action.cancel}</Button>
             <Button
               className={
                 confirmButtonColor === "error"
@@ -294,7 +294,7 @@ const ActionDialog = ({
               }
               onClick={handleConfirm}
             >
-              {confirmButtonText ?? Strings.confirm()}
+              {confirmButtonText ?? Strings.action.confirm}
             </Button>
           </>
         )}

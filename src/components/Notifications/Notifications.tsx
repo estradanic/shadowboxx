@@ -132,7 +132,7 @@ const Notifications = ({ className }: NotificationsProps) => {
           ))
         ) : (
           <MenuItem className={classes.menuItem}>
-            <Typography>{Strings.noNotifications()}</Typography>
+            <Typography>{Strings.message.noNotifications}</Typography>
           </MenuItem>
         )}
       </Menu>

@@ -128,7 +128,7 @@ const ImageSelectionDialog = ({
       fullWidth
       maxWidth="lg"
       open={open}
-      title={multiple ? Strings.selectImages() : Strings.selectImage()}
+      title={multiple ? Strings.action.selectImages : Strings.action.selectImage}
       message=""
       handleConfirm={handleConfirm}
       handleCancel={handleCancel}

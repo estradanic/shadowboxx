@@ -1,6 +1,10 @@
 import Parse from "parse";
 import ParsePointer from "./ParsePointer";
-import ParseObject, { Attributes, Columns, ParsifyPointers } from "./ParseObject";
+import ParseObject, {
+  Attributes,
+  Columns,
+  ParsifyPointers,
+} from "./ParseObject";
 
 /** Interface defining Album-specific attributes */
 export interface AlbumAttributes {
@@ -79,10 +83,12 @@ export default class ParseAlbum extends ParseObject<"Album"> {
     if (online) {
       return new Parse.Query<Parse.Object<ParsifyPointers<"Album">>>("Album");
     }
-    return new Parse.Query<Parse.Object<ParsifyPointers<"Album">>>("Album").fromLocalDatastore();
+    return new Parse.Query<Parse.Object<ParsifyPointers<"Album">>>(
+      "Album"
+    ).fromLocalDatastore();
   }
 
-  private _album: Parse.Object<ParsifyPointers<"Album">>;
+  _album: Parse.Object<ParsifyPointers<"Album">>;
 
   constructor(album: Parse.Object<ParsifyPointers<"Album">>) {
     super(album);
@@ -179,7 +185,7 @@ export default class ParseAlbum extends ParseObject<"Album"> {
 
   /** Pointer to the cover image for this album */
   get coverImage(): Attributes<"Album">["coverImage"] {
-    const coverImage = this._album.get(ParseAlbum.COLUMNS.coverImage)
+    const coverImage = this._album.get(ParseAlbum.COLUMNS.coverImage);
     if (coverImage) {
       return new ParsePointer(coverImage);
     }
@@ -191,7 +197,10 @@ export default class ParseAlbum extends ParseObject<"Album"> {
   }
 
   set coverImage(coverImage) {
-    this._album.set(ParseAlbum.COLUMNS.coverImage, coverImage?.toNativePointer());
+    this._album.set(
+      ParseAlbum.COLUMNS.coverImage,
+      coverImage?.toNativePointer()
+    );
   }
 
   /** Map of image ids to captions */
@@ -226,17 +235,23 @@ export default class ParseAlbum extends ParseObject<"Album"> {
 
 export class UnpersistedParseAlbum extends ParseAlbum {
   constructor(attributes: Partial<Attributes<"Album">> = {}) {
-    // @ts-expect-error
-    super(new Parse.Object<ParsifyPointers<"Album">>("Album", {
-      images: [],
-      name: "",
-      collaborators: [],
-      viewers: [],
-      captions: {},
-      ...attributes,
-      owner: attributes.owner?.toNativePointer() ?? {__type: "Pointer", className: "_User", objectId: ""},
-      coverImage: attributes.coverImage?.toNativePointer(),
-    }));
+    super(
+      // @ts-expect-error
+      new Parse.Object<ParsifyPointers<"Album">>("Album", {
+        images: [],
+        name: "",
+        collaborators: [],
+        viewers: [],
+        captions: {},
+        ...attributes,
+        owner: attributes.owner?.toNativePointer() ?? {
+          __type: "Pointer",
+          className: "_User",
+          objectId: "",
+        },
+        coverImage: attributes.coverImage?.toNativePointer(),
+      })
+    );
   }
 
   get id(): Attributes<"Album">["objectId"] {
@@ -245,12 +260,12 @@ export class UnpersistedParseAlbum extends ParseAlbum {
   }
 
   get createdAt(): Attributes<"Album">["createdAt"] {
-    console.warn("Unpersisted album has no createdAt")
+    console.warn("Unpersisted album has no createdAt");
     return new Date();
   }
 
   get updatedAt(): Attributes<"Album">["updatedAt"] {
-    console.warn("Unpersisted album has no updatedAt")
+    console.warn("Unpersisted album has no updatedAt");
     return new Date();
   }
 }

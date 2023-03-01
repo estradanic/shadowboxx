@@ -17,7 +17,7 @@ const BackButton = ({ placement = "header", ...rest }: BackButtonProps) => {
   const location = useLocation() as { state: { previousLocation: Location } };
 
   const startIcon = placement === "header" ? <ArrowBackIcon /> : undefined;
-  const text = placement === "header" ? Strings.back() : Strings.goBack();
+  const text = placement === "header" ? Strings.action.back : Strings.action.goBack;
 
   return (
     <Button

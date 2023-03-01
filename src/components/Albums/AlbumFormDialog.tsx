@@ -117,7 +117,7 @@ const AlbumFormDialog = ({
       fullWidth
       maxWidth="lg"
       open={open}
-      title={name ?? Strings.untitledAlbum()}
+      title={name ?? Strings.label.untitledAlbum}
       message=""
       handleConfirm={onSubmit}
       handleCancel={onCancel}
@@ -134,7 +134,7 @@ const AlbumFormDialog = ({
             fullWidth
             value={name}
             onChange={(e) => setName(e.target.value)}
-            label={Strings.name()}
+            label={Strings.label.name}
             id="name"
             type="text"
           />
@@ -145,7 +145,7 @@ const AlbumFormDialog = ({
             fullWidth
             value={description}
             onChange={(e) => setDescription(e.target.value)}
-            label={Strings.description()}
+            label={Strings.label.description}
             id="description"
             type="text"
             multiline
@@ -154,19 +154,19 @@ const AlbumFormDialog = ({
         {!isCollaborator && (
           <>
             <Grid item xs={12}>
-              <Tooltip title={Strings.collaboratorsTooltip()}>
+              <Tooltip title={Strings.label.collaboratorsTooltip}>
                 <UserField
                   value={collaborators}
-                  label={Strings.collaborators()}
+                  label={Strings.label.collaborators}
                   onChange={(collaborators) => setCollaborators(collaborators)}
                 />
               </Tooltip>
             </Grid>
             <Grid item xs={12}>
-              <Tooltip title={Strings.viewersTooltip()}>
+              <Tooltip title={Strings.label.viewersTooltip}>
                 <UserField
                   value={viewers}
-                  label={Strings.viewers()}
+                  label={Strings.label.viewers}
                   onChange={(viewers) => setViewers(viewers)}
                 />
               </Tooltip>
@@ -185,7 +185,7 @@ const AlbumFormDialog = ({
               }}
               coverImage={coverImage ?? images?.[0]?.toPointer()}
               setCoverImage={setCoverImage}
-              label={Strings.images()}
+              label={Strings.label.images}
               multiple
               value={
                 images?.filter?.(

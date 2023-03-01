@@ -32,7 +32,7 @@ const EmailField = ({
       event.target.value?.length > 0
     ) {
       setError(true);
-      setHelperText(Strings.invalidEmail(event.target.value));
+      setHelperText(Strings.error.invalidEmail(event.target.value));
     } else {
       setError(piError);
       setHelperText(piHelperText);

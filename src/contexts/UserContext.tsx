@@ -14,12 +14,12 @@ import {
   UpdateReason,
   ParseImage,
   Attributes,
+  UnpersistedParseUser,
 } from "../classes";
 import { Strings } from "../resources";
 import { routes } from "../app";
 import { useNavigate } from "../hooks";
 import { useNetworkDetectionContext } from "./NetworkDetectionContext";
-import { UnpersistedParseUser } from "../classes/ParseUser";
 
 /**
  * Interface defining the return value of the UserContext
@@ -88,10 +88,10 @@ export const UserContextProvider = ({ children }: UserContextProviderProps) => {
             if (userResponse) {
               setLoggedInUser(userResponse);
             } else {
-              console.error(Strings.couldNotGetUserInfo());
+              console.error(Strings.error.gettingUserInfo);
             }
           } catch (error: any) {
-            console.error(error?.message ?? Strings.couldNotGetUserInfo());
+            console.error(error);
           }
           if (redirectPath) {
             navigate(redirectPath);

@@ -1,11 +1,15 @@
+import { NativeAttributes, ParseAlbum } from "../../shared";
+
 /** Function to set user permissions for albums */
-const setUserPermissions = async (user: Parse.User) => {
+const setUserPermissions = async (
+  user: Parse.User<NativeAttributes<"_User">>
+) => {
   if (!user.existed()) {
-    const collaboratorAlbums = await new Parse.Query("Album")
-      .containsAll("collaborators", [user.getEmail()])
+    const collaboratorAlbums = await ParseAlbum.query()
+      .containsAll(ParseAlbum.COLUMNS.collaborators, [user.getEmail()])
       .find({ useMasterKey: true });
-    const viewerAlbums = await new Parse.Query("Album")
-      .containsAll("viewers", [user.getEmail()])
+    const viewerAlbums = await ParseAlbum.query()
+      .containsAll(ParseAlbum.COLUMNS.viewers, [user.getEmail()])
       .find({ useMasterKey: true });
     if (collaboratorAlbums.length > 0) {
       const readWriteRoleNames = collaboratorAlbums.map(

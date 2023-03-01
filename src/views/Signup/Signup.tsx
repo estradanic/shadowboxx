@@ -22,8 +22,8 @@ import {
 } from "../../utils";
 import { routes } from "../../app";
 import { useGlobalLoadingStore } from "../../stores";
+import { UnpersistedParseUser } from "../../classes";
 import { useView } from "../View";
-import { UnpersistedParseUser } from "../../classes/ParseUser";
 
 const useStyles = makeStyles((theme: Theme) => ({
   card: {
@@ -88,25 +88,25 @@ const Signup = memo(() => {
     if (!validateEmail(email)) {
       newErrors.email = {
         isError: true,
-        errorMessage: Strings.invalidEmail(email),
+        errorMessage: Strings.error.invalidEmail(email),
       };
     }
     if (!validatePassword(password)) {
       newErrors.password = {
         isError: true,
-        errorMessage: Strings.passwordHelperText(),
+        errorMessage: Strings.message.passwordHelperText,
       };
     }
     if (isNullOrWhitespace(firstName)) {
       newErrors.firstName = {
         isError: true,
-        errorMessage: Strings.pleaseEnterA(Strings.firstName()),
+        errorMessage: Strings.prompt.pleaseEnterA(Strings.label.firstName),
       };
     }
     if (isNullOrWhitespace(lastName)) {
       newErrors.lastName = {
         isError: true,
-        errorMessage: Strings.pleaseEnterA(Strings.firstName()),
+        errorMessage: Strings.prompt.pleaseEnterA(Strings.label.lastName),
       };
     }
 
@@ -134,7 +134,8 @@ const Signup = memo(() => {
         params.append("email", email);
         navigate(`${routes.VerifyEmail.path}?${params.toString()}`);
       } catch (error: any) {
-        enqueueErrorSnackbar(error?.message ?? Strings.signupError());
+        console.error(error);
+        enqueueErrorSnackbar(Strings.error.signingUp);
       } finally {
         stopGlobalLoader();
       }
@@ -147,7 +148,7 @@ const Signup = memo(() => {
         <Card>
           <Grid container direction="row">
             <Grid className={classes.cardTitle} item xs={12}>
-              <Typography variant="h4">{Strings.signup()}</Typography>
+              <Typography variant="h4">{Strings.action.signup}</Typography>
             </Grid>
             <Grid item xs={12}>
               <TextField
@@ -156,7 +157,7 @@ const Signup = memo(() => {
                 fullWidth
                 value={firstName}
                 onChange={(e) => setFirstName(e.target.value)}
-                label={Strings.firstName()}
+                label={Strings.label.firstName}
                 id="firstName"
                 type="text"
               />
@@ -168,7 +169,7 @@ const Signup = memo(() => {
                 fullWidth
                 value={lastName}
                 onChange={(e) => setLastName(e.target.value)}
-                label={Strings.lastName()}
+                label={Strings.label.lastName}
                 id="lastName"
                 type="text"
               />
@@ -181,7 +182,7 @@ const Signup = memo(() => {
                 fullWidth
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                label={Strings.email()}
+                label={Strings.label.email}
                 id="email"
                 onEnterKey={signup}
               />
@@ -194,7 +195,7 @@ const Signup = memo(() => {
                 fullWidth
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                label={Strings.password()}
+                label={Strings.label.password}
                 id="password"
                 onEnterKey={signup}
               />
@@ -206,7 +207,7 @@ const Signup = memo(() => {
                 size="large"
                 onClick={signup}
               >
-                {Strings.submit()}
+                {Strings.action.submit}
               </Button>
             </Grid>
           </Grid>
@@ -214,9 +215,9 @@ const Signup = memo(() => {
       </Grid>
       <br />
       <br />
-      <Typography variant="h6">{Strings.alreadyHaveAccount()}</Typography>
+      <Typography variant="h6">{Strings.prompt.alreadyHaveAccount}</Typography>
       <Link saveHistory={false} to="/login">
-        {Strings.login()}
+        {Strings.action.login}
       </Link>
     </PageContainer>
   );

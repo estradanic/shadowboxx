@@ -1,18 +1,26 @@
 import { createTransport } from "nodemailer";
+import { NativeAttributes, ParseUser, Strings } from "../../shared";
 
 /** Function to send verification email when email changes */
-const sendVerificationEmail = async (user: Parse.User) => {
-  const oldUser = await new Parse.Query(Parse.User).get(user.id, {
+const sendVerificationEmail = async (
+  user: Parse.User<NativeAttributes<"_User">>
+) => {
+  const oldUser = await ParseUser.query().get(user.id, {
     useMasterKey: true,
   });
-  if (oldUser.get("email") === user.get("email")) {
+  if (
+    oldUser.get(ParseUser.COLUMNS.email) === user.get(ParseUser.COLUMNS.email)
+  ) {
     return;
   }
 
   const config = await new Parse.Query("Config").first({ useMasterKey: true });
   if (!config?.get("zohoPassword")) {
     console.error("Failed to send verification email: no Zoho password");
-    throw new Parse.Error(500, "Failed to send verification email");
+    throw new Parse.Error(
+      500,
+      Strings.cloud.error.failedToSendVerificationEmail
+    );
   }
 
   const transport = createTransport({
@@ -31,29 +39,34 @@ const sendVerificationEmail = async (user: Parse.User) => {
   user.set("verificationCode", code);
 
   if (user.isNew()) {
-    user.set("email", user.getUsername());
+    user.set(ParseUser.COLUMNS.email, user.getUsername()!);
   } else {
-    user.set("oldEmail", oldUser.get("email"));
+    user.set(ParseUser.COLUMNS.oldEmail, oldUser.get(ParseUser.COLUMNS.email));
   }
 
   const mailOptions = {
     from: '"Shadowboxx Admin" <admin@shadowboxx.app>',
-    to: user.get("email"),
+    to: user.get(ParseUser.COLUMNS.email),
     subject: "Shadowboxx Email Verification",
-    text: `Hi ${user.get("firstName")}, your verification code is ${code}`,
+    text: `Hi ${user.get(
+      ParseUser.COLUMNS.firstName
+    )}, your verification code is ${code}`,
     html: `<p>Hi ${user.get(
-      "firstName"
+      ParseUser.COLUMNS.firstName
     )}, your verification code is ${code}</p>`,
   };
 
   transport.sendMail(mailOptions, (e, i) => {
     if (e) {
       console.error("Failed to send verification email", e);
-      throw new Parse.Error(500, "Failed to send verification email");
+      throw new Parse.Error(
+        500,
+        Strings.cloud.error.failedToSendVerificationEmail
+      );
     }
     console.log(
       "Verification email sent to user",
-      user.get("email"),
+      user.get(ParseUser.COLUMNS.email),
       i.messageId,
       i.response
     );

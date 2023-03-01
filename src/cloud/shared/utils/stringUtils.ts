@@ -44,7 +44,7 @@ export const uniqueId = (prefix: string = ""): string => {
 export const makeValidFileName = (input: string): string => {
   let fileName = input?.replaceAll(/[^A-Z0-9a-z_. ]/g, "");
   if (isNullOrWhitespace(fileName)) {
-    throw new Error(Strings.invalidEmptyFilename());
+    throw new Error(Strings.error.invalidEmptyFilename);
   }
   if (fileName.length > MAX_ALLOWED_FILE_NAME_LENGTH) {
     fileName = fileName.substring(0, MAX_ALLOWED_FILE_NAME_LENGTH);
@@ -56,7 +56,7 @@ export const makeValidFileName = (input: string): string => {
 export const removeExtension = (input: string): string => {
   const fileName = input?.replace(/\..*$/, "");
   if (isNullOrWhitespace(fileName)) {
-    throw new Error(Strings.invalidEmptyFilename());
+    throw new Error(Strings.error.invalidEmptyFilename);
   }
   return fileName;
 };

@@ -1,4 +1,5 @@
 import { createTransport } from "nodemailer";
+import { ParseUser, Strings } from "../shared";
 
 export type ResendVerificationEmailParams = {
   email: string;
@@ -11,26 +12,27 @@ const resendVerificationEmail = async ({
   const config = await new Parse.Query("Config").first({ useMasterKey: true });
   if (!config?.get("zohoPassword")) {
     console.error("Failed to send verification email: no Zoho password");
-    throw new Parse.Error(500, "Failed to send verification email");
+    throw new Parse.Error(
+      500,
+      Strings.cloud.error.failedToSendVerificationEmail
+    );
   }
 
-  const user = await new Parse.Query(Parse.User)
-    .equalTo("email", email)
+  const user = await ParseUser.query()
+    .equalTo(ParseUser.COLUMNS.email, email)
     .first({ useMasterKey: true });
 
   if (!user) {
-    throw new Parse.Error(404, "User not found");
+    throw new Parse.Error(404, Strings.cloud.error.userNotFound);
   }
 
-  if (user.get("updatedAt")) {
-    const updatedAt = user.get("updatedAt");
-    const diff = new Date().getTime() - updatedAt.getTime();
+  if (user.get(ParseUser.COLUMNS.updatedAt)) {
+    const diff =
+      new Date().getTime() - user.get(ParseUser.COLUMNS.updatedAt).getTime();
     if (diff < 5 * 60 * 1000) {
       throw new Parse.Error(
         429,
-        `Please wait ${Math.round(
-          300 - diff / 1000
-        )} seconds before trying again`
+        Strings.cloud.error.pleaseWaitSeconds(Math.round(300 - diff / 1000))
       );
     }
   }
@@ -38,8 +40,8 @@ const resendVerificationEmail = async ({
   const code = Math.floor(Math.random() * 1000000)
     .toString()
     .padStart(6, "0");
-  user.set("verificationCode", code);
-  user.save(null, { useMasterKey: true, context: { noTrigger: true } });
+  user.set(ParseUser.COLUMNS.verificationCode, code);
+  await user.save(null, { useMasterKey: true, context: { noTrigger: true } });
 
   const transport = createTransport({
     host: "smtppro.zoho.com",
@@ -51,24 +53,26 @@ const resendVerificationEmail = async ({
     },
   });
 
+  const firstName = user.get(ParseUser.COLUMNS.firstName);
   const mailOptions = {
     from: '"Shadowboxx Admin" <admin@shadowboxx.app>',
     to: user.get("email"),
     subject: "Shadowboxx Email Verification",
-    text: `Hi ${user.get("firstName")}, your verification code is ${code}`,
-    html: `<p>Hi ${user.get(
-      "firstName"
-    )}, your verification code is ${code}</p>`,
+    text: `Hi ${firstName}, your verification code is ${code}`,
+    html: `<p>Hi ${firstName}, your verification code is ${code}</p>`,
   };
 
   transport.sendMail(mailOptions, (e, i) => {
     if (e) {
       console.error("Failed to resend verification email", e);
-      throw new Parse.Error(500, "Failed to resend verification email");
+      throw new Parse.Error(
+        500,
+        Strings.cloud.error.failedToSendVerificationEmail
+      );
     }
     console.log(
       "Verification email resent to user",
-      user.get("email"),
+      user.get(ParseUser.COLUMNS.email),
       i.messageId,
       i.response
     );

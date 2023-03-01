@@ -1,3 +1,4 @@
+import { ParseUser, Strings } from "../shared";
 import { updateEmail } from "../triggers";
 
 export interface VerifyEmailParams {
@@ -7,16 +8,16 @@ export interface VerifyEmailParams {
 
 /** Function to verify email */
 const verifyEmail = async ({ code, email }: VerifyEmailParams) => {
-  const user = await new Parse.Query(Parse.User)
-    .equalTo("email", email)
+  const user = await ParseUser.query()
+    .equalTo(ParseUser.COLUMNS.email, email)
     .first({ useMasterKey: true });
   if (!user) {
-    throw new Parse.Error(404, "User not found");
+    throw new Parse.Error(404, Strings.cloud.error.userNotFound);
   }
-  if (user.get("verificationCode") !== code) {
-    throw new Parse.Error(400, "Invalid verification code");
+  if (user.get(ParseUser.COLUMNS.verificationCode) !== code) {
+    throw new Parse.Error(400, Strings.cloud.error.invalidVerificationCode);
   }
-  user.set("verificationCode", "");
+  user.set(ParseUser.COLUMNS.verificationCode, undefined);
   await user.save(null, { useMasterKey: true });
 
   await updateEmail(user);

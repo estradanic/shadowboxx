@@ -10,7 +10,12 @@ import { useNotificationsContext } from "./NotificationsContext";
 import ErrorIcon from "@material-ui/icons/Error";
 import { FancyTypography, useSnackbar } from "../components";
 import { Strings } from "../resources";
-import { ParseImage, ImageAttributes } from "../classes";
+import {
+  ParseImage,
+  ImageAttributes,
+  UnpersistedParseImage,
+  UnpersistedParseImageAttributes,
+} from "../classes";
 import { useGlobalLoadingStore } from "../stores";
 import {
   isNullOrWhitespace,
@@ -20,10 +25,6 @@ import {
 import { ImageSelectionDialog } from "../components/Images";
 import { readAndCompressImage } from "browser-image-resizer";
 import { useUserContext } from "./UserContext";
-import {
-  UnpersistedParseImage,
-  UnpersistedParseImageAttributes,
-} from "../classes/ParseImage";
 
 export enum ImageActionCommand {
   DELETE,
@@ -153,7 +154,7 @@ export const ImageContextProvider = ({
       type: "determinate",
       content: (
         <FancyTypography variant="loading">
-          {Strings.uploadingImages()}
+          {Strings.message.uploadingImages}
         </FancyTypography>
       ),
       progress: 5,
@@ -175,15 +176,15 @@ export const ImageContextProvider = ({
       action.completed = true;
       recalculateProgress();
       if (isNullOrWhitespace(error.message)) {
-        error.message = Strings.uploadImageError();
+        error.message = Strings.error.uploadingImage(image.name);
       }
       addNotification({
         id: `upload-image-error-${image.name}`,
-        title: Strings.uploadImageError(),
+        title: Strings.error.uploadingImage(image.name),
         icon: <ErrorIcon />,
       });
       console.error(error);
-      enqueueErrorSnackbar(Strings.uploadImageError());
+      enqueueErrorSnackbar(Strings.error.uploadingImage(image.name));
       return undefined;
     }
   };
@@ -239,7 +240,7 @@ export const ImageContextProvider = ({
       type: "determinate",
       content: (
         <FancyTypography variant="loading">
-          {Strings.processingImages()}
+          {Strings.message.processingImages}
         </FancyTypography>
       ),
     });
@@ -277,7 +278,7 @@ export const ImageContextProvider = ({
       acl
     );
     if (!newImage) {
-      throw new Error(Strings.uploadImageError());
+      throw new Error(Strings.error.uploadingImage(fileName));
     }
     return newImage;
   };
@@ -293,7 +294,8 @@ export const ImageContextProvider = ({
     try {
       await parseImage.destroy();
     } catch (e: any) {
-      enqueueErrorSnackbar(e?.message ?? Strings.commonError());
+      console.error(e);
+      enqueueErrorSnackbar(Strings.error.deletingImage(parseImage.name));
     }
 
     action.completed = true;

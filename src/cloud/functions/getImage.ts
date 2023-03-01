@@ -1,3 +1,5 @@
+import { ParseImage, Strings } from "../shared";
+
 export interface GetImageParams {
   imageId: string;
 }
@@ -7,13 +9,13 @@ export interface GetImageParams {
  * thus skirting cors problems from getting it directly on the browser
  */
 const getImage = async ({ imageId }: GetImageParams) => {
-  const image = await new Parse.Query("Image")
-    .equalTo("objectId", imageId)
+  const image = await ParseImage.query()
+    .equalTo(ParseImage.COLUMNS.objectId, imageId)
     .first({ useMasterKey: true });
   if (!image) {
-    throw new Parse.Error(404, "Image not found");
+    throw new Parse.Error(404, Strings.cloud.error.imageNotFound);
   }
-  const data: string = image.get("file").getData();
+  const data: string = await image.get(ParseImage.COLUMNS.file).getData();
   return data;
 };
 

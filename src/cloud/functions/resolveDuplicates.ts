@@ -1,22 +1,37 @@
+import {
+  ParseAlbum,
+  ParseDuplicate,
+  ParseImage,
+  ParseUser,
+  NativeAttributes,
+  getObjectId,
+} from "../shared";
+
 export interface ResolveDuplicatesParams {
   duplicateIds: string[];
 }
 
 const resolveDuplicates = async (
   { duplicateIds }: ResolveDuplicatesParams,
-  user?: Parse.User
+  user?: Parse.User<NativeAttributes<"_User">>
 ) => {
-  const duplicates = await new Parse.Query("Duplicate")
-    .containedIn("objectId", duplicateIds)
+  const duplicates = await ParseDuplicate.query()
+    .containedIn(ParseDuplicate.COLUMNS.objectId, duplicateIds)
     .find({ useMasterKey: true });
   for (const duplicate of duplicates) {
     try {
       console.log("Resolving duplicate", duplicate.id);
-      const imageToDelete = await new Parse.Query("Image")
-        .equalTo("objectId", duplicate.get("image1").id)
+      const imageToDelete = await ParseImage.query()
+        .equalTo(
+          ParseImage.COLUMNS.objectId,
+          getObjectId(duplicate.get(ParseDuplicate.COLUMNS.image1))
+        )
         .first({ useMasterKey: true });
-      const imageToKeep = await new Parse.Query("Image")
-        .equalTo("objectId", duplicate.get("image2").id)
+      const imageToKeep = await ParseImage.query()
+        .equalTo(
+          ParseImage.COLUMNS.objectId,
+          getObjectId(duplicate.get(ParseDuplicate.COLUMNS.image2))
+        )
         .first({ useMasterKey: true });
       if (!imageToDelete) {
         console.log("Image to delete not found");
@@ -27,21 +42,21 @@ const resolveDuplicates = async (
         await duplicate.destroy({ useMasterKey: true });
         continue;
       }
-      const albumsToCorrect = await new Parse.Query("Album")
-        .contains("images", imageToDelete.id)
+      const albumsToCorrect = await ParseAlbum.query()
+        .contains(ParseAlbum.COLUMNS.images, imageToDelete.id)
         .find({ useMasterKey: true });
       for (const album of albumsToCorrect) {
         try {
-          console.log("Correcting album", album.get("name"));
-          const imageIds: string[] = album.get("images");
+          console.log("Correcting album", album.get(ParseAlbum.COLUMNS.name));
+          const imageIds: string[] = album.get(ParseAlbum.COLUMNS.images);
           if (imageIds.includes(imageToKeep.id)) {
             album.set(
-              "images",
+              ParseAlbum.COLUMNS.images,
               imageIds.filter((id) => id !== imageToDelete.id)
             );
           } else {
             album.set(
-              "images",
+              ParseAlbum.COLUMNS.images,
               imageIds.map((id) =>
                 id === imageToDelete.id ? imageToKeep.id : id
               )
@@ -54,21 +69,28 @@ const resolveDuplicates = async (
             },
           });
         } catch (error) {
-          console.error("Error correcting album", album.get("name"), error);
+          console.error(
+            "Error correcting album",
+            album.get(ParseAlbum.COLUMNS.name),
+            error
+          );
         }
       }
       if (user) {
         await user.fetch();
-        if (user.get("profilePicture").id === imageToDelete.id) {
+        if (
+          getObjectId(user.get(ParseUser.COLUMNS.profilePicture)) ===
+          imageToDelete.id
+        ) {
           console.log("Fixing profile picture for user", user.get("email"));
-          user.set("profilePicture", imageToKeep.toPointer());
+          user.set(ParseUser.COLUMNS.profilePicture, imageToKeep.toPointer());
           await user.save(null, {
             useMasterKey: true,
             context: { noTrigger: true },
           });
         }
       }
-      console.log("Deleting image", imageToDelete.get("name"));
+      console.log("Deleting image", imageToDelete.get(ParseImage.COLUMNS.name));
       await imageToDelete.destroy({ useMasterKey: true });
       console.log("Deleting duplicate", duplicate.id);
       await duplicate.destroy({ useMasterKey: true });

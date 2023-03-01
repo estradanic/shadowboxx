@@ -28,6 +28,8 @@
     "types",
     "utils",
     "views",
-    "classes"
+    "classes",
+    "cloud/shared/resources/index.ts",
+    "cloud/shared/utils/stringUtils.ts"
   ]
 }

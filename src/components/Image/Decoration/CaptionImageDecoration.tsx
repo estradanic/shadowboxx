@@ -66,20 +66,20 @@ const CaptionImageDecoration = ({
       <InPortal node={captionPortalNode}>
         <TextField
           onChange={(e) => setCaption(e.target.value)}
-          label={Strings.caption()}
+          label={Strings.label.caption}
           value={caption ?? ""}
         />
       </InPortal>
       <ImageDecoration<IconProps>
         onClick={() => {
           openPrompt(captionPortalNode, handleConfirm, handleCancel, {
-            title: Strings.addOrEditCaption(),
+            title: Strings.action.addOrEditCaption,
             confirmButtonColor: "success",
           });
         }}
         corner={corner}
         Component={CaptionImageDecorationIcon}
-        description={Strings.captionImage()}
+        description={Strings.action.captionImage}
         ComponentProps={{
           fontSize: "large",
           ...IconProps,

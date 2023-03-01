@@ -177,7 +177,8 @@ const ImageField = memo(
           const newImages = await uploadImagesFromFiles(files, acl);
           await onAdd(...newImages);
         } catch (error: any) {
-          enqueueErrorSnackbar(error?.message ?? Strings.uploadImageError());
+          console.error(error);
+          enqueueErrorSnackbar(Strings.error.uploadingImage());
         } finally {
           // Clear the input so that the same file can be uploaded again
           event.target.value = "";
@@ -190,9 +191,8 @@ const ImageField = memo(
         const newImage = await uploadImageFromUrl(imageUrlRef.current, acl);
         await onAdd(newImage);
       } catch (error: any) {
-        enqueueErrorSnackbar(
-          error?.message ?? Strings.uploadImageError(imageUrlRef.current)
-        );
+        console.log(error);
+        enqueueErrorSnackbar(Strings.error.uploadingImage(imageUrlRef.current));
       }
       setShowUrlInput(false);
       setImageUrl("");
@@ -226,7 +226,7 @@ const ImageField = memo(
                 }
               }}
               value={imageUrl}
-              label={Strings.imageUrl()}
+              label={Strings.label.imageUrl}
               InputProps={{
                 endAdornment: (
                   <>
@@ -272,7 +272,7 @@ const ImageField = memo(
                       onClick={openUrlInput}
                       position="end"
                     >
-                      <Tooltip title={Strings.addFromUrl()}>
+                      <Tooltip title={Strings.action.addFromUrl}>
                         <LinkIcon className={classes.endAdornment} />
                       </Tooltip>
                     </InputAdornment>
@@ -281,7 +281,7 @@ const ImageField = memo(
                       position="end"
                       onClick={selectFromLibrary}
                     >
-                      <Tooltip title={Strings.addFromLibrary()}>
+                      <Tooltip title={Strings.action.addFromLibrary}>
                         <CloudIcon className={classes.endAdornment} />
                       </Tooltip>
                     </InputAdornment>
@@ -292,7 +292,7 @@ const ImageField = memo(
                         inputRef.current?.click?.();
                       }}
                     >
-                      <Tooltip title={Strings.addFromFile()}>
+                      <Tooltip title={Strings.action.addFromFile}>
                         <AddAPhotoIcon className={classes.endAdornment} />
                       </Tooltip>
                     </InputAdornment>
@@ -314,7 +314,7 @@ const ImageField = memo(
                   <InputAdornment position="start">
                     <Typography variant="body1">
                       {value.length > 1 && multiple
-                        ? Strings.multipleImages()
+                        ? Strings.label.multipleImages
                         : elide(value[0].name, 20, 3)}
                     </Typography>
                   </InputAdornment>
@@ -389,7 +389,7 @@ const ImageField = memo(
             <InPortal node={dialogImageUrlInputPortalNode}>
               <TextField
                 onChange={(e) => setImageUrl(e.target.value)}
-                label={Strings.imageUrl()}
+                label={Strings.label.imageUrl}
                 value={imageUrl}
               />
             </InPortal>
@@ -403,10 +403,10 @@ const ImageField = memo(
             />
             <Menu open={!!anchorEl} anchorEl={anchorEl} onClose={closeMenu}>
               <MenuItem onClick={selectFromLibrary}>
-                {Strings.addFromLibrary()}
+                {Strings.action.addFromLibrary}
               </MenuItem>
               <MenuItem onClick={() => inputRef.current?.click?.()}>
-                {Strings.addFromFile()}
+                {Strings.action.addFromFile}
               </MenuItem>
               <MenuItem
                 onClick={() =>
@@ -415,13 +415,13 @@ const ImageField = memo(
                     addFromUrl,
                     undefined,
                     {
-                      title: Strings.addFromUrl(),
+                      title: Strings.action.addFromUrl,
                       confirmButtonColor: "success",
                     }
                   )
                 }
               >
-                {Strings.addFromUrl()}
+                {Strings.action.addFromUrl}
               </MenuItem>
             </Menu>
             <IconButton

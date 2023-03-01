@@ -97,10 +97,10 @@ const DuplicatesNotificationDetail = ({
         duplicateIds: duplicateIds,
       });
       notificationRef.current?.remove();
-      enqueueSuccessSnackbar(Strings.commonSaved());
+      enqueueSuccessSnackbar(Strings.success.saved);
     } catch (error) {
       console.error(error);
-      enqueueErrorSnackbar(Strings.couldNotResolveDuplicates());
+      enqueueErrorSnackbar(Strings.error.resolvingDuplicates);
     } finally {
       stopGlobalLoader();
       queryClient.invalidateQueries({ queryKey: [getDuplicatesQueryKey()] });
@@ -162,7 +162,7 @@ const DuplicatesNotificationDetail = ({
                         }}
                       />
                     }
-                    label={Strings.isDuplicate()}
+                    label={Strings.prompt.isDuplicate}
                   />
                 </Grid>
               </Grid>
@@ -173,7 +173,7 @@ const DuplicatesNotificationDetail = ({
       <Grid container>
         <Grid item xs={7} className={classes.textContainer}>
           <Typography>
-            {Strings.duplicatesNotificationDetail(duplicates.length)}
+            {Strings.message.duplicatesNotificationDetail(duplicates.length)}
           </Typography>
         </Grid>
         <Grid item xs={5} className={classes.buttonContainer}>
@@ -181,16 +181,16 @@ const DuplicatesNotificationDetail = ({
             onClick={() => {
               openPrompt(resolveDialogPortalNode, resolve, reset, {
                 confirmButtonColor: "success",
-                confirmButtonText: Strings.resolve(),
+                confirmButtonText: Strings.action.resolve,
                 fullScreen: true,
-                title: Strings.resolveDuplicates(),
+                title: Strings.action.resolveDuplicates,
               });
             }}
             variant="contained"
             className={classes.resolveButton}
             size="small"
           >
-            {Strings.resolve()}
+            {Strings.action.resolve}
           </Button>
         </Grid>
       </Grid>

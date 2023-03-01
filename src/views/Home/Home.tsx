@@ -21,11 +21,11 @@ import {
   useInfiniteScroll,
   useRandomColor,
   useVirtualList,
+  useFlatInfiniteQueryData,
 } from "../../hooks";
 import { DEFAULT_PAGE_SIZE } from "../../constants";
 import NoAlbums from "../../components/Albums/NoAlbums";
-import { UnpersistedParseAlbum } from "../../classes/ParseAlbum";
-import useFlatInfiniteQueryData from "../../hooks/Query/useFlatInfiniteQueryData";
+import { UnpersistedParseAlbum } from "../../classes";
 
 const useStyles = makeStyles((theme: Theme) => ({
   title: {
@@ -128,7 +128,7 @@ const Home = memo(() => {
         value={{
           owner: getLoggedInUser().toPointer(),
           images: [],
-          name: Strings.untitledAlbum(),
+          name: Strings.label.untitledAlbum,
           collaborators: [],
           viewers: [],
           captions: {},
@@ -142,9 +142,10 @@ const Home = memo(() => {
               attributes
             ).saveNew();
             await refetchAlbums();
-            enqueueSuccessSnackbar(Strings.addAlbumSuccess(response?.name));
+            enqueueSuccessSnackbar(Strings.success.addingAlbum(response?.name));
           } catch (error: any) {
-            enqueueErrorSnackbar(error?.message ?? Strings.addAlbumError());
+            console.error(error);
+            enqueueErrorSnackbar(Strings.error.addingAlbum);
           }
         }}
       />

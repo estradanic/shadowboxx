@@ -84,7 +84,7 @@ const useQueryConfigHelpers = () => {
   }: HandleErrorOptions): Error => {
     console.error(error);
     if (error?.message === "Invalid session token") {
-      enqueueWarningSnackbar(Strings.sessionExpired());
+      enqueueWarningSnackbar(Strings.message.sessionExpired);
       getLoggedInUser().logout(updateLoggedInUser);
     } else if (
       errorMessage &&
