@@ -1,4 +1,4 @@
-import React, { Suspense, useEffect } from "react";
+import React, { Suspense, useCallback, useEffect } from "react";
 import Parse from "parse";
 import { Routes, Route } from "react-router-dom";
 import CircularProgress from "@material-ui/core/CircularProgress";
@@ -61,12 +61,13 @@ const App = () => {
   const { getLoggedInUser, isUserLoggedIn } = useUserContext();
   const { addNotification } = useNotificationsContext();
 
-  const darkTheme = (lightThemeSettings: Theme) =>
+  const isDarkThemeEnabled = getLoggedInUser()?.isDarkThemeEnabled;
+  const darkTheme = useCallback((lightThemeSettings: Theme) =>
     createTheme(
-      isUserLoggedIn && getLoggedInUser()?.isDarkThemeEnabled
+      isUserLoggedIn && isDarkThemeEnabled
         ? darkThemeSettings
         : lightThemeSettings
-    );
+    ), [isUserLoggedIn, isDarkThemeEnabled]);
 
   useEffect(() => {
     navigator?.storage?.persisted?.()?.then?.((initialIsPersisted) => {
