@@ -1,3 +1,4 @@
+import loggerWrapper from "../../loggerWrapper";
 import { NativeAttributes, ParseUser } from "../../shared";
 
 /** Function to check the whitelist of users and return if a given user is allowed to log in */
@@ -15,4 +16,4 @@ const isUserWhitelisted = async (
   );
 };
 
-export default isUserWhitelisted;
+export default loggerWrapper("isUserWhitelisted", isUserWhitelisted);

@@ -2,11 +2,11 @@ import React, { useEffect, useState } from "react";
 import Grid from "@material-ui/core/Grid";
 import { VariableColor } from "../../types";
 import { ParseImage } from "../../classes";
-import { useVirtualList } from "../../hooks";
 import ImagesSkeleton from "../Skeleton/ImagesSkeleton";
 import Image, { ImageProps } from "./Image";
 import NoImages from "./NoImages";
 import useImageStyles from "./useImageStyles";
+import useVirtualList from "../../hooks/useVirtualList";
 
 export type ImagesProps = {
   /** Images to show */

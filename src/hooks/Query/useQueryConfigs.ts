@@ -1,6 +1,5 @@
 import Parse from "parse";
 import { QueryObserverOptions } from "@tanstack/react-query";
-import { useUserContext } from "../../contexts";
 import { Strings } from "../../resources";
 import {
   ParseAlbum,
@@ -13,6 +12,7 @@ import useQueryConfigHelpers, {
   FunctionOptions,
 } from "./useQueryConfigHelpers";
 import QueryCacheGroups from "./QueryCacheGroups";
+import { useUserContext } from "../../contexts/UserContext";
 
 export type QueryOptionsFunction<TData> = (
   options?: Partial<QueryObserverOptions<TData, Error>>

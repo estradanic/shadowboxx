@@ -1,3 +1,4 @@
+import loggerWrapper from "../../loggerWrapper";
 import { NativeAttributes } from "../../shared";
 
 /** Function to delete roles associated with this album */
@@ -17,4 +18,4 @@ const deleteRoles = async (album: Parse.Object<NativeAttributes<"Album">>) => {
   }
 };
 
-export default deleteRoles;
+export default loggerWrapper("deleteRoles", deleteRoles);

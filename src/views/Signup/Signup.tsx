@@ -4,7 +4,6 @@ import Typography from "@material-ui/core/Typography";
 import Grid from "@material-ui/core/Grid";
 import Card from "@material-ui/core/Card";
 import Button from "@material-ui/core/Button";
-import { useNavigate } from "../../hooks";
 import { Strings } from "../../resources";
 import {
   PasswordField,
@@ -20,10 +19,11 @@ import {
   validatePassword,
   isNullOrWhitespace,
 } from "../../utils";
-import { routes } from "../../app";
+import routes from "../../app/routes";
 import { useGlobalLoadingStore } from "../../stores";
 import { UnpersistedParseUser } from "../../classes";
 import { useView } from "../View";
+import useNavigate from "../../hooks/useNavigate";
 
 const useStyles = makeStyles((theme: Theme) => ({
   card: {

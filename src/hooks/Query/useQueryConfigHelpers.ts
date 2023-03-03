@@ -1,8 +1,9 @@
 import { useSnackbar } from "../../components";
-import { useNetworkDetectionContext, useUserContext } from "../../contexts";
 import { useGlobalLoadingStore } from "../../stores";
 import { Strings } from "../../resources";
 import { Interdependent } from "../../types";
+import { useUserContext } from "../../contexts/UserContext";
+import { useNetworkDetectionContext } from "../../contexts/NetworkDetectionContext";
 
 export type FunctionOptions = Interdependent<
   {
@@ -95,7 +96,8 @@ const useQueryConfigHelpers = () => {
       enqueueErrorSnackbar(errorMessage);
       throw new Error(errorMessage);
     } else if (showNativeError && showErrorsInSnackbar && online) {
-      enqueueErrorSnackbar(error?.message);
+      console.error(error);
+      enqueueErrorSnackbar(Strings.error.common);
     }
     throw new Error(error?.message ?? errorMessage);
   };

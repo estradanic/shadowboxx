@@ -26,8 +26,12 @@ import {
 } from "./functions";
 import { NativeAttributes, ParseUser, Strings } from "./shared";
 
+type Image = Parse.Object<NativeAttributes<"Image">>;
+type Album = Parse.Object<NativeAttributes<"Album">>;
+type User = Parse.User<NativeAttributes<"_User">>;
+
 Parse.Cloud.beforeLogin(async (request) => {
-  const user = request.object as Parse.User<NativeAttributes<"_User">>;
+  const user = request.object as User;
   if (!(await isUserWhitelisted(user))) {
     throw new Parse.Error(403, Strings.cloud.error.userNotWhitelisted);
   }
@@ -36,41 +40,30 @@ Parse.Cloud.beforeLogin(async (request) => {
   }
 });
 
-Parse.Cloud.afterSave<Parse.Object<NativeAttributes<"Image">>>(
-  "Image",
-  async (request) => {
-    if (request.master && request.context?.noTrigger) {
-      return;
-    }
-    await hashImage(request.object);
+Parse.Cloud.afterSave<Image>("Image", async (request) => {
+  if (request.master && request.context?.noTrigger) {
+    return;
   }
-);
+  await hashImage(request.object);
+});
 
-Parse.Cloud.afterSave<Parse.Object<NativeAttributes<"Album">>>(
-  "Album",
-  async (request) => {
-    if (request.master && request.context?.noTrigger) {
-      return;
-    }
-    await setAlbumPermissions(request.object);
-    await notifyOfAlbumChange(
-      request.object,
-      request.user as Parse.User<NativeAttributes<"_User">>
-    );
+Parse.Cloud.afterSave<Album>("Album", async (request) => {
+  if (request.master && request.context?.noTrigger) {
+    return;
   }
-);
+  await setAlbumPermissions(request.object);
+  await notifyOfAlbumChange(request.object, request.user as User);
+});
 
 Parse.Cloud.afterSave(Parse.User, async (request) => {
   if (request.master && request.context?.noTrigger) {
     return;
   }
-  await setUserPermissions(
-    request.object as Parse.User<NativeAttributes<"_User">>
-  );
+  await setUserPermissions(request.object as User);
 });
 
 Parse.Cloud.beforeSave(Parse.User, async (request) => {
-  const user = request.object as Parse.User<NativeAttributes<"_User">>;
+  const user = request.object as User;
   if (request.master && request.context?.noTrigger) {
     return;
   }
@@ -81,42 +74,30 @@ Parse.Cloud.beforeSave(Parse.User, async (request) => {
   }
 });
 
-Parse.Cloud.beforeSave<Parse.Object<NativeAttributes<"Image">>>(
-  "Image",
-  async (request) => {
-    if (request.master && request.context?.noTrigger) {
-      return;
-    }
-    await resizeImage(request.object);
-    if (request.object.isNew()) {
-      request.object.set("dateTaken", new Date());
-    }
+Parse.Cloud.beforeSave<Image>("Image", async (request) => {
+  if (request.master && request.context?.noTrigger) {
+    return;
   }
-);
+  await resizeImage(request.object);
+  if (request.object.isNew()) {
+    request.object.set("dateTaken", new Date());
+  }
+});
 
-Parse.Cloud.beforeSave<Parse.Object<NativeAttributes<"Album">>>(
-  "Album",
-  async (request) => {
-    if (request.master && request.context?.noTrigger) {
-      return;
-    }
-    await mergeAlbumChanges(request.object, request.context);
+Parse.Cloud.beforeSave<Album>("Album", async (request) => {
+  if (request.master && request.context?.noTrigger) {
+    return;
   }
-);
+  await mergeAlbumChanges(request.object, request.context);
+});
 
-Parse.Cloud.beforeDelete<Parse.Object<NativeAttributes<"Album">>>(
-  "Album",
-  async (request) => {
-    await deleteRoles(request.object);
-  }
-);
+Parse.Cloud.beforeDelete<Album>("Album", async (request) => {
+  await deleteRoles(request.object);
+});
 
-Parse.Cloud.beforeDelete<Parse.Object<NativeAttributes<"Image">>>(
-  "Image",
-  async (request) => {
-    await deleteImageFromAlbums(request.object);
-  }
-);
+Parse.Cloud.beforeDelete<Image>("Image", async (request) => {
+  await deleteImageFromAlbums(request.object);
+});
 
 Parse.Cloud.job("findDuplicates", async (request) => {
   await findDuplicateImages();
@@ -136,10 +117,7 @@ Parse.Cloud.job("populateDateTaken", async (request) => {
 Parse.Cloud.define<(params: ResolveDuplicatesParams) => Promise<void>>(
   "resolveDuplicates",
   async (request) => {
-    await resolveDuplicates(
-      request.params,
-      request.user as Parse.User<NativeAttributes<"_User">>
-    );
+    await resolveDuplicates(request.params, request.user as User);
   }
 );
 

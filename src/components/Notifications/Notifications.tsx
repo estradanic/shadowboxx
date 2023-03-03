@@ -12,10 +12,10 @@ import ArrowDropUpIcon from "@material-ui/icons/ArrowDropUp";
 import CloseIcon from "@material-ui/icons/Close";
 import NotificationsIcon from "@material-ui/icons/Notifications";
 import cx from "classnames";
-import { useNotificationsContext, Notification } from "../../contexts";
 import { Strings } from "../../resources";
 import { elide } from "../../utils";
 import Tooltip from "../Tooltip/Tooltip";
+import { useNotificationsContext, Notification } from "../../contexts/NotificationsContext";
 
 const useStyles = makeStyles((theme: Theme) => ({
   text: {

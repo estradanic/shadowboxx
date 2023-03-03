@@ -2,14 +2,11 @@ import React, { useEffect, MutableRefObject, useRef, useCallback } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import FiberNewIcon from "@material-ui/icons/FiberNew";
 import { ParseAlbumChangeNotification } from "../../classes";
-import {
-  useUserContext,
-  useNotificationsContext,
-  Notification,
-} from "../../contexts";
 import useQueryConfigs from "../Query/useQueryConfigs";
 import { Strings } from "../../resources";
 import AlbumChangesNotificationDetail from "../../components/Notifications/Detail/AlbumChanges";
+import { useNotificationsContext, Notification } from "../../contexts/NotificationsContext";
+import { useUserContext } from "../../contexts/UserContext";
 
 const useAlbumChangeNotifications = () => {
   const { addNotification } = useNotificationsContext();

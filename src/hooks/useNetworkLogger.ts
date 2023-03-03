@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef } from "react";
 import Parse from "parse";
-import { useUserContext } from "../contexts";
+import { useUserContext } from "../contexts/UserContext";
 
 type Timestamp = string;
 

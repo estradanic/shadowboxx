@@ -1,3 +1,4 @@
+import loggerWrapper from "../../loggerWrapper";
 import {
   getObjectId,
   NativeAttributes,
@@ -13,7 +14,7 @@ const getAllImages = async (album: Parse.Object<NativeAttributes<"Album">>) => {
   let offset = 0;
   const limit = 1000;
   while (!exhausted) {
-    const partialImages = await ParseImage.query()
+    const partialImages = await ParseImage.cloudQuery(Parse)
       .containedIn(
         ParseImage.COLUMNS.objectId,
         album.get(ParseAlbum.COLUMNS.images)
@@ -38,7 +39,7 @@ const getAllUsersByEmails = async (emails: string[]) => {
   let offset = 0;
   const limit = 1000;
   while (!exhausted) {
-    const partialUsers = await ParseUser.query()
+    const partialUsers = await ParseUser.cloudQuery(Parse)
       .containedIn(ParseUser.COLUMNS.email, emails)
       .limit(limit)
       .skip(offset)
@@ -57,7 +58,7 @@ const getAllUsersByEmails = async (emails: string[]) => {
 const setAlbumPermissions = async (
   album: Parse.Object<NativeAttributes<"Album">>
 ) => {
-  const owner = await ParseUser.query()
+  const owner = await ParseUser.cloudQuery(Parse)
     .equalTo(
       ParseUser.COLUMNS.objectId,
       getObjectId(album.get(ParseAlbum.COLUMNS.owner))
@@ -131,4 +132,4 @@ const setAlbumPermissions = async (
   await album.save(null, { useMasterKey: true, context: { noTrigger: true } });
 };
 
-export default setAlbumPermissions;
+export default loggerWrapper("setAlbumPermissions", setAlbumPermissions);

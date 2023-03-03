@@ -25,17 +25,19 @@ import { createHtmlPortalNode, InPortal } from "react-reverse-portal";
 import { elide } from "../../utils";
 import { Strings } from "../../resources";
 import { ParseImage, ParsePointer } from "../../classes";
-import { useRandomColor, useRefState, useVirtualList } from "../../hooks";
 import TextField, { TextFieldProps } from "../Field/TextField";
 import Tooltip from "../Tooltip/Tooltip";
 import { useSnackbar } from "../Snackbar/Snackbar";
-import { useImageContext } from "../../contexts";
 import Image from "../Image/Image";
 import RemoveImageDecoration from "../Image/Decoration/RemoveImageDecoration";
 import CoverImageDecoration from "../Image/Decoration/CoverImageDecoration";
 import { useActionDialogContext } from "../Dialog/ActionDialog";
 import { CaptionImageDecoration } from "../Image";
 import DateImageDecoration from "../Image/Decoration/DateImageDecoration";
+import useRandomColor from "../../hooks/useRandomColor";
+import useRefState from "../../hooks/useRefState";
+import useVirtualList from "../../hooks/useVirtualList";
+import { useImageContext } from "../../contexts/ImageContext";
 
 const useStyles = makeStyles((theme: Theme) => ({
   endAdornment: {

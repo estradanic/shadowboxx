@@ -9,8 +9,8 @@ import UserChip from "../User/UserChip";
 import TextField from "../Field/TextField";
 import { makeStyles, Theme } from "@material-ui/core/styles";
 import { useQuery } from "@tanstack/react-query";
-import { useQueryConfigs } from "../../hooks";
-import { useNetworkDetectionContext } from "../../contexts";
+import useQueryConfigs from "../../hooks/Query/useQueryConfigs";
+import { useNetworkDetectionContext } from "../../contexts/NetworkDetectionContext";
 
 const useStyles = makeStyles((theme: Theme) => ({
   endAdornment: {

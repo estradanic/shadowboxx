@@ -1,3 +1,4 @@
+import loggerWrapper from "../../loggerWrapper";
 import { NativeAttributes, ParseAlbum, ParseUser, Strings } from "../../shared";
 
 /** Function to update references to a user's email address when it changes */
@@ -8,7 +9,7 @@ const updateEmail = async (user: Parse.User<NativeAttributes<"_User">>) => {
     "to",
     user.get(ParseUser.COLUMNS.email)
   );
-  const oldUser = await ParseUser.query()
+  const oldUser = await ParseUser.cloudQuery(Parse)
     .equalTo(ParseUser.COLUMNS.objectId, user.id)
     .first({ useMasterKey: true });
 
@@ -28,8 +29,11 @@ const updateEmail = async (user: Parse.User<NativeAttributes<"_User">>) => {
 
   console.log("Getting albums referencing old email for user", user.id);
   const albumsReferencingOldEmail = await Parse.Query.or(
-    ParseAlbum.query().contains(ParseAlbum.COLUMNS.collaborators, oldEmail),
-    ParseAlbum.query().contains(ParseAlbum.COLUMNS.viewers, oldEmail)
+    ParseAlbum.cloudQuery(Parse).contains(
+      ParseAlbum.COLUMNS.collaborators,
+      oldEmail
+    ),
+    ParseAlbum.cloudQuery(Parse).contains(ParseAlbum.COLUMNS.viewers, oldEmail)
   ).find({ useMasterKey: true });
 
   console.log("Updating albums referencing old email for user", user.id);
@@ -56,4 +60,4 @@ const updateEmail = async (user: Parse.User<NativeAttributes<"_User">>) => {
   console.log("Updated albums referencing old email for user", user.id);
 };
 
-export default updateEmail;
+export default loggerWrapper("updateEmail", updateEmail);

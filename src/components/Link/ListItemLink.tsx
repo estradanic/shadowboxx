@@ -2,7 +2,7 @@ import React from "react";
 import ListItem from "@material-ui/core/ListItem";
 import { ButtonBaseProps } from "@material-ui/core/ButtonBase";
 import { useLocation } from "react-router-dom";
-import { useNavigate } from "../../hooks";
+import useNavigate from "../../hooks/useNavigate";
 
 /**
  * Interface defining props for ListItemLink

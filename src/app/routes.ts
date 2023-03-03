@@ -1,18 +1,4 @@
-import { ComponentType, lazy } from "react";
 import QueryCacheGroups from "../hooks/Query/QueryCacheGroups";
-
-// Lazy importing these to allow code-splitting
-const Home = lazy(() => import("../views/Home/Home"));
-const Login = lazy(() => import("../views/Login/Login"));
-const Settings = lazy(() => import("../views/Settings/Settings"));
-const Signup = lazy(() => import("../views/Signup/Signup"));
-const Album = lazy(() => import("../views/Album/Album"));
-const Pictures = lazy(() => import("../views/Pictures/Pictures"));
-const Share = lazy(() => import("../views/Share/Share"));
-const VerifyEmail = lazy(() => import("../views/VerifyEmail/VerifyEmail"));
-const ForgotPassword = lazy(
-  () => import("../views/ForgotPassword/ForgotPassword")
-);
 
 /** Union type of all the allowed Route ids */
 export type RouteId =
@@ -35,8 +21,6 @@ export interface RouteProps {
   viewName: string;
   /** Id of View. Should be same as key in the routes object */
   viewId: RouteId;
-  /** React Component to render in the layout */
-  View: ComponentType<any>;
   /** React Router path */
   path: string;
   /** Whether to try to sessionId authenticate on page load */
@@ -54,7 +38,6 @@ const routes = {
   Album: {
     viewId: "Album",
     viewName: "Album",
-    View: Album,
     path: "/album/:id",
     tryAuthenticate: true,
     redirectOnAuthFail: true,
@@ -66,7 +49,6 @@ const routes = {
   ForgotPassword: {
     viewId: "ForgotPassword",
     viewName: "Forgot Password",
-    View: ForgotPassword,
     path: "/forgot-password",
     tryAuthenticate: false,
     redirectOnAuthFail: false,
@@ -75,7 +57,6 @@ const routes = {
   Home: {
     viewId: "Home",
     viewName: "Home",
-    View: Home,
     path: "/home",
     tryAuthenticate: true,
     redirectOnAuthFail: true,
@@ -84,7 +65,6 @@ const routes = {
   Login: {
     viewId: "Login",
     viewName: "Login",
-    View: Login,
     path: "/login",
     tryAuthenticate: false,
     redirectOnAuthFail: false,
@@ -93,7 +73,6 @@ const routes = {
   Pictures: {
     viewId: "Pictures",
     viewName: "Pictures",
-    View: Pictures,
     path: "/pictures",
     tryAuthenticate: true,
     redirectOnAuthFail: true,
@@ -102,7 +81,6 @@ const routes = {
   Settings: {
     viewId: "Settings",
     viewName: "Settings",
-    View: Settings,
     path: "/settings",
     tryAuthenticate: true,
     redirectOnAuthFail: true,
@@ -111,7 +89,6 @@ const routes = {
   Share: {
     viewId: "Share",
     viewName: "Share",
-    View: Share,
     path: "/share",
     tryAuthenticate: true,
     redirectOnAuthFail: true,
@@ -120,7 +97,6 @@ const routes = {
   Signup: {
     viewId: "Signup",
     viewName: "Signup",
-    View: Signup,
     path: "/signup",
     tryAuthenticate: false,
     redirectOnAuthFail: false,
@@ -129,7 +105,6 @@ const routes = {
   VerifyEmail: {
     viewId: "VerifyEmail",
     viewName: "Verify Email",
-    View: VerifyEmail,
     path: "/verify",
     tryAuthenticate: false,
     redirectOnAuthFail: false,
@@ -138,7 +113,6 @@ const routes = {
   Root: {
     viewId: "Home",
     viewName: "Home",
-    View: Home,
     path: "/",
     tryAuthenticate: true,
     redirectOnAuthFail: true,

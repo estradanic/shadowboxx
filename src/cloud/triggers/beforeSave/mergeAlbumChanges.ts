@@ -1,3 +1,4 @@
+import loggerWrapper from "../../loggerWrapper";
 import {
   getObjectId,
   NativeAttributes,
@@ -85,7 +86,7 @@ const mergeAlbumChanges = async (
   let coverImage = attributes.coverImage;
   if (images && (!coverImage || !images.includes(getObjectId(coverImage)))) {
     console.log("Setting fallback for cover image");
-    const image = await ParseImage.query()
+    const image = await ParseImage.cloudQuery(Parse)
       .equalTo(ParseImage.COLUMNS.objectId, images[0])
       .first({ useMasterKey: true });
     coverImage = image?.toPointer();
@@ -95,4 +96,4 @@ const mergeAlbumChanges = async (
   album.set({ ...attributes, images, collaborators, viewers, coverImage });
 };
 
-export default mergeAlbumChanges;
+export default loggerWrapper("mergeAlbumChanges", mergeAlbumChanges);

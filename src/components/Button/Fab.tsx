@@ -2,7 +2,7 @@ import React from "react";
 import MuiFab, { FabProps as MuiFabProps } from "@material-ui/core/Fab";
 import { makeStyles, Theme } from "@material-ui/core/styles";
 import classNames from "classnames";
-import { useHideOnScroll } from "../../hooks";
+import useHideOnScroll from "../../hooks/useHideOnScroll";
 import { VariableColor } from "../../types";
 
 type UseStylesProps = {

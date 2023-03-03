@@ -13,7 +13,8 @@ const Strings = {
     gettingUserInfo: "Error getting user info",
     resolvingDuplicates: "Error resolving duplicates",
     deletingAlbum: (name: string) => `Error deleting album ${name}`,
-    deletingImage: (fileName?: string) => `Error deleting image${fileName ? ` ${fileName}` : ""}`,
+    deletingImage: (fileName?: string) =>
+      `Error deleting image${fileName ? ` ${fileName}` : ""}`,
     editingAlbum: "Error editing album",
     gettingImage: "Error getting image",
     gettingImages: "Error getting images",
@@ -25,10 +26,12 @@ const Strings = {
     imageNotFound: (imageId?: string) => `Image ${imageId} not found`,
     albumNotFound: (album?: string) =>
       `Album not found${album ? ` (${album})` : ""}`,
-    invalidEmail: (email: string) => `Invalid email${email ? ` (${email})` : ""}`,
+    invalidEmail: (email: string) =>
+      `Invalid email${email ? ` (${email})` : ""}`,
     invalidEmptyFilename: "File name cannot be empty!",
     noConnection: "No Internet Connection. Please try again later",
     notInstalled: "Not installed :(",
+    common: "Something went wrong!",
   },
   success: {
     common: "Success!",
@@ -111,7 +114,8 @@ const Strings = {
     offline: "You are offline. Viewing mode only",
     passwordHelperText:
       "Password must be at least 8 characters, contain a capital, lowercase, number, and special character",
-    passwordChangeEmailSent: "Please check your email for a password change link",
+    passwordChangeEmailSent:
+      "Please check your email for a password change link",
     pleaseLogin: "Please login first",
     verifyEmail: (email: string) =>
       `Please check your email ${email} for the verification code`,
@@ -123,7 +127,8 @@ const Strings = {
     collaborators: "Collaborators",
     collaboratorsTooltip:
       "Users who will be allowed to add images to this album. (Enter email)",
-    createdAt: (createdAt: Date) => `Created: ${createdAt.toLocaleDateString()}`,
+    createdAt: (createdAt: Date) =>
+      `Created: ${createdAt.toLocaleDateString()}`,
     darkMode: "Dark Mode",
     dateTaken: "Date Taken",
     description: "Description",
@@ -146,7 +151,8 @@ const Strings = {
     untitledAlbum: "Untitled Album",
     verifyEmailTitle: "Verify Email",
     viewers: "Viewers",
-    viewersTooltip: "Users who will be allowed to view this album. (Enter email)",
+    viewersTooltip:
+      "Users who will be allowed to view this album. (Enter email)",
     copyright: `© Nicholas Estrada ${new Date().getFullYear()}`,
   },
   prompt: {

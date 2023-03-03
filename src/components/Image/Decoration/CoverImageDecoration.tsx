@@ -51,7 +51,11 @@ const CoverImageDecoration = ({
     <ImageDecoration<IconProps>
       corner={corner}
       Component={CoverImageDecorationIcon}
-      description={checked ? Strings.action.unsetCoverImage : Strings.action.setImageAsCover}
+      description={
+        checked
+          ? Strings.action.unsetCoverImage
+          : Strings.action.setImageAsCover
+      }
       className={classNames(classes.root, piClassName, {
         [classes.checked]: checked,
         [classes.unchecked]: !checked,

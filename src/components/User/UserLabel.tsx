@@ -1,7 +1,7 @@
 import React from "react";
 import Typography, { TypographyProps } from "@material-ui/core/Typography";
-import { useUserInfo, UseUserInfoParams } from "../../hooks";
 import { Strings } from "../../resources";
+import useUserInfo, { UseUserInfoParams } from "../../hooks/useUserInfo";
 
 /** Interface defining props for UserLabel */
 export interface UserLabelProps extends TypographyProps {

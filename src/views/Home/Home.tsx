@@ -14,18 +14,17 @@ import {
 } from "../../components";
 import { Strings } from "../../resources";
 import { ParseAlbum } from "../../classes";
-import { useUserContext, useNetworkDetectionContext } from "../../contexts";
 import { useView } from "../View";
-import {
-  useInfiniteQueryConfigs,
-  useInfiniteScroll,
-  useRandomColor,
-  useVirtualList,
-  useFlatInfiniteQueryData,
-} from "../../hooks";
 import { DEFAULT_PAGE_SIZE } from "../../constants";
 import NoAlbums from "../../components/Albums/NoAlbums";
 import { UnpersistedParseAlbum } from "../../classes";
+import useRandomColor from "../../hooks/useRandomColor";
+import useVirtualList from "../../hooks/useVirtualList";
+import useFlatInfiniteQueryData from "../../hooks/Query/useFlatInfiniteQueryData";
+import useInfiniteScroll from "../../hooks/useInfiniteScroll";
+import useInfiniteQueryConfigs from "../../hooks/Query/useInfiniteQueryConfigs";
+import { useNetworkDetectionContext } from "../../contexts/NetworkDetectionContext";
+import { useUserContext } from "../../contexts/UserContext";
 
 const useStyles = makeStyles((theme: Theme) => ({
   title: {

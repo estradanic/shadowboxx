@@ -1,3 +1,4 @@
+import loggerWrapper from "../../loggerWrapper";
 import {
   getObjectId,
   NativeAttributes,
@@ -15,13 +16,13 @@ const notifyOfAlbumChange = async (
     return;
   }
   console.log("Getting album owner");
-  const albumOwner = await ParseUser.query().get(
+  const albumOwner = await ParseUser.cloudQuery(Parse).get(
     getObjectId(album.get(ParseAlbum.COLUMNS.owner)),
     { useMasterKey: true }
   );
   console.log("Getting users to notify of album change");
   const usersToNotify = (
-    await ParseUser.query()
+    await ParseUser.cloudQuery(Parse)
       .containedIn(ParseUser.COLUMNS.email, [
         ...album.get(ParseAlbum.COLUMNS.viewers),
         ...album.get(ParseAlbum.COLUMNS.collaborators),
@@ -36,7 +37,9 @@ const notifyOfAlbumChange = async (
     return;
   }
   console.log("Getting existing notifications");
-  const existingNotifications = await ParseAlbumChangeNotification.query()
+  const existingNotifications = await ParseAlbumChangeNotification.cloudQuery(
+    Parse
+  )
     .containedIn(ParseAlbumChangeNotification.COLUMNS.owner, usersToNotify)
     .equalTo(ParseAlbumChangeNotification.COLUMNS.album, album.toPointer())
     .equalTo(ParseAlbumChangeNotification.COLUMNS.user, user.toPointer())
@@ -73,4 +76,4 @@ const notifyOfAlbumChange = async (
   console.log("Created/updated notifications");
 };
 
-export default notifyOfAlbumChange;
+export default loggerWrapper("notifyOfAlbumChange", notifyOfAlbumChange);

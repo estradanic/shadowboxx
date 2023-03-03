@@ -16,28 +16,23 @@ import {
   NoConnection,
 } from "../../components";
 import { useView } from "../View";
-import {
-  useInfiniteQueryConfigs,
-  useInfiniteScroll,
-  useRandomColor,
-  useVirtualList,
-  useNavigate,
-} from "../../hooks";
 import { ParseAlbum } from "../../classes";
 import { DEFAULT_PAGE_SIZE } from "../../constants";
-import {
-  ImageContextProvider,
-  useImageContext,
-  useNetworkDetectionContext,
-} from "../../contexts";
 import { Strings } from "../../resources";
 import { useGlobalLoadingStore } from "../../stores";
-import { routes } from "../../app";
+import routes from "../../app/routes";
 import {
   SHARE_TARGET_DB_NAME,
   SHARE_TARGET_STORE_KEY,
   SHARE_TARGET_STORE_NAME,
 } from "../../serviceWorker/sharedExports";
+import useInfiniteScroll from "../../hooks/useInfiniteScroll";
+import useInfiniteQueryConfigs from "../../hooks/Query/useInfiniteQueryConfigs";
+import { useNavigate } from "react-router-dom";
+import useRandomColor from "../../hooks/useRandomColor";
+import useVirtualList from "../../hooks/useVirtualList";
+import { ImageContextProvider, useImageContext } from "../../contexts/ImageContext";
+import { useNetworkDetectionContext } from "../../contexts/NetworkDetectionContext";
 
 const useStyles = makeStyles(() => ({
   title: {

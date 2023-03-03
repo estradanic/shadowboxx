@@ -79,6 +79,11 @@ export default class ParseAlbum extends ParseObject<"Album"> {
     });
   }
 
+  /**
+   * Create a new Parse.Query for Albums. For client code only.
+   * @param online Whether to query online or from local datastore
+   * @returns Parse.Query for Albums
+   */
   static query(online = true) {
     if (online) {
       return new Parse.Query<Parse.Object<ParsifyPointers<"Album">>>("Album");
@@ -88,7 +93,16 @@ export default class ParseAlbum extends ParseObject<"Album"> {
     ).fromLocalDatastore();
   }
 
-  _album: Parse.Object<ParsifyPointers<"Album">>;
+  /**
+   * Create a new Parse.Query for Albums. For cloud code only.
+   * @param parse Parse instance
+   * @returns Parse.Query for Albums
+   */
+  static cloudQuery(parse: typeof Parse) {
+    return new parse.Query<Parse.Object<ParsifyPointers<"Album">>>("Album");
+  }
+
+  private _album: Parse.Object<ParsifyPointers<"Album">>;
 
   constructor(album: Parse.Object<ParsifyPointers<"Album">>) {
     super(album);

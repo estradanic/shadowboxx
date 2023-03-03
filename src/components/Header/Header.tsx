@@ -5,15 +5,16 @@ import Button from "@material-ui/core/Button";
 import useMediaQuery from "@material-ui/core/useMediaQuery";
 import Typography from "@material-ui/core/Typography";
 import { makeStyles, Theme, useTheme } from "@material-ui/core/styles";
-import { routes } from "../../app";
+import routes from "../../app/routes";
 import { Strings } from "../../resources";
-import { useUserContext } from "../../contexts";
-import { useNavigate, useHideOnScroll } from "../../hooks";
 import Link from "../Link/Link";
 import AppMenu from "../Menu/AppMenu";
 import UserAvatar from "../User/UserAvatar";
 import Notifications from "../Notifications/Notifications";
 import classNames from "classnames";
+import { useNavigate } from "react-router-dom";
+import { useUserContext } from "../../contexts/UserContext";
+import useHideOnScroll from "../../hooks/useHideOnScroll";
 
 type UseStylesParams = {
   xs: boolean;

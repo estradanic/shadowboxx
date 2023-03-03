@@ -1,9 +1,13 @@
-import React, { memo, useEffect, useState } from "react";
+import React, { memo, useEffect, useState, useCallback } from "react";
+import classNames from "classnames";
 import Grid from "@material-ui/core/Grid";
 import CloseIcon from "@material-ui/icons/Close";
 import EditIcon from "@material-ui/icons/Edit";
 import DeleteIcon from "@material-ui/icons/Delete";
 import AddIcon from "@material-ui/icons/Add";
+import { makeStyles, Theme } from "@material-ui/core/styles";
+import { useInfiniteQuery } from "@tanstack/react-query";
+import { SnackbarKey } from "notistack";
 import {
   FancyTitleTypography,
   PageContainer,
@@ -12,30 +16,20 @@ import {
   useImageStyles,
   useSnackbar,
   Button,
+  Online,
+  useActionDialogContext,
 } from "../../components";
-import {
-  useRandomColor,
-  useInfiniteQueryConfigs,
-  useInfiniteScroll,
-} from "../../hooks";
 import { Strings } from "../../resources";
 import { ParseImage } from "../../classes";
-import { useView } from "../View";
-import { useInfiniteQuery } from "@tanstack/react-query";
 import { DEFAULT_PAGE_SIZE } from "../../constants";
-import {
-  ImageContextProvider,
-  useImageContext,
-  useNetworkDetectionContext,
-} from "../../contexts";
-import useFlatInfiniteQueryData from "../../hooks/Query/useFlatInfiniteQueryData";
-import { Online } from "react-detect-offline";
-import { useCallback } from "react";
-import classNames from "classnames";
+import { useView } from "../View";
 import { ImageProps } from "../../components/Image/Image";
-import { SnackbarKey } from "notistack";
-import { makeStyles, Theme } from "@material-ui/core/styles";
-import { useActionDialogContext } from "../../components/Dialog/ActionDialog";
+import useFlatInfiniteQueryData from "../../hooks/Query/useFlatInfiniteQueryData";
+import useInfiniteScroll from "../../hooks/useInfiniteScroll";
+import useInfiniteQueryConfigs from "../../hooks/Query/useInfiniteQueryConfigs";
+import useRandomColor from "../../hooks/useRandomColor";
+import { ImageContextProvider, useImageContext } from "../../contexts/ImageContext";
+import { useNetworkDetectionContext } from "../../contexts/NetworkDetectionContext";
 
 const useStyles = makeStyles((theme: Theme) => ({
   actionContainer: {

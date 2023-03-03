@@ -11,9 +11,9 @@ import {
   Button,
   FancyTitleTypography,
 } from "../../components";
-import { useNavigate } from "../../hooks";
 import { useView } from "../View";
-import { routes } from "../../app";
+import routes from "../../app/routes";
+import useNavigate from "../../hooks/useNavigate";
 
 const useStyles = makeStyles((theme: Theme) => ({
   container: {
@@ -72,7 +72,9 @@ const ForgotPassword = memo(() => {
 
   return (
     <PageContainer>
-      <FancyTitleTypography>{Strings.prompt.forgotPassword}</FancyTitleTypography>
+      <FancyTitleTypography>
+        {Strings.prompt.forgotPassword}
+      </FancyTitleTypography>
       <Grid item sm={8} className={classes.container}>
         <EmailField
           validate

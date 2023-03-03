@@ -3,13 +3,13 @@ import { makeStyles, Theme } from "@material-ui/core/styles";
 import NotesIcon from "@material-ui/icons/Notes";
 import Icon, { IconProps } from "@material-ui/core/Icon";
 import classNames from "classnames";
+import { createHtmlPortalNode, InPortal } from "react-reverse-portal";
 import { Strings } from "../../../resources";
 import ImageDecoration, { ImageDecorationProps } from "./ImageDecoration";
 import { forwardRef } from "react";
 import { useActionDialogContext } from "../../Dialog/ActionDialog";
-import { createHtmlPortalNode, InPortal } from "react-reverse-portal";
 import { TextField } from "../../Field";
-import { useRefState } from "../../../hooks";
+import useRefState from "../../../hooks/useRefState";
 
 const useStyles = makeStyles((theme: Theme) => ({
   root: {

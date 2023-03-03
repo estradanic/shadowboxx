@@ -13,12 +13,12 @@ import {
   useSnackbar,
   EmailField,
 } from "../../components";
-import { useNavigate } from "../../hooks";
 import { useView } from "../View";
-import { useUserContext } from "../../contexts";
 import { useGlobalLoadingStore } from "../../stores";
 import { UnpersistedParseUser } from "../../classes";
-import { routes } from "../../app";
+import routes from "../../app/routes";
+import useNavigate from "../../hooks/useNavigate";
+import { useUserContext } from "../../contexts/UserContext";
 
 const useStyles = makeStyles((theme: Theme) => ({
   cardTitle: {
@@ -90,14 +90,20 @@ const Login = memo(() => {
       })
         .login(updateLoggedInUser)
         .catch((error) => {
-          if (error?.message === "Email not verified") {
+          if (error?.message === Strings.cloud.error.emailNotVerified) {
             const params = new URLSearchParams();
             params.append("email", email);
             navigate(`${routes.VerifyEmail.path}?${params.toString()}`);
             enqueueWarningSnackbar(error.message);
             return;
+          } else if (
+            error?.message === Strings.cloud.error.userNotWhitelisted
+          ) {
+            enqueueErrorSnackbar(error.message);
+            return;
           }
-          enqueueErrorSnackbar(error?.message ?? Strings.error.loggingIn);
+          console.error(error);
+          enqueueErrorSnackbar(Strings.error.loggingIn);
         })
         .finally(() => {
           stopGlobalLoader();

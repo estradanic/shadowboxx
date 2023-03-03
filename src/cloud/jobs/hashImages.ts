@@ -1,3 +1,4 @@
+import loggerWrapper from "../loggerWrapper";
 import { ParseImage } from "../shared";
 import { hashImage } from "../triggers";
 
@@ -8,7 +9,7 @@ const hashImages = async () => {
   let exhausted = false;
   while (!exhausted) {
     console.log(`Getting batch ${page}`);
-    const images = await ParseImage.query()
+    const images = await ParseImage.cloudQuery(Parse)
       .ascending(ParseImage.COLUMNS.createdAt)
       .limit(pageSize)
       .skip(page * pageSize)
@@ -26,4 +27,4 @@ const hashImages = async () => {
   }
 };
 
-export default hashImages;
+export default loggerWrapper("hashImages", hashImages);

@@ -31,6 +31,11 @@ class AlbumChangeNotificationColumns extends Columns {
 export default class ParseAlbumChangeNotification extends ParseObject<"AlbumChangeNotification"> {
   static COLUMNS = new AlbumChangeNotificationColumns();
 
+  /**
+   * Get a Parse.Query for the "AlbumChangeNotification" class. For client code only.
+   * @param online Whether to query online or not, defaults to true
+   * @returns Parse.Query for the "AlbumChangeNotification" class
+   */
   static query(online = true) {
     if (online) {
       return new Parse.Query<
@@ -40,6 +45,12 @@ export default class ParseAlbumChangeNotification extends ParseObject<"AlbumChan
     return new Parse.Query<
       Parse.Object<ParsifyPointers<"AlbumChangeNotification">>
     >("AlbumChangeNotification").fromLocalDatastore();
+  }
+
+  static cloudQuery(parse: typeof Parse) {
+    return new parse.Query<
+      Parse.Object<ParsifyPointers<"AlbumChangeNotification">>
+    >("AlbumChangeNotification");
   }
 
   private _albumChangeNotification: Parse.Object<

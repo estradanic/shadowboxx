@@ -19,13 +19,11 @@ import {
 } from "../../components";
 import { Strings } from "../../resources";
 import { ErrorState, validateEmail, isNullOrWhitespace } from "../../utils";
-import {
-  useUserContext,
-  ImageContextProvider,
-  useNetworkDetectionContext,
-} from "../../contexts";
 import { useGlobalLoadingStore } from "../../stores";
 import { useView } from "../View";
+import { useUserContext } from "../../contexts/UserContext";
+import { useNetworkDetectionContext } from "../../contexts/NetworkDetectionContext";
+import { ImageContextProvider } from "../../contexts/ImageContext";
 
 const useStyles = makeStyles((theme: Theme) => ({
   cardTitle: {
@@ -340,7 +338,9 @@ const Settings = memo(() => {
                   variant="text"
                   onClick={async () => {
                     await Parse.User.requestPasswordReset(settings.email);
-                    enqueueInfoSnackbar(Strings.message.passwordChangeEmailSent);
+                    enqueueInfoSnackbar(
+                      Strings.message.passwordChangeEmailSent
+                    );
                   }}
                 >
                   {Strings.action.changePassword}

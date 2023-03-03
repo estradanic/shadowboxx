@@ -5,24 +5,19 @@ import useMediaQuery from "@material-ui/core/useMediaQuery";
 import { useInfiniteQuery } from "@tanstack/react-query";
 import { Strings } from "../../resources";
 import { uniqueId } from "../../utils";
-import {
-  ImageContextProvider,
-  useNetworkDetectionContext,
-  useUserContext,
-} from "../../contexts";
 import { ParseImage, AlbumAttributes } from "../../classes";
-import {
-  useInfiniteScroll,
-  useInfiniteQueryConfigs,
-  useAlbumForm,
-  UseAlbumFormOptions,
-} from "../../hooks";
 import ActionDialog, { ActionDialogProps } from "../Dialog/ActionDialog";
 import ImageField from "../Field/ImageField";
 import UserField from "../Field/UserField";
 import TextField from "../Field/TextField";
 import Tooltip from "../Tooltip/Tooltip";
 import { DEFAULT_PAGE_SIZE } from "../../constants";
+import useInfiniteScroll from "../../hooks/useInfiniteScroll";
+import useInfiniteQueryConfigs from "../../hooks/Query/useInfiniteQueryConfigs";
+import useAlbumForm, { UseAlbumFormOptions } from "../../hooks/useAlbumForm";
+import { useUserContext } from "../../contexts/UserContext";
+import { ImageContextProvider } from "../../contexts/ImageContext";
+import { useNetworkDetectionContext } from "../../contexts/NetworkDetectionContext";
 
 /** Interface defining props for AlbumFormDialog */
 export interface AlbumFormDialogProps

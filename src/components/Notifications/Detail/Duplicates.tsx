@@ -10,16 +10,14 @@ import { createHtmlPortalNode, InPortal } from "react-reverse-portal";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { ParseDuplicate, ParseImage } from "../../../classes";
 import { Strings } from "../../../resources";
-import {
-  Notification,
-  useNetworkDetectionContext,
-  useNotificationsContext,
-} from "../../../contexts";
 import { useGlobalLoadingStore } from "../../../stores";
 import { useActionDialogContext } from "../../Dialog/ActionDialog";
-import { useQueryConfigs, useRandomColor } from "../../../hooks";
 import Image from "../../Image/Image";
 import { useSnackbar } from "../../Snackbar";
+import { useNetworkDetectionContext } from "../../../contexts/NetworkDetectionContext";
+import { useNotificationsContext, Notification } from "../../../contexts/NotificationsContext";
+import useQueryConfigs from "../../../hooks/Query/useQueryConfigs";
+import useRandomColor from "../../../hooks/useRandomColor";
 
 const useStyles = makeStyles((theme: Theme) => ({
   resolveButton: {

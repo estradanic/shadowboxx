@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import AppBar from "@material-ui/core/AppBar";
 import Toolbar from "@material-ui/core/Toolbar";
 import Typography from "@material-ui/core/Typography";
@@ -7,10 +7,9 @@ import { makeStyles, Theme } from "@material-ui/core/styles";
 import classNames from "classnames";
 import { Strings } from "../../resources";
 import { useSnackbar } from "../Snackbar";
-import { useHideOnScroll } from "../../hooks";
 import Offline from "../NetworkDetector/Offline";
 import Online from "../NetworkDetector/Online";
-import { useEffect } from "react";
+import useHideOnScroll from "../../hooks/useHideOnScroll";
 
 const useStyles = makeStyles((theme: Theme) => ({
   footer: {

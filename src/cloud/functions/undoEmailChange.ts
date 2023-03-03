@@ -1,3 +1,4 @@
+import loggerWrapper from "../loggerWrapper";
 import { ParseUser, Strings } from "../shared";
 
 export type UndoEmailChangeParams = {
@@ -6,7 +7,7 @@ export type UndoEmailChangeParams = {
 
 /** Function to undo email change */
 const undoEmailChange = async ({ email }: UndoEmailChangeParams) => {
-  const user = await ParseUser.query()
+  const user = await ParseUser.cloudQuery(Parse)
     .equalTo(ParseUser.COLUMNS.email, email)
     .first({ useMasterKey: true });
 
@@ -24,4 +25,4 @@ const undoEmailChange = async ({ email }: UndoEmailChangeParams) => {
   user.save(null, { useMasterKey: true, context: { noTrigger: true } });
 };
 
-export default undoEmailChange;
+export default loggerWrapper("undoEmailChange", undoEmailChange);

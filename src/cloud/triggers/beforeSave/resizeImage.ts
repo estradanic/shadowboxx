@@ -1,4 +1,5 @@
 import sharp from "sharp";
+import loggerWrapper from "../../loggerWrapper";
 import { NativeAttributes, ParseImage } from "../../shared";
 
 /**
@@ -58,4 +59,4 @@ const resizeImage = async (image: Parse.Object<NativeAttributes<"Image">>) => {
   }
 };
 
-export default resizeImage;
+export default loggerWrapper("resizeImage", resizeImage);

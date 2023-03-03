@@ -4,15 +4,16 @@ import { makeStyles, Theme } from "@material-ui/core/styles";
 import Grid from "@material-ui/core/Grid";
 import Typography from "@material-ui/core/Typography";
 import Button from "@material-ui/core/Button";
-import { Notification, useNotificationsContext } from "../../../contexts";
 import { Strings } from "../../../resources";
 import {
   ParseAlbum,
   ParseAlbumChangeNotification,
   ParseUser,
 } from "../../../classes";
-import { QueryCacheGroups, useNavigate } from "../../../hooks";
-import { routes } from "../../../app";
+import routes from "../../../app/routes";
+import { useNavigate } from "react-router-dom";
+import { useNotificationsContext, Notification } from "../../../contexts/NotificationsContext";
+import QueryCacheGroups from "../../../hooks/Query/QueryCacheGroups";
 
 const useStyles = makeStyles((theme: Theme) => ({
   resolveButton: {

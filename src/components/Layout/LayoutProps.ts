@@ -1,5 +1,5 @@
 import React from "react";
-import { routes } from "../../app";
+import routes from "../../app/routes";
 
 /**
  * Interface defining props for a Layout

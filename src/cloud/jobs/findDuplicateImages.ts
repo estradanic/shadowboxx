@@ -1,3 +1,4 @@
+import loggerWrapper from "../loggerWrapper";
 import { ParseDuplicate, ParseImage, ParseUser } from "../shared";
 import { NativeAttributes } from "../shared/classes/ParseObject";
 
@@ -24,7 +25,7 @@ const findDuplicateImages = async () => {
   let user: Parse.User<NativeAttributes<"_User">> | undefined;
   do {
     user = (
-      await ParseUser.query()
+      await ParseUser.cloudQuery(Parse)
         .ascending(ParseUser.COLUMNS.createdAt)
         .limit(1)
         .skip(userSkip++)
@@ -36,7 +37,7 @@ const findDuplicateImages = async () => {
     let image: Parse.Object<NativeAttributes<"Image">> | undefined;
     do {
       image = (
-        await ParseImage.query()
+        await ParseImage.cloudQuery(Parse)
           .equalTo(ParseImage.COLUMNS.owner, user.toPointer())
           .ascending(ParseImage.COLUMNS.objectId)
           .limit(1)
@@ -63,7 +64,7 @@ const findDuplicateImages = async () => {
             ParseImage.COLUMNS.name
           )}`
         );
-        const otherImages = await ParseImage.query()
+        const otherImages = await ParseImage.cloudQuery(Parse)
           .equalTo(ParseImage.COLUMNS.owner, user.toPointer())
           .notEqualTo(ParseImage.COLUMNS.objectId, image.id)
           .ascending(ParseImage.COLUMNS.createdAt)
@@ -81,10 +82,10 @@ const findDuplicateImages = async () => {
             otherImage.get(ParseImage.COLUMNS.name)
           );
           const existingDuplicateQuery = await Parse.Query.or(
-            ParseDuplicate.query()
+            ParseDuplicate.cloudQuery(Parse)
               .equalTo(ParseDuplicate.COLUMNS.image1, image.toPointer())
               .equalTo(ParseDuplicate.COLUMNS.image2, otherImage.toPointer()),
-            ParseDuplicate.query()
+            ParseDuplicate.cloudQuery(Parse)
               .equalTo(ParseDuplicate.COLUMNS.image1, otherImage.toPointer())
               .equalTo(ParseDuplicate.COLUMNS.image2, image.toPointer())
           ).find({ useMasterKey: true });
@@ -130,4 +131,4 @@ const findDuplicateImages = async () => {
   } while (user);
 };
 
-export default findDuplicateImages;
+export default loggerWrapper("findDuplicateImages", findDuplicateImages);

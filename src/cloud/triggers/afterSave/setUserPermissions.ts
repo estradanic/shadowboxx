@@ -1,3 +1,4 @@
+import loggerWrapper from "../../loggerWrapper";
 import { NativeAttributes, ParseAlbum } from "../../shared";
 
 /** Function to set user permissions for albums */
@@ -5,10 +6,10 @@ const setUserPermissions = async (
   user: Parse.User<NativeAttributes<"_User">>
 ) => {
   if (!user.existed()) {
-    const collaboratorAlbums = await ParseAlbum.query()
+    const collaboratorAlbums = await ParseAlbum.cloudQuery(Parse)
       .containsAll(ParseAlbum.COLUMNS.collaborators, [user.getEmail()])
       .find({ useMasterKey: true });
-    const viewerAlbums = await ParseAlbum.query()
+    const viewerAlbums = await ParseAlbum.cloudQuery(Parse)
       .containsAll(ParseAlbum.COLUMNS.viewers, [user.getEmail()])
       .find({ useMasterKey: true });
     if (collaboratorAlbums.length > 0) {
@@ -44,4 +45,4 @@ const setUserPermissions = async (
   }
 };
 
-export default setUserPermissions;
+export default loggerWrapper("setUserPermissions", setUserPermissions);

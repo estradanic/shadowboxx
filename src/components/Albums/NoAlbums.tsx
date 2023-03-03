@@ -29,7 +29,9 @@ const NoAlbums = ({ text = Strings.message.noAlbums }) => {
         {text}
       </Typography>
       <br />
-      <Typography variant="overline">{Strings.prompt.tryAddingAlbum}</Typography>
+      <Typography variant="overline">
+        {Strings.prompt.tryAddingAlbum}
+      </Typography>
     </Grid>
   );
 };

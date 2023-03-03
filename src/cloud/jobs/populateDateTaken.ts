@@ -1,3 +1,4 @@
+import loggerWrapper from "../loggerWrapper";
 import { ParseImage } from "../shared";
 
 /** Function to populate dateTaken with "createdAt" */
@@ -7,7 +8,7 @@ const populateDateTaken = async () => {
   let exhausted = false;
   while (!exhausted) {
     console.log(`Getting batch ${page}`);
-    const images = await ParseImage.query()
+    const images = await ParseImage.cloudQuery(Parse)
       .doesNotExist(ParseImage.COLUMNS.dateTaken)
       .ascending(ParseImage.COLUMNS.createdAt)
       .limit(pageSize)
@@ -29,4 +30,4 @@ const populateDateTaken = async () => {
   }
 };
 
-export default populateDateTaken;
+export default loggerWrapper("populateDateTaken", populateDateTaken);

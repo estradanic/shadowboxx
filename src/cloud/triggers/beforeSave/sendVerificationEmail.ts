@@ -1,11 +1,12 @@
 import { createTransport } from "nodemailer";
+import loggerWrapper from "../../loggerWrapper";
 import { NativeAttributes, ParseUser, Strings } from "../../shared";
 
 /** Function to send verification email when email changes */
 const sendVerificationEmail = async (
   user: Parse.User<NativeAttributes<"_User">>
 ) => {
-  const oldUser = await ParseUser.query().get(user.id, {
+  const oldUser = await ParseUser.cloudQuery(Parse).get(user.id, {
     useMasterKey: true,
   });
   if (
@@ -73,4 +74,4 @@ const sendVerificationEmail = async (
   });
 };
 
-export default sendVerificationEmail;
+export default loggerWrapper("sendVerificationEmail", sendVerificationEmail);

@@ -34,6 +34,11 @@ class DuplicateColumns extends Columns {
 export default class ParseDuplicate extends ParseObject<"Duplicate"> {
   static COLUMNS = new DuplicateColumns();
 
+  /**
+   * Get a Parse.Query for the "Duplicate" class. For client code only.
+   * @param online Whether to query online or not, defaults to true
+   * @returns Parse.Query for the "Duplicate" class
+   */
   static query(online = true) {
     if (online) {
       return new Parse.Query<Parse.Object<ParsifyPointers<"Duplicate">>>(
@@ -43,6 +48,17 @@ export default class ParseDuplicate extends ParseObject<"Duplicate"> {
     return new Parse.Query<Parse.Object<ParsifyPointers<"Duplicate">>>(
       "Duplicate"
     ).fromLocalDatastore();
+  }
+
+  /**
+   * Get a Parse.Query for the "Duplicate" class. For cloud code only.
+   * @param parse instance of Parse
+   * @returns Parse.Query for the "Duplicate" class
+   */
+  static cloudQuery(parse: typeof Parse) {
+    return new parse.Query<Parse.Object<ParsifyPointers<"Duplicate">>>(
+      "Duplicate"
+    );
   }
 
   private _duplicate: Parse.Object<ParsifyPointers<"Duplicate">>;

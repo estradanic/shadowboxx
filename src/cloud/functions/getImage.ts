@@ -1,3 +1,4 @@
+import loggerWrapper from "../loggerWrapper";
 import { ParseImage, Strings } from "../shared";
 
 export interface GetImageParams {
@@ -9,7 +10,7 @@ export interface GetImageParams {
  * thus skirting cors problems from getting it directly on the browser
  */
 const getImage = async ({ imageId }: GetImageParams) => {
-  const image = await ParseImage.query()
+  const image = await ParseImage.cloudQuery(Parse)
     .equalTo(ParseImage.COLUMNS.objectId, imageId)
     .first({ useMasterKey: true });
   if (!image) {
@@ -19,4 +20,4 @@ const getImage = async ({ imageId }: GetImageParams) => {
   return data;
 };
 
-export default getImage;
+export default loggerWrapper("getImage", getImage);

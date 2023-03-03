@@ -3,7 +3,7 @@ import Button, { ButtonProps } from "@material-ui/core/Button";
 import { useLocation, Location } from "react-router-dom";
 import ArrowBackIcon from "@material-ui/icons/ArrowBack";
 import { Strings } from "../../resources";
-import { useNavigate } from "../../hooks";
+import useNavigate from "../../hooks/useNavigate";
 
 /** Interface defining props for BackButton */
 interface BackButtonProps
@@ -17,7 +17,8 @@ const BackButton = ({ placement = "header", ...rest }: BackButtonProps) => {
   const location = useLocation() as { state: { previousLocation: Location } };
 
   const startIcon = placement === "header" ? <ArrowBackIcon /> : undefined;
-  const text = placement === "header" ? Strings.action.back : Strings.action.goBack;
+  const text =
+    placement === "header" ? Strings.action.back : Strings.action.goBack;
 
   return (
     <Button

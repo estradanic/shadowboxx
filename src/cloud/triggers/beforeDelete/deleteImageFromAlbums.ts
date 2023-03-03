@@ -1,3 +1,4 @@
+import loggerWrapper from "../../loggerWrapper";
 import { NativeAttributes, ParseAlbum } from "../../shared";
 
 /** Function to delete image from the albums it appears in before destruction */
@@ -9,7 +10,7 @@ const deleteImageFromAlbums = async (
     return;
   }
   console.log(`Deleting image ${image.id} from albums`);
-  const albums = await ParseAlbum.query()
+  const albums = await ParseAlbum.cloudQuery(Parse)
     .contains(ParseAlbum.COLUMNS.images, image.id)
     .find({ useMasterKey: true });
   console.log("Found albums", albums);
@@ -34,4 +35,4 @@ const deleteImageFromAlbums = async (
   console.log(`Deleted image ${image.id} from albums`);
 };
 
-export default deleteImageFromAlbums;
+export default loggerWrapper("deleteImageFromAlbum", deleteImageFromAlbums);

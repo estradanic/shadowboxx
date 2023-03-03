@@ -5,18 +5,17 @@ import classNames from "classnames";
 import { useInfiniteQuery } from "@tanstack/react-query";
 import { difference } from "../../utils";
 import { Strings } from "../../resources";
-import { useNetworkDetectionContext, useUserContext } from "../../contexts";
-import {
-  useRandomColor,
-  useInfiniteQueryConfigs,
-  useInfiniteScroll,
-} from "../../hooks";
 import { ParseImage } from "../../classes";
 import ActionDialog, { ActionDialogProps } from "../Dialog/ActionDialog";
 import { ImageProps } from "../Image/Image";
 import { DEFAULT_PAGE_SIZE } from "../../constants";
 import Images from "../Image/Images";
 import useImageStyles from "../Image/useImageStyles";
+import { useNetworkDetectionContext } from "../../contexts/NetworkDetectionContext";
+import { useUserContext } from "../../contexts/UserContext";
+import useInfiniteQueryConfigs from "../../hooks/Query/useInfiniteQueryConfigs";
+import useInfiniteScroll from "../../hooks/useInfiniteScroll";
+import useRandomColor from "../../hooks/useRandomColor";
 
 export interface ImageSelectionDialogProps
   extends Pick<ActionDialogProps, "open" | "handleCancel"> {
@@ -128,7 +127,9 @@ const ImageSelectionDialog = ({
       fullWidth
       maxWidth="lg"
       open={open}
-      title={multiple ? Strings.action.selectImages : Strings.action.selectImage}
+      title={
+        multiple ? Strings.action.selectImages : Strings.action.selectImage
+      }
       message=""
       handleConfirm={handleConfirm}
       handleCancel={handleCancel}

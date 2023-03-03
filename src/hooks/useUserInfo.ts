@@ -9,9 +9,9 @@ import {
 } from "@tanstack/react-query";
 import { ParsePointer, ParseUser } from "../classes";
 import { Exclusive } from "../types";
-import { useNetworkDetectionContext } from "../contexts";
 import useQueryConfigs from "./Query/useQueryConfigs";
 import { FunctionOptions } from "./Query/useQueryConfigHelpers";
+import { useNetworkDetectionContext } from "../contexts/NetworkDetectionContext";
 
 /** Interface defining parameters for useUserInfo */
 export type UseUserInfoParams = Exclusive<

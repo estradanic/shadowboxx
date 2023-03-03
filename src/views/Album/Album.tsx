@@ -21,19 +21,17 @@ import { Strings } from "../../resources";
 import { ParseImage, ParseAlbum } from "../../classes";
 import { FancyTitleTypography, Void, Images } from "../../components";
 import { DEFAULT_PAGE_SIZE } from "../../constants";
-import {
-  useRandomColor,
-  useQueryConfigs,
-  useInfiniteQueryConfigs,
-  useInfiniteScroll,
-} from "../../hooks";
 import { useView } from "../View";
 import OwnerImageDecoration from "../../components/Image/Decoration/OwnerImageDecoration";
-import { useNetworkDetectionContext } from "../../contexts";
 import useFlatInfiniteQueryData from "../../hooks/Query/useFlatInfiniteQueryData";
 import { FormControlLabel, Switch } from "@material-ui/core";
 import { VariableColor } from "../../types";
 import ShareImageDecoration from "../../components/Image/Decoration/ShareImageDecoration";
+import useRandomColor from "../../hooks/useRandomColor";
+import useQueryConfigs from "../../hooks/Query/useQueryConfigs";
+import useInfiniteQueryConfigs from "../../hooks/Query/useInfiniteQueryConfigs";
+import useInfiniteScroll from "../../hooks/useInfiniteScroll";
+import { useNetworkDetectionContext } from "../../contexts/NetworkDetectionContext";
 
 type UseStylesParams = {
   randomColor: VariableColor;
@@ -172,7 +170,8 @@ const Album = memo(() => {
                 await refetch();
                 enqueueSuccessSnackbar(Strings.success.saved);
               } catch (error: any) {
-                enqueueErrorSnackbar(error?.message ?? Strings.error.editingAlbum);
+                console.error(error);
+                enqueueErrorSnackbar(Strings.error.editingAlbum);
               }
             }}
           />

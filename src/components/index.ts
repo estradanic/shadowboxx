@@ -5,6 +5,7 @@ export * from "./Field";
 export * from "./Footer";
 export * from "./Header";
 export * from "./Image";
+export * from "./Images";
 export * from "./Layout";
 export * from "./Link";
 export * from "./Loader";

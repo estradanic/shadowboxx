@@ -6,14 +6,12 @@ import {
   unstable_createMuiStrictModeTheme as createMuiTheme,
 } from "@material-ui/core/styles";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import {
-  UserContextProvider,
-  NotificationsContextProvider,
-  NetworkDetectionContextProvider,
-} from "./contexts";
 import { SnackbarProvider } from "./components";
 import { lightThemeSettings } from "./app/theme";
 import App from "./app/App";
+import { NetworkDetectionContextProvider } from "./contexts/NetworkDetectionContext";
+import { UserContextProvider } from "./contexts/UserContext";
+import { NotificationsContextProvider } from "./contexts/NotificationsContext";
 
 const queryClient = new QueryClient({
   defaultOptions: {

@@ -11,10 +11,10 @@ import SettingsIcon from "@material-ui/icons/Settings";
 import MenuIcon from "@material-ui/icons/Menu";
 import InsertPhotoIcon from "@material-ui/icons/InsertPhoto";
 import { makeStyles, Theme, useTheme } from "@material-ui/core/styles";
-import { routes } from "../../app";
+import routes from "../../app/routes";
 import { Strings } from "../../resources";
-import { useUserContext } from "../../contexts";
 import ListItemLink from "../Link/ListItemLink";
+import { useUserContext } from "../../contexts/UserContext";
 
 const useStyles = makeStyles((theme: Theme) => ({
   drawer: {

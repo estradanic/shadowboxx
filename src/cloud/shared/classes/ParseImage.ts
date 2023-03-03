@@ -44,7 +44,7 @@ class ImageColumns extends Columns {
  */
 export default class ParseImage extends ParseObject<"Image"> {
   /**
-   * Get a Parse.Query for the "Image" class
+   * Get a Parse.Query for the "Image" class. For client code only.
    * @param online Whether to query online or not, defaults to true
    * @returns Parse.Query for the "Image" class
    */
@@ -55,6 +55,15 @@ export default class ParseImage extends ParseObject<"Image"> {
     return new Parse.Query<Parse.Object<ParsifyPointers<"Image">>>(
       "Image"
     ).fromLocalDatastore();
+  }
+
+  /**
+   * Get a Parse.Query for the "Image" class. For cloud code only.
+   * @param parse instance of Parse
+   * @returns Parse.Query for the "Image" class
+   */
+  static cloudQuery(parse: typeof Parse) {
+    return new parse.Query<Parse.Object<ParsifyPointers<"Image">>>("Image");
   }
 
   /**
@@ -116,7 +125,7 @@ export default class ParseImage extends ParseObject<"Image"> {
    */
   async save() {
     if (!this._image.getACL()) {
-      const owner = await ParseUser.query().get(this.owner.id);
+      const owner = await ParseUser.cloudQuery(Parse).get(this.owner.id);
       const acl = new Parse.ACL(owner);
       this._image.setACL(acl);
     }

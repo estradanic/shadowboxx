@@ -2,14 +2,11 @@ import React, { useEffect, useRef } from "react";
 import { useQuery } from "@tanstack/react-query";
 import BurstModeIcon from "@material-ui/icons/BurstMode";
 import { ParseDuplicate } from "../../classes";
-import {
-  useUserContext,
-  useNotificationsContext,
-  Notification,
-} from "../../contexts";
 import useQueryConfigs from "../Query/useQueryConfigs";
 import { Strings } from "../../resources";
 import DuplicatesNotificationDetail from "../../components/Notifications/Detail/Duplicates";
+import { useNotificationsContext, Notification } from "../../contexts/NotificationsContext";
+import { useUserContext } from "../../contexts/UserContext";
 
 const useDuplicatesNotifications = () => {
   const { addNotification } = useNotificationsContext();

@@ -1,16 +1,14 @@
 import { useCallback, useEffect, useLayoutEffect, useRef } from "react";
 import { useLocation, createPath } from "react-router-dom";
 import { useQueryClient } from "@tanstack/react-query";
-import { useUserContext } from "../contexts";
-import { routes } from "../app";
+import routes from "../app/routes";
 import { useGlobalLoadingStore, useScrollPositionStore } from "../stores";
-import {
-  useNavigate,
-  useDuplicatesNotifications,
-  useAlbumChangeNotifications,
-} from "../hooks";
 import { useSnackbar } from "../components";
 import { Strings } from "../resources";
+import useNavigate from "../hooks/useNavigate";
+import useDuplicatesNotifications from "../hooks/Notifications/useDuplicatesNotifications";
+import useAlbumChangeNotifications from "../hooks/Notifications/useAlbumChangeNotifications";
+import { useUserContext } from "../contexts/UserContext";
 
 /**
  * Hook that handles navigation, query invalidation, and authentication at the beginning of every View component.

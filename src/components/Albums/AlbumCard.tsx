@@ -12,10 +12,10 @@ import MenuItem from "@material-ui/core/MenuItem";
 import { makeStyles, Theme } from "@material-ui/core/styles";
 import MoreVertIcon from "@material-ui/icons/MoreVert";
 import StarIcon from "@material-ui/icons/Star";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { Strings } from "../../resources";
-import { routes } from "../../app";
+import routes from "../../app/routes";
 import { VariableColor } from "../../types";
 import {
   ParseImage,
@@ -24,12 +24,6 @@ import {
   Attributes,
   AlbumSaveContext,
 } from "../../classes";
-import {
-  ImageContextProvider,
-  useNetworkDetectionContext,
-  useUserContext,
-} from "../../contexts";
-import { useQueryConfigs, useNavigate } from "../../hooks";
 import UserAvatar from "../User/UserAvatar";
 import Empty from "../Svgs/Empty";
 import { useSnackbar } from "../Snackbar/Snackbar";
@@ -40,6 +34,10 @@ import ImageField from "../Field/ImageField";
 import Online from "../NetworkDetector/Online";
 import AlbumCardSkeleton from "../Skeleton/AlbumCardSkeleton";
 import Image from "../Image/Image";
+import { ImageContextProvider } from "../../contexts/ImageContext";
+import { useNetworkDetectionContext } from "../../contexts/NetworkDetectionContext";
+import { useUserContext } from "../../contexts/UserContext";
+import useQueryConfigs from "../../hooks/Query/useQueryConfigs";
 
 interface UseStylesParams {
   borderColor: VariableColor;
@@ -274,7 +272,9 @@ const AlbumCard = memo(({ value, onChange, borderColor }: AlbumCardProps) => {
                   onClose={closeMenu}
                   onClick={closeMenu}
                 >
-                  <MenuItem onClick={editAlbum}>{Strings.action.editAlbum}</MenuItem>
+                  <MenuItem onClick={editAlbum}>
+                    {Strings.action.editAlbum}
+                  </MenuItem>
                   {isOwner && (
                     <MenuItem onClick={deleteAlbum}>
                       {Strings.action.deleteAlbum}
@@ -425,7 +425,8 @@ const AlbumCard = memo(({ value, onChange, borderColor }: AlbumCardProps) => {
             await onChange(response);
             enqueueSuccessSnackbar(Strings.success.saved);
           } catch (error: any) {
-            enqueueErrorSnackbar(error?.message ?? Strings.error.editingAlbum);
+            console.error(error);
+            enqueueErrorSnackbar(Strings.error.editingAlbum);
           }
         }}
       />

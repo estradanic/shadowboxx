@@ -1,6 +1,7 @@
 import { bmvbhash } from "blockhash-core";
 import { imageFromBuffer, getImageData } from "@canvas/image";
 import { NativeAttributes, ParseImage } from "../../shared";
+import loggerWrapper from "../../loggerWrapper";
 
 /** Function to convert hexadecimal to binary */
 const hexToBinary = (hex: string) => {
@@ -46,4 +47,4 @@ const hashImage = async (image: Parse.Object<NativeAttributes<"Image">>) => {
   await image.save(null, { useMasterKey: true, context: { noTrigger: true } });
 };
 
-export default hashImage;
+export default loggerWrapper("hashImage", hashImage);

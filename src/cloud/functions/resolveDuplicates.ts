@@ -1,3 +1,4 @@
+import loggerWrapper from "../loggerWrapper";
 import {
   ParseAlbum,
   ParseDuplicate,
@@ -15,19 +16,19 @@ const resolveDuplicates = async (
   { duplicateIds }: ResolveDuplicatesParams,
   user?: Parse.User<NativeAttributes<"_User">>
 ) => {
-  const duplicates = await ParseDuplicate.query()
+  const duplicates = await ParseDuplicate.cloudQuery(Parse)
     .containedIn(ParseDuplicate.COLUMNS.objectId, duplicateIds)
     .find({ useMasterKey: true });
   for (const duplicate of duplicates) {
     try {
       console.log("Resolving duplicate", duplicate.id);
-      const imageToDelete = await ParseImage.query()
+      const imageToDelete = await ParseImage.cloudQuery(Parse)
         .equalTo(
           ParseImage.COLUMNS.objectId,
           getObjectId(duplicate.get(ParseDuplicate.COLUMNS.image1))
         )
         .first({ useMasterKey: true });
-      const imageToKeep = await ParseImage.query()
+      const imageToKeep = await ParseImage.cloudQuery(Parse)
         .equalTo(
           ParseImage.COLUMNS.objectId,
           getObjectId(duplicate.get(ParseDuplicate.COLUMNS.image2))
@@ -42,7 +43,7 @@ const resolveDuplicates = async (
         await duplicate.destroy({ useMasterKey: true });
         continue;
       }
-      const albumsToCorrect = await ParseAlbum.query()
+      const albumsToCorrect = await ParseAlbum.cloudQuery(Parse)
         .contains(ParseAlbum.COLUMNS.images, imageToDelete.id)
         .find({ useMasterKey: true });
       for (const album of albumsToCorrect) {
@@ -100,4 +101,4 @@ const resolveDuplicates = async (
   }
 };
 
-export default resolveDuplicates;
+export default loggerWrapper("resolveDuplicates", resolveDuplicates);

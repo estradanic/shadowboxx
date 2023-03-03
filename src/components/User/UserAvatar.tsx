@@ -5,9 +5,10 @@ import cx from "classnames";
 import { useQuery } from "@tanstack/react-query";
 import { ParseImage } from "../../classes";
 import { Strings } from "../../resources";
-import { useQueryConfigs, useUserInfo, UseUserInfoParams } from "../../hooks";
-import { useNetworkDetectionContext } from "../../contexts";
 import Tooltip from "../Tooltip/Tooltip";
+import { useNetworkDetectionContext } from "../../contexts/NetworkDetectionContext";
+import useQueryConfigs from "../../hooks/Query/useQueryConfigs";
+import useUserInfo, { UseUserInfoParams } from "../../hooks/useUserInfo";
 
 const useStyles = makeStyles((theme: Theme) => ({
   avatar: {

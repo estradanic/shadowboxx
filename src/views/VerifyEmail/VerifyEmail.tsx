@@ -12,9 +12,10 @@ import {
   Void,
 } from "../../components";
 import { Strings } from "../../resources";
-import { routes } from "../../app";
-import { useNavigate, useUserInfo } from "../../hooks";
-import { useUserContext } from "../../contexts";
+import routes from "../../app/routes";
+import useNavigate from "../../hooks/useNavigate";
+import useUserInfo from "../../hooks/useUserInfo";
+import { useUserContext } from "../../contexts/UserContext";
 
 const useStyles = makeStyles(() => ({
   message: {

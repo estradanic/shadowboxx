@@ -1,5 +1,4 @@
 import Parse from "parse";
-import { useUserContext } from "../../contexts";
 import { Strings } from "../../resources";
 import { ParseAlbum, ParseImage, ParseUser } from "../../classes";
 import { InfiniteQueryObserverOptions } from "@tanstack/react-query";
@@ -8,6 +7,7 @@ import useQueryConfigHelpers, {
 } from "./useQueryConfigHelpers";
 import { DEFAULT_PAGE_SIZE } from "../../constants";
 import QueryCacheGroups from "./QueryCacheGroups";
+import { useUserContext } from "../../contexts/UserContext";
 
 export type InfiniteFunctionOptions = FunctionOptions & {
   /** Page index */

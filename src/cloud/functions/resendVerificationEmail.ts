@@ -1,4 +1,5 @@
 import { createTransport } from "nodemailer";
+import loggerWrapper from "../loggerWrapper";
 import { ParseUser, Strings } from "../shared";
 
 export type ResendVerificationEmailParams = {
@@ -18,7 +19,7 @@ const resendVerificationEmail = async ({
     );
   }
 
-  const user = await ParseUser.query()
+  const user = await ParseUser.cloudQuery(Parse)
     .equalTo(ParseUser.COLUMNS.email, email)
     .first({ useMasterKey: true });
 
@@ -79,4 +80,7 @@ const resendVerificationEmail = async ({
   });
 };
 
-export default resendVerificationEmail;
+export default loggerWrapper(
+  "resendVerificationEmail",
+  resendVerificationEmail
+);

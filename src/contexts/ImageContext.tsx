@@ -6,9 +6,8 @@ import React, {
   useState,
 } from "react";
 import Parse from "parse";
-import { useNotificationsContext } from "./NotificationsContext";
+import { readAndCompressImage } from "browser-image-resizer";
 import ErrorIcon from "@material-ui/icons/Error";
-import { FancyTypography, useSnackbar } from "../components";
 import { Strings } from "../resources";
 import {
   ParseImage,
@@ -22,9 +21,11 @@ import {
   makeValidFileName,
   removeExtension,
 } from "../utils";
-import { ImageSelectionDialog } from "../components/Images";
-import { readAndCompressImage } from "browser-image-resizer";
+import { FancyTypography } from "../components/Typography";
+import { useSnackbar } from "../components/Snackbar";
 import { useUserContext } from "./UserContext";
+import ImageSelectionDialog from "../components/Images/ImageSelectionDialog";
+import { useNotificationsContext } from "./NotificationsContext";
 
 export enum ImageActionCommand {
   DELETE,

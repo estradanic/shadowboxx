@@ -10,10 +10,10 @@ import {
 import { useQuery } from "@tanstack/react-query";
 import classNames from "classnames";
 import { ParseAlbum, ParseImage } from "../../classes";
-import { useNetworkDetectionContext } from "../../contexts";
-import { useQueryConfigs } from "../../hooks";
 import { VariableColor } from "../../types";
 import { elide } from "../../utils";
+import { useNetworkDetectionContext } from "../../contexts/NetworkDetectionContext";
+import useQueryConfigs from "../../hooks/Query/useQueryConfigs";
 
 interface UseStylesParams {
   borderColor: VariableColor;

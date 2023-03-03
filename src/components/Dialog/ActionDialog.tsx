@@ -18,7 +18,7 @@ import Typography from "@material-ui/core/Typography";
 import { HtmlPortalNode, OutPortal } from "react-reverse-portal";
 import { makeStyles, Theme } from "@material-ui/core/styles";
 import { Strings } from "../../resources";
-import { useRandomColor } from "../../hooks";
+import useRandomColor from "../../hooks/useRandomColor";
 import { VariableColor } from "../../types";
 
 interface UseStylesParams {

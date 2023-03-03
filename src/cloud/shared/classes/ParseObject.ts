@@ -70,7 +70,7 @@ export default class ParseObject<C extends ClassName> {
   /** Basic columns for any class */
   static COLUMNS = new Columns();
 
-  _object: Parse.Object<ParsifyPointers<C>>;
+  private _object: Parse.Object<ParsifyPointers<C>>;
 
   constructor(object: Parse.Object<ParsifyPointers<C>>) {
     this._object = object;

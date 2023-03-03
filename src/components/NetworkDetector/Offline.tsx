@@ -1,5 +1,5 @@
 import React from "react";
-import { useNetworkDetectionContext } from "../../contexts";
+import { useNetworkDetectionContext } from "../../contexts/NetworkDetectionContext";
 
 export interface OfflineProps {
   /** Child node */

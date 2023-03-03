@@ -9,16 +9,18 @@ import {
 } from "@material-ui/core/styles";
 import DiscFullIcon from "@material-ui/icons/DiscFull";
 import { get, set, entries, createStore, del, clear } from "idb-keyval";
-import { useNotificationsContext, useUserContext } from "../contexts";
 import { ActionDialogContextProvider, DefaultLayout } from "../components";
 import { Strings } from "../resources";
 import routes from "./routes";
+import routeComponents from "./routeComponents";
 import { darkThemeSettings } from "./theme";
 import {
   SHARE_TARGET_DB_NAME,
   SHARE_TARGET_STORE_KEY,
   SHARE_TARGET_STORE_NAME,
 } from "../serviceWorker/sharedExports";
+import { useUserContext } from "../contexts/UserContext";
+import { useNotificationsContext } from "../contexts/NotificationsContext";
 
 Parse.serverURL = window.__env__?.PARSE_HOST_URL;
 Parse.initialize(
@@ -121,17 +123,20 @@ const App = () => {
           }
         >
           <Routes>
-            {Object.values(routes).map((route) => (
-              <Route
-                key={route.viewName}
-                element={
-                  <DefaultLayout viewId={route.viewId}>
-                    <route.View />
-                  </DefaultLayout>
-                }
-                path={route.path}
-              />
-            ))}
+            {Object.values(routes).map((route) => {
+              const View = routeComponents[route.viewId];
+              return (
+                <Route
+                  key={route.viewName}
+                  element={
+                    <DefaultLayout viewId={route.viewId}>
+                      <View />
+                    </DefaultLayout>
+                  }
+                  path={route.path}
+                />
+              );
+            })}
           </Routes>
         </Suspense>
       </ActionDialogContextProvider>

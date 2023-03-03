@@ -11,12 +11,12 @@ import { makeStyles, Theme } from "@material-ui/core/styles";
 import Typography from "@material-ui/core/Typography";
 import { VariableColor } from "../../types";
 import { ParseImage } from "../../classes";
-import { useVirtualList } from "../../hooks";
 import ImagesSkeleton from "../Skeleton/ImagesSkeleton";
 import Image, { ImageProps } from "./Image";
 import NoImages from "./NoImages";
 import useImageStyles from "./useImageStyles";
 import FancyTypography from "../Typography/FancyTypography";
+import useVirtualList from "../../hooks/useVirtualList";
 
 type UseStylesParams = {
   color: VariableColor;

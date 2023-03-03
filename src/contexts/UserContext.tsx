@@ -17,8 +17,8 @@ import {
   UnpersistedParseUser,
 } from "../classes";
 import { Strings } from "../resources";
-import { routes } from "../app";
-import { useNavigate } from "../hooks";
+import routes from "../app/routes";
+import useNavigate from "../hooks/useNavigate";
 import { useNetworkDetectionContext } from "./NetworkDetectionContext";
 
 /**

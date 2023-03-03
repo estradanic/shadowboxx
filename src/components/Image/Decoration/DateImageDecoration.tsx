@@ -9,8 +9,8 @@ import { Strings } from "../../../resources";
 import ImageDecoration, { ImageDecorationProps } from "./ImageDecoration";
 import { forwardRef } from "react";
 import { useActionDialogContext } from "../../Dialog/ActionDialog";
-import { useRefState } from "../../../hooks";
 import TextField from "../../Field/TextField";
+import useRefState from "../../../hooks/useRefState";
 
 const useStyles = makeStyles((theme: Theme) => ({
   root: {

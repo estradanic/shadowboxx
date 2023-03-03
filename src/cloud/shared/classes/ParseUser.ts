@@ -63,22 +63,31 @@ class UserColumns extends Columns {
  */
 export default class ParseUser extends ParseObject<"_User"> {
   /**
-   * Columns for the Parse.User ("User") class
+   * Columns for the Parse.User ("_User") class
    */
   static COLUMNS = new UserColumns();
 
   /**
-   * Gets a Parse.Query for the Parse.User ("User") class
+   * Gets a Parse.Query for the Parse.User ("_User") class. For client code only.
    * @param online Whether to query online or not
-   * @returns A Parse.Query for the Parse.User ("User") class
+   * @returns A Parse.Query for the Parse.User ("_User") class
    */
   static query(online = true) {
     if (online) {
-      return new Parse.Query<Parse.User<ParsifyPointers<"_User">>>("User");
+      return new Parse.Query<Parse.User<ParsifyPointers<"_User">>>(Parse.User);
     }
     return new Parse.Query<Parse.User<ParsifyPointers<"_User">>>(
-      "User"
+      Parse.User
     ).fromLocalDatastore();
+  }
+
+  /**
+   * Gets a Parse.Query for the Parse.User ("_User") class. For cloud code only.
+   * @param parse instance of Parse
+   * @returns A Parse.Query for the Parse.User ("_User") class
+   */
+  static cloudQuery(parse: typeof Parse) {
+    return new parse.Query<Parse.User<ParsifyPointers<"_User">>>(parse.User);
   }
 
   private _user: Parse.User<ParsifyPointers<"_User">>;
@@ -294,6 +303,7 @@ export default class ParseUser extends ParseObject<"_User"> {
     return this._user.get(ParseUser.COLUMNS.oldEmail);
   }
 
+  /** Whether server logging is enabled for this user */
   get isLoggingEnabled(): UserAttributes["isLoggingEnabled"] {
     return this._user.get(ParseUser.COLUMNS.isLoggingEnabled);
   }
