@@ -1,4 +1,10 @@
-import React, { ImgHTMLAttributes, memo, useRef, useState } from "react";
+import React, {
+  ImgHTMLAttributes,
+  memo,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 import { makeStyles, Theme } from "@material-ui/core/styles";
 import NotesIcon from "@material-ui/icons/Notes";
 import Popper from "@material-ui/core/Popper";
@@ -138,7 +144,7 @@ const Image = memo(
       classes.root = classes.rootNoPadding;
     }
     const [fullResolutionOpen, setFullResolutionOpen] = useState(false);
-    const ref = useRef(null);
+    const ref = useRef<HTMLDivElement>(null);
     const [isLoaded, setIsLoaded] = useState(false);
     const [isFullResolutionLoaded, setIsFullResolutionLoaded] = useState(false);
 
@@ -146,12 +152,20 @@ const Image = memo(
       ? () => setFullResolutionOpen(true)
       : piOnClick;
 
+    const videoRef = useRef<HTMLVideoElement>(null);
+    useEffect(() => {
+      if (videoRef.current) {
+        videoRef.current.load();
+      }
+    }, []);
+
     return (
       <div className={classNames(className, classes.root)} key={key} ref={ref}>
         <Tooltip title={parseImage.name}>
           {parseImage.type === "video" ? (
             <>
               <video
+                ref={videoRef}
                 src={parseImage.fileMobile.url()}
                 className={classNames(classes.image, classes.width100, {
                   [classes.pointer]: showFullResolutionOnClick,
