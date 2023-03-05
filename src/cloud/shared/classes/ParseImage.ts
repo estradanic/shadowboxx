@@ -26,6 +26,8 @@ export interface ImageAttributes {
   dateTaken?: Date;
   /** Hash of the image for comparisons */
   hash?: string;
+  /** Type of the image */
+  type?: "image" | "video" | "gif";
 }
 
 class ImageColumns extends Columns {
@@ -37,6 +39,7 @@ class ImageColumns extends Columns {
   fileLegacy = "fileLegacy" as const;
   dateTaken = "dateTaken" as const;
   hash = "hash" as const;
+  type = "type" as const;
 }
 
 /**
@@ -160,7 +163,7 @@ export default class ParseImage extends ParseObject<"Image"> {
 
   /** PNG version of the file for mobile Safari and IE */
   get fileLegacy(): Attributes<"Image">["fileLegacy"] {
-    return this._image.get(ParseImage.COLUMNS.fileLegacy);
+    return this._image.get(ParseImage.COLUMNS.fileLegacy) ?? this.file;
   }
 
   /** Pointer to user who owns the image */
@@ -191,6 +194,11 @@ export default class ParseImage extends ParseObject<"Image"> {
 
   set dateTaken(dateTaken) {
     this._image.set(ParseImage.COLUMNS.dateTaken, dateTaken);
+  }
+
+  /** Type of the image */
+  get type(): Attributes<"Image">["type"] {
+    return this._image.get(ParseImage.COLUMNS.type) ?? "image";
   }
 
   /** All attributes of the image */

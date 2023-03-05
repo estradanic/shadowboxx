@@ -5,7 +5,10 @@ import { ParseAlbumChangeNotification } from "../../classes";
 import useQueryConfigs from "../Query/useQueryConfigs";
 import { Strings } from "../../resources";
 import AlbumChangesNotificationDetail from "../../components/Notifications/Detail/AlbumChanges";
-import { useNotificationsContext, Notification } from "../../contexts/NotificationsContext";
+import {
+  useNotificationsContext,
+  Notification,
+} from "../../contexts/NotificationsContext";
 import { useUserContext } from "../../contexts/UserContext";
 
 const useAlbumChangeNotifications = () => {

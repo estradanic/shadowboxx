@@ -12,7 +12,10 @@ import {
 } from "../../../classes";
 import routes from "../../../app/routes";
 import { useNavigate } from "react-router-dom";
-import { useNotificationsContext, Notification } from "../../../contexts/NotificationsContext";
+import {
+  useNotificationsContext,
+  Notification,
+} from "../../../contexts/NotificationsContext";
 import QueryCacheGroups from "../../../hooks/Query/QueryCacheGroups";
 
 const useStyles = makeStyles((theme: Theme) => ({

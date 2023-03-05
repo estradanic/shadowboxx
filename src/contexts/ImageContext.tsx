@@ -79,6 +79,36 @@ interface ImageContextProviderProps {
   children: React.ReactNode;
 }
 
+const ACCEPTABLE_IMAGE_EXTENSIONS = ["png", "jpg", "jpeg", "webp", "bmp"];
+const ACCEPTABLE_VIDEO_EXTENSIONS = [
+  "mp4",
+  "avi",
+  "flv",
+  "webm",
+  "m4v",
+  "mpg",
+  "ogg",
+  "mkv",
+  "gif",
+];
+const ACCEPTABLE_IMAGE_TYPES = [
+  "image/png",
+  "image/jpeg",
+  "image/jpg",
+  "image/webp",
+];
+const ACCEPTABLE_VIDEO_TYPES = [
+  "video/mp4",
+  "video/x-msvideo",
+  "video/x-flv",
+  "video/webm",
+  "video/x-m4v",
+  "video/mpeg",
+  "video/ogg",
+  "video/x-matroska",
+  "image/gif",
+];
+
 export const ImageContextProvider = ({
   children,
 }: ImageContextProviderProps) => {
@@ -199,17 +229,27 @@ export const ImageContextProvider = ({
     const resizeImagePromises: Promise<File>[] = [];
     for (let i = 0; i < max; i++) {
       let file = files[i];
-      if (file.size > 15000000) {
-        resizeImagePromises.push(
-          readAndCompressImage(file, {
-            quality: 1,
-            maxWidth: 2400,
-            maxHeight: 2400,
-            mimeType: "image/webp",
-          })
-        );
-      } else {
+      if (ACCEPTABLE_VIDEO_TYPES.includes(file.type)) {
+        if (file.size > 20000000) {
+          enqueueErrorSnackbar(Strings.error.videoTooLarge(file.name));
+          continue;
+        }
         resizeImagePromises.push(Promise.resolve(file));
+      } else if (ACCEPTABLE_IMAGE_TYPES.includes(file.type)) {
+        if (file.size > 15000000) {
+          resizeImagePromises.push(
+            readAndCompressImage(file, {
+              quality: 1,
+              maxWidth: 2400,
+              maxHeight: 2400,
+              mimeType: "image/webp",
+            })
+          );
+        } else {
+          resizeImagePromises.push(Promise.resolve(file));
+        }
+      } else {
+        enqueueErrorSnackbar(Strings.error.invalidFileType(file.name));
       }
     }
     return await Promise.all(resizeImagePromises);
@@ -222,12 +262,21 @@ export const ImageContextProvider = ({
       let file = files[i];
       const fileName = makeValidFileName(files[i].name);
       const parseFile = new Parse.File(fileName, file);
+      let type: ImageAttributes["type"] = ACCEPTABLE_VIDEO_TYPES.includes(
+        file.type
+      )
+        ? "video"
+        : "image";
+      if (file.type === "image/gif") {
+        type = "gif";
+      }
       newImagePromises.push(
         uploadImage(
           {
             file: parseFile,
             owner: getLoggedInUser().toPointer(),
             name: removeExtension(fileName),
+            type,
           },
           acl
         )
@@ -248,8 +297,8 @@ export const ImageContextProvider = ({
     return new Promise<ParseImage[]>((resolve, reject) => {
       // Using setTimeout to prevent the loader from not showing up
       setTimeout(async () => {
-        const processedFiles = await processFiles(files);
         try {
+          const processedFiles = await processFiles(files);
           const result = await uploadFiles(processedFiles, acl);
           const newImages: ParseImage[] = [];
           for (const promise of result) {
@@ -268,6 +317,19 @@ export const ImageContextProvider = ({
   };
 
   const uploadImageFromUrl = async (url: string, acl?: Parse.ACL) => {
+    if (!url) {
+      throw new Error(Strings.prompt.pleaseEnterA("URL"));
+    }
+    let type: ImageAttributes["type"] = "image";
+    const extension = url.substring(url.lastIndexOf(".") + 1).toLowerCase();
+    if (extension === "gif") {
+      type = "gif";
+    } else if (ACCEPTABLE_VIDEO_EXTENSIONS.includes(extension)) {
+      type = "video";
+    } else if (!ACCEPTABLE_IMAGE_EXTENSIONS.includes(extension)) {
+      enqueueErrorSnackbar(Strings.error.invalidFileType(url));
+      throw new Error(Strings.error.invalidFileType(url));
+    }
     const fileName = makeValidFileName(url.substring(url.lastIndexOf("/") + 1));
     const parseFile = new Parse.File(fileName, { uri: url });
     const newImage = await uploadImage(
@@ -275,6 +337,7 @@ export const ImageContextProvider = ({
         file: parseFile,
         owner: getLoggedInUser().toPointer(),
         name: removeExtension(fileName),
+        type,
       },
       acl
     );

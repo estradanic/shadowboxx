@@ -31,7 +31,10 @@ import useInfiniteQueryConfigs from "../../hooks/Query/useInfiniteQueryConfigs";
 import { useNavigate } from "react-router-dom";
 import useRandomColor from "../../hooks/useRandomColor";
 import useVirtualList from "../../hooks/useVirtualList";
-import { ImageContextProvider, useImageContext } from "../../contexts/ImageContext";
+import {
+  ImageContextProvider,
+  useImageContext,
+} from "../../contexts/ImageContext";
 import { useNetworkDetectionContext } from "../../contexts/NetworkDetectionContext";
 
 const useStyles = makeStyles(() => ({

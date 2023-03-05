@@ -15,7 +15,10 @@ import cx from "classnames";
 import { Strings } from "../../resources";
 import { elide } from "../../utils";
 import Tooltip from "../Tooltip/Tooltip";
-import { useNotificationsContext, Notification } from "../../contexts/NotificationsContext";
+import {
+  useNotificationsContext,
+  Notification,
+} from "../../contexts/NotificationsContext";
 
 const useStyles = makeStyles((theme: Theme) => ({
   text: {

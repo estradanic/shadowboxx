@@ -28,7 +28,10 @@ import useFlatInfiniteQueryData from "../../hooks/Query/useFlatInfiniteQueryData
 import useInfiniteScroll from "../../hooks/useInfiniteScroll";
 import useInfiniteQueryConfigs from "../../hooks/Query/useInfiniteQueryConfigs";
 import useRandomColor from "../../hooks/useRandomColor";
-import { ImageContextProvider, useImageContext } from "../../contexts/ImageContext";
+import {
+  ImageContextProvider,
+  useImageContext,
+} from "../../contexts/ImageContext";
 import { useNetworkDetectionContext } from "../../contexts/NetworkDetectionContext";
 
 const useStyles = makeStyles((theme: Theme) => ({

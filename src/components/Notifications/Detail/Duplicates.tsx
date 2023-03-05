@@ -15,7 +15,10 @@ import { useActionDialogContext } from "../../Dialog/ActionDialog";
 import Image from "../../Image/Image";
 import { useSnackbar } from "../../Snackbar";
 import { useNetworkDetectionContext } from "../../../contexts/NetworkDetectionContext";
-import { useNotificationsContext, Notification } from "../../../contexts/NotificationsContext";
+import {
+  useNotificationsContext,
+  Notification,
+} from "../../../contexts/NotificationsContext";
 import useQueryConfigs from "../../../hooks/Query/useQueryConfigs";
 import useRandomColor from "../../../hooks/useRandomColor";
 

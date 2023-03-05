@@ -5,7 +5,10 @@ import { ParseDuplicate } from "../../classes";
 import useQueryConfigs from "../Query/useQueryConfigs";
 import { Strings } from "../../resources";
 import DuplicatesNotificationDetail from "../../components/Notifications/Detail/Duplicates";
-import { useNotificationsContext, Notification } from "../../contexts/NotificationsContext";
+import {
+  useNotificationsContext,
+  Notification,
+} from "../../contexts/NotificationsContext";
 import { useUserContext } from "../../contexts/UserContext";
 
 const useDuplicatesNotifications = () => {

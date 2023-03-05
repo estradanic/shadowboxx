@@ -149,32 +149,56 @@ const Image = memo(
     return (
       <div className={classNames(className, classes.root)} key={key} ref={ref}>
         <Tooltip title={parseImage.name}>
-          <>
-            <picture
-              className={classNames(classes.image, classes.width100, {
-                [classes.pointer]: showFullResolutionOnClick,
-                [classes.displayNone]: !isLoaded,
-              })}
-            >
-              <source srcSet={parseImage.fileMobile.url()} type="image/webp" />
-              <source srcSet={parseImage.fileLegacy.url()} type="image/png" />
-              <img
-                className={classes.width100}
-                onLoad={() => setIsLoaded(true)}
-                alt={parseImage.name}
-                src={parseImage.fileLegacy.url()}
-                onClick={onClick}
-                {...rest}
+          {parseImage.type === "video" ? (
+            <>
+              <video
+                src={parseImage.fileMobile.url()}
+                className={classNames(classes.image, classes.width100, {
+                  [classes.pointer]: showFullResolutionOnClick,
+                  [classes.displayNone]: !isLoaded,
+                })}
+                onLoadedData={() => setIsLoaded(true)}
+                controls
               />
-            </picture>
-            {!isLoaded && (
-              <Skeleton
-                variant="rect"
-                width="100%"
-                height={IMAGE_SKELETON_HEIGHT}
-              />
-            )}
-          </>
+              {!isLoaded && (
+                <Skeleton
+                  variant="rect"
+                  width="100%"
+                  height={IMAGE_SKELETON_HEIGHT}
+                />
+              )}
+            </>
+          ) : (
+            <>
+              <picture
+                className={classNames(classes.image, classes.width100, {
+                  [classes.pointer]: showFullResolutionOnClick,
+                  [classes.displayNone]: !isLoaded,
+                })}
+              >
+                <source
+                  srcSet={parseImage.fileMobile.url()}
+                  type="image/webp"
+                />
+                <source srcSet={parseImage.fileLegacy.url()} type="image/png" />
+                <img
+                  className={classes.width100}
+                  onLoad={() => setIsLoaded(true)}
+                  alt={parseImage.name}
+                  src={parseImage.fileLegacy.url()}
+                  onClick={onClick}
+                  {...rest}
+                />
+              </picture>
+              {!isLoaded && (
+                <Skeleton
+                  variant="rect"
+                  width="100%"
+                  height={IMAGE_SKELETON_HEIGHT}
+                />
+              )}
+            </>
+          )}
         </Tooltip>
         {decorations?.map((decoration, index) =>
           React.cloneElement(decoration, { key: `decoration${index}` })

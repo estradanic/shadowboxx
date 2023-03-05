@@ -24,7 +24,7 @@ import {
   verifyEmail,
   VerifyEmailParams,
 } from "./functions";
-import { NativeAttributes, ParseUser, Strings } from "./shared";
+import { NativeAttributes, ParseImage, ParseUser, Strings } from "./shared";
 
 type Image = Parse.Object<NativeAttributes<"Image">>;
 type Album = Parse.Object<NativeAttributes<"Album">>;
@@ -42,6 +42,10 @@ Parse.Cloud.beforeLogin(async (request) => {
 
 Parse.Cloud.afterSave<Image>("Image", async (request) => {
   if (request.master && request.context?.noTrigger) {
+    return;
+  }
+  const image = request.object as Image;
+  if (image.get(ParseImage.COLUMNS.type) !== "image") {
     return;
   }
   await hashImage(request.object);
@@ -78,10 +82,14 @@ Parse.Cloud.beforeSave<Image>("Image", async (request) => {
   if (request.master && request.context?.noTrigger) {
     return;
   }
-  await resizeImage(request.object);
   if (request.object.isNew()) {
     request.object.set("dateTaken", new Date());
   }
+  const image = request.object as Image;
+  if (image.get(ParseImage.COLUMNS.type) !== "image") {
+    return;
+  }
+  await resizeImage(request.object);
 });
 
 Parse.Cloud.beforeSave<Album>("Album", async (request) => {

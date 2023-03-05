@@ -259,7 +259,7 @@ const ImageField = memo(
               onChange={addFromFile}
               fullWidth
               inputProps={{
-                accept: "image/*",
+                accept: "image/*,video/*",
                 multiple,
                 className: classes.input,
                 ref: inputRef,
@@ -399,7 +399,7 @@ const ImageField = memo(
               type="file"
               style={{ display: "none" }}
               onChange={addFromFile}
-              accept="image/*"
+              accept="image/*,video/*"
               multiple={multiple}
               ref={inputRef}
             />

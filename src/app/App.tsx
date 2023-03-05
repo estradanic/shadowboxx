@@ -62,12 +62,15 @@ const App = () => {
   const { addNotification } = useNotificationsContext();
 
   const isDarkThemeEnabled = getLoggedInUser()?.isDarkThemeEnabled;
-  const darkTheme = useCallback((lightThemeSettings: Theme) =>
-    createTheme(
-      isUserLoggedIn && isDarkThemeEnabled
-        ? darkThemeSettings
-        : lightThemeSettings
-    ), [isUserLoggedIn, isDarkThemeEnabled]);
+  const darkTheme = useCallback(
+    (lightThemeSettings: Theme) =>
+      createTheme(
+        isUserLoggedIn && isDarkThemeEnabled
+          ? darkThemeSettings
+          : lightThemeSettings
+      ),
+    [isUserLoggedIn, isDarkThemeEnabled]
+  );
 
   useEffect(() => {
     navigator?.storage?.persisted?.()?.then?.((initialIsPersisted) => {

@@ -32,6 +32,10 @@ const Strings = {
     noConnection: "No Internet Connection. Please try again later",
     notInstalled: "Not installed :(",
     common: "Something went wrong!",
+    videoTooLarge: (fileName?: string) =>
+      `Video${fileName ? ` ${fileName}` : ""} is too large`,
+    invalidFileType: (fileName?: string) =>
+      `Invalid file type${fileName ? ` ${fileName}` : ""}`,
   },
   success: {
     common: "Success!",
