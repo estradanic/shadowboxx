@@ -79,7 +79,7 @@
     "@types/uuid": "^9.0.0",
     "@vitejs/plugin-react": "^3.1.0",
     "blockhash-core": "^0.1.0",
-    "eslint": "^8.34.0",
+    "eslint": "^8.35.0",
     "eslint-config-react-app": "^7.0.1",
     "nodemailer": "^6.9.1",
     "prettier": "^2.8.4",
