@@ -163,7 +163,10 @@ export default class ParseImage extends ParseObject<"Image"> {
 
   /** PNG version of the file for mobile Safari and IE */
   get fileLegacy(): Attributes<"Image">["fileLegacy"] {
-    return this._image.get(ParseImage.COLUMNS.fileLegacy) ?? this.file;
+    if (this.type !== "image") {
+      return this.file;
+    }
+    return this._image.get(ParseImage.COLUMNS.fileLegacy);
   }
 
   /** Pointer to user who owns the image */

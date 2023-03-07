@@ -35,6 +35,12 @@ const manifest = {
 };
 
 export default defineConfig(({ mode }) => ({
+  server: {
+    headers: {
+      "Cross-Origin-Opener-Policy": "same-origin",
+      "Cross-Origin-Embedder-Policy": "credentialless",
+    },
+  },
   publicDir: "public",
   build: {
     outDir: "build",

@@ -30,7 +30,10 @@ app.use((req, res, next) => {
     req.method === "GET" &&
     (frontendRoutes.includes(pathParts[0]) || pathParts.length === 0);
   if (serveIndex) {
-    res.sendFile(path.join(`${__dirname}/public/index.html`));
+    res
+      .header("Cross-Origin-Opener-Policy", "same-origin")
+      .header("Cross-Origin-Embedder-Policy", "credentialless")
+      .sendFile(path.join(`${__dirname}/public/index.html`));
   } else {
     next();
   }

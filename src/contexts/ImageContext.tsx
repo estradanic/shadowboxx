@@ -8,6 +8,7 @@ import React, {
 import Parse from "parse";
 import { readAndCompressImage } from "browser-image-resizer";
 import ErrorIcon from "@material-ui/icons/Error";
+import { createFFmpeg } from "@ffmpeg/ffmpeg";
 import { Strings } from "../resources";
 import {
   ParseImage,
@@ -108,6 +109,7 @@ const ACCEPTABLE_VIDEO_TYPES = [
   "video/x-matroska",
   "image/gif",
 ];
+const MAX_FILE_SIZE = 20000000; // 20 MB
 
 export const ImageContextProvider = ({
   children,
@@ -220,6 +222,54 @@ export const ImageContextProvider = ({
     }
   };
 
+  const compressImage = async (file: File): Promise<File> => {
+    return readAndCompressImage(file, {
+      quality: 1,
+      maxWidth: 2400,
+      maxHeight: 2400,
+      mimeType: "image/webp",
+    });
+  };
+
+  const compressVideo = async (file: File): Promise<File> => {
+    const ffmpeg = createFFmpeg({ log: true });
+    await ffmpeg.load();
+    let success = true;
+    ffmpeg.setLogger(({ message }) => {
+      console.log(message);
+      if (message.includes("Conversion failed!")) {
+        success = false;
+      }
+    });
+    const dataArray = new Uint8Array(await file.arrayBuffer());
+    ffmpeg.FS("writeFile", file.name, dataArray);
+    const newFileName = removeExtension(file.name) + "_compressed.mp4";
+    await ffmpeg.run(
+      "-i",
+      file.name,
+      "-f",
+      "webm",
+      "-vcodec",
+      "libvpx-vp9",
+      "-acodec",
+      "libvorbis",
+      "-vf",
+      "scale='min(720,iw)':'min(1080,ih)':'force_original_aspect_ratio=decrease',pad='width=ceil(iw/2)*2:height=ceil(ih/2)*2'",
+      "-pix_fmt",
+      "yuv420p",
+      "-preset",
+      "faster",
+      newFileName
+    );
+    if (!success) {
+      throw new Error("Video compression failed");
+    }
+    const result = ffmpeg.FS("readFile", newFileName);
+    return new File([result.buffer], newFileName, {
+      type: "video/mp4",
+    });
+  };
+
   const processFiles = async (eventFiles: File[]) => {
     const files: File[] = [];
     for (let i = 0; i < eventFiles.length; i++) {
@@ -230,21 +280,10 @@ export const ImageContextProvider = ({
     for (let i = 0; i < max; i++) {
       let file = files[i];
       if (ACCEPTABLE_VIDEO_TYPES.includes(file.type)) {
-        if (file.size > 20000000) {
-          enqueueErrorSnackbar(Strings.error.videoTooLarge(file.name));
-          continue;
-        }
-        resizeImagePromises.push(Promise.resolve(file));
+        resizeImagePromises.push(compressVideo(file));
       } else if (ACCEPTABLE_IMAGE_TYPES.includes(file.type)) {
-        if (file.size > 15000000) {
-          resizeImagePromises.push(
-            readAndCompressImage(file, {
-              quality: 1,
-              maxWidth: 2400,
-              maxHeight: 2400,
-              mimeType: "image/webp",
-            })
-          );
+        if (file.size > MAX_FILE_SIZE) {
+          resizeImagePromises.push(compressImage(file));
         } else {
           resizeImagePromises.push(Promise.resolve(file));
         }

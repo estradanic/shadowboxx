@@ -4,6 +4,7 @@ import React, {
   useEffect,
   useRef,
   useState,
+  MouseEvent,
 } from "react";
 import { makeStyles, Theme } from "@material-ui/core/styles";
 import NotesIcon from "@material-ui/icons/Notes";
@@ -119,6 +120,8 @@ export type ImageProps = ImgHTMLAttributes<HTMLImageElement> & {
   variant?: "bordered" | "contained" | "bordered-no-padding";
   /** Caption text */
   caption?: string;
+  /** onClick handler */
+  onClick?: (e: MouseEvent<HTMLVideoElement | HTMLImageElement>) => void;
 };
 
 /** Component showing an image in a pretty and functional way */
@@ -148,10 +151,17 @@ const Image = memo(
     const [isLoaded, setIsLoaded] = useState(false);
     const [isFullResolutionLoaded, setIsFullResolutionLoaded] = useState(false);
 
-    const onClick = showFullResolutionOnClick
-      ? () => setFullResolutionOpen(true)
-      : piOnClick;
+    const onClick = (e: MouseEvent<HTMLImageElement | HTMLVideoElement>) => {
+      e.stopPropagation();
+      e.preventDefault();
+      if (showFullResolutionOnClick) {
+        setFullResolutionOpen(true);
+      } else if (piOnClick) {
+        piOnClick(e);
+      }
+    };
 
+    const largeVideoRef = useRef<HTMLVideoElement>(null);
     const videoRef = useRef<HTMLVideoElement>(null);
     useEffect(() => {
       if (videoRef.current) {
@@ -166,13 +176,15 @@ const Image = memo(
             <>
               <video
                 ref={videoRef}
-                src={parseImage.fileMobile.url()}
+                src={parseImage.file.url()}
                 className={classNames(classes.image, classes.width100, {
                   [classes.pointer]: showFullResolutionOnClick,
                   [classes.displayNone]: !isLoaded,
                 })}
-                onLoadedData={() => setIsLoaded(true)}
+                onLoadStart={() => setIsLoaded(true)}
+                onClick={onClick}
                 controls
+                preload="metadata"
               />
               {!isLoaded && (
                 <Skeleton
@@ -224,20 +236,55 @@ const Image = memo(
             onClick={() => setFullResolutionOpen(false)}
             anchorEl={ref.current}
           >
-            <picture
-              className={classNames(classes.fullResolutionPicture, {
-                [classes.displayNone]: !isFullResolutionLoaded,
-              })}
-            >
-              <source srcSet={parseImage.file.url()} type="image/webp" />
-              <source srcSet={parseImage.fileLegacy.url()} type="image/png" />
-              <img
-                className={classes.fullResolutionImage}
-                alt={parseImage.name}
-                onLoad={() => setIsFullResolutionLoaded(true)}
-                src={parseImage.fileLegacy.url()}
-              />
-            </picture>
+            {parseImage.type === "video" ? (
+              <>
+                <video
+                  ref={largeVideoRef}
+                  src={parseImage.file.url()}
+                  className={classNames(
+                    classes.fullResolutionPicture,
+                    classes.fullResolutionImage,
+                    {
+                      [classes.displayNone]: !isFullResolutionLoaded,
+                    }
+                  )}
+                  onLoadStart={() => setIsFullResolutionLoaded(true)}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    e.preventDefault();
+                    if (largeVideoRef.current?.paused) {
+                      largeVideoRef.current?.play();
+                    } else {
+                      largeVideoRef.current?.pause();
+                    }
+                  }}
+                  controls
+                  preload="metadata"
+                />
+                {!isLoaded && (
+                  <Skeleton
+                    variant="rect"
+                    width="100%"
+                    height={IMAGE_SKELETON_HEIGHT}
+                  />
+                )}
+              </>
+            ) : (
+              <picture
+                className={classNames(classes.fullResolutionPicture, {
+                  [classes.displayNone]: !isFullResolutionLoaded,
+                })}
+              >
+                <source srcSet={parseImage.file.url()} type="image/webp" />
+                <source srcSet={parseImage.fileLegacy.url()} type="image/png" />
+                <img
+                  className={classes.fullResolutionImage}
+                  alt={parseImage.name}
+                  onLoad={() => setIsFullResolutionLoaded(true)}
+                  src={parseImage.fileLegacy.url()}
+                />
+              </picture>
+            )}
             <Typography
               className={classNames(classes.caption, {
                 [classes.displayNone]:
