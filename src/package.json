@@ -24,7 +24,7 @@
     "classnames": "^2.3.2",
     "events": "^3.3.0",
     "luxon": "^3.3.0",
-    "notistack": "^1.0.5",
+    "notistack": "^3.0.1",
     "parse": "3.4.4",
     "react": "^17.0.1",
     "react-detect-offline": "^2.4.5",
