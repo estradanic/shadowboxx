@@ -33,7 +33,7 @@
     "react-router-dom": "^6.8.2",
     "use-debounce": "^9.0.3",
     "uuid": "^9.0.0",
-    "zustand": "^4.3.3"
+    "zustand": "^4.3.7"
   },
   "scripts": {
     "build": "vite build --mode development",
