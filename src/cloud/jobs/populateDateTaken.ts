@@ -20,13 +20,13 @@ const populateDateTaken = async () => {
     for (const image of images) {
       console.log(
         "Populating dateTaken for image",
-        image.get(ParseImage.COLUMNS.name)
+        image.name
       );
-      image.set(ParseImage.COLUMNS.dateTaken, image.createdAt);
+      image.dateTaken = image.createdAt;
     }
     page++;
     console.log("Saving batch", page);
-    await Parse.Object.saveAll(images, { useMasterKey: true });
+    await Parse.Object.saveAll(images.map((i) => i.toNative()), { useMasterKey: true });
   }
 };
 

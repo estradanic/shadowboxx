@@ -1,7 +1,6 @@
 import loggerWrapper from "../../loggerWrapper";
 import {
   getObjectId,
-  NativeAttributes,
   ParseAlbum,
   ParseImage,
 } from "../../shared";
@@ -11,7 +10,7 @@ import {
  * Applies changes to the album in the db rather than just blindly saving the uploaded object.
  */
 const mergeAlbumChanges = async (
-  album: Parse.Object<NativeAttributes<"Album">>,
+  album: ParseAlbum,
   context: Record<string, any>
 ) => {
   if (
@@ -32,9 +31,9 @@ const mergeAlbumChanges = async (
 
   await album.fetch({ useMasterKey: true });
 
-  const images: string[] = album.get(ParseAlbum.COLUMNS.images);
-  const collaborators: string[] = album.get(ParseAlbum.COLUMNS.collaborators);
-  const viewers: string[] = album.get(ParseAlbum.COLUMNS.viewers);
+  const images: string[] = album.images;
+  const collaborators: string[] = album.collaborators;
+  const viewers: string[] = album.viewers;
 
   if (context.addedImages) {
     console.log("Adding images", context.addedImages);
@@ -93,7 +92,7 @@ const mergeAlbumChanges = async (
   }
 
   console.log("Saving album", album.id);
-  album.set({ ...attributes, images, collaborators, viewers, coverImage });
+  album.set({ ...attributes, owner: attributes.owner.toNativePointer(), images, collaborators, viewers, coverImage: coverImage?.toNativePointer() });
 };
 
 export default loggerWrapper("mergeAlbumChanges", mergeAlbumChanges);

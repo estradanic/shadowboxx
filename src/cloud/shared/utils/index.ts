@@ -6,3 +6,4 @@ export {
   removeExtension,
 } from "./stringUtils";
 export { getObjectId } from "./parseUtils";
+export {distinctBy} from "./arrayUtils";

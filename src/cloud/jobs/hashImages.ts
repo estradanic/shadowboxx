@@ -18,12 +18,12 @@ const hashImages = async () => {
       exhausted = true;
     }
     for (const image of images) {
-      console.log("Hashing image", image.get(ParseImage.COLUMNS.name));
+      console.log("Hashing image", image.name);
       await hashImage(image);
     }
     page++;
     console.log("Saving batch", page);
-    await Parse.Object.saveAll(images, { useMasterKey: true });
+    await Parse.Object.saveAll(images.map((i) => i.toNative()), { useMasterKey: true });
   }
 };
 

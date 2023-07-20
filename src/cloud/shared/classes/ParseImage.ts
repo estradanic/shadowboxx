@@ -7,6 +7,7 @@ import ParseObject, {
   ParsifyPointers,
 } from "./ParseObject";
 import ParseUser from "./ParseUser";
+import ParseQuery from './ParseQuery';
 
 /** Interface defining Image-specific attributes */
 export interface ImageAttributes {
@@ -31,14 +32,23 @@ export interface ImageAttributes {
 }
 
 class ImageColumns extends Columns {
+  /** The actual saved file */
   file = "file" as const;
+  /** User that owns this picture */
   owner = "owner" as const;
+  /** Name of the image */
   name = "name" as const;
+  /** The file resized for mobile */
   fileMobile = "fileMobile" as const;
+  /** The file resized for thumbnails */
   fileThumb = "fileThumb" as const;
+  /** The file in png format for older iPhones */
   fileLegacy = "fileLegacy" as const;
+  /** Date that the image was taken */
   dateTaken = "dateTaken" as const;
+  /** Hash of the image for comparisons */
   hash = "hash" as const;
+  /** Type of the image */
   type = "type" as const;
 }
 
@@ -52,12 +62,15 @@ export default class ParseImage extends ParseObject<"Image"> {
    * @returns Parse.Query for the "Image" class
    */
   static query(online = true) {
+    let nativeQuery;
     if (online) {
-      return new Parse.Query<Parse.Object<ParsifyPointers<"Image">>>("Image");
+      nativeQuery = new Parse.Query<Parse.Object<ParsifyPointers<"Image">>>("Image");
+    } else {
+      nativeQuery = new Parse.Query<Parse.Object<ParsifyPointers<"Image">>>(
+        "Image"
+      ).fromLocalDatastore();
     }
-    return new Parse.Query<Parse.Object<ParsifyPointers<"Image">>>(
-      "Image"
-    ).fromLocalDatastore();
+    return new ParseQuery(nativeQuery);
   }
 
   /**
@@ -66,7 +79,7 @@ export default class ParseImage extends ParseObject<"Image"> {
    * @returns Parse.Query for the "Image" class
    */
   static cloudQuery(parse: typeof Parse) {
-    return new parse.Query<Parse.Object<ParsifyPointers<"Image">>>("Image");
+    return ParseQuery.for("Image", parse);
   }
 
   /**
@@ -93,9 +106,7 @@ export default class ParseImage extends ParseObject<"Image"> {
     return [...images].sort((a, b) => a.compareTo(b));
   }
 
-  /**
-   * Columns for the "Image" class
-   */
+  /** Columns for the "Image" class */
   static COLUMNS = new ImageColumns();
 
   private _image: Parse.Object<ParsifyPointers<"Image">>;
@@ -126,7 +137,7 @@ export default class ParseImage extends ParseObject<"Image"> {
    * @param options Options to pass to Parse.Object.save
    * @returns The saved image
    */
-  async save() {
+  async save(options?: Parse.Object.SaveOptions) {
     if (!this._image.getACL()) {
       const owner = await ParseUser.cloudQuery(Parse).get(this.owner.id);
       const acl = new Parse.ACL(owner);
@@ -135,7 +146,12 @@ export default class ParseImage extends ParseObject<"Image"> {
     if (!this.dateTaken) {
       this.dateTaken = new Date();
     }
-    return new ParseImage(await this._image.save());
+    return new ParseImage(await this._image.save(null, options));
+  }
+
+  /** Whether image has been changed */
+  dirty(column?: keyof Attributes<"Image">) {
+    return this._image.dirty(column);
   }
 
   /** The actual saved file */
@@ -156,9 +172,17 @@ export default class ParseImage extends ParseObject<"Image"> {
     );
   }
 
+  set fileThumb(fileThumb) {
+    this._image.set(ParseImage.COLUMNS.fileThumb, fileThumb);
+  }
+
   /** Mobile size of the file (700px max edge) */
   get fileMobile(): Attributes<"Image">["fileMobile"] {
     return this._image.get(ParseImage.COLUMNS.fileMobile) ?? this.file;
+  }
+
+  set fileMobile(fileMobile) {
+    this._image.set(ParseImage.COLUMNS.fileMobile, fileMobile);
   }
 
   /** PNG version of the file for mobile Safari and IE */
@@ -167,6 +191,10 @@ export default class ParseImage extends ParseObject<"Image"> {
       return this.file;
     }
     return this._image.get(ParseImage.COLUMNS.fileLegacy);
+  }
+
+  set fileLegacy(fileLegacy) {
+    this._image.set(ParseImage.COLUMNS.fileLegacy, fileLegacy);
   }
 
   /** Pointer to user who owns the image */
@@ -202,6 +230,23 @@ export default class ParseImage extends ParseObject<"Image"> {
   /** Type of the image */
   get type(): Attributes<"Image">["type"] {
     return this._image.get(ParseImage.COLUMNS.type) ?? "image";
+  }
+
+  /** Hash of the image for comparisons */
+  get hash(): Attributes<"Image">["hash"] {
+    return this._image.get(ParseImage.COLUMNS.hash);
+  }
+
+  set hash(hash) {
+    this._image.set(ParseImage.COLUMNS.hash, hash);
+  }
+
+  hasBeenResized() {
+    return !(
+      this.file = this.fileMobile
+      || this.file === this.fileThumb
+      || this.file === this.fileLegacy
+    )
   }
 
   /** All attributes of the image */

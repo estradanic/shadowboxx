@@ -50,13 +50,21 @@ export interface AlbumSaveContext {
 }
 
 class AlbumColumns extends Columns {
+  /** User that owns the album */
   owner = "owner" as const;
+  /** Images in the album */
   images = "images" as const;
+  /** Name of the album */
   name = "name" as const;
+  /** Description of the album */
   description = "description" as const;
+  /** Collaborators with "put" access */
   collaborators = "collaborators" as const;
+  /** Collaborators with "view" access */
   viewers = "viewers" as const;
+  /** First image in album, or user selected cover image */
   coverImage = "coverImage" as const;
+  /** Map of image id to captions */
   captions = "captions" as const;
 }
 
@@ -64,6 +72,7 @@ class AlbumColumns extends Columns {
  * Class wrapping the Parse.Album class and providing convenience methods/properties
  */
 export default class ParseAlbum extends ParseObject<"Album"> {
+  /** Columns for the Album class */
   static COLUMNS = new AlbumColumns();
 
   static sort(albums: ParseAlbum[], favoriteAlbums?: string[]) {
@@ -114,8 +123,17 @@ export default class ParseAlbum extends ParseObject<"Album"> {
     return this.name.localeCompare(that.name);
   }
 
+
   async save(context: AlbumSaveContext) {
     return new ParseAlbum(await this._album.save(null, { context }));
+  }
+
+  async cloudSave(options?: Parse.Object.SaveOptions) {
+    return new ParseAlbum(await this._album.save(null, options));
+  }
+
+  existed() {
+    return this._album.existed();
   }
 
   async saveNew() {

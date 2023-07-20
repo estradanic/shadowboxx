@@ -24,19 +24,19 @@ import {
   verifyEmail,
   VerifyEmailParams,
 } from "./functions";
-import { NativeAttributes, ParseImage, ParseUser, Strings } from "./shared";
+import { ParseAlbum, ParseImage, ParseUser, ParsifyPointers, Strings } from "./shared";
 
-type Image = Parse.Object<NativeAttributes<"Image">>;
-type Album = Parse.Object<NativeAttributes<"Album">>;
-type User = Parse.User<NativeAttributes<"_User">>;
+type Image = Parse.Object<ParsifyPointers<"Image">>;
+type Album = Parse.Object<ParsifyPointers<"Album">>;
+type User = Parse.User<ParsifyPointers<"_User">>;
 
 Parse.Cloud.beforeLogin(async (request) => {
-  const user = request.object as User;
+  const user = new ParseUser(request.object as User);
   if (!(await isUserWhitelisted(user))) {
-    throw new Parse.Error(403, Strings.cloud.error.userNotWhitelisted);
+    throw new Parse.Error(Parse.Error.OPERATION_FORBIDDEN, Strings.cloud.error.userNotWhitelisted);
   }
   if (!(await isEmailVerified(user))) {
-    throw new Parse.Error(401, Strings.cloud.error.emailNotVerified);
+    throw new Parse.Error(Parse.Error.OPERATION_FORBIDDEN, Strings.cloud.error.emailNotVerified);
   }
 });
 
@@ -44,35 +44,36 @@ Parse.Cloud.afterSave<Image>("Image", async (request) => {
   if (request.master && request.context?.noTrigger) {
     return;
   }
-  const image = request.object as Image;
-  if (image.get(ParseImage.COLUMNS.type) !== "image") {
+  const image = new ParseImage(request.object as Image);
+  if (image.type !== "image") {
     return;
   }
-  await hashImage(request.object);
+  await hashImage(image);
 });
 
 Parse.Cloud.afterSave<Album>("Album", async (request) => {
   if (request.master && request.context?.noTrigger) {
     return;
   }
-  await setAlbumPermissions(request.object);
-  await notifyOfAlbumChange(request.object, request.user as User);
+  const album = new ParseAlbum(request.object as Album);
+  await setAlbumPermissions(album);
+  await notifyOfAlbumChange(album, new ParseUser(request.user as User));
 });
 
 Parse.Cloud.afterSave(Parse.User, async (request) => {
   if (request.master && request.context?.noTrigger) {
     return;
   }
-  await setUserPermissions(request.object as User);
+  await setUserPermissions(new ParseUser(request.object as User));
 });
 
 Parse.Cloud.beforeSave(Parse.User, async (request) => {
-  const user = request.object as User;
+  const user = new ParseUser(request.object as User);
   if (request.master && request.context?.noTrigger) {
     return;
   }
   if (user.isNew() && !(await isUserWhitelisted(user))) {
-    throw new Parse.Error(403, Strings.cloud.error.userNotWhitelisted);
+    throw new Parse.Error(Parse.Error.OPERATION_FORBIDDEN, Strings.cloud.error.userNotWhitelisted);
   } else if (user.isNew() || user.dirty(ParseUser.COLUMNS.email)) {
     await sendVerificationEmail(user);
   }
@@ -82,29 +83,29 @@ Parse.Cloud.beforeSave<Image>("Image", async (request) => {
   if (request.master && request.context?.noTrigger) {
     return;
   }
-  if (request.object.isNew()) {
-    request.object.set("dateTaken", new Date());
+  const image = new ParseImage(request.object as Image);
+  if (image.isNew()) {
+    image.dateTaken = new Date();
   }
-  const image = request.object as Image;
-  if (image.get(ParseImage.COLUMNS.type) !== "image") {
+  if (image.type !== "image") {
     return;
   }
-  await resizeImage(request.object);
+  await resizeImage(image);
 });
 
 Parse.Cloud.beforeSave<Album>("Album", async (request) => {
   if (request.master && request.context?.noTrigger) {
     return;
   }
-  await mergeAlbumChanges(request.object, request.context);
+  await mergeAlbumChanges(new ParseAlbum(request.object as Album), request.context);
 });
 
 Parse.Cloud.beforeDelete<Album>("Album", async (request) => {
-  await deleteRoles(request.object);
+  await deleteRoles(new ParseAlbum(request.object as Album));
 });
 
 Parse.Cloud.beforeDelete<Image>("Image", async (request) => {
-  await deleteImageFromAlbums(request.object);
+  await deleteImageFromAlbums(new ParseImage(request.object as Image));
 });
 
 Parse.Cloud.job("findDuplicates", async (request) => {
@@ -125,7 +126,7 @@ Parse.Cloud.job("populateDateTaken", async (request) => {
 Parse.Cloud.define<(params: ResolveDuplicatesParams) => Promise<void>>(
   "resolveDuplicates",
   async (request) => {
-    await resolveDuplicates(request.params, request.user as User);
+    await resolveDuplicates(request.params, new ParseUser(request.user as User));
   }
 );
 

@@ -5,6 +5,7 @@ import ParseObject, {
   ParsifyPointers,
 } from "./ParseObject";
 import ParsePointer from "./ParsePointer";
+import ParseQuery from './ParseQuery';
 
 /** Interface defining User-specific attributes */
 export interface UserAttributes {
@@ -45,16 +46,27 @@ export enum UserUpdateReason {
 }
 
 class UserColumns extends Columns {
+  /** Password for login */
   password = "password" as const;
+  /** Email address */
   email = "email" as const;
+  /** Last name */
   lastName = "lastName" as const;
+  /** First name */
   firstName: "firstName" = "firstName";
+  /** Whether dark theme is enabled or not */
   isDarkThemeEnabled = "isDarkThemeEnabled" as const;
+  /** Pointer to Image record for profile picture */
   profilePicture = "profilePicture" as const;
+  /** Username (email) for login */
   username = "username" as const;
+  /** List of favorited album ids */
   favoriteAlbums = "favoriteAlbums" as const;
+  /** Old email address in case of email change */
   oldEmail = "oldEmail" as const;
+  /** Whether detailed logging is turned on for this user */
   isLoggingEnabled = "isLoggingEnabled" as const;
+  /** Ephemeral verification code for email changes */
   verificationCode = "verificationCode" as const;
 }
 
@@ -73,12 +85,15 @@ export default class ParseUser extends ParseObject<"_User"> {
    * @returns A Parse.Query for the Parse.User ("_User") class
    */
   static query(online = true) {
+    let nativeQuery;
     if (online) {
-      return new Parse.Query<Parse.User<ParsifyPointers<"_User">>>(Parse.User);
+      nativeQuery = new Parse.Query<Parse.User<ParsifyPointers<"_User">>>(Parse.User);
+    } else {
+      nativeQuery = new Parse.Query<Parse.User<ParsifyPointers<"_User">>>(
+        Parse.User
+      ).fromLocalDatastore()
     }
-    return new Parse.Query<Parse.User<ParsifyPointers<"_User">>>(
-      Parse.User
-    ).fromLocalDatastore();
+    return new ParseQuery(nativeQuery);
   }
 
   /**
@@ -87,7 +102,7 @@ export default class ParseUser extends ParseObject<"_User"> {
    * @returns A Parse.Query for the Parse.User ("_User") class
    */
   static cloudQuery(parse: typeof Parse) {
-    return new parse.Query<Parse.User<ParsifyPointers<"_User">>>(parse.User);
+    return ParseQuery.for("_User", parse);
   }
 
   private _user: Parse.User<ParsifyPointers<"_User">>;
@@ -116,7 +131,10 @@ export default class ParseUser extends ParseObject<"_User"> {
    * @param that The other ParseUser to compare to
    * @returns Whether the two ParseUsers are equal or not
    */
-  equals(that: ParseUser): boolean {
+  equals(that: ParseUser | ParseObject<"_User">): boolean {
+    if (!(that instanceof ParseUser)) {
+      return false;
+    }
     return (
       this.email === that.email &&
       this.isDarkThemeEnabled === that.isDarkThemeEnabled &&
@@ -138,8 +156,8 @@ export default class ParseUser extends ParseObject<"_User"> {
    * Fetches the ParseUser from the server
    * @returns The fetched ParseUser
    */
-  async fetch() {
-    return new ParseUser(await this._user.fetch());
+  async fetch(options?: Parse.Object.FetchOptions) {
+    return new ParseUser(await this._user.fetch(options));
   }
 
   /**
@@ -192,6 +210,10 @@ export default class ParseUser extends ParseObject<"_User"> {
     } catch (error: any) {
       console.error(error);
     }
+  }
+
+  async save(options?: Parse.Object.SaveOptions) {
+    return new ParseUser(await this._user.save(undefined, options));
   }
 
   /**
@@ -303,9 +325,25 @@ export default class ParseUser extends ParseObject<"_User"> {
     return this._user.get(ParseUser.COLUMNS.oldEmail);
   }
 
+  set oldEmail(oldEmail) {
+    this._user.set(ParseUser.COLUMNS.oldEmail, oldEmail);
+  }
+
   /** Whether server logging is enabled for this user */
   get isLoggingEnabled(): UserAttributes["isLoggingEnabled"] {
     return this._user.get(ParseUser.COLUMNS.isLoggingEnabled);
+  }
+
+  /** Ephemeral verification code for email changes */
+  get verificationCode(): UserAttributes["verificationCode"] {
+    return this._user.get(ParseUser.COLUMNS.verificationCode);
+  }
+
+  set verificationCode(verificationCode) {
+    this._user.set(
+      ParseUser.COLUMNS.verificationCode,
+      verificationCode
+    );
   }
 
   /** Alias to _user.attributes but with the pointers as ParsePointer objects */
@@ -314,6 +352,10 @@ export default class ParseUser extends ParseObject<"_User"> {
       ...this._user.attributes,
       profilePicture: this.profilePicture,
     };
+  }
+
+  toNative() {
+    return this._user;
   }
 }
 
@@ -351,5 +393,9 @@ export class UnpersistedParseUser extends ParseUser {
   get updatedAt(): Attributes<"_User">["updatedAt"] {
     console.warn("Unpersisted user has no updatedAt");
     return new Date();
+  }
+
+  isNew() {
+    return true;
   }
 }

@@ -73,10 +73,9 @@ const useQueryConfigs = () => {
   ): Promise<ParseImage[]> => {
     return await runFunctionInTryCatch<ParseImage[]>(
       async () => {
-        const images = await ParseImage.query(online)
+        return await ParseImage.query(online)
           .containedIn(ParseImage.COLUMNS.id, imageIds)
           .findAll();
-        return images.map((image) => new ParseImage(image));
       },
       { errorMessage: Strings.error.gettingImages, ...options }
     );
@@ -111,7 +110,7 @@ const useQueryConfigs = () => {
         if (!image) {
           throw new Error(Strings.error.imageNotFound(imageId));
         }
-        return new ParseImage(image);
+        return image;
       },
       { errorMessage: Strings.error.imageNotFound(), ...options }
     );
@@ -140,8 +139,7 @@ const useQueryConfigs = () => {
         if (userId === getLoggedInUser().id) {
           return getLoggedInUser();
         }
-        const user = await ParseUser.query(online).get(userId);
-        return new ParseUser(user);
+        return await ParseUser.query(online).get(userId);
       },
       { errorMessage: Strings.error.gettingUserInfo, ...options }
     );
@@ -170,7 +168,7 @@ const useQueryConfigs = () => {
         const users = await ParseUser.query(online)
           .containedIn(ParseUser.COLUMNS.email, emails)
           .findAll();
-        return users.map((user) => new ParseUser(user));
+        return users;
       },
       { errorMessage: Strings.error.gettingUserInfo, ...options }
     );
@@ -205,7 +203,7 @@ const useQueryConfigs = () => {
         if (!user) {
           throw new Error(Strings.error.gettingUserInfo);
         }
-        return new ParseUser(user);
+        return user;
       },
       { errorMessage: Strings.error.gettingUserInfo, ...options }
     );
@@ -323,16 +321,11 @@ const useQueryConfigs = () => {
   ): Promise<ParseAlbumChangeNotification[]> => {
     return await runFunctionInTryCatch<ParseAlbumChangeNotification[]>(
       async () => {
-        const albumChangeNotifications =
-          await ParseAlbumChangeNotification.query()
+        return await ParseAlbumChangeNotification.query()
             .notEqualTo("user", getLoggedInUser().toNativePointer())
             .greaterThan(ParseAlbumChangeNotification.COLUMNS.count, 0)
             .ascending(ParseAlbumChangeNotification.COLUMNS.createdAt)
             .find();
-        return albumChangeNotifications.map(
-          (albumChangeNotification) =>
-            new ParseAlbumChangeNotification(albumChangeNotification)
-        );
       },
       { errorMessage: Strings.error.gettingDuplicates, ...options }
     );

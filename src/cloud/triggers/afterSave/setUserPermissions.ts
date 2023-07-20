@@ -1,16 +1,16 @@
 import loggerWrapper from "../../loggerWrapper";
-import { NativeAttributes, ParseAlbum } from "../../shared";
+import { ParseUser, ParseAlbum } from "../../shared";
 
 /** Function to set user permissions for albums */
 const setUserPermissions = async (
-  user: Parse.User<NativeAttributes<"_User">>
+  user: ParseUser
 ) => {
   if (!user.existed()) {
     const collaboratorAlbums = await ParseAlbum.cloudQuery(Parse)
-      .containsAll(ParseAlbum.COLUMNS.collaborators, [user.getEmail()])
+      .containsAll(ParseAlbum.COLUMNS.collaborators, [user.email])
       .find({ useMasterKey: true });
     const viewerAlbums = await ParseAlbum.cloudQuery(Parse)
-      .containsAll(ParseAlbum.COLUMNS.viewers, [user.getEmail()])
+      .containsAll(ParseAlbum.COLUMNS.viewers, [user.email])
       .find({ useMasterKey: true });
     if (collaboratorAlbums.length > 0) {
       const readWriteRoleNames = collaboratorAlbums.map(
@@ -20,7 +20,7 @@ const setUserPermissions = async (
         .containedIn("name", readWriteRoleNames)
         .find({ useMasterKey: true });
       readWriteRoles.forEach((role) => {
-        role.getUsers().add(user);
+        role.getUsers().add(user.toNative());
       });
       await Promise.all(
         readWriteRoles.map((role) =>
@@ -34,7 +34,7 @@ const setUserPermissions = async (
         .containedIn("name", readRoleNames)
         .find({ useMasterKey: true });
       readRoles.forEach((role) => {
-        role.getUsers().add(user);
+        role.getUsers().add(user.toNative());
       });
       await Promise.all(
         readRoles.map((role) =>

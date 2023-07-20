@@ -1,37 +1,37 @@
 import loggerWrapper from "../../loggerWrapper";
 import {
   getObjectId,
-  NativeAttributes,
   ParseAlbum,
   ParseAlbumChangeNotification,
   ParseUser,
+  distinctBy,
 } from "../../shared";
+import { UnpersistedParseAlbumChangeNotification } from '../../shared/classes/ParseAlbumChangeNotification';
 
 /** Function to add notifications that an album has changed */
 const notifyOfAlbumChange = async (
-  album: Parse.Object<NativeAttributes<"Album">>,
-  user?: Parse.User<NativeAttributes<"_User">>
+  album: ParseAlbum,
+  user?: ParseUser,
 ) => {
   if (!user || !album) {
     return;
   }
   console.log("Getting album owner");
   const albumOwner = await ParseUser.cloudQuery(Parse).get(
-    getObjectId(album.get(ParseAlbum.COLUMNS.owner)),
+    getObjectId(album.owner),
     { useMasterKey: true }
   );
   console.log("Getting users to notify of album change");
-  const usersToNotify = (
+  const usersToNotify = distinctBy((
     await ParseUser.cloudQuery(Parse)
       .containedIn(ParseUser.COLUMNS.email, [
-        ...album.get(ParseAlbum.COLUMNS.viewers),
-        ...album.get(ParseAlbum.COLUMNS.collaborators),
-        albumOwner.get(ParseUser.COLUMNS.email),
+        ...album.viewers,
+        ...album.collaborators,
+        albumOwner.email,
       ])
       .find({ useMasterKey: true })
   )
-    .filter((u) => u.id !== user?.id)
-    .map((u) => u.toPointer());
+    .filter((u) => u.id !== user?.id), getObjectId);
   console.log("Got users to notify", { usersToNotify });
   if (usersToNotify.length === 0) {
     return;
@@ -40,9 +40,9 @@ const notifyOfAlbumChange = async (
   const existingNotifications = await ParseAlbumChangeNotification.cloudQuery(
     Parse
   )
-    .containedIn(ParseAlbumChangeNotification.COLUMNS.owner, usersToNotify)
-    .equalTo(ParseAlbumChangeNotification.COLUMNS.album, album.toPointer())
-    .equalTo(ParseAlbumChangeNotification.COLUMNS.user, user.toPointer())
+    .containedIn(ParseAlbumChangeNotification.COLUMNS.owner, usersToNotify.map((u) => u.toNativePointer()))
+    .equalTo(ParseAlbumChangeNotification.COLUMNS.album, album.toNativePointer())
+    .equalTo(ParseAlbumChangeNotification.COLUMNS.user, user.toNativePointer())
     .find({ useMasterKey: true });
   console.log("Got existing notifications", { existingNotifications });
   console.log("Creating/updating notifications");
@@ -50,26 +50,22 @@ const notifyOfAlbumChange = async (
     console.log("Creating/updating notification for user", { userToNotify });
     const existingNotification = existingNotifications.find(
       (notification) =>
-        getObjectId(
-          notification.get(ParseAlbumChangeNotification.COLUMNS.owner)
-        ) === getObjectId(userToNotify)
+        getObjectId(notification.owner) === getObjectId(userToNotify)
     );
     if (existingNotification) {
       console.log("Updating existing notification", { existingNotification });
-      existingNotification.increment("count");
-      await existingNotification.save(null, { useMasterKey: true });
+      existingNotification.count += 1;
+      await existingNotification.save({ useMasterKey: true });
       console.log("Updated existing notification", { existingNotification });
     } else {
       console.log("Creating new notification");
-      const notification = new Parse.Object<
-        NativeAttributes<"AlbumChangeNotification">
-      >("AlbumChangeNotification", {
-        owner: userToNotify,
+      const notification = new UnpersistedParseAlbumChangeNotification({
+        owner: userToNotify.toPointer(),
         user: user.toPointer(),
         album: album.toPointer(),
         count: 1,
       });
-      await notification.save(null, { useMasterKey: true });
+      await notification.save({ useMasterKey: true });
       console.log("Created new notification", { notification });
     }
   }

@@ -1,9 +1,9 @@
 import loggerWrapper from "../../loggerWrapper";
-import { NativeAttributes, ParseAlbum } from "../../shared";
+import { ParseAlbum, ParseImage } from "../../shared";
 
 /** Function to delete image from the albums it appears in before destruction */
 const deleteImageFromAlbums = async (
-  image: Parse.Object<NativeAttributes<"Image">>
+  image: ParseImage
 ) => {
   if (!image?.id) {
     console.error("image not found for deleting from albums");

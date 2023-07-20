@@ -5,6 +5,7 @@ import ParseObject, {
   Columns,
   ParsifyPointers,
 } from "./ParseObject";
+import ParseQuery from './ParseQuery';
 
 /** Interface defining AlbumChangeNotification-specific attributes */
 export interface AlbumChangeNotificationAttributes {
@@ -14,14 +15,18 @@ export interface AlbumChangeNotificationAttributes {
   user: ParsePointer<"_User">;
   /** The number of unacknowledged changes */
   count: number;
-  /** User that "owns" this notification */
+  /** User that is being notified ("owns" this notification) */
   owner: ParsePointer<"_User">;
 }
 
 class AlbumChangeNotificationColumns extends Columns {
+  /** Album that was changed */
   album = "album" as const;
+  /** User that changed the album */
   user = "user" as const;
+  /** The number of unacknowledged changes */
   count = "count" as const;
+  /** User that is being notified ("owns" this notification) */
   owner = "owner" as const;
 }
 
@@ -29,28 +34,30 @@ class AlbumChangeNotificationColumns extends Columns {
  * Class wrapping the Parse.AlbumChangeNotification class and providing convenience methods/properties
  */
 export default class ParseAlbumChangeNotification extends ParseObject<"AlbumChangeNotification"> {
+  /** Columns for the AlbumChangeNotification class */
   static COLUMNS = new AlbumChangeNotificationColumns();
 
   /**
-   * Get a Parse.Query for the "AlbumChangeNotification" class. For client code only.
+   * Get a ParseQuery for the "AlbumChangeNotification" class. For client code only.
    * @param online Whether to query online or not, defaults to true
-   * @returns Parse.Query for the "AlbumChangeNotification" class
+   * @returns ParseQuery for the "AlbumChangeNotification" class
    */
   static query(online = true) {
+    let nativeQuery;
     if (online) {
-      return new Parse.Query<
+      nativeQuery = new Parse.Query<
         Parse.Object<ParsifyPointers<"AlbumChangeNotification">>
       >("AlbumChangeNotification");
-    }
-    return new Parse.Query<
+    } else {
+      nativeQuery = new Parse.Query<
       Parse.Object<ParsifyPointers<"AlbumChangeNotification">>
-    >("AlbumChangeNotification").fromLocalDatastore();
+    >("AlbumChangeNotification").fromLocalDatastore()
+    }
+    return new ParseQuery(nativeQuery);
   }
 
   static cloudQuery(parse: typeof Parse) {
-    return new parse.Query<
-      Parse.Object<ParsifyPointers<"AlbumChangeNotification">>
-    >("AlbumChangeNotification");
+    return ParseQuery.for("AlbumChangeNotification", parse);
   }
 
   private _albumChangeNotification: Parse.Object<
@@ -116,5 +123,39 @@ export default class ParseAlbumChangeNotification extends ParseObject<"AlbumChan
       count: this.count,
       owner: this.owner,
     };
+  }
+
+  async save(options?: Parse.Object.SaveOptions) {
+    return this._albumChangeNotification.save(null, options);
+  }
+}
+
+export class UnpersistedParseAlbumChangeNotification extends ParseAlbumChangeNotification {
+  constructor(attributes: Partial<Attributes<"AlbumChangeNotification">> = {}) {
+    super(
+      // @ts-expect-error
+      new Parse.Object<ParsifyPointers<"AlbumChangeNotification">>("AlbumChangeNotification", {
+        count: 0,
+        ...attributes,
+        owner: attributes.owner?.toNativePointer() ?? {__type: "Pointer", className: "_User", objectId: ""},
+        user: attributes.user?.toNativePointer() ?? {__type: "Pointer", className: "_User", objectId: ""},
+        album: attributes.album?.toNativePointer() ?? {__type: "Pointer", className: "Album", objectId: ""},
+      })
+    );
+  }
+
+  get id(): Attributes<"AlbumChangeNotification">["objectId"] {
+    console.warn("Unpersisted albumChangeNotification has no id");
+    return "";
+  }
+
+  get createdAt(): Attributes<"AlbumChangeNotification">["createdAt"] {
+    console.warn("Unpersisted albumChangeNotification has no createdAt");
+    return new Date();
+  }
+
+  get updatedAt(): Attributes<"AlbumChangeNotification">["updatedAt"] {
+    console.warn("Unpersisted albumChangeNotification has no updatedAt");
+    return new Date();
   }
 }

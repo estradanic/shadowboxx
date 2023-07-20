@@ -111,12 +111,11 @@ const useInfiniteQueryConfigs = () => {
   ): Promise<ParseImage[]> => {
     return await runFunctionInTryCatch<ParseImage[]>(
       async () => {
-        const images = await ParseImage.query(online)
+        return await ParseImage.query(online)
           .descending(ParseImage.COLUMNS.dateTaken)
           .limit(options.pageSize)
           .skip(options.page * options.pageSize)
           .find();
-        return images.map((image) => new ParseImage(image));
       },
       { errorMessage: Strings.message.noImages, ...options }
     );
@@ -142,13 +141,12 @@ const useInfiniteQueryConfigs = () => {
   ): Promise<ParseImage[]> => {
     return await runFunctionInTryCatch<ParseImage[]>(
       async () => {
-        const images = await ParseImage.query(online)
+        return await ParseImage.query(online)
           .containedIn(ParseImage.COLUMNS.id, imageIds)
           .descending(ParseImage.COLUMNS.dateTaken)
           .limit(options.pageSize)
           .skip(options.page * options.pageSize)
           .find();
-        return images.map((image) => new ParseImage(image));
       },
       { errorMessage: Strings.error.gettingImages, ...options }
     );
@@ -175,13 +173,12 @@ const useInfiniteQueryConfigs = () => {
   ): Promise<ParseImage[]> => {
     return await runFunctionInTryCatch<ParseImage[]>(
       async () => {
-        const images = await ParseImage.query(online)
+        return await ParseImage.query(online)
           .equalTo(ParseImage.COLUMNS.owner, owner.toNativePointer())
           .descending(ParseImage.COLUMNS.dateTaken)
           .limit(options.pageSize)
           .skip(options.page * options.pageSize)
           .find();
-        return images.map((image) => new ParseImage(image));
       },
       { errorMessage: Strings.error.gettingImage, ...options }
     );

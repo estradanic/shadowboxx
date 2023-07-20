@@ -13,13 +13,13 @@ const verifyEmail = async ({ code, email }: VerifyEmailParams) => {
     .equalTo(ParseUser.COLUMNS.email, email)
     .first({ useMasterKey: true });
   if (!user) {
-    throw new Parse.Error(404, Strings.cloud.error.userNotFound);
+    throw new Parse.Error(Parse.Error.OBJECT_NOT_FOUND, Strings.cloud.error.userNotFound);
   }
-  if (user.get(ParseUser.COLUMNS.verificationCode) !== code) {
-    throw new Parse.Error(400, Strings.cloud.error.invalidVerificationCode);
+  if (user.verificationCode !== code) {
+    throw new Parse.Error(Parse.Error.INVALID_QUERY, Strings.cloud.error.invalidVerificationCode);
   }
-  user.set(ParseUser.COLUMNS.verificationCode, undefined);
-  await user.save(null, { useMasterKey: true });
+  user.verificationCode = undefined;
+  await user.save({ useMasterKey: true });
 
   await updateEmail(user);
 };

@@ -21,10 +21,15 @@ export interface DuplicateAttributes {
 }
 
 class DuplicateColumns extends Columns {
+  /** User that owns image1 and image2 */
   owner = "owner" as const;
+  /** The first image */
   image1 = "image1" as const;
+  /** The second image */
   image2 = "image2" as const;
+  /** How similar the images are (0 - 1) */
   similarity = "similarity" as const;
+  /** Whether the duplicate has been acknowledged by the user */
   acknowledged = "acknowledged" as const;
 }
 
@@ -32,6 +37,7 @@ class DuplicateColumns extends Columns {
  * Class wrapping the Parse.Duplicate class and providing convenience methods/properties
  */
 export default class ParseDuplicate extends ParseObject<"Duplicate"> {
+  /** Columns for the Duplicate class */
   static COLUMNS = new DuplicateColumns();
 
   /**

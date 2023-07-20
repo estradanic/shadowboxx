@@ -113,7 +113,7 @@ export const UserContextProvider = ({ children }: UserContextProviderProps) => {
             .equalTo("objectId", newLoggedInUser.profilePicture.id)
             .first();
           if (profilePictureResponse) {
-            setProfilePicture(new ParseImage(profilePictureResponse));
+            setProfilePicture(profilePictureResponse);
           }
         }
       }

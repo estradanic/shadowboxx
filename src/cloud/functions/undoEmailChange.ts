@@ -12,17 +12,17 @@ const undoEmailChange = async ({ email }: UndoEmailChangeParams) => {
     .first({ useMasterKey: true });
 
   if (!user) {
-    throw new Parse.Error(404, Strings.cloud.error.userNotFound);
+    throw new Parse.Error(Parse.Error.REQUEST_LIMIT_EXCEEDED, Strings.cloud.error.userNotFound);
   }
-  const oldEmail = user.get(ParseUser.COLUMNS.oldEmail);
+  const oldEmail = user.oldEmail;
   if (!oldEmail) {
-    throw new Parse.Error(400, Strings.cloud.error.noPreviousEmailFound);
+    throw new Parse.Error(Parse.Error.INVALID_QUERY, Strings.cloud.error.noPreviousEmailFound);
   }
 
-  user.set(ParseUser.COLUMNS.email, oldEmail);
-  user.set(ParseUser.COLUMNS.oldEmail, undefined);
-  user.set(ParseUser.COLUMNS.verificationCode, undefined);
-  user.save(null, { useMasterKey: true, context: { noTrigger: true } });
+  user.email = oldEmail;
+  user.oldEmail = undefined;
+  user.verificationCode = undefined;
+  user.save({ useMasterKey: true, context: { noTrigger: true } });
 };
 
 export default loggerWrapper("undoEmailChange", undoEmailChange);

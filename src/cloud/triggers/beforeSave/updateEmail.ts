@@ -1,26 +1,26 @@
 import loggerWrapper from "../../loggerWrapper";
-import { NativeAttributes, ParseAlbum, ParseUser, Strings } from "../../shared";
+import { ParseAlbum, ParseUser, Strings } from "../../shared";
 
 /** Function to update references to a user's email address when it changes */
-const updateEmail = async (user: Parse.User<NativeAttributes<"_User">>) => {
+const updateEmail = async (user: ParseUser) => {
   console.log(
     "Updating email for user",
     user.id,
     "to",
-    user.get(ParseUser.COLUMNS.email)
+    user.email
   );
   const oldUser = await ParseUser.cloudQuery(Parse)
     .equalTo(ParseUser.COLUMNS.objectId, user.id)
     .first({ useMasterKey: true });
 
   if (!oldUser) {
-    throw new Parse.Error(404, Strings.cloud.error.userNotFound);
+    throw new Parse.Error(Parse.Error.OBJECT_NOT_FOUND, Strings.cloud.error.userNotFound);
   }
 
-  console.log("Old email", oldUser.get(ParseUser.COLUMNS.email));
+  console.log("Old email", oldUser.email);
 
-  const oldEmail = oldUser.get(ParseUser.COLUMNS.email);
-  const newEmail = user.get(ParseUser.COLUMNS.email);
+  const oldEmail = oldUser.email;
+  const newEmail = user.email;
 
   if (oldEmail === newEmail) {
     console.log("Emails are the same, no need to update");

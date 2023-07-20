@@ -4,7 +4,6 @@ import {
   ParseDuplicate,
   ParseImage,
   ParseUser,
-  NativeAttributes,
   getObjectId,
 } from "../shared";
 
@@ -14,7 +13,7 @@ export interface ResolveDuplicatesParams {
 
 const resolveDuplicates = async (
   { duplicateIds }: ResolveDuplicatesParams,
-  user?: Parse.User<NativeAttributes<"_User">>
+  user?: ParseUser
 ) => {
   const duplicates = await ParseDuplicate.cloudQuery(Parse)
     .containedIn(ParseDuplicate.COLUMNS.objectId, duplicateIds)
@@ -80,18 +79,18 @@ const resolveDuplicates = async (
       if (user) {
         await user.fetch();
         if (
-          getObjectId(user.get(ParseUser.COLUMNS.profilePicture)) ===
+          getObjectId(user.profilePicture) ===
           imageToDelete.id
         ) {
-          console.log("Fixing profile picture for user", user.get("email"));
-          user.set(ParseUser.COLUMNS.profilePicture, imageToKeep.toPointer());
-          await user.save(null, {
+          console.log("Fixing profile picture for user", user.email);
+          user.profilePicture = imageToKeep.toPointer();
+          await user.save({
             useMasterKey: true,
             context: { noTrigger: true },
           });
         }
       }
-      console.log("Deleting image", imageToDelete.get(ParseImage.COLUMNS.name));
+      console.log("Deleting image", imageToDelete.name);
       await imageToDelete.destroy({ useMasterKey: true });
       console.log("Deleting duplicate", duplicate.id);
       await duplicate.destroy({ useMasterKey: true });

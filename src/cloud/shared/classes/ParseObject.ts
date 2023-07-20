@@ -11,7 +11,6 @@ export type ClassName =
   | "Album"
   | "Image"
   | "_User"
-  | "_Role"
   | "Duplicate"
   | "AlbumChangeNotification";
 
@@ -37,7 +36,7 @@ export type Attributes<C extends ClassName> = ObjectAttributes &
     ? DuplicateAttributes
     : C extends "AlbumChangeNotification"
     ? AlbumChangeNotificationAttributes
-    : {});
+    : never);
 
 /**
  * Type for converting an Attributes type to one with native Parse Pointers
@@ -92,7 +91,7 @@ export default class ParseObject<C extends ClassName> {
     if (this._object.isNew()) {
       return {
         className: this._object.className,
-        objectId: "null",
+        objectId: "",
         __type: "Pointer",
       };
     }
@@ -128,8 +127,8 @@ export default class ParseObject<C extends ClassName> {
    * Delete this object from the database
    * @returns A promise that resolves when the object has been deleted
    */
-  async destroy() {
-    return await this._object.destroy();
+  async destroy(options?: Parse.Object.DestroyOptions) {
+    return await this._object.destroy(options);
   }
 
   /**
@@ -153,5 +152,33 @@ export default class ParseObject<C extends ClassName> {
   /** Date that the object was last updated in the db */
   get updatedAt(): ObjectAttributes["updatedAt"] {
     return this._object.updatedAt;
+  }
+
+  isNew() {
+    return this._object.isNew();
+  }
+
+  existed() {
+    return this._object.existed();
+  }
+
+  dirty(key?: Parameters<typeof this._object.dirty>[0]) {
+    return this._object.dirty(key);
+  }
+
+  toNative() {
+    return this._object;
+  }
+
+  getACL() {
+    return this._object.getACL();
+  }
+
+  async fetch(options?: Parse.Object.FetchOptions) {
+    return new ParseObject(await this._object.fetch(options));
+  }
+
+  set(attributes: ParsifyPointers<C>, options?: Parse.Object.SetOptions) {
+    return this._object.set(attributes, options);
   }
 }
