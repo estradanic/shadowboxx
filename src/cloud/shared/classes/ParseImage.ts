@@ -58,7 +58,7 @@ class ImageColumns extends Columns {
 export default class ParseImage extends ParseObject<"Image"> {
   /**
    * Get a Parse.Query for the "Image" class. For client code only.
-   * @param online Whether to query online or not, defaults to true
+   * @param online Whether to query online, defaults to true
    * @returns Parse.Query for the "Image" class
    */
   static query(online = true) {

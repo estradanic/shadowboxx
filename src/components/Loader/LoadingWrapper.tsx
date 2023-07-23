@@ -60,7 +60,7 @@ const useStyles = makeStyles((theme: Theme) => ({
 export interface LoadingWrapperProps
   extends Omit<CircularProgressProps, "variant" | "color" | "classes">,
     Omit<LinearProgressProps, "variant" | "color" | "classes" | "value"> {
-  /** Whether to display the LoadingWrapper or not */
+  /** Whether to display the LoadingWrapper */
   loading?: boolean;
   /** Content to display under the loader */
   content?: ReactNode;

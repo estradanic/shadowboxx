@@ -85,8 +85,6 @@ registerRoute(
   }
 );
 
-registerRoute(({ url }) => url.host === "httpbin.org", new NetworkOnly());
-
 const shareTargetHandler = async ({ event }: { event: FetchEvent }) => {
   const formData = await event.request.formData();
   const files = formData.getAll("media");
@@ -97,8 +95,7 @@ const shareTargetHandler = async ({ event }: { event: FetchEvent }) => {
 registerRoute("/share_target", shareTargetHandler as any, "POST");
 
 registerRoute(
-  ({ url }) =>
-    url.host !== "httpbin.org" && url.host !== "parsefiles.back4app.com",
+  ({ url }) => url.host !== "parsefiles.back4app.com",
   new NetworkFirst(),
   "GET"
 );

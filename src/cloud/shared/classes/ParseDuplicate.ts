@@ -42,7 +42,7 @@ export default class ParseDuplicate extends ParseObject<"Duplicate"> {
 
   /**
    * Get a Parse.Query for the "Duplicate" class. For client code only.
-   * @param online Whether to query online or not, defaults to true
+   * @param online Whether to query online, defaults to true
    * @returns Parse.Query for the "Duplicate" class
    */
   static query(online = true) {

@@ -42,7 +42,7 @@ const useStyles = makeStyles((theme: Theme) => ({
 
 /** Interface defining props for AppMenuList */
 export interface AppMenuListProps {
-  /** Whether screen is extra-small or not */
+  /** Whether screen is extra-small */
   collapse?: boolean;
 }
 

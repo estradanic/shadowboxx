@@ -7,7 +7,7 @@ export type UseInfiniteScrollOptions = {
   /** Number of pixels from the bottom to run onThresholdReached */
   scrollThreshold?: number;
   /**
-   * Whether the function can execute or not.
+   * Whether the function can execute
    * Allows dynamic enabling/disabling
    */
   canExecute?: boolean;

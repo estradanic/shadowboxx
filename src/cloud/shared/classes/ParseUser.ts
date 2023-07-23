@@ -21,7 +21,7 @@ export interface UserAttributes {
   lastName: string;
   /** First name */
   firstName: string;
-  /** Whether dark theme is enabled or not */
+  /** Whether dark theme is enabled */
   isDarkThemeEnabled: boolean;
   /** Pointer to Image record for profile picture */
   profilePicture?: ParsePointer<"Image">;
@@ -54,7 +54,7 @@ class UserColumns extends Columns {
   lastName = "lastName" as const;
   /** First name */
   firstName: "firstName" = "firstName";
-  /** Whether dark theme is enabled or not */
+  /** Whether dark theme is enabled */
   isDarkThemeEnabled = "isDarkThemeEnabled" as const;
   /** Pointer to Image record for profile picture */
   profilePicture = "profilePicture" as const;
@@ -81,7 +81,7 @@ export default class ParseUser extends ParseObject<"_User"> {
 
   /**
    * Gets a Parse.Query for the Parse.User ("_User") class. For client code only.
-   * @param online Whether to query online or not
+   * @param online Whether to query online
    * @returns A Parse.Query for the Parse.User ("_User") class
    */
   static query(online = true) {
@@ -131,7 +131,7 @@ export default class ParseUser extends ParseObject<"_User"> {
   /**
    * Checks to see if that ParseUser is equal to this one
    * @param that The other ParseUser to compare to
-   * @returns Whether the two ParseUsers are equal or not
+   * @returns Whether the two ParseUsers are equal
    */
   equals(that: ParseUser | ParseObject<"_User">): boolean {
     if (!(that instanceof ParseUser)) {

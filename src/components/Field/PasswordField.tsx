@@ -31,7 +31,7 @@ const useStyles = makeStyles((theme: Theme) => ({
  * Interface defining props for PasswordField
  */
 export interface PasswordFieldProps extends Omit<TextFieldProps, "type"> {
-  /** Whether to validate input or not */
+  /** Whether to validate input */
   validate?: boolean;
 }
 

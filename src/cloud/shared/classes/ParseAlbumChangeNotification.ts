@@ -39,7 +39,7 @@ export default class ParseAlbumChangeNotification extends ParseObject<"AlbumChan
 
   /**
    * Get a ParseQuery for the "AlbumChangeNotification" class. For client code only.
-   * @param online Whether to query online or not, defaults to true
+   * @param online Whether to query online, defaults to true
    * @returns ParseQuery for the "AlbumChangeNotification" class
    */
   static query(online = true) {
@@ -133,9 +133,9 @@ export default class ParseAlbumChangeNotification extends ParseObject<"AlbumChan
 export class UnpersistedParseAlbumChangeNotification extends ParseAlbumChangeNotification {
   constructor(attributes: Partial<Attributes<"AlbumChangeNotification">> = {}) {
     super(
-      // @ts-expect-error
       new Parse.Object<ParsifyPointers<"AlbumChangeNotification">>(
         "AlbumChangeNotification",
+        // @ts-expect-error
         {
           count: 0,
           ...attributes,

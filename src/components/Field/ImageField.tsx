@@ -100,7 +100,7 @@ export type ImageFieldProps = Omit<
         onRemove: (...image: ParseImage[]) => Promise<void> | void;
         /** Variant for how to display the field */
         variant?: "field";
-        /** Whether multiple images can be selected or not */
+        /** Whether multiple images can be selected */
         multiple: true;
       }
     | {
@@ -108,7 +108,7 @@ export type ImageFieldProps = Omit<
         onRemove?: never;
         /** Variant for how to display the field */
         variant: "field";
-        /** Whether multiple images can be selected or not */
+        /** Whether multiple images can be selected */
         multiple?: false;
       }
     | {
@@ -116,7 +116,7 @@ export type ImageFieldProps = Omit<
         onRemove?: never;
         /** Variant for how to display the field */
         variant: "button";
-        /** Whether multiple images can be selected or not */
+        /** Whether multiple images can be selected */
         multiple?: boolean;
       }
   );

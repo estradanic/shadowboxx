@@ -109,7 +109,7 @@ export default class ParseObject<C extends ClassName> {
   /**
    * Checks to see if that ParseObject is equal to this one
    * @param that The other ParseObject to compare to
-   * @returns Whether the two ParseObjects are equal or not
+   * @returns Whether the two ParseObjects are equal
    */
   equals(that: ParseObject<C>): boolean {
     return this.id === that.id;

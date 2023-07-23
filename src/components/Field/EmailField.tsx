@@ -7,7 +7,7 @@ import TextField, { TextFieldProps } from "./TextField";
  * Interface defining props for EmailField
  */
 export interface EmailFieldProps extends Omit<TextFieldProps, "type"> {
-  /** Whether to validate input or not */
+  /** Whether to validate input */
   validate?: boolean;
 }
 

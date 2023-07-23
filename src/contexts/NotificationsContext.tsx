@@ -40,7 +40,7 @@ interface NotificationsContextValue {
    * If notification with id already exists, it is updated to the new one
    */
   addNotification: (params: AddNotificationParams) => Notification;
-  /** Whether the notification menu is open or not */
+  /** Whether the notification menu is open */
   notificationMenuOpen: boolean;
   /** React state setter for notificationMenuOpen */
   setNotificationMenuOpen: React.Dispatch<React.SetStateAction<boolean>>;

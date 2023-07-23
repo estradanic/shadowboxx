@@ -39,7 +39,7 @@ export enum ImageActionCommand {
 export interface ImageAction {
   /** The command being performed on the image */
   command: ImageActionCommand;
-  /** Whether action is completed or not */
+  /** Whether action is completed */
   completed?: boolean;
   /** Fractional progress (0-1) of the action */
   progress?: number;

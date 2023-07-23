@@ -1,8 +1,7 @@
 import React, { createContext, useContext } from "react";
-import { Detector } from "react-detect-offline";
 
 interface NetworkDetectionContextValue {
-  /** Whether the browser is online or not */
+  /** Whether the browser is online */
   online: boolean;
 }
 
@@ -19,14 +18,21 @@ interface NetworkDetectionContextProviderProps {
 export const NetworkDetectionContextProvider = ({
   children,
 }: NetworkDetectionContextProviderProps) => {
+  const [online, setOnline] = React.useState<boolean>(true);
+  React.useEffect(() => {
+    const handler = () => setOnline(navigator.onLine);
+    window.addEventListener("online", handler);
+    window.addEventListener("offline", handler);
+    return () => {
+      window.removeEventListener("online", handler);
+      window.removeEventListener("offline", handler);
+    };
+  }, []);
+
   return (
-    <Detector
-      render={({ online }) => (
-        <NetworkDetectionContext.Provider value={{ online }}>
-          {children}
-        </NetworkDetectionContext.Provider>
-      )}
-    />
+    <NetworkDetectionContext.Provider value={{ online }}>
+      {children}
+    </NetworkDetectionContext.Provider>
   );
 };
 
