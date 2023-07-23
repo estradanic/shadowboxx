@@ -89,6 +89,8 @@ const Strings = {
   message: {
     loadingSharedImages: "Loading selected images...",
     processingImages: "Processing...",
+    processingImagesDetail:
+      "Please wait. Videos and large images may take a while.",
     uploadingImages: "Uploading...",
     shareTargetTitle: (num: number) =>
       `Select album to add ${num} image${num > 1 ? "s" : ""} to.`,

@@ -14,7 +14,10 @@ const getImage = async ({ imageId }: GetImageParams) => {
     .equalTo(ParseImage.COLUMNS.objectId, imageId)
     .first({ useMasterKey: true });
   if (!image) {
-    throw new Parse.Error(Parse.Error.OBJECT_NOT_FOUND, Strings.cloud.error.imageNotFound);
+    throw new Parse.Error(
+      Parse.Error.OBJECT_NOT_FOUND,
+      Strings.cloud.error.imageNotFound
+    );
   }
   const data: string = await image.file.getData();
   return data;

@@ -3,18 +3,16 @@ import { ParseAlbum, ParseUser, Strings } from "../../shared";
 
 /** Function to update references to a user's email address when it changes */
 const updateEmail = async (user: ParseUser) => {
-  console.log(
-    "Updating email for user",
-    user.id,
-    "to",
-    user.email
-  );
+  console.log("Updating email for user", user.id, "to", user.email);
   const oldUser = await ParseUser.cloudQuery(Parse)
     .equalTo(ParseUser.COLUMNS.objectId, user.id)
     .first({ useMasterKey: true });
 
   if (!oldUser) {
-    throw new Parse.Error(Parse.Error.OBJECT_NOT_FOUND, Strings.cloud.error.userNotFound);
+    throw new Parse.Error(
+      Parse.Error.OBJECT_NOT_FOUND,
+      Strings.cloud.error.userNotFound
+    );
   }
 
   console.log("Old email", oldUser.email);

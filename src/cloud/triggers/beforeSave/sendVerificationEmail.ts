@@ -3,15 +3,11 @@ import loggerWrapper from "../../loggerWrapper";
 import { ParseUser, Strings } from "../../shared";
 
 /** Function to send verification email when email changes */
-const sendVerificationEmail = async (
-  user: ParseUser
-) => {
+const sendVerificationEmail = async (user: ParseUser) => {
   const oldUser = await ParseUser.cloudQuery(Parse).get(user.id, {
     useMasterKey: true,
   });
-  if (
-    oldUser.email === user.email
-  ) {
+  if (oldUser.email === user.email) {
     return;
   }
 

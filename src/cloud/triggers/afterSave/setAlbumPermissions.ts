@@ -1,10 +1,5 @@
 import loggerWrapper from "../../loggerWrapper";
-import {
-  getObjectId,
-  ParseAlbum,
-  ParseImage,
-  ParseUser,
-} from "../../shared";
+import { getObjectId, ParseAlbum, ParseImage, ParseUser } from "../../shared";
 
 /** Function to get all images in this album */
 const getAllImages = async (album: ParseAlbum) => {
@@ -14,10 +9,7 @@ const getAllImages = async (album: ParseAlbum) => {
   const limit = 1000;
   while (!exhausted) {
     const partialImages = await ParseImage.cloudQuery(Parse)
-      .containedIn(
-        ParseImage.COLUMNS.objectId,
-        album.images
-      )
+      .containedIn(ParseImage.COLUMNS.objectId, album.images)
       .limit(limit)
       .skip(offset)
       .find({ useMasterKey: true });
@@ -56,10 +48,7 @@ const getAllUsersByEmails = async (emails: string[]) => {
 /** Function to set permissions for this album and the images within it */
 const setAlbumPermissions = async (album: ParseAlbum) => {
   const owner = await ParseUser.cloudQuery(Parse)
-    .equalTo(
-      ParseUser.COLUMNS.objectId,
-      getObjectId(album.owner)
-    )
+    .equalTo(ParseUser.COLUMNS.objectId, getObjectId(album.owner))
     .first({ useMasterKey: true });
   const readRoleName = `${album.id}_r`;
   const readWriteRoleName = `${album.id}_rw`;
@@ -77,15 +66,11 @@ const setAlbumPermissions = async (album: ParseAlbum) => {
   }
 
   if (album.viewers.length > 0) {
-    const viewers = await getAllUsersByEmails(
-      album.viewers
-    );
+    const viewers = await getAllUsersByEmails(album.viewers);
     readRole.getUsers().add(viewers.map((v) => v.toNative()));
   }
   if (album.collaborators.length > 0) {
-    const collaborators = await getAllUsersByEmails(
-      album.collaborators
-    );
+    const collaborators = await getAllUsersByEmails(album.collaborators);
     readWriteRole.getUsers().add(collaborators.map((c) => c.toNative()));
   }
 
@@ -109,8 +94,8 @@ const setAlbumPermissions = async (album: ParseAlbum) => {
           image.save({ useMasterKey: true, context: { noTrigger: true } })
         )
       );
-    albumACL.setReadAccess(owner.toNative(), true);
-    albumACL.setWriteAccess(owner.toNative(), true);
+      albumACL.setReadAccess(owner.toNative(), true);
+      albumACL.setWriteAccess(owner.toNative(), true);
     }
   }
   await readRole.save(null, {

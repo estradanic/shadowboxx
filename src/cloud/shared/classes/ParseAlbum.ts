@@ -123,7 +123,6 @@ export default class ParseAlbum extends ParseObject<"Album"> {
     return this.name.localeCompare(that.name);
   }
 
-
   async save(context: AlbumSaveContext) {
     return new ParseAlbum(await this._album.save(null, { context }));
   }

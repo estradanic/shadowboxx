@@ -44,24 +44,16 @@ const findDuplicateImages = async () => {
           .skip(imageSkip++)
           .find({ useMasterKey: true })
       )?.[0];
-      console.log(
-        "Checking duplicates for image",
-        image?.name
-      );
+      console.log("Checking duplicates for image", image?.name);
       if (!image || !image.hash) {
-        console.warn(
-          "Image does not exist or does not have hash",
-          image?.name
-        );
+        console.warn("Image does not exist or does not have hash", image?.name);
         continue;
       }
       let page = 0;
       const pageSize = 100;
       let exhausted = false;
       while (!exhausted) {
-        console.log(
-          `Getting batch ${page} for image ${image.name}`
-        );
+        console.log(`Getting batch ${page} for image ${image.name}`);
         const otherImages = await ParseImage.cloudQuery(Parse)
           .equalTo(ParseImage.COLUMNS.owner, user.toNativePointer())
           .notEqualTo(ParseImage.COLUMNS.objectId, image.id)
@@ -75,16 +67,19 @@ const findDuplicateImages = async () => {
         }
         const duplicates = [];
         for (const otherImage of otherImages) {
-          console.log(
-            "Checking image",
-            otherImage.name
-          );
+          console.log("Checking image", otherImage.name);
           const existingDuplicateQuery = await Parse.Query.or(
             ParseDuplicate.cloudQuery(Parse)
               .equalTo(ParseDuplicate.COLUMNS.image1, image.toNativePointer())
-              .equalTo(ParseDuplicate.COLUMNS.image2, otherImage.toNativePointer()),
+              .equalTo(
+                ParseDuplicate.COLUMNS.image2,
+                otherImage.toNativePointer()
+              ),
             ParseDuplicate.cloudQuery(Parse)
-              .equalTo(ParseDuplicate.COLUMNS.image1, otherImage.toNativePointer())
+              .equalTo(
+                ParseDuplicate.COLUMNS.image1,
+                otherImage.toNativePointer()
+              )
               .equalTo(ParseDuplicate.COLUMNS.image2, image.toNativePointer())
           ).find({ useMasterKey: true });
           if (existingDuplicateQuery.length > 0) {
@@ -95,10 +90,7 @@ const findDuplicateImages = async () => {
             );
             continue;
           }
-          const similarityScore = similarity(
-            image.hash,
-            otherImage.hash
-          );
+          const similarityScore = similarity(image.hash, otherImage.hash);
           if (similarityScore > SIMILARITY_THRESHOLD) {
             console.log(
               `Found duplicate images: ${image.name} and ${otherImage.name} with similarity ${similarityScore}`

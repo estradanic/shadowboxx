@@ -5,7 +5,7 @@ import ParseObject, {
   Columns,
   ParsifyPointers,
 } from "./ParseObject";
-import ParseQuery from './ParseQuery';
+import ParseQuery from "./ParseQuery";
 
 /** Interface defining AlbumChangeNotification-specific attributes */
 export interface AlbumChangeNotificationAttributes {
@@ -50,8 +50,8 @@ export default class ParseAlbumChangeNotification extends ParseObject<"AlbumChan
       >("AlbumChangeNotification");
     } else {
       nativeQuery = new Parse.Query<
-      Parse.Object<ParsifyPointers<"AlbumChangeNotification">>
-    >("AlbumChangeNotification").fromLocalDatastore()
+        Parse.Object<ParsifyPointers<"AlbumChangeNotification">>
+      >("AlbumChangeNotification").fromLocalDatastore();
     }
     return new ParseQuery(nativeQuery);
   }
@@ -134,13 +134,28 @@ export class UnpersistedParseAlbumChangeNotification extends ParseAlbumChangeNot
   constructor(attributes: Partial<Attributes<"AlbumChangeNotification">> = {}) {
     super(
       // @ts-expect-error
-      new Parse.Object<ParsifyPointers<"AlbumChangeNotification">>("AlbumChangeNotification", {
-        count: 0,
-        ...attributes,
-        owner: attributes.owner?.toNativePointer() ?? {__type: "Pointer", className: "_User", objectId: ""},
-        user: attributes.user?.toNativePointer() ?? {__type: "Pointer", className: "_User", objectId: ""},
-        album: attributes.album?.toNativePointer() ?? {__type: "Pointer", className: "Album", objectId: ""},
-      })
+      new Parse.Object<ParsifyPointers<"AlbumChangeNotification">>(
+        "AlbumChangeNotification",
+        {
+          count: 0,
+          ...attributes,
+          owner: attributes.owner?.toNativePointer() ?? {
+            __type: "Pointer",
+            className: "_User",
+            objectId: "",
+          },
+          user: attributes.user?.toNativePointer() ?? {
+            __type: "Pointer",
+            className: "_User",
+            objectId: "",
+          },
+          album: attributes.album?.toNativePointer() ?? {
+            __type: "Pointer",
+            className: "Album",
+            objectId: "",
+          },
+        }
+      )
     );
   }
 

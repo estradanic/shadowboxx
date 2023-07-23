@@ -2,9 +2,7 @@ import loggerWrapper from "../../loggerWrapper";
 import { ParseUser, ParseAlbum } from "../../shared";
 
 /** Function to set user permissions for albums */
-const setUserPermissions = async (
-  user: ParseUser
-) => {
+const setUserPermissions = async (user: ParseUser) => {
   if (!user.existed()) {
     const collaboratorAlbums = await ParseAlbum.cloudQuery(Parse)
       .containsAll(ParseAlbum.COLUMNS.collaborators, [user.email])

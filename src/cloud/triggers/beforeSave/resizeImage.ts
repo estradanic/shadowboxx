@@ -32,12 +32,9 @@ const resizeImage = async (image: ParseImage) => {
     image.fileThumb = await new Parse.File(image.name + "_thumb.webp", {
       base64: thumbnail,
     }).save({ useMasterKey: true });
-    image.fileMobile = await new Parse.File(
-      image.name + "_mobile.wepb",
-      {
-        base64: mobile,
-      }
-    ).save({ useMasterKey: true });
+    image.fileMobile = await new Parse.File(image.name + "_mobile.wepb", {
+      base64: mobile,
+    }).save({ useMasterKey: true });
     image.fileLegacy = await new Parse.File(image.name + "_legacy.png", {
       base64: legacy,
     }).save({ useMasterKey: true });

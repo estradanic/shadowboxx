@@ -2,9 +2,7 @@ import loggerWrapper from "../../loggerWrapper";
 import { ParseUser } from "../../shared";
 
 /** Function to check the whitelist of users and return if a given user is allowed to log in */
-const isUserWhitelisted = async (
-  user: ParseUser
-): Promise<boolean> => {
+const isUserWhitelisted = async (user: ParseUser): Promise<boolean> => {
   const whitelist = await new Parse.Query("Whitelist").find({
     useMasterKey: true,
   });

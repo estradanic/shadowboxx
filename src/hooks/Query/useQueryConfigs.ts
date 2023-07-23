@@ -322,10 +322,10 @@ const useQueryConfigs = () => {
     return await runFunctionInTryCatch<ParseAlbumChangeNotification[]>(
       async () => {
         return await ParseAlbumChangeNotification.query()
-            .notEqualTo("user", getLoggedInUser().toNativePointer())
-            .greaterThan(ParseAlbumChangeNotification.COLUMNS.count, 0)
-            .ascending(ParseAlbumChangeNotification.COLUMNS.createdAt)
-            .find();
+          .notEqualTo("user", getLoggedInUser().toNativePointer())
+          .greaterThan(ParseAlbumChangeNotification.COLUMNS.count, 0)
+          .ascending(ParseAlbumChangeNotification.COLUMNS.createdAt)
+          .find();
       },
       { errorMessage: Strings.error.gettingDuplicates, ...options }
     );

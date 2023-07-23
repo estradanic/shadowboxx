@@ -13,18 +13,12 @@ const hexToBinary = (hex: string) => {
 
 /** Function to hash an image for finding duplicates */
 const hashImage = async (image: ParseImage) => {
-  if (
-    !image.dirty(ParseImage.COLUMNS.file) &&
-    image.hash
-  ) {
+  if (!image.dirty(ParseImage.COLUMNS.file) && image.hash) {
     // If the image file hasn't changed and the hash already exists,
     // then don't do anything
     return;
   }
-  const file =
-    image.fileThumb ??
-    image.fileMobile ??
-    image.file;
+  const file = image.fileThumb ?? image.fileMobile ?? image.file;
   if (!file) {
     console.error("No file found for image", image.id);
     return;

@@ -6,13 +6,10 @@ import {
   ParseUser,
   distinctBy,
 } from "../../shared";
-import { UnpersistedParseAlbumChangeNotification } from '../../shared/classes/ParseAlbumChangeNotification';
+import { UnpersistedParseAlbumChangeNotification } from "../../shared/classes/ParseAlbumChangeNotification";
 
 /** Function to add notifications that an album has changed */
-const notifyOfAlbumChange = async (
-  album: ParseAlbum,
-  user?: ParseUser,
-) => {
+const notifyOfAlbumChange = async (album: ParseAlbum, user?: ParseUser) => {
   if (!user || !album) {
     return;
   }
@@ -22,16 +19,18 @@ const notifyOfAlbumChange = async (
     { useMasterKey: true }
   );
   console.log("Getting users to notify of album change");
-  const usersToNotify = distinctBy((
-    await ParseUser.cloudQuery(Parse)
-      .containedIn(ParseUser.COLUMNS.email, [
-        ...album.viewers,
-        ...album.collaborators,
-        albumOwner.email,
-      ])
-      .find({ useMasterKey: true })
-  )
-    .filter((u) => u.id !== user?.id), getObjectId);
+  const usersToNotify = distinctBy(
+    (
+      await ParseUser.cloudQuery(Parse)
+        .containedIn(ParseUser.COLUMNS.email, [
+          ...album.viewers,
+          ...album.collaborators,
+          albumOwner.email,
+        ])
+        .find({ useMasterKey: true })
+    ).filter((u) => u.id !== user?.id),
+    getObjectId
+  );
   console.log("Got users to notify", { usersToNotify });
   if (usersToNotify.length === 0) {
     return;
@@ -40,8 +39,14 @@ const notifyOfAlbumChange = async (
   const existingNotifications = await ParseAlbumChangeNotification.cloudQuery(
     Parse
   )
-    .containedIn(ParseAlbumChangeNotification.COLUMNS.owner, usersToNotify.map((u) => u.toNativePointer()))
-    .equalTo(ParseAlbumChangeNotification.COLUMNS.album, album.toNativePointer())
+    .containedIn(
+      ParseAlbumChangeNotification.COLUMNS.owner,
+      usersToNotify.map((u) => u.toNativePointer())
+    )
+    .equalTo(
+      ParseAlbumChangeNotification.COLUMNS.album,
+      album.toNativePointer()
+    )
     .equalTo(ParseAlbumChangeNotification.COLUMNS.user, user.toNativePointer())
     .find({ useMasterKey: true });
   console.log("Got existing notifications", { existingNotifications });

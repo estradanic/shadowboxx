@@ -5,7 +5,7 @@ import ParseObject, {
   ParsifyPointers,
 } from "./ParseObject";
 import ParsePointer from "./ParsePointer";
-import ParseQuery from './ParseQuery';
+import ParseQuery from "./ParseQuery";
 
 /** Interface defining User-specific attributes */
 export interface UserAttributes {
@@ -87,11 +87,13 @@ export default class ParseUser extends ParseObject<"_User"> {
   static query(online = true) {
     let nativeQuery;
     if (online) {
-      nativeQuery = new Parse.Query<Parse.User<ParsifyPointers<"_User">>>(Parse.User);
+      nativeQuery = new Parse.Query<Parse.User<ParsifyPointers<"_User">>>(
+        Parse.User
+      );
     } else {
       nativeQuery = new Parse.Query<Parse.User<ParsifyPointers<"_User">>>(
         Parse.User
-      ).fromLocalDatastore()
+      ).fromLocalDatastore();
     }
     return new ParseQuery(nativeQuery);
   }
@@ -340,10 +342,7 @@ export default class ParseUser extends ParseObject<"_User"> {
   }
 
   set verificationCode(verificationCode) {
-    this._user.set(
-      ParseUser.COLUMNS.verificationCode,
-      verificationCode
-    );
+    this._user.set(ParseUser.COLUMNS.verificationCode, verificationCode);
   }
 
   /** Alias to _user.attributes but with the pointers as ParsePointer objects */

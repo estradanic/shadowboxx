@@ -1,4 +1,7 @@
-export const distinctBy = <T, K>(array: T[], getUniqueId?: (item: T) => K): T[] => {
+export const distinctBy = <T, K>(
+  array: T[],
+  getUniqueId?: (item: T) => K
+): T[] => {
   if (!getUniqueId) {
     return [...new Set(array)];
   }

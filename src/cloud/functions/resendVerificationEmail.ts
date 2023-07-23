@@ -24,12 +24,14 @@ const resendVerificationEmail = async ({
     .first({ useMasterKey: true });
 
   if (!user) {
-    throw new Parse.Error(Parse.Error.OBJECT_NOT_FOUND, Strings.cloud.error.userNotFound);
+    throw new Parse.Error(
+      Parse.Error.OBJECT_NOT_FOUND,
+      Strings.cloud.error.userNotFound
+    );
   }
 
   if (user.updatedAt) {
-    const diff =
-      new Date().getTime() - user.updatedAt.getTime();
+    const diff = new Date().getTime() - user.updatedAt.getTime();
     if (diff < 5 * 60 * 1000) {
       throw new Parse.Error(
         Parse.Error.REQUEST_LIMIT_EXCEEDED,

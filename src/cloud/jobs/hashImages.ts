@@ -23,7 +23,10 @@ const hashImages = async () => {
     }
     page++;
     console.log("Saving batch", page);
-    await Parse.Object.saveAll(images.map((i) => i.toNative()), { useMasterKey: true });
+    await Parse.Object.saveAll(
+      images.map((i) => i.toNative()),
+      { useMasterKey: true }
+    );
   }
 };
 

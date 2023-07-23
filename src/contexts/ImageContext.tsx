@@ -27,7 +27,7 @@ import { useSnackbar } from "../components/Snackbar";
 import { useUserContext } from "./UserContext";
 import ImageSelectionDialog from "../components/Images/ImageSelectionDialog";
 import { useNotificationsContext } from "./NotificationsContext";
-import Typography from '@material-ui/core/Typography';
+import Typography from "@material-ui/core/Typography";
 
 export enum ImageActionCommand {
   DELETE,
@@ -168,7 +168,7 @@ export const ImageContextProvider = ({
 
   const recalculateProgress = () => {
     let totalProgress = 0;
-    actions.current.forEach((a) => totalProgress += a.progress ?? 0);
+    actions.current.forEach((a) => (totalProgress += a.progress ?? 0));
     let newProgress = (totalProgress / actions.current.length) * 100;
     if (newProgress === 100) {
       // Allow user to see progress reach 100
@@ -235,7 +235,10 @@ export const ImageContextProvider = ({
     });
   };
 
-  const compressVideo = async (file: File, actionIndex: number): Promise<File> => {
+  const compressVideo = async (
+    file: File,
+    actionIndex: number
+  ): Promise<File> => {
     const videoEl = document.createElement("video");
     videoEl.preload = "metadata";
     let duration = Number.MAX_SAFE_INTEGER;
@@ -257,11 +260,14 @@ export const ImageContextProvider = ({
         const [hours, minutes, seconds] = time.split(":").map(Number);
         const totalSeconds = hours * 3600 + minutes * 60 + seconds;
         actions.current[actionIndex].progress = totalSeconds / duration;
-        let progress = actions.current.reduce((a, b) => a + (b.progress ?? 0), 0) / actions.current.length * 100;
+        let progress =
+          (actions.current.reduce((a, b) => a + (b.progress ?? 0), 0) /
+            actions.current.length) *
+          100;
         if (progress < 5) {
           progress = 5;
         }
-        updateGlobalLoader({progress});
+        updateGlobalLoader({ progress });
       }
     });
     const dataArray = new Uint8Array(await file.arrayBuffer());
@@ -301,7 +307,8 @@ export const ImageContextProvider = ({
     const max = multiple ? files.length : 1;
     const resizeImagePromises: Promise<File>[] = [];
     for (let i = 0; i < max; i++) {
-      const actionIndex = actions.current.push({ command: ImageActionCommand.PROCESS }) - 1;
+      const actionIndex =
+        actions.current.push({ command: ImageActionCommand.PROCESS }) - 1;
       let file = files[i];
       if (ACCEPTABLE_VIDEO_TYPES.includes(file.type)) {
         resizeImagePromises.push(compressVideo(file, actionIndex));
@@ -356,7 +363,7 @@ export const ImageContextProvider = ({
           <FancyTypography variant="loading">
             {Strings.message.processingImages}
           </FancyTypography>
-          <Typography>Please wait. Videos and large images may take a while.</Typography>
+          <Typography>{Strings.message.processingImagesDetail}</Typography>
         </>
       ),
     });

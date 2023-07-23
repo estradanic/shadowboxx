@@ -12,11 +12,17 @@ const undoEmailChange = async ({ email }: UndoEmailChangeParams) => {
     .first({ useMasterKey: true });
 
   if (!user) {
-    throw new Parse.Error(Parse.Error.REQUEST_LIMIT_EXCEEDED, Strings.cloud.error.userNotFound);
+    throw new Parse.Error(
+      Parse.Error.REQUEST_LIMIT_EXCEEDED,
+      Strings.cloud.error.userNotFound
+    );
   }
   const oldEmail = user.oldEmail;
   if (!oldEmail) {
-    throw new Parse.Error(Parse.Error.INVALID_QUERY, Strings.cloud.error.noPreviousEmailFound);
+    throw new Parse.Error(
+      Parse.Error.INVALID_QUERY,
+      Strings.cloud.error.noPreviousEmailFound
+    );
   }
 
   user.email = oldEmail;

@@ -1,9 +1,5 @@
 import loggerWrapper from "../../loggerWrapper";
-import {
-  getObjectId,
-  ParseAlbum,
-  ParseImage,
-} from "../../shared";
+import { getObjectId, ParseAlbum, ParseImage } from "../../shared";
 
 /**
  * Function to avoid a race condition when saving an album.
@@ -92,7 +88,14 @@ const mergeAlbumChanges = async (
   }
 
   console.log("Saving album", album.id);
-  album.set({ ...attributes, owner: attributes.owner.toNativePointer(), images, collaborators, viewers, coverImage: coverImage?.toNativePointer() });
+  album.set({
+    ...attributes,
+    owner: attributes.owner.toNativePointer(),
+    images,
+    collaborators,
+    viewers,
+    coverImage: coverImage?.toNativePointer(),
+  });
 };
 
 export default loggerWrapper("mergeAlbumChanges", mergeAlbumChanges);

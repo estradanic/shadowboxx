@@ -7,7 +7,7 @@ import ParseObject, {
   ParsifyPointers,
 } from "./ParseObject";
 import ParseUser from "./ParseUser";
-import ParseQuery from './ParseQuery';
+import ParseQuery from "./ParseQuery";
 
 /** Interface defining Image-specific attributes */
 export interface ImageAttributes {
@@ -64,7 +64,9 @@ export default class ParseImage extends ParseObject<"Image"> {
   static query(online = true) {
     let nativeQuery;
     if (online) {
-      nativeQuery = new Parse.Query<Parse.Object<ParsifyPointers<"Image">>>("Image");
+      nativeQuery = new Parse.Query<Parse.Object<ParsifyPointers<"Image">>>(
+        "Image"
+      );
     } else {
       nativeQuery = new Parse.Query<Parse.Object<ParsifyPointers<"Image">>>(
         "Image"
@@ -242,11 +244,10 @@ export default class ParseImage extends ParseObject<"Image"> {
   }
 
   hasBeenResized() {
-    return !(
-      this.file = this.fileMobile
-      || this.file === this.fileThumb
-      || this.file === this.fileLegacy
-    )
+    return !(this.file =
+      this.fileMobile ||
+      this.file === this.fileThumb ||
+      this.file === this.fileLegacy);
   }
 
   /** All attributes of the image */

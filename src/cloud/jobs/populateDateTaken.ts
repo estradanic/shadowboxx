@@ -18,15 +18,15 @@ const populateDateTaken = async () => {
       exhausted = true;
     }
     for (const image of images) {
-      console.log(
-        "Populating dateTaken for image",
-        image.name
-      );
+      console.log("Populating dateTaken for image", image.name);
       image.dateTaken = image.createdAt;
     }
     page++;
     console.log("Saving batch", page);
-    await Parse.Object.saveAll(images.map((i) => i.toNative()), { useMasterKey: true });
+    await Parse.Object.saveAll(
+      images.map((i) => i.toNative()),
+      { useMasterKey: true }
+    );
   }
 };
 
