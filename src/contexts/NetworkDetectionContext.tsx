@@ -2,7 +2,7 @@ import React, { createContext, useContext } from "react";
 import { Detector } from "react-detect-offline";
 
 interface NetworkDetectionContextValue {
-  /** Whether httpbin.org can be reached or not */
+  /** Whether the browser is online or not */
   online: boolean;
 }
 
@@ -21,12 +21,6 @@ export const NetworkDetectionContextProvider = ({
 }: NetworkDetectionContextProviderProps) => {
   return (
     <Detector
-      polling={{
-        url: "https://httpbin.org/get",
-        enabled: true,
-        interval: 7500,
-        timeout: 5000,
-      }}
       render={({ online }) => (
         <NetworkDetectionContext.Provider value={{ online }}>
           {children}

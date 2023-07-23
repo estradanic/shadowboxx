@@ -33,6 +33,7 @@ app.use((req, res, next) => {
     res
       .header("Cross-Origin-Opener-Policy", "same-origin")
       .header("Cross-Origin-Embedder-Policy", "credentialless")
+      .header("Cross-Origin-Resource-Policy", "cross-origin")
       .sendFile(path.join(`${__dirname}/public/index.html`));
   } else {
     next();

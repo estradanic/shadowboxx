@@ -27,20 +27,22 @@ import { useSnackbar } from "../components/Snackbar";
 import { useUserContext } from "./UserContext";
 import ImageSelectionDialog from "../components/Images/ImageSelectionDialog";
 import { useNotificationsContext } from "./NotificationsContext";
+import Typography from '@material-ui/core/Typography';
 
 export enum ImageActionCommand {
   DELETE,
   UPLOAD,
+  PROCESS,
 }
 
 /** Interface defining an action being done to an image */
 export interface ImageAction {
-  /** The image being worked on */
-  image: UnpersistedParseImageAttributes | ImageAttributes;
   /** The command being performed on the image */
   command: ImageActionCommand;
   /** Whether action is completed or not */
   completed?: boolean;
+  /** Fractional progress (0-1) of the action */
+  progress?: number;
 }
 
 export type PromptImageSelectionDialogProps = {
@@ -117,7 +119,6 @@ export const ImageContextProvider = ({
   const actions = useRef<ImageAction[]>([]);
   const { addNotification } = useNotificationsContext();
   const { enqueueErrorSnackbar } = useSnackbar();
-
   const { getLoggedInUser } = useUserContext();
 
   const { startGlobalLoader, stopGlobalLoader, updateGlobalLoader } =
@@ -166,10 +167,9 @@ export const ImageContextProvider = ({
   );
 
   const recalculateProgress = () => {
-    const completedActions = actions.current.filter(
-      (action) => action.completed
-    );
-    let newProgress = (completedActions.length / actions.current.length) * 100;
+    let totalProgress = 0;
+    actions.current.forEach((a) => totalProgress += a.progress ?? 0);
+    let newProgress = (totalProgress / actions.current.length) * 100;
     if (newProgress === 100) {
       // Allow user to see progress reach 100
       setTimeout(() => stopGlobalLoader(), 1000);
@@ -192,7 +192,7 @@ export const ImageContextProvider = ({
       ),
       progress: 5,
     });
-    const action: ImageAction = { image, command: ImageActionCommand.UPLOAD };
+    const action: ImageAction = { command: ImageActionCommand.UPLOAD };
     actions.current.push(action);
 
     try {
@@ -222,23 +222,46 @@ export const ImageContextProvider = ({
     }
   };
 
-  const compressImage = async (file: File): Promise<File> => {
+  const compressImage = (file: File, actionIndex: number): Promise<File> => {
     return readAndCompressImage(file, {
       quality: 1,
       maxWidth: 2400,
       maxHeight: 2400,
       mimeType: "image/webp",
+    }).then((c) => {
+      actions.current[actionIndex].progress = 1;
+      actions.current[actionIndex].completed = true;
+      return c;
     });
   };
 
-  const compressVideo = async (file: File): Promise<File> => {
+  const compressVideo = async (file: File, actionIndex: number): Promise<File> => {
+    const videoEl = document.createElement("video");
+    videoEl.preload = "metadata";
+    let duration = Number.MAX_SAFE_INTEGER;
+    videoEl.onloadedmetadata = () => {
+      window.URL.revokeObjectURL(videoEl.src);
+      duration = videoEl.duration;
+    };
+    videoEl.src = URL.createObjectURL(file);
     const ffmpeg = createFFmpeg({ log: true });
     await ffmpeg.load();
     let success = true;
     ffmpeg.setLogger(({ message }) => {
-      console.log(message);
       if (message.includes("Conversion failed!")) {
         success = false;
+        return;
+      }
+      if (message.startsWith("frame=")) {
+        const time = message.split("time=")[1].split("bitrate=")[0].trim();
+        const [hours, minutes, seconds] = time.split(":").map(Number);
+        const totalSeconds = hours * 3600 + minutes * 60 + seconds;
+        actions.current[actionIndex].progress = totalSeconds / duration;
+        let progress = actions.current.reduce((a, b) => a + (b.progress ?? 0), 0) / actions.current.length * 100;
+        if (progress < 5) {
+          progress = 5;
+        }
+        updateGlobalLoader({progress});
       }
     });
     const dataArray = new Uint8Array(await file.arrayBuffer());
@@ -278,12 +301,13 @@ export const ImageContextProvider = ({
     const max = multiple ? files.length : 1;
     const resizeImagePromises: Promise<File>[] = [];
     for (let i = 0; i < max; i++) {
+      const actionIndex = actions.current.push({ command: ImageActionCommand.PROCESS }) - 1;
       let file = files[i];
       if (ACCEPTABLE_VIDEO_TYPES.includes(file.type)) {
-        resizeImagePromises.push(compressVideo(file));
+        resizeImagePromises.push(compressVideo(file, actionIndex));
       } else if (ACCEPTABLE_IMAGE_TYPES.includes(file.type)) {
         if (file.size > MAX_FILE_SIZE) {
-          resizeImagePromises.push(compressImage(file));
+          resizeImagePromises.push(compressImage(file, actionIndex));
         } else {
           resizeImagePromises.push(Promise.resolve(file));
         }
@@ -328,9 +352,12 @@ export const ImageContextProvider = ({
     startGlobalLoader({
       type: "determinate",
       content: (
-        <FancyTypography variant="loading">
-          {Strings.message.processingImages}
-        </FancyTypography>
+        <>
+          <FancyTypography variant="loading">
+            {Strings.message.processingImages}
+          </FancyTypography>
+          <Typography>Please wait. Videos and large images may take a while.</Typography>
+        </>
       ),
     });
     return new Promise<ParseImage[]>((resolve, reject) => {
@@ -388,10 +415,7 @@ export const ImageContextProvider = ({
 
   const deleteImage = async (parseImage: ParseImage) => {
     startGlobalLoader();
-    const action: ImageAction = {
-      image: parseImage.attributes,
-      command: ImageActionCommand.DELETE,
-    };
+    const action: ImageAction = { command: ImageActionCommand.DELETE };
     actions.current.push(action);
 
     try {

@@ -140,7 +140,7 @@ export default class ParseImage extends ParseObject<"Image"> {
   async save(options?: Parse.Object.SaveOptions) {
     if (!this._image.getACL()) {
       const owner = await ParseUser.cloudQuery(Parse).get(this.owner.id);
-      const acl = new Parse.ACL(owner);
+      const acl = new Parse.ACL(owner.toNative());
       this._image.setACL(acl);
     }
     if (!this.dateTaken) {

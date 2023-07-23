@@ -63,8 +63,8 @@ export default defineConfig(({ mode }) => ({
         data: {
           preconnectBack4App: `<link rel="preconnect" href="${
             mode === "production"
-              ? "http://shadowboxx.b4a.io"
-              : "http://shadowboxxdevtest.b4a.io"
+              ? "https://shadowboxx.b4a.io"
+              : "https://shadowboxxdevtest.b4a.io"
           }" />`,
           injectVariables: `
             <script>
@@ -81,8 +81,8 @@ export default defineConfig(({ mode }) => ({
                 }",
                 PARSE_HOST_URL: "${
                   mode === "production"
-                    ? "http://shadowboxx.b4a.io"
-                    : "http://shadowboxxdevtest.b4a.io"
+                    ? "https://shadowboxx.b4a.io"
+                    : "https://shadowboxxdevtest.b4a.io"
                 }",
               };
             </script>
