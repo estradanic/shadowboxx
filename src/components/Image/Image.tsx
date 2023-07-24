@@ -150,6 +150,7 @@ const Image = memo(
     const ref = useRef<HTMLDivElement>(null);
     const [isLoaded, setIsLoaded] = useState(false);
     const [isFullResolutionLoaded, setIsFullResolutionLoaded] = useState(false);
+    const [isPlaying, setIsPlaying] = useState(false);
 
     const onClick = (e: MouseEvent<HTMLImageElement | HTMLVideoElement>) => {
       e.stopPropagation();
@@ -163,11 +164,30 @@ const Image = memo(
 
     const largeVideoRef = useRef<HTMLVideoElement>(null);
     const videoRef = useRef<HTMLVideoElement>(null);
+    const playbackTimeRef = useRef<number>(0);
     useEffect(() => {
       if (videoRef.current) {
         videoRef.current.load();
       }
     }, []);
+    useEffect(() => {
+      if (!videoRef.current) {
+        return;
+      }
+      if (fullResolutionOpen && isFullResolutionLoaded && largeVideoRef.current) {
+        videoRef.current.pause();
+        largeVideoRef.current.currentTime = playbackTimeRef.current;
+        if (isPlaying) {
+          largeVideoRef.current.play();
+        }
+      } else if (!fullResolutionOpen) {
+        videoRef.current.currentTime = playbackTimeRef.current;
+        setIsFullResolutionLoaded(false);
+        if (isPlaying) {
+          videoRef.current.play();
+        }
+      }
+    }, [isFullResolutionLoaded, fullResolutionOpen, isPlaying]);
 
     return (
       <div className={classNames(className, classes.root)} key={key} ref={ref}>
@@ -175,6 +195,8 @@ const Image = memo(
           {parseImage.type === "video" ? (
             <>
               <video
+                onPlay={() => setIsPlaying(true)}
+                onPause={() => setIsPlaying(false)}
                 ref={videoRef}
                 src={parseImage.file.url()}
                 className={classNames(classes.image, classes.width100, {
@@ -185,6 +207,7 @@ const Image = memo(
                 onClick={onClick}
                 controls
                 preload="metadata"
+                onTimeUpdate={(e) => playbackTimeRef.current = e.currentTarget.currentTime}
               />
               {!isLoaded && (
                 <Skeleton
@@ -239,6 +262,9 @@ const Image = memo(
             {parseImage.type === "video" ? (
               <>
                 <video
+                  onPlay={() => setIsPlaying(true)}
+                  onPause={() => setIsPlaying(false)}
+                  onTimeUpdate={(e) => playbackTimeRef.current = e.currentTarget.currentTime}
                   ref={largeVideoRef}
                   src={parseImage.file.url()}
                   className={classNames(
