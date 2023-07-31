@@ -178,6 +178,10 @@ export default class ParseObject<C extends ClassName> {
     return new ParseObject(await this._object.fetch(options));
   }
 
+  async cloudFetch(options?: Parse.Object.FetchOptions) {
+    return new ParseObject(await this._object.fetch(options));
+  }
+
   set(attributes: ParsifyPointers<C>, options?: Parse.Object.SetOptions) {
     return this._object.set(attributes, options);
   }

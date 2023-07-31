@@ -22,12 +22,11 @@ import {
   makeValidFileName,
   removeExtension,
 } from "../utils";
-import { FancyTypography } from "../components/Typography";
+import { FancyTypography, Typography } from "../components/Typography";
 import { useSnackbar } from "../components/Snackbar";
 import { useUserContext } from "./UserContext";
 import ImageSelectionDialog from "../components/Images/ImageSelectionDialog";
 import { useNotificationsContext } from "./NotificationsContext";
-import Typography from "@material-ui/core/Typography";
 
 export enum ImageActionCommand {
   DELETE,
@@ -363,7 +362,9 @@ export const ImageContextProvider = ({
           <FancyTypography variant="loading">
             {Strings.message.processingImages}
           </FancyTypography>
-          <Typography>{Strings.message.processingImagesDetail}</Typography>
+          <Typography color='primaryContrast'>
+            {Strings.message.processingImagesDetail}
+          </Typography>
         </>
       ),
     });

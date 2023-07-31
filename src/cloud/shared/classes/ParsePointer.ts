@@ -64,19 +64,22 @@ export default class ParsePointer<C extends ClassName> {
     switch (this.className) {
       case "Image":
         return new ParseImage(
-          fetchedObject as Parse.Object<ParsifyPointers<"Image">>
+          fetchedObject as Parse.Object<ParsifyPointers<"Image">>,
+          true,
         ) as unknown as P;
       case "Duplicate":
         return new ParseDuplicate(
-          fetchedObject as Parse.Object<ParsifyPointers<"Duplicate">>
+          fetchedObject as Parse.Object<ParsifyPointers<"Duplicate">>,
         ) as unknown as P;
       case "_User":
         return new ParseUser(
-          fetchedObject as Parse.User<ParsifyPointers<"_User">>
+          fetchedObject as Parse.User<ParsifyPointers<"_User">>,
+          true,
         ) as unknown as P;
       case "Album":
         return new ParseAlbum(
-          fetchedObject as Parse.Object<ParsifyPointers<"Album">>
+          fetchedObject as Parse.Object<ParsifyPointers<"Album">>,
+          true,
         ) as unknown as P;
       default:
         return new ParseObject(await query.get(this.id)) as P;

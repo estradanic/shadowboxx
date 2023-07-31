@@ -113,22 +113,24 @@ export default class ParseAlbum extends ParseObject<"Album"> {
 
   private _album: Parse.Object<ParsifyPointers<"Album">>;
 
-  constructor(album: Parse.Object<ParsifyPointers<"Album">>) {
+  constructor(album: Parse.Object<ParsifyPointers<"Album">>, noPin: boolean = false) {
     super(album);
     this._album = album;
-    this.pin();
+    if (!noPin) {
+      this.pin();
+    }
   }
 
   compareTo(that: ParseAlbum): number {
     return this.name.localeCompare(that.name);
   }
 
-  async save(context: AlbumSaveContext) {
+  private async save(context: AlbumSaveContext) {
     return new ParseAlbum(await this._album.save(null, { context }));
   }
 
   async cloudSave(options?: Parse.Object.SaveOptions) {
-    return new ParseAlbum(await this._album.save(null, options));
+    return new ParseAlbum(await this._album.save(null, options), true);
   }
 
   existed() {

@@ -37,7 +37,7 @@ type Album = Parse.Object<ParsifyPointers<"Album">>;
 type User = Parse.User<ParsifyPointers<"_User">>;
 
 Parse.Cloud.beforeLogin(async (request) => {
-  const user = new ParseUser(request.object as User);
+  const user = new ParseUser(request.object as User, true);
   if (!(await isUserWhitelisted(user))) {
     throw new Parse.Error(
       Parse.Error.OPERATION_FORBIDDEN,
@@ -67,20 +67,20 @@ Parse.Cloud.afterSave<Album>("Album", async (request) => {
   if (request.master && request.context?.noTrigger) {
     return;
   }
-  const album = new ParseAlbum(request.object as Album);
+  const album = new ParseAlbum(request.object as Album, true);
   await setAlbumPermissions(album);
-  await notifyOfAlbumChange(album, new ParseUser(request.user as User));
+  await notifyOfAlbumChange(album, new ParseUser(request.user as User, true));
 });
 
 Parse.Cloud.afterSave(Parse.User, async (request) => {
   if (request.master && request.context?.noTrigger) {
     return;
   }
-  await setUserPermissions(new ParseUser(request.object as User));
+  await setUserPermissions(new ParseUser(request.object as User, true));
 });
 
 Parse.Cloud.beforeSave(Parse.User, async (request) => {
-  const user = new ParseUser(request.object as User);
+  const user = new ParseUser(request.object as User, true);
   if (request.master && request.context?.noTrigger) {
     return;
   }
@@ -113,13 +113,13 @@ Parse.Cloud.beforeSave<Album>("Album", async (request) => {
     return;
   }
   await mergeAlbumChanges(
-    new ParseAlbum(request.object as Album),
+    new ParseAlbum(request.object as Album, true),
     request.context
   );
 });
 
 Parse.Cloud.beforeDelete<Album>("Album", async (request) => {
-  await deleteRoles(new ParseAlbum(request.object as Album));
+  await deleteRoles(new ParseAlbum(request.object as Album, true));
 });
 
 Parse.Cloud.beforeDelete<Image>("Image", async (request) => {
@@ -146,7 +146,7 @@ Parse.Cloud.define<(params: ResolveDuplicatesParams) => Promise<void>>(
   async (request) => {
     await resolveDuplicates(
       request.params,
-      new ParseUser(request.user as User)
+      new ParseUser(request.user as User, true)
     );
   }
 );

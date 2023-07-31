@@ -24,20 +24,21 @@ type PO<C extends ClassName> = C extends "_User"
 
 const getParseObject = <C extends ClassName>(
   obj: P<C>,
-  className: C
+  className: C,
+  cloud: boolean,
 ): PO<C> => {
   if (className === "_User") {
-    return new ParseUser(obj as P<"_User">) as PO<C>;
+    return new ParseUser(obj as P<"_User">, !cloud) as PO<C>;
   }
   if (className === "Album") {
-    return new ParseAlbum(obj as P<"Album">) as PO<C>;
+    return new ParseAlbum(obj as P<"Album">, !cloud) as PO<C>;
   }
   if (className === "Image") {
-    return new ParseImage(obj as P<"Image">) as PO<C>;
+    return new ParseImage(obj as P<"Image">, !cloud) as PO<C>;
   }
   if (className === "AlbumChangeNotification") {
     return new ParseAlbumChangeNotification(
-      obj as P<"AlbumChangeNotification">
+      obj as P<"AlbumChangeNotification">,
     ) as PO<C>;
   }
   if (className === "Duplicate") {
@@ -53,15 +54,17 @@ export default class ParseQuery<C extends ClassName> {
         ? new parse.Query<Parse.User<ParsifyPointers<Fc>>>(className)
         : new parse.Query<Parse.Object<ParsifyPointers<Fc>>>(className)
     ) as Parse.Query<P<Fc>>;
-    return new ParseQuery<Fc>(query);
+    return new ParseQuery<Fc>(query, true);
   }
 
   private _query: Parse.Query<P<C>>;
   private _className: C;
+  private _cloud: boolean;
 
-  constructor(query: Parse.Query<P<C>>) {
+  constructor(query: Parse.Query<P<C>>, cloud = false) {
     this._query = query;
     this._className = query.className as C;
+    this._cloud = cloud;
   }
 
   addAscending<K extends keyof Parse.BaseAttributes | keyof P<C>["attributes"]>(
@@ -205,7 +208,7 @@ export default class ParseQuery<C extends ClassName> {
     options?: Parse.Query.BatchOptions | undefined
   ): Promise<PO<C>[]> {
     const result = await this._query.filter(callback, options);
-    return result.map((obj) => getParseObject(obj, this._className));
+    return result.map((obj) => getParseObject(obj, this._className, this._cloud));
   }
   endsWith<K extends keyof Parse.BaseAttributes | keyof P<C>["attributes"]>(
     key: K,
@@ -241,19 +244,19 @@ export default class ParseQuery<C extends ClassName> {
   }
   async find(options?: Parse.Query.FindOptions | undefined): Promise<PO<C>[]> {
     const result = await this._query.find(options);
-    return result.map((obj) => getParseObject(obj, this._className));
+    return result.map((obj) => getParseObject(obj, this._className, this._cloud));
   }
   async findAll(
     options?: Parse.Query.BatchOptions | undefined
   ): Promise<PO<C>[]> {
     const result = await this._query.findAll(options);
-    return result.map((obj) => getParseObject(obj, this._className));
+    return result.map((obj) => getParseObject(obj, this._className, this._cloud));
   }
   async first(
     options?: Parse.Query.FirstOptions | undefined
   ): Promise<PO<C> | undefined> {
     const result = await this._query.first(options);
-    return result ? getParseObject(result, this._className) : undefined;
+    return result ? getParseObject(result, this._className, this._cloud) : undefined;
   }
   fromNetwork(): this {
     this._query = this._query.fromNetwork();
@@ -288,7 +291,7 @@ export default class ParseQuery<C extends ClassName> {
     options?: Parse.Query.GetOptions | undefined
   ): Promise<PO<C>> {
     const result = await this._query.get(objectId, options);
-    return getParseObject(result, this._className);
+    return getParseObject(result, this._className, this._cloud);
   }
   greaterThan<K extends keyof Parse.BaseAttributes | keyof P<C>["attributes"]>(
     key: K,

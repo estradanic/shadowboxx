@@ -163,6 +163,14 @@ export default class ParseUser extends ParseObject<"_User"> {
   }
 
   /**
+   * Fetches the ParseUser from the db
+   * @returns The fetched ParseUser
+   */
+  async cloudFetch(options?: Parse.Object.FetchOptions) {
+    return new ParseUser(await this._user.fetch(options), true);
+  }
+
+  /**
    * Logs in the ParseUser
    * @param updateLoggedInUser Callback function to update the logged in user
    * @param options Options to pass to the Parse login function
