@@ -18,6 +18,8 @@ import { ImageDecorationProps } from "./Decoration/ImageDecoration";
 import Skeleton from "../Skeleton/Skeleton";
 import { IMAGE_SKELETON_HEIGHT } from "../Skeleton/ImageSkeleton";
 import Typography from "@material-ui/core/Typography";
+import useQueryConfigs from "../../hooks/Query/useQueryConfigs";
+import { useQuery } from "@tanstack/react-query";
 
 interface UseStylesParams {
   borderColor: VariableColor;
@@ -139,6 +141,27 @@ const Image = memo(
     ...rest
   }: ImageProps) => {
     const classes = useStyles({ borderColor, hasCaption: !!caption });
+    const { getImageUrlFunction, getImageUrlOptions, getImageUrlQueryKey } =
+      useQueryConfigs();
+    const { data: mobileUrl } = useQuery<string, Error>(
+      getImageUrlQueryKey(parseImage.id, "mobile"),
+      () => getImageUrlFunction(parseImage.id, "mobile"),
+      getImageUrlOptions({
+        enabled: !!parseImage.id && parseImage.type === "image",
+      })
+    );
+    const { data: legacyUrl } = useQuery<string, Error>(
+      getImageUrlQueryKey(parseImage.id, "legacy"),
+      () => getImageUrlFunction(parseImage.id, "legacy"),
+      getImageUrlOptions({
+        enabled: !!parseImage.id && parseImage.type === "image",
+      })
+    );
+    const { data: fullUrl } = useQuery<string, Error>(
+      getImageUrlQueryKey(parseImage.id, "full"),
+      () => getImageUrlFunction(parseImage.id, "full"),
+      getImageUrlOptions({ enabled: !!parseImage.id })
+    );
     if (variant === "contained") {
       classes.image = "";
       classes.pointer = "";
@@ -174,7 +197,11 @@ const Image = memo(
       if (!videoRef.current) {
         return;
       }
-      if (fullResolutionOpen && isFullResolutionLoaded && largeVideoRef.current) {
+      if (
+        fullResolutionOpen &&
+        isFullResolutionLoaded &&
+        largeVideoRef.current
+      ) {
         videoRef.current.pause();
         largeVideoRef.current.currentTime = playbackTimeRef.current;
         if (isPlaying) {
@@ -198,7 +225,7 @@ const Image = memo(
                 onPlay={() => setIsPlaying(true)}
                 onPause={() => setIsPlaying(false)}
                 ref={videoRef}
-                src={parseImage.file.url()}
+                src={fullUrl?.replace("data:image/webp", "data:video/mp4")}
                 className={classNames(classes.image, classes.width100, {
                   [classes.pointer]: showFullResolutionOnClick,
                   [classes.displayNone]: !isLoaded,
@@ -207,7 +234,9 @@ const Image = memo(
                 onClick={onClick}
                 controls
                 preload="metadata"
-                onTimeUpdate={(e) => playbackTimeRef.current = e.currentTarget.currentTime}
+                onTimeUpdate={(e) =>
+                  (playbackTimeRef.current = e.currentTarget.currentTime)
+                }
               />
               {!isLoaded && (
                 <Skeleton
@@ -225,16 +254,13 @@ const Image = memo(
                   [classes.displayNone]: !isLoaded,
                 })}
               >
-                <source
-                  srcSet={parseImage.fileMobile.url()}
-                  type="image/webp"
-                />
-                <source srcSet={parseImage.fileLegacy.url()} type="image/png" />
+                <source srcSet={mobileUrl} type="image/webp" />
+                <source srcSet={legacyUrl?.replace("data:image/webp", "data:image/png")} type="image/png" />
                 <img
                   className={classes.width100}
                   onLoad={() => setIsLoaded(true)}
                   alt={parseImage.name}
-                  src={parseImage.fileLegacy.url()}
+                  src={legacyUrl?.replace("data:image/webp", "data:image/png")}
                   onClick={onClick}
                   {...rest}
                 />
@@ -264,9 +290,11 @@ const Image = memo(
                 <video
                   onPlay={() => setIsPlaying(true)}
                   onPause={() => setIsPlaying(false)}
-                  onTimeUpdate={(e) => playbackTimeRef.current = e.currentTarget.currentTime}
+                  onTimeUpdate={(e) =>
+                    (playbackTimeRef.current = e.currentTarget.currentTime)
+                  }
                   ref={largeVideoRef}
-                  src={parseImage.file.url()}
+                  src={fullUrl?.replace("data:image/webp", "data:video/mp4")}
                   className={classNames(
                     classes.fullResolutionPicture,
                     classes.fullResolutionImage,
@@ -301,13 +329,13 @@ const Image = memo(
                   [classes.displayNone]: !isFullResolutionLoaded,
                 })}
               >
-                <source srcSet={parseImage.file.url()} type="image/webp" />
-                <source srcSet={parseImage.fileLegacy.url()} type="image/png" />
+                <source srcSet={fullUrl} type="image/webp" />
+                <source srcSet={legacyUrl?.replace("data:image/webp", "data:image/png")} type="image/png" />
                 <img
                   className={classes.fullResolutionImage}
                   alt={parseImage.name}
                   onLoad={() => setIsFullResolutionLoaded(true)}
-                  src={parseImage.fileLegacy.url()}
+                  src={legacyUrl?.replace("data:image/webp", "data:image/png")}
                 />
               </picture>
             )}

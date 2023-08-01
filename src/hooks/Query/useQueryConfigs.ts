@@ -13,6 +13,7 @@ import useQueryConfigHelpers, {
 } from "./useQueryConfigHelpers";
 import QueryCacheGroups from "./QueryCacheGroups";
 import { useUserContext } from "../../contexts/UserContext";
+import { ImageVariant } from "../../types";
 
 export type QueryOptionsFunction<TData> = (
   options?: Partial<QueryObserverOptions<TData, Error>>
@@ -331,7 +332,40 @@ const useQueryConfigs = () => {
     );
   };
 
+  /** ["GET_IMAGE_URL", imageId, variant] */
+  const getImageUrlQueryKey = (imageId: string, variant: ImageVariant) => [
+    QueryCacheGroups.GET_IMAGE_URL,
+    imageId,
+    variant,
+  ];
+  /** Defaults to default + refetch on window focus: false + enabled: false */
+  const getImageUrlOptions: QueryOptionsFunction<string> = (options = {}) => ({
+    refetchOnWindowFocus: false,
+    enabled: false,
+    ...options,
+  });
+  /** Function to get image url */
+  const getImageUrlFunction = async (
+    imageId: string,
+    variant: ImageVariant,
+    options: FunctionOptions = {}
+  ): Promise<string> => {
+    return await runFunctionInTryCatch<string>(
+      async () => {
+        const base64: string = await Parse.Cloud.run("getImage", {
+          imageId,
+          variant,
+        });
+        return `data:image/webp;base64,${base64}`;
+      },
+      { errorMessage: Strings.error.gettingImageUrl, ...options }
+    );
+  };
+
   return {
+    getImageUrlQueryKey,
+    getImageUrlOptions,
+    getImageUrlFunction,
     getAlbumChangeNotificationsQueryKey,
     getAlbumChangeNotificationsOptions,
     getAlbumChangeNotificationsFunction,

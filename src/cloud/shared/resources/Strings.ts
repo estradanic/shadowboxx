@@ -10,6 +10,7 @@ const Strings = {
     addingAlbum: "Error adding album",
     sharingImage: "Error sharing image",
     gettingDuplicates: "Error getting duplicates",
+    gettingImageUrl: "Error getting image url",
     gettingUserInfo: "Error getting user info",
     resolvingDuplicates: "Error resolving duplicates",
     deletingAlbum: (name: string) => `Error deleting album ${name}`,

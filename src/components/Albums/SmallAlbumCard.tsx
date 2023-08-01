@@ -9,10 +9,9 @@ import {
 } from "@material-ui/core";
 import { useQuery } from "@tanstack/react-query";
 import classNames from "classnames";
-import { ParseAlbum, ParseImage } from "../../classes";
+import { ParseAlbum } from "../../classes";
 import { VariableColor } from "../../types";
 import { elide } from "../../utils";
-import { useNetworkDetectionContext } from "../../contexts/NetworkDetectionContext";
 import useQueryConfigs from "../../hooks/Query/useQueryConfigs";
 
 interface UseStylesParams {
@@ -64,13 +63,12 @@ const SmallAlbumCard = ({
   ...rest
 }: SmallAlbumCardProps) => {
   const classes = useStyles({ borderColor });
-  const { online } = useNetworkDetectionContext();
-  const { getImageByIdQueryKey, getImageByIdFunction, getImageByIdOptions } =
+  const { getImageUrlFunction, getImageUrlOptions, getImageUrlQueryKey } =
     useQueryConfigs();
-  const { data: coverImage } = useQuery<ParseImage, Error>(
-    getImageByIdQueryKey(value.coverImage?.id ?? ""),
-    () => getImageByIdFunction(online, value.coverImage?.id ?? ""),
-    getImageByIdOptions({ enabled: !!value.coverImage?.id })
+  const { data: imageUrl } = useQuery<string, Error>(
+    getImageUrlQueryKey(value.coverImage?.id ?? "", "mobile"),
+    () => getImageUrlFunction(value.coverImage?.id ?? "", "mobile"),
+    getImageUrlOptions({ enabled: !!value.coverImage?.id })
   );
 
   return (
@@ -81,7 +79,7 @@ const SmallAlbumCard = ({
       </CardContent>
       <CardMedia
         className={classes.coverImage}
-        src={coverImage?.fileMobile.url()}
+        src={imageUrl}
         component="img"
       />
     </Card>

@@ -72,8 +72,9 @@ registerRoute(
 );
 
 registerRoute(
-  ({ url }) => url.host === "parsefiles.back4app.com",
+  "/functions/getImage",
   async ({ request }) => {
+    console.log(request.url);
     const cache = await caches.open(cacheNames.runtime);
     const cacheResponse = await cache.match(request);
     if (cacheResponse) {
@@ -93,12 +94,6 @@ const shareTargetHandler = async ({ event }: { event: FetchEvent }) => {
 };
 
 registerRoute("/share_target", shareTargetHandler as any, "POST");
-
-registerRoute(
-  ({ url }) => url.host !== "parsefiles.back4app.com",
-  new NetworkFirst(),
-  "GET"
-);
 
 setDefaultHandler(new NetworkOnly());
 

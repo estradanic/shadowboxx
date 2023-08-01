@@ -362,7 +362,7 @@ export const ImageContextProvider = ({
           <FancyTypography variant="loading">
             {Strings.message.processingImages}
           </FancyTypography>
-          <Typography color='primaryContrast'>
+          <Typography color="primaryContrast">
             {Strings.message.processingImagesDetail}
           </Typography>
         </>

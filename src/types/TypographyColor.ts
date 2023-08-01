@@ -1,4 +1,4 @@
-import VariableColor from './VariableColor';
+import VariableColor from "./VariableColor";
 
 type TypographyColor =
   | VariableColor

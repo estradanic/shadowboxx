@@ -3,10 +3,8 @@ import Avatar, { AvatarProps } from "@material-ui/core/Avatar";
 import { makeStyles, Theme } from "@material-ui/core/styles";
 import cx from "classnames";
 import { useQuery } from "@tanstack/react-query";
-import { ParseImage } from "../../classes";
 import { Strings } from "../../resources";
 import Tooltip from "../Tooltip/Tooltip";
-import { useNetworkDetectionContext } from "../../contexts/NetworkDetectionContext";
 import useQueryConfigs from "../../hooks/Query/useQueryConfigs";
 import useUserInfo, { UseUserInfoParams } from "../../hooks/useUserInfo";
 
@@ -37,14 +35,13 @@ const UserAvatar = forwardRef(
     ref: ForwardedRef<any>
   ) => {
     const classes = useStyles();
-    const { getImageByIdFunction, getImageByIdQueryKey, getImageByIdOptions } =
+    const { getImageUrlFunction, getImageUrlOptions, getImageUrlQueryKey } =
       useQueryConfigs();
     const user = useUserInfo(UseUserInfoParams);
-    const { online } = useNetworkDetectionContext();
-    const { data: profilePicture } = useQuery<ParseImage, Error>(
-      getImageByIdQueryKey(user?.profilePicture?.id ?? ""),
-      () => getImageByIdFunction(online, user?.profilePicture?.id ?? ""),
-      getImageByIdOptions({ enabled: !!user?.profilePicture?.id })
+    const { data: thumbUrl } = useQuery<string, Error>(
+      getImageUrlQueryKey(user?.profilePicture?.id ?? "", "thumb"),
+      () => getImageUrlFunction(user?.profilePicture?.id ?? "", "thumb"),
+      getImageUrlOptions({ enabled: !!user?.profilePicture?.id })
     );
     const userName =
       user?.name ??
@@ -58,7 +55,7 @@ const UserAvatar = forwardRef(
           <Avatar
             {...rest}
             className={cx(classes.avatar, piClassName)}
-            src={profilePicture?.fileThumb.url()}
+            src={thumbUrl}
             alt={userName}
           />
         </div>

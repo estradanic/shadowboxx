@@ -1,12 +1,14 @@
 import React from "react";
-import MuiTypography, { TypographyProps as MuiTypographyProps } from "@material-ui/core/Typography";
+import MuiTypography, {
+  TypographyProps as MuiTypographyProps,
+} from "@material-ui/core/Typography";
 import { makeStyles, Theme } from "@material-ui/core/styles";
 import classNames from "classnames";
-import { TypographyColor } from '../../types';
+import { TypographyColor } from "../../types";
 
 type UseStylesProps = {
   color: TypographyColor;
-}
+};
 
 const getTypographyColor = (color: TypographyColor, theme: Theme) => {
   switch (color) {
@@ -47,16 +49,20 @@ const getTypographyColor = (color: TypographyColor, theme: Theme) => {
 
 const useStyles = makeStyles((theme: Theme) => ({
   root: {
-    color: ({color}: UseStylesProps) => getTypographyColor(color, theme),
+    color: ({ color }: UseStylesProps) => getTypographyColor(color, theme),
   },
 }));
 
-export interface TypographyProps  extends Omit<MuiTypographyProps, "color"> {
+export interface TypographyProps extends Omit<MuiTypographyProps, "color"> {
   color?: TypographyColor;
 }
 
-const Typography = ({color = "textPrimary", children, ...rest}: TypographyProps) => {
-  const classes = useStyles({color});
+const Typography = ({
+  color = "textPrimary",
+  children,
+  ...rest
+}: TypographyProps) => {
+  const classes = useStyles({ color });
   return (
     <MuiTypography
       {...rest}

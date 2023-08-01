@@ -38,6 +38,8 @@ import useRandomColor from "../../hooks/useRandomColor";
 import useRefState from "../../hooks/useRefState";
 import useVirtualList from "../../hooks/useVirtualList";
 import { useImageContext } from "../../contexts/ImageContext";
+import useQueryConfigs from "../../hooks/Query/useQueryConfigs";
+import { useQuery } from "@tanstack/react-query";
 
 const useStyles = makeStyles((theme: Theme) => ({
   endAdornment: {
@@ -148,6 +150,14 @@ const ImageField = memo(
     } = useImageContext();
     const [showUrlInput, setShowUrlInput] = useState<boolean>(false);
     const [imageUrlRef, imageUrl, setImageUrl] = useRefState("");
+
+    const { getImageUrlFunction, getImageUrlOptions, getImageUrlQueryKey } =
+      useQueryConfigs();
+    const { data: mobileUrl } = useQuery<string, Error>(
+      getImageUrlQueryKey(value[0]?.id ?? "", "mobile"),
+      () => getImageUrlFunction(value[0]?.id ?? "", "mobile"),
+      getImageUrlOptions({ enabled: !!value[0]?.id })
+    );
 
     const [anchorEl, setAnchorEl] = useState<Element>();
     const closeMenu = () => setAnchorEl(undefined);
@@ -305,7 +315,7 @@ const ImageField = memo(
                       >
                         <Avatar
                           className={classes.endAdornmentAvatar}
-                          src={value[0].fileThumb.url()}
+                          src={mobileUrl}
                           alt={value[0].name}
                         />
                       </InputAdornment>

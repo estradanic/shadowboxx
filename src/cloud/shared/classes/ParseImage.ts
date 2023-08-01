@@ -9,6 +9,8 @@ import ParseObject, {
 import ParseUser from "./ParseUser";
 import ParseQuery from "./ParseQuery";
 
+export type ImageType = "image" | "video" | "gif";
+
 /** Interface defining Image-specific attributes */
 export interface ImageAttributes {
   /** The actual saved file */
@@ -28,7 +30,7 @@ export interface ImageAttributes {
   /** Hash of the image for comparisons */
   hash?: string;
   /** Type of the image */
-  type?: "image" | "video" | "gif";
+  type?: ImageType;
 }
 
 class ImageColumns extends Columns {
@@ -113,7 +115,10 @@ export default class ParseImage extends ParseObject<"Image"> {
 
   private _image: Parse.Object<ParsifyPointers<"Image">>;
 
-  constructor(image: Parse.Object<ParsifyPointers<"Image">>, noPin: boolean = false) {
+  constructor(
+    image: Parse.Object<ParsifyPointers<"Image">>,
+    noPin: boolean = false
+  ) {
     super(image);
     this._image = image;
     if (!noPin) {

@@ -77,42 +77,73 @@ const ShareImageDecoration = ({
     a.click();
   };
 
+  const downloadImage = async (image: ParseImage) => {
+    const base64: string = await Parse.Cloud.run("getImage", {
+      imageId: image.id,
+      variant: "full",
+    });
+    const buffer = Buffer.from(base64, "base64");
+    const file = new File([buffer], image.name, { type: "image/webp" });
+    const pngFile = await readAndCompressImage(file, {
+      quality: 1,
+      maxHeight: 2400,
+      maxWidth: 2400,
+      mimeType: "image/png",
+    });
+    const shareData = {
+      files: [new File([pngFile], `${image.name}.png`, { type: "image/png" })],
+      title: image.name,
+    };
+    if (navigator?.canShare?.(shareData)) {
+      try {
+        await navigator.share(shareData);
+      } catch (error) {
+        console.error(error);
+        enqueueErrorSnackbar(Strings.error.sharingImage);
+        download(pngFile);
+      }
+    } else {
+      download(pngFile);
+    }
+  };
+
+  const downloadOther = async (image: ParseImage) => {
+    const type = image.type === "gif" ? "image/gif" : "video/mp4";
+    const base64: string = await Parse.Cloud.run("getImage", {
+      imageId: image.id,
+      variant: "full",
+    });
+    const buffer = Buffer.from(base64, "base64");
+    const file = new File([buffer], image.name, { type });
+    const shareData = {
+      files: [new File([file], `${image.name}.png`, { type: "image/png" })],
+      title: image.name,
+    };
+    if (navigator?.canShare?.(shareData)) {
+      try {
+        await navigator.share(shareData);
+      } catch (error) {
+        console.error(error);
+        enqueueErrorSnackbar(Strings.error.sharingImage);
+        download(file);
+      }
+    } else {
+      download(file);
+    }
+  };
+
   const onClick = async () => {
     startGlobalLoader();
     try {
-      const base64: string = await Parse.Cloud.run("getImage", {
-        imageId: image.id,
-      });
-      const buffer = Buffer.from(base64, "base64");
-      const file = new File([buffer], image.name, { type: "image/webp" });
-      const pngFile = await readAndCompressImage(file, {
-        quality: 1,
-        maxHeight: 2400,
-        maxWidth: 2400,
-        mimeType: "image/png",
-      });
-      const shareData = {
-        files: [
-          new File([pngFile], `${image.name}.png`, { type: "image/png" }),
-        ],
-        title: image.name,
-      };
-      if (navigator?.canShare?.(shareData)) {
-        try {
-          await navigator.share(shareData);
-        } catch (error) {
-          console.error(error);
-          enqueueErrorSnackbar(Strings.error.sharingImage);
-          download(pngFile);
-        }
+      if (image.type === "image") {
+        await downloadImage(image);
       } else {
-        download(pngFile);
+        await downloadOther(image);
       }
       piOnClick?.(image);
     } catch (error) {
       console.error(error);
       enqueueErrorSnackbar(Strings.error.sharingImage);
-      download(image.fileLegacy.url());
     } finally {
       stopGlobalLoader();
     }

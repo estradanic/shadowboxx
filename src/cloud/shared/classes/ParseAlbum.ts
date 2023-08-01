@@ -113,7 +113,10 @@ export default class ParseAlbum extends ParseObject<"Album"> {
 
   private _album: Parse.Object<ParsifyPointers<"Album">>;
 
-  constructor(album: Parse.Object<ParsifyPointers<"Album">>, noPin: boolean = false) {
+  constructor(
+    album: Parse.Object<ParsifyPointers<"Album">>,
+    noPin: boolean = false
+  ) {
     super(album);
     this._album = album;
     if (!noPin) {

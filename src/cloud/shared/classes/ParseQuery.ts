@@ -25,7 +25,7 @@ type PO<C extends ClassName> = C extends "_User"
 const getParseObject = <C extends ClassName>(
   obj: P<C>,
   className: C,
-  cloud: boolean,
+  cloud: boolean
 ): PO<C> => {
   if (className === "_User") {
     return new ParseUser(obj as P<"_User">, !cloud) as PO<C>;
@@ -38,7 +38,7 @@ const getParseObject = <C extends ClassName>(
   }
   if (className === "AlbumChangeNotification") {
     return new ParseAlbumChangeNotification(
-      obj as P<"AlbumChangeNotification">,
+      obj as P<"AlbumChangeNotification">
     ) as PO<C>;
   }
   if (className === "Duplicate") {
@@ -208,7 +208,9 @@ export default class ParseQuery<C extends ClassName> {
     options?: Parse.Query.BatchOptions | undefined
   ): Promise<PO<C>[]> {
     const result = await this._query.filter(callback, options);
-    return result.map((obj) => getParseObject(obj, this._className, this._cloud));
+    return result.map((obj) =>
+      getParseObject(obj, this._className, this._cloud)
+    );
   }
   endsWith<K extends keyof Parse.BaseAttributes | keyof P<C>["attributes"]>(
     key: K,
@@ -244,19 +246,25 @@ export default class ParseQuery<C extends ClassName> {
   }
   async find(options?: Parse.Query.FindOptions | undefined): Promise<PO<C>[]> {
     const result = await this._query.find(options);
-    return result.map((obj) => getParseObject(obj, this._className, this._cloud));
+    return result.map((obj) =>
+      getParseObject(obj, this._className, this._cloud)
+    );
   }
   async findAll(
     options?: Parse.Query.BatchOptions | undefined
   ): Promise<PO<C>[]> {
     const result = await this._query.findAll(options);
-    return result.map((obj) => getParseObject(obj, this._className, this._cloud));
+    return result.map((obj) =>
+      getParseObject(obj, this._className, this._cloud)
+    );
   }
   async first(
     options?: Parse.Query.FirstOptions | undefined
   ): Promise<PO<C> | undefined> {
     const result = await this._query.first(options);
-    return result ? getParseObject(result, this._className, this._cloud) : undefined;
+    return result
+      ? getParseObject(result, this._className, this._cloud)
+      : undefined;
   }
   fromNetwork(): this {
     this._query = this._query.fromNetwork();
