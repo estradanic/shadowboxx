@@ -38,7 +38,7 @@ const hashImage = async (image: ParseImage) => {
   const hash = hexToBinary(await bmvbhash(imageData, 16));
 
   image.hash = hash;
-  await image.save({ useMasterKey: true, context: { noTrigger: true } });
+  await image.cloudSave({ useMasterKey: true, context: { noTrigger: true } });
 };
 
 export default loggerWrapper("hashImage", hashImage);

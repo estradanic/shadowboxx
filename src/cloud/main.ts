@@ -56,7 +56,7 @@ Parse.Cloud.afterSave<Image>("Image", async (request) => {
   if (request.master && request.context?.noTrigger) {
     return;
   }
-  const image = new ParseImage(request.object as Image);
+  const image = new ParseImage(request.object as Image, true);
   if (image.type !== "image") {
     return;
   }
@@ -98,7 +98,7 @@ Parse.Cloud.beforeSave<Image>("Image", async (request) => {
   if (request.master && request.context?.noTrigger) {
     return;
   }
-  const image = new ParseImage(request.object as Image);
+  const image = new ParseImage(request.object as Image, true);
   if (image.isNew()) {
     image.dateTaken = new Date();
   }
@@ -123,7 +123,7 @@ Parse.Cloud.beforeDelete<Album>("Album", async (request) => {
 });
 
 Parse.Cloud.beforeDelete<Image>("Image", async (request) => {
-  await deleteImageFromAlbums(new ParseImage(request.object as Image));
+  await deleteImageFromAlbums(new ParseImage(request.object as Image, true));
 });
 
 Parse.Cloud.job("findDuplicates", async (request) => {

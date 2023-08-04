@@ -158,6 +158,21 @@ export default class ParseImage extends ParseObject<"Image"> {
     return new ParseImage(await this._image.save(null, options));
   }
 
+  /**
+   * Save the image - Only for cloud code
+   */
+  async cloudSave(options?: Parse.Object.SaveOptions) {
+    if (!this._image.getACL()) {
+      const owner = await ParseUser.cloudQuery(Parse).get(this.owner.id);
+      const acl = new Parse.ACL(owner.toNative());
+      this._image.setACL(acl);
+    }
+    if (!this.dateTaken) {
+      this.dateTaken = new Date();
+    }
+    return new ParseImage(await this._image.save(null, options), true);
+  }
+
   /** Whether image has been changed */
   dirty(column?: keyof Attributes<"Image">) {
     return this._image.dirty(column);

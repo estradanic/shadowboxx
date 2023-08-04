@@ -25,7 +25,7 @@ const verifyEmail = async ({ code, email }: VerifyEmailParams) => {
     );
   }
   user.verificationCode = undefined;
-  await user.save({ useMasterKey: true });
+  await user.cloudSave({ useMasterKey: true });
 
   await updateEmail(user);
 };

@@ -44,7 +44,7 @@ const resendVerificationEmail = async ({
     .toString()
     .padStart(6, "0");
   user.verificationCode = code;
-  await user.save({ useMasterKey: true, context: { noTrigger: true } });
+  await user.cloudSave({ useMasterKey: true, context: { noTrigger: true } });
 
   const transport = createTransport({
     host: "smtppro.zoho.com",

@@ -91,7 +91,7 @@ const setAlbumPermissions = async (album: ParseAlbum) => {
       });
       await Promise.all(
         images.map((image) =>
-          image.save({ useMasterKey: true, context: { noTrigger: true } })
+          image.cloudSave({ useMasterKey: true, context: { noTrigger: true } })
         )
       );
       albumACL.setReadAccess(owner.toNative(), true);

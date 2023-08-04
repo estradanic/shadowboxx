@@ -28,7 +28,7 @@ const undoEmailChange = async ({ email }: UndoEmailChangeParams) => {
   user.email = oldEmail;
   user.oldEmail = undefined;
   user.verificationCode = undefined;
-  user.save({ useMasterKey: true, context: { noTrigger: true } });
+  user.cloudSave({ useMasterKey: true, context: { noTrigger: true } });
 };
 
 export default loggerWrapper("undoEmailChange", undoEmailChange);

@@ -222,8 +222,20 @@ export default class ParseUser extends ParseObject<"_User"> {
     }
   }
 
+  /**
+   * Save the ParseUser
+   * @param options
+   * @returns The saved ParseUser
+   */
   async save(options?: Parse.Object.SaveOptions) {
     return new ParseUser(await this._user.save(undefined, options));
+  }
+
+  /**
+   * Save the ParseUser - Only for cloud code
+   */
+  async cloudSave(options?: Parse.Object.SaveOptions) {
+    return new ParseUser(await this._user.save(undefined, options), true);
   }
 
   /**
