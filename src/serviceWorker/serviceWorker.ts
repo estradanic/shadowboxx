@@ -71,21 +71,6 @@ registerRoute(
   new NetworkFirst({ cacheName: cacheNames.precache })
 );
 
-registerRoute(
-  "/functions/getImage",
-  async ({ request }) => {
-    console.log(request.url);
-    const cache = await caches.open(cacheNames.runtime);
-    const cacheResponse = await cache.match(request);
-    if (cacheResponse) {
-      return cacheResponse;
-    }
-    const networkResponse = await fetch(request.clone());
-    cache.put(request, networkResponse.clone());
-    return networkResponse;
-  }
-);
-
 const shareTargetHandler = async ({ event }: { event: FetchEvent }) => {
   const formData = await event.request.formData();
   const files = formData.getAll("media");

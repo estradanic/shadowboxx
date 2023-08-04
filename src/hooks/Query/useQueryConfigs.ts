@@ -14,6 +14,9 @@ import useQueryConfigHelpers, {
 import QueryCacheGroups from "./QueryCacheGroups";
 import { useUserContext } from "../../contexts/UserContext";
 import { ImageVariant } from "../../types";
+import { get, set, createStore } from "idb-keyval";
+
+const imageStore = createStore("images", "images");
 
 export type QueryOptionsFunction<TData> = (
   options?: Partial<QueryObserverOptions<TData, Error>>
@@ -352,10 +355,15 @@ const useQueryConfigs = () => {
   ): Promise<string> => {
     return await runFunctionInTryCatch<string>(
       async () => {
-        const base64: string = await Parse.Cloud.run("getImage", {
-          imageId,
-          variant,
-        });
+        const cacheKey = JSON.stringify(getImageUrlQueryKey(imageId, variant));
+        let base64 = await get<string>(cacheKey, imageStore);
+        if (!base64) {
+          base64 = await Parse.Cloud.run("getImage", {
+            imageId,
+            variant,
+          });
+          await set(cacheKey, base64, imageStore);
+        }
         return `data:image/webp;base64,${base64}`;
       },
       { errorMessage: Strings.error.gettingImageUrl, ...options }
