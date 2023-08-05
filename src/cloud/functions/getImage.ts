@@ -10,7 +10,10 @@ export interface GetImageParams {
  * Function to get image base64 data,
  * thus skirting cors problems from getting it directly on the browser
  */
-const getImage = async ({ imageId, variant = "full" }: GetImageParams): Promise<GetImageReturn> => {
+const getImage = async ({
+  imageId,
+  variant = "full",
+}: GetImageParams): Promise<GetImageReturn> => {
   const image = await ParseImage.cloudQuery(Parse)
     .equalTo(ParseImage.COLUMNS.objectId, imageId)
     .first({ useMasterKey: true });
@@ -32,11 +35,14 @@ const getImage = async ({ imageId, variant = "full" }: GetImageParams): Promise<
   return {
     base64,
     mimeType:
-      image.type === "gif" ? "image/gif"
-      : image.type === "video" ? "video/mp4"
-      : variant === "legacy" ? "image/png"
-      : "image/webp",
-  }
+      image.type === "gif"
+        ? "image/gif"
+        : image.type === "video"
+        ? "video/mp4"
+        : variant === "legacy"
+        ? "image/png"
+        : "image/webp",
+  };
 };
 
 export default loggerWrapper("getImage", getImage);

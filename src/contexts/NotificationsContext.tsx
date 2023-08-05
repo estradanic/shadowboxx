@@ -7,10 +7,20 @@ import React, {
 } from "react";
 import NotificationsIcon from "@material-ui/icons/Notifications";
 
+export enum NotificationType {
+  LowStorage = "LowStorage",
+  AlbumChange = "AlbumChange",
+  Job = "Job",
+  Error = "Error",
+  Duplicates = "Duplicates",
+}
+
 /** Interface defining a single notification */
 export interface Notification {
   /** Unique id of the notification */
   id: string;
+  /** Type of the notification */
+  type: NotificationType;
   /** Title of the notification */
   title: string;
   /** Custom icon of the notification */
@@ -19,12 +29,19 @@ export interface Notification {
   detail?: React.ReactNode;
   /** Function to remove the notification */
   remove: () => void | Promise<void>;
+  /** Function to update the notification */
+  update?: (
+    updater: (prev: Notification) => Notification
+  ) => Promise<Notification>;
+  /** Arbitrary data for the notification */
+  data?: any;
 }
 
 /** Interface defining the parameters for the addNotification function */
 interface AddNotificationParams
-  extends Pick<Notification, "title" | "icon" | "detail" | "id"> {
+  extends Omit<Notification, "update" | "remove"> {
   onRemove?: () => Promise<void> | void;
+  onUpdate?: (notification: Notification) => Promise<void> | void;
 }
 
 /** Interface defining the value of NotifcationsContextProvider */
@@ -72,7 +89,10 @@ export const NotificationsContextProvider = ({
       icon = <NotificationsIcon />,
       detail,
       onRemove,
-    }: AddNotificationParams) => {
+      type,
+      onUpdate,
+      data,
+    }: AddNotificationParams): Notification => {
       const remove = async () => {
         setNotifications((prev) => {
           const newNotifications: Record<string, Notification> = {};
@@ -85,11 +105,40 @@ export const NotificationsContextProvider = ({
         });
         await onRemove?.();
       };
+      const update = async (updater: (prev: Notification) => Notification) => {
+        let notificationPromise = new Promise<Notification>((resolve) => {
+          setNotifications((prev) => {
+            const newNotifications: Record<string, Notification> = {};
+            for (const key of Object.keys(prev)) {
+              if (key !== id) {
+                newNotifications[key] = prev[key];
+              } else {
+                newNotifications[key] = updater(prev[key]);
+                resolve(newNotifications[key]);
+              }
+            }
+            return newNotifications;
+          });
+        });
+        const notification = await notificationPromise;
+        onUpdate?.(notification);
+        return notification;
+      };
+      const notification = {
+        id,
+        title,
+        icon,
+        detail,
+        remove,
+        type,
+        update,
+        data,
+      };
       setNotifications((prev) => ({
         ...prev,
-        [id]: { id, title, icon, detail, remove },
+        [id]: notification,
       }));
-      return { id, title, icon, detail, remove };
+      return notification;
     },
     [setNotifications]
   );

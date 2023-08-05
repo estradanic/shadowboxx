@@ -1,13 +1,6 @@
-import React, {
-  createContext,
-  useCallback,
-  useContext,
-  useRef,
-  useState,
-} from "react";
+import React, { createContext, useCallback, useContext, useState } from "react";
 import Parse from "parse";
 import { readAndCompressImage } from "browser-image-resizer";
-import ErrorIcon from "@material-ui/icons/Error";
 import { createFFmpeg } from "@ffmpeg/ffmpeg";
 import { Strings } from "../resources";
 import {
@@ -16,17 +9,17 @@ import {
   UnpersistedParseImage,
   UnpersistedParseImageAttributes,
 } from "../classes";
-import { useGlobalLoadingStore } from "../stores";
 import {
   isNullOrWhitespace,
   makeValidFileName,
   removeExtension,
 } from "../utils";
-import { FancyTypography, Typography } from "../components/Typography";
 import { useSnackbar } from "../components/Snackbar";
 import { useUserContext } from "./UserContext";
 import ImageSelectionDialog from "../components/Images/ImageSelectionDialog";
-import { useNotificationsContext } from "./NotificationsContext";
+import { useJobNotifications } from "../hooks/Notifications";
+import { JobType } from "../hooks/Notifications/useJobNotifications";
+import { useGlobalLoadingStore } from "../stores";
 
 export enum ImageActionCommand {
   DELETE,
@@ -115,18 +108,15 @@ const MAX_FILE_SIZE = 20000000; // 20 MB
 export const ImageContextProvider = ({
   children,
 }: ImageContextProviderProps) => {
-  const actions = useRef<ImageAction[]>([]);
-  const { addNotification } = useNotificationsContext();
   const { enqueueErrorSnackbar } = useSnackbar();
   const { getLoggedInUser } = useUserContext();
-
-  const { startGlobalLoader, stopGlobalLoader, updateGlobalLoader } =
-    useGlobalLoadingStore((state) => ({
+  const { addJob, updateJob } = useJobNotifications();
+  const { startGlobalLoader, stopGlobalLoader } = useGlobalLoadingStore(
+    (state) => ({
       startGlobalLoader: state.startGlobalLoader,
       stopGlobalLoader: state.stopGlobalLoader,
-      updateGlobalLoader: state.updateGlobalLoader,
-    }));
-
+    })
+  );
   const [alreadySelected, setAlreadySelected] = useState<ParseImage[]>([]);
   const [multiple, setMultiple] = useState<boolean>(true);
   const [selectionDialogOpen, setSelectionDialogOpen] = useState(false);
@@ -165,79 +155,53 @@ export const ImageContextProvider = ({
     ]
   );
 
-  const recalculateProgress = () => {
-    let totalProgress = 0;
-    actions.current.forEach((a) => (totalProgress += a.progress ?? 0));
-    let newProgress = (totalProgress / actions.current.length) * 100;
-    if (newProgress === 100) {
-      // Allow user to see progress reach 100
-      setTimeout(() => stopGlobalLoader(), 1000);
-    } else if (newProgress === 0) {
-      newProgress = 5;
-    }
-    updateGlobalLoader({ progress: newProgress });
-  };
-
-  const uploadImage = async (
+  const uploadImage = (
     image: UnpersistedParseImageAttributes,
     acl?: Parse.ACL
   ): Promise<ParseImage | undefined> => {
-    startGlobalLoader({
-      type: "determinate",
-      content: (
-        <FancyTypography variant="loading">
-          {Strings.message.uploadingImages}
-        </FancyTypography>
-      ),
-      progress: 5,
+    const jobId = `upload-${image.name}`;
+    const job = addJob<JobType.Uploading>({
+      id: jobId,
+      progress: 0,
+      type: JobType.Uploading,
+      status: "pending",
+      promise: new Promise<ParseImage | undefined>(async (resolve) => {
+        try {
+          image.file = await image.file.save();
+          const unpersistedParseImage = new UnpersistedParseImage(image);
+          if (acl) {
+            unpersistedParseImage.setACL(acl);
+          }
+          const parseImage = await unpersistedParseImage.save();
+          await updateJob(jobId, { progress: 1, status: "success" });
+          resolve(parseImage);
+        } catch (error: any) {
+          updateJob(jobId, { progress: 1 });
+          if (isNullOrWhitespace(error.message)) {
+            error.message = Strings.error.uploadingImage(image.name);
+          }
+          await updateJob(jobId, { status: "error", progress: 1 });
+          console.error(error);
+          enqueueErrorSnackbar(Strings.error.uploadingImage(image.name));
+          resolve(undefined);
+        }
+      }),
     });
-    const action: ImageAction = { command: ImageActionCommand.UPLOAD };
-    actions.current.push(action);
-
-    try {
-      image.file = await image.file.save();
-      const unpersistedParseImage = new UnpersistedParseImage(image);
-      if (acl) {
-        unpersistedParseImage.setACL(acl);
-      }
-      const parseImage = await unpersistedParseImage.save();
-      action.completed = true;
-      recalculateProgress();
-      return parseImage;
-    } catch (error: any) {
-      action.completed = true;
-      recalculateProgress();
-      if (isNullOrWhitespace(error.message)) {
-        error.message = Strings.error.uploadingImage(image.name);
-      }
-      addNotification({
-        id: `upload-image-error-${image.name}`,
-        title: Strings.error.uploadingImage(image.name),
-        icon: <ErrorIcon />,
-      });
-      console.error(error);
-      enqueueErrorSnackbar(Strings.error.uploadingImage(image.name));
-      return undefined;
-    }
+    return job.promise;
   };
 
-  const compressImage = (file: File, actionIndex: number): Promise<File> => {
-    return readAndCompressImage(file, {
+  const compressImage = async (file: File, jobId: string): Promise<File> => {
+    const result = await readAndCompressImage(file, {
       quality: 1,
       maxWidth: 2400,
       maxHeight: 2400,
       mimeType: "image/webp",
-    }).then((c) => {
-      actions.current[actionIndex].progress = 1;
-      actions.current[actionIndex].completed = true;
-      return c;
     });
+    await updateJob(jobId, { progress: 1, status: "success" });
+    return result;
   };
 
-  const compressVideo = async (
-    file: File,
-    actionIndex: number
-  ): Promise<File> => {
+  const compressVideo = async (file: File, jobId: string): Promise<File> => {
     const videoEl = document.createElement("video");
     videoEl.preload = "metadata";
     let duration = Number.MAX_SAFE_INTEGER;
@@ -258,15 +222,7 @@ export const ImageContextProvider = ({
         const time = message.split("time=")[1].split("bitrate=")[0].trim();
         const [hours, minutes, seconds] = time.split(":").map(Number);
         const totalSeconds = hours * 3600 + minutes * 60 + seconds;
-        actions.current[actionIndex].progress = totalSeconds / duration;
-        let progress =
-          (actions.current.reduce((a, b) => a + (b.progress ?? 0), 0) /
-            actions.current.length) *
-          100;
-        if (progress < 5) {
-          progress = 5;
-        }
-        updateGlobalLoader({ progress });
+        updateJob(jobId, { progress: totalSeconds / duration });
       }
     });
     const dataArray = new Uint8Array(await file.arrayBuffer());
@@ -306,20 +262,27 @@ export const ImageContextProvider = ({
     const max = multiple ? files.length : 1;
     const resizeImagePromises: Promise<File>[] = [];
     for (let i = 0; i < max; i++) {
-      const actionIndex =
-        actions.current.push({ command: ImageActionCommand.PROCESS }) - 1;
-      let file = files[i];
-      if (ACCEPTABLE_VIDEO_TYPES.includes(file.type)) {
-        resizeImagePromises.push(compressVideo(file, actionIndex));
-      } else if (ACCEPTABLE_IMAGE_TYPES.includes(file.type)) {
-        if (file.size > MAX_FILE_SIZE) {
-          resizeImagePromises.push(compressImage(file, actionIndex));
-        } else {
-          resizeImagePromises.push(Promise.resolve(file));
-        }
-      } else {
-        enqueueErrorSnackbar(Strings.error.invalidFileType(file.name));
-      }
+      const jobId = `process-${files[i].name}`;
+      const job = addJob<JobType.Processing>({
+        id: jobId,
+        progress: 0,
+        type: JobType.Processing,
+        status: "pending",
+        promise: new Promise<File>(async (resolve, reject) => {
+          if (ACCEPTABLE_VIDEO_TYPES.includes(files[i].type)) {
+            resolve(await compressVideo(files[i], jobId));
+          } else if (ACCEPTABLE_IMAGE_TYPES.includes(files[i].type)) {
+            if (files[i].size > MAX_FILE_SIZE) {
+              resolve(await compressImage(files[i], jobId));
+            } else {
+              resolve(files[i]);
+            }
+          } else {
+            reject(Strings.error.invalidFileType(files[i].name));
+          }
+        }),
+      });
+      resizeImagePromises.push(job.promise);
     }
     return await Promise.all(resizeImagePromises);
   };
@@ -354,20 +317,7 @@ export const ImageContextProvider = ({
     return Promise.allSettled(newImagePromises);
   };
 
-  const uploadImagesFromFiles = async (files: File[], acl?: Parse.ACL) => {
-    startGlobalLoader({
-      type: "determinate",
-      content: (
-        <>
-          <FancyTypography variant="loading">
-            {Strings.message.processingImages}
-          </FancyTypography>
-          <Typography color="primaryContrast">
-            {Strings.message.processingImagesDetail}
-          </Typography>
-        </>
-      ),
-    });
+  const uploadImagesFromFiles = (files: File[], acl?: Parse.ACL) => {
     return new Promise<ParseImage[]>((resolve, reject) => {
       // Using setTimeout to prevent the loader from not showing up
       setTimeout(async () => {
@@ -383,8 +333,6 @@ export const ImageContextProvider = ({
           resolve(newImages);
         } catch (error: any) {
           reject(error?.message);
-        } finally {
-          stopGlobalLoader();
         }
       }, 10);
     });
@@ -423,18 +371,14 @@ export const ImageContextProvider = ({
 
   const deleteImage = async (parseImage: ParseImage) => {
     startGlobalLoader();
-    const action: ImageAction = { command: ImageActionCommand.DELETE };
-    actions.current.push(action);
-
     try {
       await parseImage.destroy();
     } catch (e: any) {
       console.error(e);
       enqueueErrorSnackbar(Strings.error.deletingImage(parseImage.name));
+    } finally {
+      stopGlobalLoader();
     }
-
-    action.completed = true;
-    recalculateProgress();
   };
 
   const value: ImageContextValue = {

@@ -20,7 +20,10 @@ import {
   SHARE_TARGET_STORE_NAME,
 } from "../serviceWorker/sharedExports";
 import { useUserContext } from "../contexts/UserContext";
-import { useNotificationsContext } from "../contexts/NotificationsContext";
+import {
+  NotificationType,
+  useNotificationsContext,
+} from "../contexts/NotificationsContext";
 
 Parse.serverURL = window.__env__?.PARSE_HOST_URL;
 Parse.initialize(
@@ -97,6 +100,7 @@ const App = () => {
             title: Strings.message.notEnoughSpace,
             detail: Strings.message.limitedOffline,
             icon: <DiscFullIcon />,
+            type: NotificationType.LowStorage,
           });
         }
       }

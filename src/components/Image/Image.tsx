@@ -225,7 +225,7 @@ const Image = memo(
                 onPlay={() => setIsPlaying(true)}
                 onPause={() => setIsPlaying(false)}
                 ref={videoRef}
-                src={fullUrl?.replace("data:image/webp", "data:video/mp4")}
+                src={fullUrl}
                 className={classNames(classes.image, classes.width100, {
                   [classes.pointer]: showFullResolutionOnClick,
                   [classes.displayNone]: !isLoaded,
@@ -255,12 +255,15 @@ const Image = memo(
                 })}
               >
                 <source srcSet={mobileUrl} type="image/webp" />
-                <source srcSet={legacyUrl?.replace("data:image/webp", "data:image/png")} type="image/png" />
+                <source
+                  srcSet={legacyUrl}
+                  type="image/png"
+                />
                 <img
                   className={classes.width100}
                   onLoad={() => setIsLoaded(true)}
                   alt={parseImage.name}
-                  src={legacyUrl?.replace("data:image/webp", "data:image/png")}
+                  src={legacyUrl}
                   onClick={onClick}
                   {...rest}
                 />
@@ -294,7 +297,7 @@ const Image = memo(
                     (playbackTimeRef.current = e.currentTarget.currentTime)
                   }
                   ref={largeVideoRef}
-                  src={fullUrl?.replace("data:image/webp", "data:video/mp4")}
+                  src={fullUrl}
                   className={classNames(
                     classes.fullResolutionPicture,
                     classes.fullResolutionImage,
@@ -330,12 +333,15 @@ const Image = memo(
                 })}
               >
                 <source srcSet={fullUrl} type="image/webp" />
-                <source srcSet={legacyUrl?.replace("data:image/webp", "data:image/png")} type="image/png" />
+                <source
+                  srcSet={legacyUrl}
+                  type="image/png"
+                />
                 <img
                   className={classes.fullResolutionImage}
                   alt={parseImage.name}
                   onLoad={() => setIsFullResolutionLoaded(true)}
-                  src={legacyUrl?.replace("data:image/webp", "data:image/png")}
+                  src={legacyUrl}
                 />
               </picture>
             )}

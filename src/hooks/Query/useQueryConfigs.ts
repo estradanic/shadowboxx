@@ -358,17 +358,18 @@ const useQueryConfigs = () => {
       async () => {
         const cacheKey = JSON.stringify(getImageUrlQueryKey(imageId, variant));
         let blob = await get<Blob>(cacheKey, imageStore);
-        if (typeof blob === "string") { // Legacy
+        if (typeof blob === "string") {
+          // Legacy
           await del(cacheKey, imageStore);
           blob = undefined;
         }
         if (!blob) {
-          const result = await Parse.Cloud.run("getImage", {
+          const result = (await Parse.Cloud.run("getImage", {
             imageId,
             variant,
-          }) as GetImageReturn;
+          })) as GetImageReturn;
           const arrayBuffer = b64.toByteArray(result.base64).buffer;
-          blob = new Blob([arrayBuffer], {type: result.mimeType});
+          blob = new Blob([arrayBuffer], { type: result.mimeType });
           await set(cacheKey, blob, imageStore);
         }
         return URL.createObjectURL(blob);
