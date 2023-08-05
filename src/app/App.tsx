@@ -83,8 +83,6 @@ const App = () => {
               isPersisted ? "persisted!" : "not persisted..."
             )
           );
-      } else {
-        console.log("Storage persisted!");
       }
     });
     navigator?.storage?.estimate?.()?.then?.((estimate) => {
@@ -93,9 +91,6 @@ const App = () => {
         estimate.quota !== undefined &&
         estimate.usage !== undefined
       ) {
-        const percent = ((estimate.usage / estimate.quota) * 100).toFixed(2);
-        console.log("Percent of storage used:", percent + "%");
-        console.log("Storage left:", estimate.quota / 1000000, "Megabytes");
         if (estimate.quota - estimate.usage < 500000000) {
           addNotification({
             id: "low-storage-notification",

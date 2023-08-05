@@ -25,6 +25,7 @@ import {
   VerifyEmailParams,
 } from "./functions";
 import {
+  GetImageReturn,
   ParseAlbum,
   ParseImage,
   ParseUser,
@@ -151,7 +152,7 @@ Parse.Cloud.define<(params: ResolveDuplicatesParams) => Promise<void>>(
   }
 );
 
-Parse.Cloud.define<(params: GetImageParams) => Promise<string>>(
+Parse.Cloud.define<(params: GetImageParams) => Promise<GetImageReturn>>(
   "getImage",
   async (request) => {
     return await getImage(request.params);

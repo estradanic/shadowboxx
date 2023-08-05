@@ -13,8 +13,9 @@ import useQueryConfigHelpers, {
 } from "./useQueryConfigHelpers";
 import QueryCacheGroups from "./QueryCacheGroups";
 import { useUserContext } from "../../contexts/UserContext";
-import { ImageVariant } from "../../types";
-import { get, set, createStore } from "idb-keyval";
+import { ImageVariant, GetImageReturn } from "../../types";
+import { get, set, createStore, del } from "idb-keyval";
+import b64 from "base64-js";
 
 const imageStore = createStore("images", "images");
 
@@ -356,15 +357,21 @@ const useQueryConfigs = () => {
     return await runFunctionInTryCatch<string>(
       async () => {
         const cacheKey = JSON.stringify(getImageUrlQueryKey(imageId, variant));
-        let base64 = await get<string>(cacheKey, imageStore);
-        if (!base64) {
-          base64 = await Parse.Cloud.run("getImage", {
+        let blob = await get<Blob>(cacheKey, imageStore);
+        if (typeof blob === "string") { // Legacy
+          await del(cacheKey, imageStore);
+          blob = undefined;
+        }
+        if (!blob) {
+          const result = await Parse.Cloud.run("getImage", {
             imageId,
             variant,
-          });
-          await set(cacheKey, base64, imageStore);
+          }) as GetImageReturn;
+          const arrayBuffer = b64.toByteArray(result.base64).buffer;
+          blob = new Blob([arrayBuffer], {type: result.mimeType});
+          await set(cacheKey, blob, imageStore);
         }
-        return `data:image/webp;base64,${base64}`;
+        return URL.createObjectURL(blob);
       },
       { errorMessage: Strings.error.gettingImageUrl, ...options }
     );

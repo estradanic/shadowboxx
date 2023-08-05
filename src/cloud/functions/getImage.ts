@@ -1,6 +1,5 @@
 import loggerWrapper from "../loggerWrapper";
-import { ParseImage, Strings } from "../shared";
-import { ImageVariant } from "../types";
+import { ParseImage, Strings, GetImageReturn, ImageVariant } from "../shared";
 
 export interface GetImageParams {
   imageId: string;
@@ -11,7 +10,7 @@ export interface GetImageParams {
  * Function to get image base64 data,
  * thus skirting cors problems from getting it directly on the browser
  */
-const getImage = async ({ imageId, variant = "full" }: GetImageParams) => {
+const getImage = async ({ imageId, variant = "full" }: GetImageParams): Promise<GetImageReturn> => {
   const image = await ParseImage.cloudQuery(Parse)
     .equalTo(ParseImage.COLUMNS.objectId, imageId)
     .first({ useMasterKey: true });
@@ -29,8 +28,15 @@ const getImage = async ({ imageId, variant = "full" }: GetImageParams) => {
       : variant === "legacy"
       ? image.fileLegacy
       : image.fileMobile;
-  const data: string = await imageFile.getData();
-  return data;
+  const base64 = await imageFile.getData();
+  return {
+    base64,
+    mimeType:
+      image.type === "gif" ? "image/gif"
+      : image.type === "video" ? "video/mp4"
+      : variant === "legacy" ? "image/png"
+      : "image/webp",
+  }
 };
 
 export default loggerWrapper("getImage", getImage);
