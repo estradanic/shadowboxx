@@ -10,6 +10,7 @@ import { useSnackbar } from "../Snackbar";
 import Offline from "../NetworkDetector/Offline";
 import Online from "../NetworkDetector/Online";
 import useHideOnScroll from "../../hooks/useHideOnScroll";
+import { useJobContext } from '../../contexts/JobContext';
 
 const useStyles = makeStyles((theme: Theme) => ({
   footer: {
@@ -35,6 +36,10 @@ const useStyles = makeStyles((theme: Theme) => ({
   offlineIndicator: {
     backgroundColor: theme.palette.error.main,
     color: theme.palette.error.contrastText,
+  },
+  jobs: {
+    backgroundColor: theme.palette.warning.main,
+    color: theme.palette.warning.contrastText,
   },
 }));
 
@@ -71,6 +76,7 @@ const Footer = () => {
     useState<BeforeInstallPromptEvent>();
   const [showInstallPrompt, setShowInstallPrompt] = useState<boolean>();
   const visible = useHideOnScroll();
+  const {jobCount} = useJobContext();
 
   const { enqueueSuccessSnackbar, enqueueErrorSnackbar } = useSnackbar();
 
@@ -95,6 +101,8 @@ const Footer = () => {
     }
   };
 
+  const footerText = jobCount > 0 ? Strings.label.jobs(jobCount) : Strings.label.copyright;
+
   return (
     <AppBar
       position="sticky"
@@ -106,7 +114,7 @@ const Footer = () => {
       })}
     >
       <Online>
-        <Toolbar variant="dense">
+        <Toolbar variant="dense" className={classNames({[classes.jobs]: jobCount > 0})}>
           {showInstallPrompt ? (
             <>
               <Typography className={classes.installLabel} variant="overline">
@@ -127,7 +135,7 @@ const Footer = () => {
               color="inherit"
               variant="overline"
             >
-              {Strings.label.copyright}
+              {footerText}
             </Typography>
           )}
         </Toolbar>

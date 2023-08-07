@@ -2,6 +2,9 @@ import React, { createContext, useCallback, useContext, useState } from "react";
 import Parse from "parse";
 import { readAndCompressImage } from "browser-image-resizer";
 import { createFFmpeg } from "@ffmpeg/ffmpeg";
+import ErrorIcon from "@material-ui/icons/Error";
+import CloudUploadIcon from "@material-ui/icons/CloudUpload";
+import HourglassIcon from "@material-ui/icons/HourglassEmpty";
 import { Strings } from "../resources";
 import {
   ParseImage,
@@ -17,9 +20,10 @@ import {
 import { useSnackbar } from "../components/Snackbar";
 import { useUserContext } from "./UserContext";
 import ImageSelectionDialog from "../components/Images/ImageSelectionDialog";
-import { useJobNotifications } from "../hooks/Notifications";
-import { JobType } from "../hooks/Notifications/useJobNotifications";
 import { useGlobalLoadingStore } from "../stores";
+import { useNotificationsContext } from './NotificationsContext';
+import { useJobContext } from './JobContext';
+import { LinearProgress } from '@material-ui/core';
 
 export enum ImageActionCommand {
   DELETE,
@@ -108,9 +112,10 @@ const MAX_FILE_SIZE = 20000000; // 20 MB
 export const ImageContextProvider = ({
   children,
 }: ImageContextProviderProps) => {
+  const {addJob} = useJobContext();
+  const { addNotification } = useNotificationsContext();
   const { enqueueErrorSnackbar } = useSnackbar();
   const { getLoggedInUser } = useUserContext();
-  const { addJob, updateJob } = useJobNotifications();
   const { startGlobalLoader, stopGlobalLoader } = useGlobalLoadingStore(
     (state) => ({
       startGlobalLoader: state.startGlobalLoader,
@@ -155,53 +160,83 @@ export const ImageContextProvider = ({
     ]
   );
 
-  const uploadImage = (
+  const uploadImage = async (
     image: UnpersistedParseImageAttributes,
     acl?: Parse.ACL
   ): Promise<ParseImage | undefined> => {
-    const jobId = `upload-${image.name}`;
-    const job = addJob<JobType.Uploading>({
-      id: jobId,
-      progress: 0,
-      type: JobType.Uploading,
-      status: "pending",
-      promise: new Promise<ParseImage | undefined>(async (resolve) => {
-        try {
-          image.file = await image.file.save();
-          const unpersistedParseImage = new UnpersistedParseImage(image);
-          if (acl) {
-            unpersistedParseImage.setACL(acl);
-          }
-          const parseImage = await unpersistedParseImage.save();
-          await updateJob(jobId, { progress: 1, status: "success" });
-          resolve(parseImage);
-        } catch (error: any) {
-          updateJob(jobId, { progress: 1 });
-          if (isNullOrWhitespace(error.message)) {
-            error.message = Strings.error.uploadingImage(image.name);
-          }
-          await updateJob(jobId, { status: "error", progress: 1 });
-          console.error(error);
-          enqueueErrorSnackbar(Strings.error.uploadingImage(image.name));
-          resolve(undefined);
-        }
-      }),
+    const notification = addNotification({
+      id: `upload-${image.name}`,
+      title: `Uploading ${image.name}`,
+      icon: <HourglassIcon />,
+      removeable: false,
     });
-    return job.promise;
+    try {
+      image.file = await image.file.save();
+      const unpersistedParseImage = new UnpersistedParseImage(image);
+      if (acl) {
+        unpersistedParseImage.setACL(acl);
+      }
+      const parseImage = await unpersistedParseImage.save();
+      notification.update((prev) => ({
+        ...prev,
+        title: `Uploaded ${image.name}`,
+        icon: <CloudUploadIcon />,
+        removeable: true,
+      }));
+      return parseImage;
+    } catch (error: any) {
+      notification.update((prev) => ({
+        ...prev,
+        title: Strings.error.uploadingImage(image.name),
+        icon: <ErrorIcon />,
+        removeable: true,
+      }));
+      if (isNullOrWhitespace(error.message)) {
+        error.message = Strings.error.uploadingImage(image.name);
+      }
+      return undefined;
+    }
   };
 
-  const compressImage = async (file: File, jobId: string): Promise<File> => {
-    const result = await readAndCompressImage(file, {
-      quality: 1,
-      maxWidth: 2400,
-      maxHeight: 2400,
-      mimeType: "image/webp",
+  const compressImage = async (file: File): Promise<File | undefined> => {
+    const notification = addNotification({
+      id: `process-${file.name}`,
+      title: `Processing ${file.name}`,
+      icon: <HourglassIcon />,
+      removeable: false,
     });
-    await updateJob(jobId, { progress: 1, status: "success" });
-    return result;
+    try {
+      const result = await readAndCompressImage(file, {
+        quality: 1,
+        maxWidth: 2400,
+        maxHeight: 2400,
+        mimeType: "image/webp",
+      });
+      notification.remove();
+      return result;
+    } catch (error: any) {
+      enqueueErrorSnackbar(Strings.error.processingFile(file.name));
+      if (isNullOrWhitespace(error.message)) {
+        error.message = Strings.error.processingFile(file.name);
+      }
+      console.error(error);
+      notification.update((prev) => ({
+        ...prev,
+        title: Strings.error.processingFile(file.name),
+        icon: <ErrorIcon />,
+        removeable: true,
+      }));
+      return undefined;
+    }
   };
 
-  const compressVideo = async (file: File, jobId: string): Promise<File> => {
+  const compressVideo = async (file: File): Promise<File | undefined> => {
+    const notification = addNotification({
+      id: `process-${file.name}`,
+      title: `Processing ${file.name}`,
+      icon: <HourglassIcon />,
+      removeable: false,
+    });
     const videoEl = document.createElement("video");
     videoEl.preload = "metadata";
     let duration = Number.MAX_SAFE_INTEGER;
@@ -222,7 +257,11 @@ export const ImageContextProvider = ({
         const time = message.split("time=")[1].split("bitrate=")[0].trim();
         const [hours, minutes, seconds] = time.split(":").map(Number);
         const totalSeconds = hours * 3600 + minutes * 60 + seconds;
-        updateJob(jobId, { progress: totalSeconds / duration });
+        const progressPercentage = totalSeconds / duration * 100;
+        notification.update((prev) => ({
+          ...prev,
+          detail: <LinearProgress variant="determinate" value={progressPercentage} />,
+        }));
       }
     });
     const dataArray = new Uint8Array(await file.arrayBuffer());
@@ -246,75 +285,70 @@ export const ImageContextProvider = ({
       newFileName
     );
     if (!success) {
-      throw new Error("Video compression failed");
+      notification.update((prev) => ({
+        ...prev,
+        title: Strings.error.processingFile(file.name),
+        icon: <ErrorIcon />,
+        removeable: true,
+      }))
+      return undefined;
     }
     const result = ffmpeg.FS("readFile", newFileName);
+    notification.remove();
     return new File([result.buffer], newFileName, {
       type: "video/mp4",
     });
   };
 
-  const processFiles = async (eventFiles: File[]) => {
-    const files: File[] = [];
-    for (let i = 0; i < eventFiles.length; i++) {
-      files[i] = eventFiles[i];
+  const processFile = (file: File) => {
+    if (ACCEPTABLE_VIDEO_TYPES.includes(file.type)) {
+      return compressVideo(file);
     }
-    const max = multiple ? files.length : 1;
-    const resizeImagePromises: Promise<File>[] = [];
-    for (let i = 0; i < max; i++) {
-      const jobId = `process-${files[i].name}`;
-      const job = addJob<JobType.Processing>({
-        id: jobId,
-        progress: 0,
-        type: JobType.Processing,
-        status: "pending",
-        promise: new Promise<File>(async (resolve, reject) => {
-          if (ACCEPTABLE_VIDEO_TYPES.includes(files[i].type)) {
-            resolve(await compressVideo(files[i], jobId));
-          } else if (ACCEPTABLE_IMAGE_TYPES.includes(files[i].type)) {
-            if (files[i].size > MAX_FILE_SIZE) {
-              resolve(await compressImage(files[i], jobId));
-            } else {
-              resolve(files[i]);
-            }
-          } else {
-            reject(Strings.error.invalidFileType(files[i].name));
-          }
-        }),
-      });
-      resizeImagePromises.push(job.promise);
+    if (ACCEPTABLE_IMAGE_TYPES.includes(file.type)) {
+      if (file.size > MAX_FILE_SIZE) {
+        return compressImage(file);
+      }
+      return Promise.resolve(file);
     }
-    return await Promise.all(resizeImagePromises);
+    enqueueErrorSnackbar(Strings.error.invalidFileType(file.name));
+    return Promise.resolve(undefined);
   };
 
-  const uploadFiles = async (files: File[], acl?: Parse.ACL) => {
-    const max = multiple ? files.length : 1;
-    const newImagePromises: Promise<ParseImage | undefined>[] = [];
-    for (let i = 0; i < max; i++) {
-      let file = files[i];
-      const fileName = makeValidFileName(files[i].name);
-      const parseFile = new Parse.File(fileName, file);
-      let type: ImageAttributes["type"] = ACCEPTABLE_VIDEO_TYPES.includes(
-        file.type
-      )
-        ? "video"
-        : "image";
-      if (file.type === "image/gif") {
-        type = "gif";
-      }
-      newImagePromises.push(
-        uploadImage(
-          {
-            file: parseFile,
-            owner: getLoggedInUser().toPointer(),
-            name: removeExtension(fileName),
-            type,
-          },
-          acl
-        )
-      );
+  const uploadFile = (file: File, acl?: Parse.ACL) => {
+    const fileName = makeValidFileName(file.name);
+    const parseFile = new Parse.File(fileName, file);
+    let type: ImageAttributes["type"] = ACCEPTABLE_VIDEO_TYPES.includes(
+      file.type
+    )
+      ? "video"
+      : "image";
+    if (file.type === "image/gif") {
+      type = "gif";
     }
-    return Promise.allSettled(newImagePromises);
+    return uploadImage(
+      {
+        file: parseFile,
+        owner: getLoggedInUser().toPointer(),
+        name: removeExtension(fileName),
+        type,
+      },
+      acl
+    );
+  };
+
+  const processAndUploadFile = async (file: File, acl?: Parse.ACL) => {
+    const processedFile = await addJob(() => processFile(file));
+    if (!processedFile) {
+      return undefined;
+    }
+    if (processedFile.size > MAX_FILE_SIZE) {
+      enqueueErrorSnackbar(Strings.error.fileTooLarge(processedFile.name));
+      return undefined;
+    }
+    const parseFile = await addJob(() => uploadFile(processedFile, acl));
+    if (!parseFile) {
+      return undefined;
+    }
   };
 
   const uploadImagesFromFiles = (files: File[], acl?: Parse.ACL) => {
@@ -322,15 +356,18 @@ export const ImageContextProvider = ({
       // Using setTimeout to prevent the loader from not showing up
       setTimeout(async () => {
         try {
-          const processedFiles = await processFiles(files);
-          const result = await uploadFiles(processedFiles, acl);
-          const newImages: ParseImage[] = [];
-          for (const promise of result) {
-            if (promise.status === "fulfilled" && promise.value) {
-              newImages.push(promise.value);
+          const promises: Promise<ParseImage | void>[] = [];
+          for (const file of files) {
+            promises.push(processAndUploadFile(file, acl));
+          }
+          const results = await Promise.all(promises);
+          const uploadedImages: ParseImage[] = [];
+          for (const result of results) {
+            if (result) {
+              uploadedImages.push(result);
             }
           }
-          resolve(newImages);
+          resolve(uploadedImages);
         } catch (error: any) {
           reject(error?.message);
         }

@@ -12,6 +12,7 @@ import App from "./app/App";
 import { NetworkDetectionContextProvider } from "./contexts/NetworkDetectionContext";
 import { UserContextProvider } from "./contexts/UserContext";
 import { NotificationsContextProvider } from "./contexts/NotificationsContext";
+import { JobContextProvider } from "./contexts/JobContext";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -35,7 +36,9 @@ ReactDOM.render(
             <UserContextProvider>
               <SnackbarProvider>
                 <NotificationsContextProvider>
-                  <App />
+                  <JobContextProvider>
+                    <App />
+                  </JobContextProvider>
                 </NotificationsContextProvider>
               </SnackbarProvider>
             </UserContextProvider>

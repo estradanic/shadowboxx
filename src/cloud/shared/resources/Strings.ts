@@ -33,10 +33,12 @@ const Strings = {
     noConnection: "No Internet Connection. Please try again later",
     notInstalled: "Not installed :(",
     common: "Something went wrong!",
-    videoTooLarge: (fileName?: string) =>
-      `Video${fileName ? ` ${fileName}` : ""} is too large`,
+    fileTooLarge: (fileName?: string) =>
+      `File${fileName ? ` ${fileName}` : ""} is too large`,
     invalidFileType: (fileName?: string) =>
       `Invalid file type${fileName ? ` ${fileName}` : ""}`,
+    processingFile: (fileName?: string) =>
+      `Error processing file${fileName ? ` ${fileName}` : ""}`,
   },
   success: {
     common: "Success!",
@@ -161,6 +163,7 @@ const Strings = {
     viewersTooltip:
       "Users who will be allowed to view this album. (Enter email)",
     copyright: `© Nicholas Estrada ${new Date().getFullYear()}`,
+    jobs: (jobCount: number) => `${jobCount} job${jobCount > 1 ? "s" : ""} running. Do not close this window.`,
   },
   prompt: {
     alreadyHaveAccount: "Already have an account?",

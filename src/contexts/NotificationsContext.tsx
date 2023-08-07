@@ -7,20 +7,10 @@ import React, {
 } from "react";
 import NotificationsIcon from "@material-ui/icons/Notifications";
 
-export enum NotificationType {
-  LowStorage = "LowStorage",
-  AlbumChange = "AlbumChange",
-  Job = "Job",
-  Error = "Error",
-  Duplicates = "Duplicates",
-}
-
 /** Interface defining a single notification */
 export interface Notification {
   /** Unique id of the notification */
   id: string;
-  /** Type of the notification */
-  type: NotificationType;
   /** Title of the notification */
   title: string;
   /** Custom icon of the notification */
@@ -30,11 +20,11 @@ export interface Notification {
   /** Function to remove the notification */
   remove: () => void | Promise<void>;
   /** Function to update the notification */
-  update?: (
+  update: (
     updater: (prev: Notification) => Notification
   ) => Promise<Notification>;
-  /** Arbitrary data for the notification */
-  data?: any;
+  /** Whether notification is removeable by the user */
+  removeable?: boolean,
 }
 
 /** Interface defining the parameters for the addNotification function */
@@ -89,9 +79,8 @@ export const NotificationsContextProvider = ({
       icon = <NotificationsIcon />,
       detail,
       onRemove,
-      type,
       onUpdate,
-      data,
+      removeable = true,
     }: AddNotificationParams): Notification => {
       const remove = async () => {
         setNotifications((prev) => {
@@ -130,9 +119,8 @@ export const NotificationsContextProvider = ({
         icon,
         detail,
         remove,
-        type,
         update,
-        data,
+        removeable,
       };
       setNotifications((prev) => ({
         ...prev,

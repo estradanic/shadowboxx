@@ -413,7 +413,7 @@ const ImageField = memo(
               multiple={multiple}
               ref={inputRef}
             />
-            <Menu open={!!anchorEl} anchorEl={anchorEl} onClose={closeMenu}>
+            <Menu open={!!anchorEl} anchorEl={anchorEl} onClose={closeMenu} onClick={closeMenu} keepMounted>
               <MenuItem onClick={selectFromLibrary}>
                 {Strings.action.addFromLibrary}
               </MenuItem>

@@ -21,7 +21,6 @@ import {
 } from "../serviceWorker/sharedExports";
 import { useUserContext } from "../contexts/UserContext";
 import {
-  NotificationType,
   useNotificationsContext,
 } from "../contexts/NotificationsContext";
 
@@ -100,7 +99,6 @@ const App = () => {
             title: Strings.message.notEnoughSpace,
             detail: Strings.message.limitedOffline,
             icon: <DiscFullIcon />,
-            type: NotificationType.LowStorage,
           });
         }
       }

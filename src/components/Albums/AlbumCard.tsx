@@ -207,7 +207,6 @@ const AlbumCard = memo(({ value, onChange, borderColor }: AlbumCardProps) => {
   const { openConfirm } = useActionDialogContext();
 
   const deleteAlbum = () => {
-    closeMenu();
     openConfirm(
       Strings.message.deleteAlbumConfirmation,
       async () => {
@@ -226,7 +225,6 @@ const AlbumCard = memo(({ value, onChange, borderColor }: AlbumCardProps) => {
   };
 
   const editAlbum = () => {
-    closeMenu();
     setEditAlbumDialogOpen(true);
   };
 

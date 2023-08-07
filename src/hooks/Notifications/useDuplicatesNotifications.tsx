@@ -8,7 +8,6 @@ import DuplicatesNotificationDetail from "../../components/Notifications/Detail/
 import {
   useNotificationsContext,
   Notification,
-  NotificationType,
 } from "../../contexts/NotificationsContext";
 import { useUserContext } from "../../contexts/UserContext";
 
@@ -42,7 +41,6 @@ const useDuplicatesNotifications = () => {
           />
         ),
         icon: <BurstModeIcon />,
-        type: NotificationType.Duplicates,
       });
     } else if (!duplicates?.length) {
       notificationRef.current = undefined;

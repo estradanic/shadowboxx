@@ -145,17 +145,13 @@ const Notifications = ({ className }: NotificationsProps) => {
 
 export const NotificationMenuItem = forwardRef(
   (
-    { title, icon, detail, remove: onRemove }: NotificationProps,
+    { title, icon, detail, remove, removeable }: NotificationProps,
     ref: ForwardedRef<any>
   ) => {
     const classes = useStyles();
     const [open, setOpen] = useState<boolean>(false);
     const toggleOpen = () => {
       setOpen((prev) => !prev);
-    };
-
-    const remove = async () => {
-      await onRemove();
     };
 
     return (
@@ -174,19 +170,23 @@ export const NotificationMenuItem = forwardRef(
               <ArrowDropDownIcon className={classes.text} />
             )}
           </IconButton>
-          <IconButton
-            onClick={async (e) => {
-              e.stopPropagation();
-              e.preventDefault();
-              await remove();
-            }}
-          >
-            <CloseIcon className={classes.close} />
-          </IconButton>
+          {removeable && (
+            <IconButton
+              onClick={async (e) => {
+                e.stopPropagation();
+                e.preventDefault();
+                await remove();
+              }}
+            >
+              <CloseIcon className={classes.close} />
+            </IconButton>
+          )}
         </MenuItem>
-        <Collapse className={classes.detail} in={open}>
-          {detail ?? <Typography>{title}</Typography>}
-        </Collapse>
+        {!!detail && (
+          <Collapse className={classes.detail} in={open}>
+            {detail}
+          </Collapse>
+        )}
       </>
     );
   }

@@ -8,7 +8,6 @@ import AlbumChangesNotificationDetail from "../../components/Notifications/Detai
 import {
   useNotificationsContext,
   Notification,
-  NotificationType,
 } from "../../contexts/NotificationsContext";
 import { useUserContext } from "../../contexts/UserContext";
 
@@ -71,7 +70,6 @@ const useAlbumChangeNotifications = () => {
               ),
               icon: <FiberNewIcon />,
               onRemove: async () => await onRemove(albumChangeNotification),
-              type: NotificationType.AlbumChange,
             });
         }
       });
