@@ -186,8 +186,12 @@ const ImageField = memo(
           files[i] = event.target.files[i];
         }
         try {
-          const newImages = await uploadImagesFromFiles(files, acl);
-          await onAdd(...newImages);
+          await uploadImagesFromFiles(files, {
+            acl,
+            onEachCompleted: async (image) => {
+              await onAdd(image);
+            },
+          });
         } catch (error: any) {
           console.error(error);
           enqueueErrorSnackbar(Strings.error.uploadingImage());
@@ -413,7 +417,13 @@ const ImageField = memo(
               multiple={multiple}
               ref={inputRef}
             />
-            <Menu open={!!anchorEl} anchorEl={anchorEl} onClose={closeMenu} onClick={closeMenu} keepMounted>
+            <Menu
+              open={!!anchorEl}
+              anchorEl={anchorEl}
+              onClose={closeMenu}
+              onClick={closeMenu}
+              keepMounted
+            >
               <MenuItem onClick={selectFromLibrary}>
                 {Strings.action.addFromLibrary}
               </MenuItem>

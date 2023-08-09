@@ -24,7 +24,7 @@ export interface Notification {
     updater: (prev: Notification) => Notification
   ) => Promise<Notification>;
   /** Whether notification is removeable by the user */
-  removeable?: boolean,
+  removeable?: boolean;
 }
 
 /** Interface defining the parameters for the addNotification function */

@@ -52,9 +52,9 @@ const useStyles = makeStyles((theme: Theme) => ({
     },
   },
   close: {
-    color: theme.palette.error.main,
+    color: theme.palette.error.light,
     "&:hover, &:focus, &:active": {
-      color: theme.palette.error.dark,
+      color: theme.palette.error.main,
     },
   },
   detail: {
@@ -69,6 +69,10 @@ const useStyles = makeStyles((theme: Theme) => ({
     },
   },
   endIcons: {
+    marginLeft: "auto",
+  },
+  emptySpace: {
+    width: theme.spacing(3),
     marginLeft: "auto",
   },
 }));
@@ -163,13 +167,17 @@ export const NotificationMenuItem = forwardRef(
           <Tooltip title={title}>
             <Typography>{elide(title, 20, 0)}</Typography>
           </Tooltip>
-          <IconButton className={classes.endIcons}>
-            {open ? (
-              <ArrowDropUpIcon className={classes.text} />
-            ) : (
-              <ArrowDropDownIcon className={classes.text} />
-            )}
-          </IconButton>
+          {detail ? (
+            <IconButton className={classes.endIcons}>
+              {open ? (
+                <ArrowDropUpIcon className={classes.text} />
+              ) : (
+                <ArrowDropDownIcon className={classes.text} />
+              )}
+            </IconButton>
+          ) : (
+            <div className={classes.emptySpace} />
+          )}
           {removeable && (
             <IconButton
               onClick={async (e) => {

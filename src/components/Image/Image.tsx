@@ -255,10 +255,7 @@ const Image = memo(
                 })}
               >
                 <source srcSet={mobileUrl} type="image/webp" />
-                <source
-                  srcSet={legacyUrl}
-                  type="image/png"
-                />
+                <source srcSet={legacyUrl} type="image/png" />
                 <img
                   className={classes.width100}
                   onLoad={() => setIsLoaded(true)}
@@ -333,10 +330,7 @@ const Image = memo(
                 })}
               >
                 <source srcSet={fullUrl} type="image/webp" />
-                <source
-                  srcSet={legacyUrl}
-                  type="image/png"
-                />
+                <source srcSet={legacyUrl} type="image/png" />
                 <img
                   className={classes.fullResolutionImage}
                   alt={parseImage.name}

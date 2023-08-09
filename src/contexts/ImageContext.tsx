@@ -21,9 +21,9 @@ import { useSnackbar } from "../components/Snackbar";
 import { useUserContext } from "./UserContext";
 import ImageSelectionDialog from "../components/Images/ImageSelectionDialog";
 import { useGlobalLoadingStore } from "../stores";
-import { useNotificationsContext } from './NotificationsContext';
-import { useJobContext } from './JobContext';
-import { LinearProgress } from '@material-ui/core';
+import { useNotificationsContext } from "./NotificationsContext";
+import { useJobContext } from "./JobContext";
+import { LinearProgress } from "@material-ui/core";
 
 export enum ImageActionCommand {
   DELETE,
@@ -63,7 +63,10 @@ interface ImageContextValue {
   /** Function to upload images from files */
   uploadImagesFromFiles: (
     files: File[],
-    acl?: Parse.ACL
+    options?: {
+      acl?: Parse.ACL;
+      onEachCompleted?: (uploadedImage: ParseImage) => Promise<void>;
+    }
   ) => Promise<ParseImage[]>;
   /** Function to upload image from url */
   uploadImageFromUrl: (url: string, acl?: Parse.ACL) => Promise<ParseImage>;
@@ -112,7 +115,7 @@ const MAX_FILE_SIZE = 20000000; // 20 MB
 export const ImageContextProvider = ({
   children,
 }: ImageContextProviderProps) => {
-  const {addJob} = useJobContext();
+  const { addJob } = useJobContext();
   const { addNotification } = useNotificationsContext();
   const { enqueueErrorSnackbar } = useSnackbar();
   const { getLoggedInUser } = useUserContext();
@@ -213,7 +216,13 @@ export const ImageContextProvider = ({
         mimeType: "image/webp",
       });
       notification.remove();
-      return result;
+      if (result.size > MAX_FILE_SIZE) {
+        enqueueErrorSnackbar(Strings.error.fileTooLarge(file.name));
+        return undefined;
+      }
+      return new File([result], file.name, {
+        type: "image/webp",
+      });
     } catch (error: any) {
       enqueueErrorSnackbar(Strings.error.processingFile(file.name));
       if (isNullOrWhitespace(error.message)) {
@@ -257,10 +266,12 @@ export const ImageContextProvider = ({
         const time = message.split("time=")[1].split("bitrate=")[0].trim();
         const [hours, minutes, seconds] = time.split(":").map(Number);
         const totalSeconds = hours * 3600 + minutes * 60 + seconds;
-        const progressPercentage = totalSeconds / duration * 100;
+        const progressPercentage = (totalSeconds / duration) * 100;
         notification.update((prev) => ({
           ...prev,
-          detail: <LinearProgress variant="determinate" value={progressPercentage} />,
+          detail: (
+            <LinearProgress variant="determinate" value={progressPercentage} />
+          ),
         }));
       }
     });
@@ -290,7 +301,7 @@ export const ImageContextProvider = ({
         title: Strings.error.processingFile(file.name),
         icon: <ErrorIcon />,
         removeable: true,
-      }))
+      }));
       return undefined;
     }
     const result = ffmpeg.FS("readFile", newFileName);
@@ -349,16 +360,33 @@ export const ImageContextProvider = ({
     if (!parseFile) {
       return undefined;
     }
+    return parseFile;
   };
 
-  const uploadImagesFromFiles = (files: File[], acl?: Parse.ACL) => {
+  const uploadImagesFromFiles = (
+    files: File[],
+    options: {
+      acl?: Parse.ACL;
+      onEachCompleted?: (uploadedImage: ParseImage) => Promise<void>;
+    } = {}
+  ) => {
     return new Promise<ParseImage[]>((resolve, reject) => {
       // Using setTimeout to prevent the loader from not showing up
       setTimeout(async () => {
         try {
           const promises: Promise<ParseImage | void>[] = [];
           for (const file of files) {
-            promises.push(processAndUploadFile(file, acl));
+            promises.push(
+              processAndUploadFile(file, options.acl).then(
+                async (uploadedImage) => {
+                  if (!uploadedImage) {
+                    return undefined;
+                  }
+                  await options.onEachCompleted?.(uploadedImage);
+                  return uploadedImage;
+                }
+              )
+            );
           }
           const results = await Promise.all(promises);
           const uploadedImages: ParseImage[] = [];

@@ -72,7 +72,7 @@ const AlbumsToShareTo = ({ albums, classes, files }: AlbumsListProps) => {
   const virtualizedAlbums = useVirtualList(albums);
   const borderColor = useRandomColor();
   const { uploadImagesFromFiles } = useImageContext();
-  const { enqueueErrorSnackbar, enqueueSuccessSnackbar } = useSnackbar();
+  const { enqueueErrorSnackbar } = useSnackbar();
   const navigate = useNavigate();
 
   return (
@@ -90,18 +90,18 @@ const AlbumsToShareTo = ({ albums, classes, files }: AlbumsListProps) => {
               value={album}
               onClick={async () => {
                 try {
-                  const images = (await uploadImagesFromFiles(files)).map(
-                    (image) => image.id
-                  );
-                  const newAlbum = await album.update(
-                    {
-                      ...album.attributes,
-                      images: [...album.images, ...images],
+                  await uploadImagesFromFiles(files, {
+                    onEachCompleted: async (image) => {
+                      await album.update(
+                        {
+                          ...album.attributes,
+                          images: [...album.images, image.id],
+                        },
+                        { addedImages: [image.id] }
+                      );
                     },
-                    { addedImages: images }
-                  );
-                  enqueueSuccessSnackbar(Strings.success.saved);
-                  navigate(routes.Album.path.replace(":id", newAlbum.id));
+                  });
+                  navigate(routes.Album.path.replace(":id", album.id));
                 } catch (e) {
                   console.error(e);
                   enqueueErrorSnackbar(Strings.error.editingAlbum);

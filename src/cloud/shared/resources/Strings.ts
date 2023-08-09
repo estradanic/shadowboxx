@@ -163,7 +163,10 @@ const Strings = {
     viewersTooltip:
       "Users who will be allowed to view this album. (Enter email)",
     copyright: `© Nicholas Estrada ${new Date().getFullYear()}`,
-    jobs: (jobCount: number) => `${jobCount} job${jobCount > 1 ? "s" : ""} running. Do not close this window.`,
+    jobs: (jobCount: number) =>
+      `${jobCount} job${
+        jobCount > 1 ? "s" : ""
+      } running. Do not close this window.`,
   },
   prompt: {
     alreadyHaveAccount: "Already have an account?",
