@@ -4,8 +4,9 @@ import Toolbar from "@material-ui/core/Toolbar";
 import Button from "@material-ui/core/Button";
 import useMediaQuery from "@material-ui/core/useMediaQuery";
 import Typography from "@material-ui/core/Typography";
+import Breadcrumbs from "@material-ui/core/Breadcrumbs";
 import { makeStyles, Theme, useTheme } from "@material-ui/core/styles";
-import routes from "../../app/routes";
+import routes, { RouteId } from "../../app/routes";
 import { Strings } from "../../resources";
 import Link from "../Link/Link";
 import AppMenu from "../Menu/AppMenu";
@@ -53,6 +54,15 @@ const useStyles = makeStyles((theme: Theme) => ({
   toolbar: {
     paddingRight: 0,
   },
+  breadcrumbs: {
+    color: theme.palette.primary.contrastText,
+  },
+  separator: {
+    lineHeight: "initial",
+  },
+  lastCrumb: {
+    fontWeight: "bold",
+  },
 }));
 
 /**
@@ -74,6 +84,17 @@ const Header = ({ viewId, className, ...rest }: HeaderProps) => {
   const { isUserLoggedIn, getLoggedInUser, profilePicture } = useUserContext();
   const visible = useHideOnScroll();
 
+  const getBreadcrumbs = (
+    viewId: RouteId,
+    ancestors: RouteId[] = []
+  ): RouteId[] => {
+    const route = routes[viewId];
+    if ("parent" in route) {
+      return getBreadcrumbs(route.parent, [...ancestors, route.parent]);
+    }
+    return ancestors;
+  };
+
   return (
     <AppBar
       position="sticky"
@@ -81,6 +102,7 @@ const Header = ({ viewId, className, ...rest }: HeaderProps) => {
         [classes.visible]: visible,
         [classes.hidden]: !visible,
       })}
+      {...rest}
     >
       <Toolbar className={classes.toolbar}>
         <Link className={classes.logo} to="/" color="inherit">
@@ -102,7 +124,28 @@ const Header = ({ viewId, className, ...rest }: HeaderProps) => {
         )}
       </Toolbar>
       <Toolbar variant="dense">
-        <Typography variant="overline">{routes[viewId].viewName}</Typography>
+        <Breadcrumbs
+          separator={
+            <Typography className={classes.separator} variant="overline">
+              🢒
+            </Typography>
+          }
+          className={classes.breadcrumbs}
+        >
+          {getBreadcrumbs(viewId).map((id) => (
+            <Link
+              variant="overline"
+              key={id}
+              to={routes[id].path}
+              color="inherit"
+            >
+              {routes[id].viewName}
+            </Link>
+          ))}
+          <Typography className={classes.lastCrumb} variant="overline">
+            {routes[viewId].viewName}
+          </Typography>
+        </Breadcrumbs>
         {isUserLoggedIn && (
           <>
             <Notifications className={classes.notifications} />

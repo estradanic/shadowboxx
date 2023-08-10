@@ -101,8 +101,8 @@ const ActionBar = ({ selectedImages, images, onDelete }: ActionBarProps) => {
 /**
  * Page for viewing all the logged in users's images
  */
-const Pictures = memo(() => {
-  useView("Pictures");
+const Memories = memo(() => {
+  useView("Memories");
   const imageClasses = useImageStyles();
   const [editMode, setEditMode] = useState<boolean>(false);
   const randomColor = useRandomColor();
@@ -181,7 +181,7 @@ const Pictures = memo(() => {
     <PageContainer>
       <Grid item sm={8}>
         <FancyTitleTypography outlineColor={randomColor}>
-          {Strings.label.pictures}
+          {Strings.label.memories}
         </FancyTitleTypography>
       </Grid>
       {editMode && (
@@ -222,4 +222,4 @@ const Pictures = memo(() => {
   );
 });
 
-export default Pictures;
+export default Memories;

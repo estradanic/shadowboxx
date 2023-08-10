@@ -7,7 +7,7 @@ const Login = lazy(() => import("../views/Login/Login"));
 const Settings = lazy(() => import("../views/Settings/Settings"));
 const Signup = lazy(() => import("../views/Signup/Signup"));
 const Album = lazy(() => import("../views/Album/Album"));
-const Pictures = lazy(() => import("../views/Pictures/Pictures"));
+const Memories = lazy(() => import("../views/Memories/Memories"));
 const Share = lazy(() => import("../views/Share/Share"));
 const VerifyEmail = lazy(() => import("../views/VerifyEmail/VerifyEmail"));
 const ForgotPassword = lazy(
@@ -19,7 +19,7 @@ const routeComponents: Record<RouteId, ComponentType<any>> = {
   ForgotPassword,
   Home,
   Login,
-  Pictures,
+  Memories,
   Settings,
   Signup,
   Share,

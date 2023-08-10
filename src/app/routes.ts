@@ -6,7 +6,7 @@ export type RouteId =
   | "ForgotPassword"
   | "Home"
   | "Login"
-  | "Pictures"
+  | "Memories"
   | "Settings"
   | "Signup"
   | "Share"
@@ -29,6 +29,8 @@ export interface RouteProps {
   redirectOnAuthFail: boolean;
   /** Query Cache Groups to make stale on page load */
   queryCacheGroups: QueryCacheGroups[];
+  /** Parent route id */
+  parent?: RouteId;
 }
 
 /**
@@ -45,6 +47,7 @@ const routes = {
       QueryCacheGroups.GET_IMAGES_BY_ID_INFINITE,
       QueryCacheGroups.GET_ALBUM,
     ],
+    parent: "Home",
   },
   ForgotPassword: {
     viewId: "ForgotPassword",
@@ -70,13 +73,14 @@ const routes = {
     redirectOnAuthFail: false,
     queryCacheGroups: [],
   },
-  Pictures: {
-    viewId: "Pictures",
-    viewName: "Pictures",
-    path: "/pictures",
+  Memories: {
+    viewId: "Memories",
+    viewName: "Memories",
+    path: "/memories",
     tryAuthenticate: true,
     redirectOnAuthFail: true,
     queryCacheGroups: [QueryCacheGroups.GET_ALL_IMAGES_INFINITE],
+    parent: "Home",
   },
   Settings: {
     viewId: "Settings",
@@ -85,6 +89,7 @@ const routes = {
     tryAuthenticate: true,
     redirectOnAuthFail: true,
     queryCacheGroups: [],
+    parent: "Home",
   },
   Share: {
     viewId: "Share",

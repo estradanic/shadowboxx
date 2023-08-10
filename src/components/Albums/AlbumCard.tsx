@@ -246,7 +246,6 @@ const AlbumCard = memo(({ value, onChange, borderColor }: AlbumCardProps) => {
   ) => {
     await value.update(attributes, changes);
     await onChange(value);
-    enqueueSuccessSnackbar(Strings.success.saved);
   };
 
   return status !== "loading" ? (
@@ -283,7 +282,7 @@ const AlbumCard = memo(({ value, onChange, borderColor }: AlbumCardProps) => {
             )
           }
           title={value?.name}
-          subheader={`${Strings.label.numOfPhotos(value.images.length)} ${
+          subheader={`${Strings.label.numOfMemories(value.images.length)} ${
             value?.description ?? ""
           }`}
         />

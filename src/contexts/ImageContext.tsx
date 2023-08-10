@@ -12,18 +12,15 @@ import {
   UnpersistedParseImage,
   UnpersistedParseImageAttributes,
 } from "../classes";
-import {
-  isNullOrWhitespace,
-  makeValidFileName,
-  removeExtension,
-} from "../utils";
+import { makeValidFileName, removeExtension } from "../utils";
 import { useSnackbar } from "../components/Snackbar";
 import { useUserContext } from "./UserContext";
 import ImageSelectionDialog from "../components/Images/ImageSelectionDialog";
+import { LinearProgress } from "../components/Progress";
 import { useGlobalLoadingStore } from "../stores";
-import { useNotificationsContext } from "./NotificationsContext";
+import { Notification, useNotificationsContext } from "./NotificationsContext";
 import { useJobContext } from "./JobContext";
-import { LinearProgress } from "@material-ui/core";
+import useRandomColor from "../hooks/useRandomColor";
 
 export enum ImageActionCommand {
   DELETE,
@@ -115,6 +112,7 @@ const MAX_FILE_SIZE = 20000000; // 20 MB
 export const ImageContextProvider = ({
   children,
 }: ImageContextProviderProps) => {
+  const variableColor = useRandomColor();
   const { addJob } = useJobContext();
   const { addNotification } = useNotificationsContext();
   const { enqueueErrorSnackbar } = useSnackbar();
@@ -166,13 +164,7 @@ export const ImageContextProvider = ({
   const uploadImage = async (
     image: UnpersistedParseImageAttributes,
     acl?: Parse.ACL
-  ): Promise<ParseImage | undefined> => {
-    const notification = addNotification({
-      id: `upload-${image.name}`,
-      title: `Uploading ${image.name}`,
-      icon: <HourglassIcon />,
-      removeable: false,
-    });
+  ) => {
     try {
       image.file = await image.file.save();
       const unpersistedParseImage = new UnpersistedParseImage(image);
@@ -180,34 +172,13 @@ export const ImageContextProvider = ({
         unpersistedParseImage.setACL(acl);
       }
       const parseImage = await unpersistedParseImage.save();
-      notification.update((prev) => ({
-        ...prev,
-        title: `Uploaded ${image.name}`,
-        icon: <CloudUploadIcon />,
-        removeable: true,
-      }));
       return parseImage;
-    } catch (error: any) {
-      notification.update((prev) => ({
-        ...prev,
-        title: Strings.error.uploadingImage(image.name),
-        icon: <ErrorIcon />,
-        removeable: true,
-      }));
-      if (isNullOrWhitespace(error.message)) {
-        error.message = Strings.error.uploadingImage(image.name);
-      }
-      return undefined;
+    } catch {
+      throw new Error(Strings.error.uploadingImage(image.name));
     }
   };
 
-  const compressImage = async (file: File): Promise<File | undefined> => {
-    const notification = addNotification({
-      id: `process-${file.name}`,
-      title: `Processing ${file.name}`,
-      icon: <HourglassIcon />,
-      removeable: false,
-    });
+  const compressImage = async (file: File) => {
     try {
       const result = await readAndCompressImage(file, {
         quality: 1,
@@ -215,37 +186,18 @@ export const ImageContextProvider = ({
         maxHeight: 2400,
         mimeType: "image/webp",
       });
-      notification.remove();
       if (result.size > MAX_FILE_SIZE) {
-        enqueueErrorSnackbar(Strings.error.fileTooLarge(file.name));
-        return undefined;
+        throw new Error(Strings.error.processingFile(file.name));
       }
       return new File([result], file.name, {
         type: "image/webp",
       });
-    } catch (error: any) {
-      enqueueErrorSnackbar(Strings.error.processingFile(file.name));
-      if (isNullOrWhitespace(error.message)) {
-        error.message = Strings.error.processingFile(file.name);
-      }
-      console.error(error);
-      notification.update((prev) => ({
-        ...prev,
-        title: Strings.error.processingFile(file.name),
-        icon: <ErrorIcon />,
-        removeable: true,
-      }));
-      return undefined;
+    } catch {
+      throw new Error(Strings.error.processingFile(file.name));
     }
   };
 
-  const compressVideo = async (file: File): Promise<File | undefined> => {
-    const notification = addNotification({
-      id: `process-${file.name}`,
-      title: `Processing ${file.name}`,
-      icon: <HourglassIcon />,
-      removeable: false,
-    });
+  const compressVideo = async (file: File, notification: Notification) => {
     const videoEl = document.createElement("video");
     videoEl.preload = "metadata";
     let duration = Number.MAX_SAFE_INTEGER;
@@ -270,7 +222,11 @@ export const ImageContextProvider = ({
         notification.update((prev) => ({
           ...prev,
           detail: (
-            <LinearProgress variant="determinate" value={progressPercentage} />
+            <LinearProgress
+              color={variableColor}
+              variant="determinate"
+              value={progressPercentage}
+            />
           ),
         }));
       }
@@ -293,27 +249,27 @@ export const ImageContextProvider = ({
       "yuv420p",
       "-preset",
       "faster",
+      "-movflags",
+      "+faststart",
       newFileName
     );
     if (!success) {
-      notification.update((prev) => ({
-        ...prev,
-        title: Strings.error.processingFile(file.name),
-        icon: <ErrorIcon />,
-        removeable: true,
-      }));
-      return undefined;
+      throw new Error(Strings.error.processingFile(file.name));
     }
     const result = ffmpeg.FS("readFile", newFileName);
-    notification.remove();
-    return new File([result.buffer], newFileName, {
-      type: "video/mp4",
+    ffmpeg.exit();
+    const compressedFile = new File([result.buffer], newFileName, {
+      type: "video/webm",
     });
+    if (compressedFile.size > MAX_FILE_SIZE) {
+      throw new Error(Strings.error.fileTooLarge(file.name));
+    }
+    return compressedFile;
   };
 
-  const processFile = (file: File) => {
+  const processFile = (file: File, notification: Notification) => {
     if (ACCEPTABLE_VIDEO_TYPES.includes(file.type)) {
-      return compressVideo(file);
+      return compressVideo(file, notification);
     }
     if (ACCEPTABLE_IMAGE_TYPES.includes(file.type)) {
       if (file.size > MAX_FILE_SIZE) {
@@ -321,8 +277,7 @@ export const ImageContextProvider = ({
       }
       return Promise.resolve(file);
     }
-    enqueueErrorSnackbar(Strings.error.invalidFileType(file.name));
-    return Promise.resolve(undefined);
+    throw new Error(Strings.error.invalidFileType(file.name));
   };
 
   const uploadFile = (file: File, acl?: Parse.ACL) => {
@@ -347,19 +302,19 @@ export const ImageContextProvider = ({
     );
   };
 
-  const processAndUploadFile = async (file: File, acl?: Parse.ACL) => {
-    const processedFile = await addJob(() => processFile(file));
-    if (!processedFile) {
-      return undefined;
-    }
-    if (processedFile.size > MAX_FILE_SIZE) {
-      enqueueErrorSnackbar(Strings.error.fileTooLarge(processedFile.name));
-      return undefined;
-    }
-    const parseFile = await addJob(() => uploadFile(processedFile, acl));
-    if (!parseFile) {
-      return undefined;
-    }
+  const processAndUploadFile = async (
+    file: File,
+    notification: Notification,
+    acl?: Parse.ACL
+  ) => {
+    const processedFile = await processFile(file, notification);
+    notification.update((prev) => ({
+      ...prev,
+      title: `Uploading ${file.name}`,
+      icon: <CloudUploadIcon />,
+      detail: <LinearProgress color={variableColor} variant="indeterminate" />,
+    }));
+    const parseFile = await uploadFile(processedFile, acl);
     return parseFile;
   };
 
@@ -376,16 +331,51 @@ export const ImageContextProvider = ({
         try {
           const promises: Promise<ParseImage | void>[] = [];
           for (const file of files) {
+            const notification = addNotification({
+              id: `process-${file.name}`,
+              title: `Processing ${file.name}`,
+              icon: <HourglassIcon />,
+              removeable: false,
+              detail: (
+                <LinearProgress color={variableColor} variant="indeterminate" />
+              ),
+            });
             promises.push(
-              processAndUploadFile(file, options.acl).then(
-                async (uploadedImage) => {
-                  if (!uploadedImage) {
-                    return undefined;
-                  }
+              addJob(async () => {
+                try {
+                  const uploadedImage = await processAndUploadFile(
+                    file,
+                    notification,
+                    options.acl
+                  );
+                  notification.update((prev) => ({
+                    ...prev,
+                    title: `Uploaded ${file.name}`,
+                    icon: <CloudUploadIcon />,
+                    removeable: true,
+                    detail: undefined,
+                  }));
                   await options.onEachCompleted?.(uploadedImage);
                   return uploadedImage;
+                } catch (error: unknown) {
+                  console.error(error);
+                  const message =
+                    error &&
+                    typeof error === "object" &&
+                    "message" in error &&
+                    error.message?.toString()
+                      ? error.message.toString()
+                      : Strings.error.common;
+                  notification.update((prev) => ({
+                    ...prev,
+                    title: message,
+                    icon: <ErrorIcon />,
+                    removeable: true,
+                    detail: undefined,
+                  }));
+                  return undefined;
                 }
-              )
+              })
             );
           }
           const results = await Promise.all(promises);

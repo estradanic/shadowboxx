@@ -21,7 +21,7 @@ export interface ImageAttributes {
   fileThumb: Parse.File;
   /** The file in png format for older iPhones */
   fileLegacy: Parse.File;
-  /** User that owns this picture */
+  /** User that owns this image */
   owner: ParsePointer<"_User">;
   /** Name of the image */
   name: string;
@@ -36,7 +36,7 @@ export interface ImageAttributes {
 class ImageColumns extends Columns {
   /** The actual saved file */
   file = "file" as const;
-  /** User that owns this picture */
+  /** User that owns this image */
   owner = "owner" as const;
   /** Name of the image */
   name = "name" as const;

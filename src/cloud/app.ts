@@ -7,7 +7,7 @@ const frontendRoutes = [
   "album",
   "home",
   "login",
-  "pictures",
+  "memories",
   "settings",
   "signup",
   "share",

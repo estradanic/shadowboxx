@@ -232,7 +232,7 @@ const Image = memo(
                 })}
                 onLoadStart={() => setIsLoaded(true)}
                 onClick={onClick}
-                controls
+                controls={!piOnClick}
                 preload="metadata"
                 onTimeUpdate={(e) =>
                   (playbackTimeRef.current = e.currentTarget.currentTime)

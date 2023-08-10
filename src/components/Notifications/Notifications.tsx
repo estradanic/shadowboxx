@@ -52,9 +52,9 @@ const useStyles = makeStyles((theme: Theme) => ({
     },
   },
   close: {
-    color: theme.palette.error.light,
+    color: theme.palette.error.main,
     "&:hover, &:focus, &:active": {
-      color: theme.palette.error.main,
+      color: theme.palette.error.light,
     },
   },
   detail: {

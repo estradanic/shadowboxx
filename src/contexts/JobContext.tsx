@@ -26,7 +26,7 @@ export const JobContextProvider = ({ children }: JobContextProviderProps) => {
       return result;
     } catch (e) {
       setJobCount((prev) => prev - 1);
-      return undefined;
+      throw e;
     }
   }
 

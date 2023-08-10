@@ -103,7 +103,7 @@ const Strings = {
     albumChangeNotificationTitle: (count: number) =>
       `${count} album change${count > 1 ? "s" : ""} to see!`,
     deleteAlbumConfirmation:
-      "Are you sure? All pictures in this album will still be accessible on the 'My Pictures' page. This action is irreversible.",
+      "Are you sure? All memories in this album will still be accessible on the 'Memories' page. This action is irreversible.",
     deleteImagesConfirm: "Are you sure? This action is irreversible.",
     duplicatesNotificationTitle: "You may have uploaded duplicate images!",
     duplicatesNotificationDetail: (duplicatesNumber: number) =>
@@ -151,9 +151,9 @@ const Strings = {
     lastName: "Last Name",
     multipleImages: "Multiple Images",
     name: "Name",
-    numOfPhotos: (numOfPhotos: number) => `${numOfPhotos} photos.`,
+    numOfMemories: (num: number) => `${num} memories.`,
     password: "Password",
-    pictures: "Pictures",
+    memories: "Memories",
     profilePicture: "Profile Picture",
     settings: "Settings",
     timelineView: "Timeline View",

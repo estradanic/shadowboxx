@@ -1,13 +1,14 @@
 import React, { ReactNode } from "react";
-import CircularProgress, {
-  CircularProgressProps,
-} from "@material-ui/core/CircularProgress";
-import LinearProgress, {
-  LinearProgressProps,
-} from "@material-ui/core/LinearProgress";
 import { makeStyles, Theme } from "@material-ui/core/styles";
 import classNames from "classnames";
 import { opacity } from "../../utils";
+import LinearProgress, {
+  LinearProgressProps,
+} from "../Progress/LinearProgress";
+import CircularProgress, {
+  CircularProgressProps,
+} from "../Progress/CircularProgress";
+import useRandomColor from "../../hooks/useRandomColor";
 
 const useStyles = makeStyles((theme: Theme) => ({
   wrapper: {
@@ -42,24 +43,19 @@ const useStyles = makeStyles((theme: Theme) => ({
     top: theme.spacing(1),
   },
   spinner: {
-    color: theme.palette.error.light,
     margin: "auto",
     marginBottom: theme.spacing(2),
     height: theme.spacing(5),
   },
   progress: {
-    "& div": {
-      backgroundColor: theme.palette.error.light,
-    },
-    width: "100%",
     marginBottom: theme.spacing(4.5),
   },
 }));
 
 /** Interface defining props for LoadingWrapper */
 export interface LoadingWrapperProps
-  extends Omit<CircularProgressProps, "variant" | "color" | "classes">,
-    Omit<LinearProgressProps, "variant" | "color" | "classes" | "value"> {
+  extends Omit<CircularProgressProps, "variant" | "classes">,
+    Omit<LinearProgressProps, "variant" | "classes" | "value"> {
   /** Whether to display the LoadingWrapper */
   loading?: boolean;
   /** Content to display under the loader */
@@ -89,6 +85,7 @@ const LoadingWrapper = ({
   ...rest
 }: LoadingWrapperProps) => {
   const classes = useStyles({ loading, backgroundColor });
+  const variableColor = useRandomColor();
 
   return (
     <div className={className}>
@@ -110,6 +107,7 @@ const LoadingWrapper = ({
               />
             ) : (
               <LinearProgress
+                color={variableColor}
                 variant="determinate"
                 value={progress}
                 className={classes.progress}
