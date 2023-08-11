@@ -30,12 +30,12 @@ const hashImage = async (image: ParseImage) => {
     console.error("Could not get buffer for image", image.id);
     return;
   }
-  const imageData = await getImageData(await imageFromBuffer(buffer));
+  const imageData = getImageData(await imageFromBuffer(buffer));
   if (!imageData) {
     console.error("Could not get ImageData for image", image.id);
     return;
   }
-  const hash = hexToBinary(await bmvbhash(imageData, 16));
+  const hash = hexToBinary(bmvbhash(imageData, 16));
 
   image.hash = hash;
   await image.cloudSave({ useMasterKey: true, context: { noTrigger: true } });

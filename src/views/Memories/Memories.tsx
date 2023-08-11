@@ -33,6 +33,7 @@ import {
   useImageContext,
 } from "../../contexts/ImageContext";
 import { useNetworkDetectionContext } from "../../contexts/NetworkDetectionContext";
+import { SortDirection } from "../../types";
 
 const useStyles = makeStyles((theme: Theme) => ({
   actionContainer: {
@@ -107,6 +108,8 @@ const Memories = memo(() => {
   const [editMode, setEditMode] = useState<boolean>(false);
   const randomColor = useRandomColor();
   const { online } = useNetworkDetectionContext();
+  const [sortDirection, setSortDirection] =
+    useState<SortDirection>("descending");
   const {
     getAllImagesInfiniteFunction,
     getAllImagesInfiniteQueryKey,
@@ -120,9 +123,9 @@ const Memories = memo(() => {
     refetch,
     isRefetching,
   } = useInfiniteQuery<ParseImage[], Error>(
-    getAllImagesInfiniteQueryKey(),
+    getAllImagesInfiniteQueryKey(sortDirection),
     ({ pageParam: page = 0 }) =>
-      getAllImagesInfiniteFunction(online, {
+      getAllImagesInfiniteFunction(online, sortDirection, {
         showErrorsInSnackbar: true,
         page,
         pageSize: DEFAULT_PAGE_SIZE,
@@ -194,6 +197,8 @@ const Memories = memo(() => {
         </ImageContextProvider>
       )}
       <Images
+        sortDirection={sortDirection}
+        setSortDirection={setSortDirection}
         status={isRefetching ? "refetching" : status}
         images={images}
         outlineColor={randomColor}

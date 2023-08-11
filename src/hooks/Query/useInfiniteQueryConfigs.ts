@@ -8,6 +8,7 @@ import useQueryConfigHelpers, {
 import { DEFAULT_PAGE_SIZE } from "../../constants";
 import QueryCacheGroups from "./QueryCacheGroups";
 import { useUserContext } from "../../contexts/UserContext";
+import { SortDirection } from "../../types";
 
 export type InfiniteFunctionOptions = FunctionOptions & {
   /** Page index */
@@ -94,9 +95,9 @@ const useInfiniteQueryConfigs = () => {
   };
 
   /** ["GET_ALL_IMAGES_INFINITE"] */
-  const getAllImagesInfiniteQueryKey = () => [
-    QueryCacheGroups.GET_ALL_IMAGES_INFINITE,
-  ];
+  const getAllImagesInfiniteQueryKey = (
+    sortDirection: SortDirection = "descending"
+  ) => [QueryCacheGroups.GET_ALL_IMAGES_INFINITE, sortDirection];
   /** Defaults to default */
   const getAllImagesInfiniteOptions: InfiniteQueryOptionsFunction<
     ParseImage[]
@@ -107,12 +108,13 @@ const useInfiniteQueryConfigs = () => {
   /** Infinite function to get all images, sorted desc by createdAt */
   const getAllImagesInfiniteFunction = async (
     online: boolean,
+    sortDirection: SortDirection = "descending",
     options: InfiniteFunctionOptions = DEFAULT_FUNCTION_OPTIONS
   ): Promise<ParseImage[]> => {
     return await runFunctionInTryCatch<ParseImage[]>(
       async () => {
         return await ParseImage.query(online)
-          .descending(ParseImage.COLUMNS.dateTaken)
+          [sortDirection](ParseImage.COLUMNS.dateTaken)
           .limit(options.pageSize)
           .skip(options.page * options.pageSize)
           .find();
@@ -122,10 +124,10 @@ const useInfiniteQueryConfigs = () => {
   };
 
   /** ["GET_IMAGES_BY_ID_INFINITE", imageIds] */
-  const getImagesByIdInfiniteQueryKey = (imageIds: string[]) => [
-    QueryCacheGroups.GET_IMAGES_BY_ID_INFINITE,
-    imageIds,
-  ];
+  const getImagesByIdInfiniteQueryKey = (
+    imageIds: string[],
+    sortDirection: SortDirection = "descending"
+  ) => [QueryCacheGroups.GET_IMAGES_BY_ID_INFINITE, imageIds, sortDirection];
   /** Defaults to default */
   const getImagesByIdInfiniteOptions: InfiniteQueryOptionsFunction<
     ParseImage[]
@@ -137,13 +139,14 @@ const useInfiniteQueryConfigs = () => {
   const getImagesByIdInfiniteFunction = async (
     online: boolean,
     imageIds: string[],
+    sortDirection: SortDirection = "descending",
     options: InfiniteFunctionOptions = DEFAULT_FUNCTION_OPTIONS
   ): Promise<ParseImage[]> => {
     return await runFunctionInTryCatch<ParseImage[]>(
       async () => {
         return await ParseImage.query(online)
           .containedIn(ParseImage.COLUMNS.id, imageIds)
-          .descending(ParseImage.COLUMNS.dateTaken)
+          [sortDirection](ParseImage.COLUMNS.dateTaken)
           .limit(options.pageSize)
           .skip(options.page * options.pageSize)
           .find();

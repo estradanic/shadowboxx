@@ -1,6 +1,11 @@
-import React, { createContext, useContext, useState } from "react";
+import React, {
+  createContext,
+  useContext,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 import PQueue from "p-queue";
-import useNoSleep from "use-no-sleep";
 
 export interface JobContextValue {
   jobCount: number;
@@ -16,7 +21,27 @@ const JobContext = createContext<JobContextValue | undefined>(undefined);
 export const JobContextProvider = ({ children }: JobContextProviderProps) => {
   const promiseQueue = new PQueue({ concurrency: 4 });
   const [jobCount, setJobCount] = useState(0);
-  useNoSleep(jobCount > 0);
+  const wakeLockRef = useRef<WakeLockSentinel>();
+
+  useEffect(() => {
+    if (!("wakeLock" in navigator)) {
+      return;
+    }
+    if (jobCount && !wakeLockRef.current) {
+      navigator.wakeLock
+        .request("screen")
+        .then((wakeLock) => {
+          wakeLockRef.current = wakeLock;
+        })
+        .catch((e) => {
+          console.error(e);
+        });
+    } else if (!jobCount && wakeLockRef.current) {
+      wakeLockRef.current.release().then(() => {
+        wakeLockRef.current = undefined;
+      });
+    }
+  }, [jobCount]);
 
   async function addJob<T>(fn: () => Promise<T>) {
     setJobCount((prev) => prev + 1);

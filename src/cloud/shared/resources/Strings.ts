@@ -90,11 +90,10 @@ const Strings = {
     setImageAsCover: "Set this image as the album cover",
   },
   message: {
+    uploading: (fileName: string) => `Uploading ${fileName}`,
+    processing: (fileName: string) => `Processing ${fileName}`,
+    uploaded: (fileName: string) => `Uploaded ${fileName}`,
     loadingSharedImages: "Loading selected images...",
-    processingImages: "Processing...",
-    processingImagesDetail:
-      "Please wait. Videos and large images may take a while.",
-    uploadingImages: "Uploading...",
     shareTargetTitle: (num: number) =>
       `Select album to add ${num} image${num > 1 ? "s" : ""} to.`,
     sessionExpired: "Session Expired. Please log in again.",
@@ -131,6 +130,7 @@ const Strings = {
   },
   label: {
     caption: "Caption",
+    captionSearch: "Caption Search",
     appName: "Shadowboxx",
     aUser: "User",
     collaborators: "Collaborators",

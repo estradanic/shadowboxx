@@ -25,7 +25,7 @@ import { useView } from "../View";
 import OwnerImageDecoration from "../../components/Image/Decoration/OwnerImageDecoration";
 import useFlatInfiniteQueryData from "../../hooks/Query/useFlatInfiniteQueryData";
 import { FormControlLabel, Switch } from "@material-ui/core";
-import { VariableColor } from "../../types";
+import { SortDirection, VariableColor } from "../../types";
 import ShareImageDecoration from "../../components/Image/Decoration/ShareImageDecoration";
 import useRandomColor from "../../hooks/useRandomColor";
 import useQueryConfigs from "../../hooks/Query/useQueryConfigs";
@@ -90,6 +90,8 @@ const Album = memo(() => {
     () => getAlbumFunction(online, id, { showErrorsInSnackbar: true }),
     getAlbumOptions()
   );
+  const [sortDirection, setSortDirection] =
+    useState<SortDirection>("ascending");
   const {
     data,
     status: imagesStatus,
@@ -98,13 +100,18 @@ const Album = memo(() => {
     refetch,
     isRefetching,
   } = useInfiniteQuery<ParseImage[], Error>(
-    getImagesByIdInfiniteQueryKey(album?.images ?? []),
+    getImagesByIdInfiniteQueryKey(album?.images ?? [], sortDirection),
     ({ pageParam: page = 0 }) =>
-      getImagesByIdInfiniteFunction(online, album?.images ?? [], {
-        showErrorsInSnackbar: true,
-        page,
-        pageSize: DEFAULT_PAGE_SIZE,
-      }),
+      getImagesByIdInfiniteFunction(
+        online,
+        album?.images ?? [],
+        sortDirection,
+        {
+          showErrorsInSnackbar: true,
+          page,
+          pageSize: DEFAULT_PAGE_SIZE,
+        }
+      ),
     getImagesByIdInfiniteOptions({ enabled: !!album?.images })
   );
   useInfiniteScroll(fetchNextPage, { canExecute: !isFetchingNextPage });
@@ -211,6 +218,8 @@ const Album = memo(() => {
             />
           ) : (
             <Images
+              sortDirection={sortDirection}
+              setSortDirection={setSortDirection}
               getImageProps={getImageProps}
               status={isRefetching ? "refetching" : imagesStatus}
               images={images}

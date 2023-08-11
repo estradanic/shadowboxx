@@ -57,9 +57,6 @@ const useStyles = makeStyles((theme: Theme) => ({
   breadcrumbs: {
     color: theme.palette.primary.contrastText,
   },
-  separator: {
-    lineHeight: "initial",
-  },
   lastCrumb: {
     fontWeight: "bold",
   },
@@ -125,11 +122,7 @@ const Header = ({ viewId, className, ...rest }: HeaderProps) => {
       </Toolbar>
       <Toolbar variant="dense">
         <Breadcrumbs
-          separator={
-            <Typography className={classes.separator} variant="overline">
-              🢒
-            </Typography>
-          }
+          separator={<Typography variant="overline">/</Typography>}
           className={classes.breadcrumbs}
         >
           {getBreadcrumbs(viewId).map((id) => (

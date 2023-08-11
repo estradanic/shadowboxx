@@ -310,7 +310,7 @@ export const ImageContextProvider = ({
     const processedFile = await processFile(file, notification);
     notification.update((prev) => ({
       ...prev,
-      title: `Uploading ${file.name}`,
+      title: Strings.message.uploading(file.name),
       icon: <CloudUploadIcon />,
       detail: <LinearProgress color={variableColor} variant="indeterminate" />,
     }));
@@ -333,7 +333,7 @@ export const ImageContextProvider = ({
           for (const file of files) {
             const notification = addNotification({
               id: `process-${file.name}`,
-              title: `Processing ${file.name}`,
+              title: Strings.message.processing(file.name),
               icon: <HourglassIcon />,
               removeable: false,
               detail: (
@@ -350,7 +350,7 @@ export const ImageContextProvider = ({
                   );
                   notification.update((prev) => ({
                     ...prev,
-                    title: `Uploaded ${file.name}`,
+                    title: Strings.message.uploaded(file.name),
                     icon: <CloudUploadIcon />,
                     removeable: true,
                     detail: undefined,

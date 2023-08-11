@@ -8,6 +8,7 @@ import { Strings } from "../../resources";
 const useStyles = makeStyles(() => ({
   svgContainer: {
     textAlign: "center",
+    width: "100%",
   },
   svgText: {
     fontSize: "medium",
