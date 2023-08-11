@@ -16,7 +16,6 @@ import Image, { ImageProps } from "./Image";
 import NoImages from "./NoImages";
 import useImageStyles from "./useImageStyles";
 import FancyTypography from "../Typography/FancyTypography";
-import useVirtualList from "../../hooks/useVirtualList";
 
 type UseStylesParams = {
   color: VariableColor;
@@ -33,7 +32,7 @@ const useStyles = makeStyles((theme: Theme) => ({
     transform: `translateY(-10%)`,
   },
   timeline: {
-    paddingTop: theme.spacing(4),
+    paddingTop: theme.spacing(8),
   },
   caption: {
     lineHeight: "normal",
@@ -77,6 +76,8 @@ export type TimelineProps = {
   outlineColor: VariableColor;
   /** Function to get ImageProps given a particulat image */
   getImageProps?: (image: ParseImage) => Promise<Partial<ImageProps>>;
+  /** Node to use as the FilterBar */
+  filterBar?: React.ReactNode;
 };
 
 /** Component showing a list of images in a timeline */
@@ -85,6 +86,7 @@ const Timeline = ({
   status,
   outlineColor,
   getImageProps,
+  filterBar,
 }: TimelineProps) => {
   const imageClasses = useImageStyles();
   const classes = useStyles({ color: outlineColor });
@@ -106,20 +108,19 @@ const Timeline = ({
     }
   }, [images, getImageProps, setImageProps]);
 
-  const virtualizedImages = useVirtualList(images);
-
+  let content: React.ReactNode;
   if (status === "loading" || (!images && status !== "error")) {
-    return <ImagesSkeleton />;
+    content = <ImagesSkeleton />;
   } else if (status === "error" || !images?.length) {
-    return <NoImages />;
+    content = <NoImages />;
   } else {
-    return (
-      <Grid item container className={imageClasses.imageContainer} xs={12}>
+    content = (
+      <>
         <MuiTimeline align="alternate" className={classes.timeline}>
-          {virtualizedImages?.map((image, i) => {
+          {images?.map((image, i) => {
             const right = i % 2;
             const isNewDay =
-              virtualizedImages[i - 1]?.dateTaken?.toLocaleDateString() !==
+              images[i - 1]?.dateTaken?.toLocaleDateString() !==
               image.dateTaken.toLocaleDateString();
             return (
               <TimelineItem key={image.id}>
@@ -167,9 +168,16 @@ const Timeline = ({
             );
           })}
         </MuiTimeline>
-      </Grid>
+      </>
     );
   }
+
+  return (
+    <Grid item container className={imageClasses.imageContainer} xs={12}>
+      {filterBar}
+      {content}
+    </Grid>
+  );
 };
 
 export default Timeline;

@@ -25,13 +25,15 @@ import { useView } from "../View";
 import OwnerImageDecoration from "../../components/Image/Decoration/OwnerImageDecoration";
 import useFlatInfiniteQueryData from "../../hooks/Query/useFlatInfiniteQueryData";
 import { FormControlLabel, Switch } from "@material-ui/core";
-import { SortDirection, VariableColor } from "../../types";
+import { VariableColor } from "../../types";
 import ShareImageDecoration from "../../components/Image/Decoration/ShareImageDecoration";
 import useRandomColor from "../../hooks/useRandomColor";
 import useQueryConfigs from "../../hooks/Query/useQueryConfigs";
 import useInfiniteQueryConfigs from "../../hooks/Query/useInfiniteQueryConfigs";
 import useInfiniteScroll from "../../hooks/useInfiniteScroll";
 import { useNetworkDetectionContext } from "../../contexts/NetworkDetectionContext";
+import useFilterBar from "../../components/FilterBar/useFilterBar";
+import FilterBar from "../../components/FilterBar/FilterBar";
 
 type UseStylesParams = {
   randomColor: VariableColor;
@@ -90,8 +92,8 @@ const Album = memo(() => {
     () => getAlbumFunction(online, id, { showErrorsInSnackbar: true }),
     getAlbumOptions()
   );
-  const [sortDirection, setSortDirection] =
-    useState<SortDirection>("ascending");
+  const { sortDirection, captionSearch, ...restFilterBarProps } =
+    useFilterBar();
   const {
     data,
     status: imagesStatus,
@@ -100,12 +102,16 @@ const Album = memo(() => {
     refetch,
     isRefetching,
   } = useInfiniteQuery<ParseImage[], Error>(
-    getImagesByIdInfiniteQueryKey(album?.images ?? [], sortDirection),
+    getImagesByIdInfiniteQueryKey(album?.images ?? [], {
+      sortDirection,
+      captionSearch,
+      captions: album?.captions,
+    }),
     ({ pageParam: page = 0 }) =>
       getImagesByIdInfiniteFunction(
         online,
         album?.images ?? [],
-        sortDirection,
+        { sortDirection, captionSearch, captions: album?.captions },
         {
           showErrorsInSnackbar: true,
           page,
@@ -154,6 +160,14 @@ const Album = memo(() => {
       };
     },
     [getImageDecorations, getImageCaption]
+  );
+
+  const filterBar = (
+    <FilterBar
+      captionSearch={captionSearch}
+      sortDirection={sortDirection}
+      {...restFilterBarProps}
+    />
   );
 
   return (
@@ -211,6 +225,7 @@ const Album = memo(() => {
           </Grid>
           {timelineView ? (
             <Timeline
+              filterBar={filterBar}
               getImageProps={getImageProps}
               status={isRefetching ? "refetching" : imagesStatus}
               images={images}
@@ -218,8 +233,7 @@ const Album = memo(() => {
             />
           ) : (
             <Images
-              sortDirection={sortDirection}
-              setSortDirection={setSortDirection}
+              filterBar={filterBar}
               getImageProps={getImageProps}
               status={isRefetching ? "refetching" : imagesStatus}
               images={images}

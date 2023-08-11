@@ -36,7 +36,6 @@ import { CaptionImageDecoration } from "../Image";
 import DateImageDecoration from "../Image/Decoration/DateImageDecoration";
 import useRandomColor from "../../hooks/useRandomColor";
 import useRefState from "../../hooks/useRefState";
-import useVirtualList from "../../hooks/useVirtualList";
 import { useImageContext } from "../../contexts/ImageContext";
 import useQueryConfigs from "../../hooks/Query/useQueryConfigs";
 import { useQuery } from "@tanstack/react-query";
@@ -224,8 +223,6 @@ const ImageField = memo(
       []
     );
 
-    const virtualizedImages = useVirtualList(value);
-
     return (
       <>
         {variant === "field" ? (
@@ -342,7 +339,7 @@ const ImageField = memo(
             />
             {multiple && !!value.length && (
               <Grid container className={classes.multiImageContainer}>
-                {virtualizedImages.map((image: ParseImage) => {
+                {value.map((image: ParseImage) => {
                   const imageDecorations = [
                     <RemoveImageDecoration
                       onClick={async () => {

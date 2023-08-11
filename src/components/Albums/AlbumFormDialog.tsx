@@ -76,11 +76,16 @@ const AlbumFormDialog = ({
   >(
     getImagesByIdInfiniteQueryKey(allImageIds),
     ({ pageParam: page = 0 }) =>
-      getImagesByIdInfiniteFunction(online, allImageIds, "descending", {
-        showErrorsInSnackbar: true,
-        page,
-        pageSize: DEFAULT_PAGE_SIZE,
-      }),
+      getImagesByIdInfiniteFunction(
+        online,
+        allImageIds,
+        { sortDirection: "descending" },
+        {
+          showErrorsInSnackbar: true,
+          page,
+          pageSize: DEFAULT_PAGE_SIZE,
+        }
+      ),
     getImagesByIdInfiniteOptions({
       refetchOnWindowFocus: false,
       enabled: open,

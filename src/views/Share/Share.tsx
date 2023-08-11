@@ -30,7 +30,6 @@ import useInfiniteScroll from "../../hooks/useInfiniteScroll";
 import useInfiniteQueryConfigs from "../../hooks/Query/useInfiniteQueryConfigs";
 import { useNavigate } from "react-router-dom";
 import useRandomColor from "../../hooks/useRandomColor";
-import useVirtualList from "../../hooks/useVirtualList";
 import {
   ImageContextProvider,
   useImageContext,
@@ -69,7 +68,6 @@ interface AlbumsListProps {
 }
 
 const AlbumsToShareTo = ({ albums, classes, files }: AlbumsListProps) => {
-  const virtualizedAlbums = useVirtualList(albums);
   const borderColor = useRandomColor();
   const { uploadImagesFromFiles } = useImageContext();
   const { enqueueErrorSnackbar } = useSnackbar();
@@ -82,7 +80,7 @@ const AlbumsToShareTo = ({ albums, classes, files }: AlbumsListProps) => {
       </FancyTypography>
       <br />
       <Grid item spacing={2} container className={classes.albumsContainer}>
-        {virtualizedAlbums.map((album) => (
+        {albums.map((album) => (
           <Grid item key={album.id}>
             <SmallAlbumCard
               className={classes.card}

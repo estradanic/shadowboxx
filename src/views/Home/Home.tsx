@@ -19,7 +19,6 @@ import { DEFAULT_PAGE_SIZE } from "../../constants";
 import NoAlbums from "../../components/Albums/NoAlbums";
 import { UnpersistedParseAlbum } from "../../classes";
 import useRandomColor from "../../hooks/useRandomColor";
-import useVirtualList from "../../hooks/useVirtualList";
 import useFlatInfiniteQueryData from "../../hooks/Query/useFlatInfiniteQueryData";
 import useInfiniteScroll from "../../hooks/useInfiniteScroll";
 import useInfiniteQueryConfigs from "../../hooks/Query/useInfiniteQueryConfigs";
@@ -75,7 +74,6 @@ const Home = memo(() => {
   const { getLoggedInUser } = useUserContext();
 
   const albums = useFlatInfiniteQueryData(data);
-  const virtualizedAlbums = useVirtualList(albums);
 
   const randomColor = useRandomColor();
 
@@ -84,7 +82,7 @@ const Home = memo(() => {
       <>
         {status === "success" && !!albums.length ? (
           <Grid item spacing={2} container className={classes.albumsContainer}>
-            {virtualizedAlbums.map((album) => (
+            {albums.map((album) => (
               <Grid key={album?.name} item xs={12} md={6} lg={4} xl={3}>
                 <AlbumCard
                   borderColor={randomColor}

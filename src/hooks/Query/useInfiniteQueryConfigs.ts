@@ -94,10 +94,13 @@ const useInfiniteQueryConfigs = () => {
     );
   };
 
+  type GetAllImagesInfiniteFilters = {
+    sortDirection: SortDirection;
+  };
   /** ["GET_ALL_IMAGES_INFINITE"] */
   const getAllImagesInfiniteQueryKey = (
-    sortDirection: SortDirection = "descending"
-  ) => [QueryCacheGroups.GET_ALL_IMAGES_INFINITE, sortDirection];
+    filters: GetAllImagesInfiniteFilters = { sortDirection: "descending" }
+  ) => [QueryCacheGroups.GET_ALL_IMAGES_INFINITE, filters];
   /** Defaults to default */
   const getAllImagesInfiniteOptions: InfiniteQueryOptionsFunction<
     ParseImage[]
@@ -108,26 +111,31 @@ const useInfiniteQueryConfigs = () => {
   /** Infinite function to get all images, sorted desc by createdAt */
   const getAllImagesInfiniteFunction = async (
     online: boolean,
-    sortDirection: SortDirection = "descending",
+    filters: GetAllImagesInfiniteFilters = { sortDirection: "descending" },
     options: InfiniteFunctionOptions = DEFAULT_FUNCTION_OPTIONS
   ): Promise<ParseImage[]> => {
     return await runFunctionInTryCatch<ParseImage[]>(
       async () => {
-        return await ParseImage.query(online)
-          [sortDirection](ParseImage.COLUMNS.dateTaken)
+        const query = ParseImage.query(online)
+          [filters.sortDirection](ParseImage.COLUMNS.dateTaken)
           .limit(options.pageSize)
-          .skip(options.page * options.pageSize)
-          .find();
+          .skip(options.page * options.pageSize);
+        return await query.find();
       },
       { errorMessage: Strings.message.noImages, ...options }
     );
   };
 
+  type GetImagesByIdInfiniteFilters = {
+    sortDirection: SortDirection;
+    captionSearch?: string;
+    captions?: Record<string, string>;
+  };
   /** ["GET_IMAGES_BY_ID_INFINITE", imageIds] */
   const getImagesByIdInfiniteQueryKey = (
     imageIds: string[],
-    sortDirection: SortDirection = "descending"
-  ) => [QueryCacheGroups.GET_IMAGES_BY_ID_INFINITE, imageIds, sortDirection];
+    filters: GetImagesByIdInfiniteFilters = { sortDirection: "descending" }
+  ) => [QueryCacheGroups.GET_IMAGES_BY_ID_INFINITE, imageIds, filters];
   /** Defaults to default */
   const getImagesByIdInfiniteOptions: InfiniteQueryOptionsFunction<
     ParseImage[]
@@ -139,17 +147,24 @@ const useInfiniteQueryConfigs = () => {
   const getImagesByIdInfiniteFunction = async (
     online: boolean,
     imageIds: string[],
-    sortDirection: SortDirection = "descending",
+    filters: GetImagesByIdInfiniteFilters = { sortDirection: "descending" },
     options: InfiniteFunctionOptions = DEFAULT_FUNCTION_OPTIONS
   ): Promise<ParseImage[]> => {
     return await runFunctionInTryCatch<ParseImage[]>(
       async () => {
-        return await ParseImage.query(online)
+        const query = ParseImage.query(online)
           .containedIn(ParseImage.COLUMNS.id, imageIds)
-          [sortDirection](ParseImage.COLUMNS.dateTaken)
+          [filters.sortDirection](ParseImage.COLUMNS.dateTaken)
           .limit(options.pageSize)
-          .skip(options.page * options.pageSize)
-          .find();
+          .skip(options.page * options.pageSize);
+        if (filters.captionSearch && filters.captions) {
+          const search = filters.captionSearch.toLowerCase();
+          const captions = Object.keys(filters.captions).filter((key) =>
+            filters.captions?.[key].toLowerCase().includes(search)
+          );
+          query.containedIn(ParseImage.COLUMNS.id, captions);
+        }
+        return await query.find();
       },
       { errorMessage: Strings.error.gettingImages, ...options }
     );

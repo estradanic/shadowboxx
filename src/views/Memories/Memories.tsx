@@ -33,7 +33,8 @@ import {
   useImageContext,
 } from "../../contexts/ImageContext";
 import { useNetworkDetectionContext } from "../../contexts/NetworkDetectionContext";
-import { SortDirection } from "../../types";
+import useFilterBar from "../../components/FilterBar/useFilterBar";
+import FilterBar from "../../components/FilterBar/FilterBar";
 
 const useStyles = makeStyles((theme: Theme) => ({
   actionContainer: {
@@ -108,8 +109,7 @@ const Memories = memo(() => {
   const [editMode, setEditMode] = useState<boolean>(false);
   const randomColor = useRandomColor();
   const { online } = useNetworkDetectionContext();
-  const [sortDirection, setSortDirection] =
-    useState<SortDirection>("descending");
+  const { sortDirection, ...restFilterBarProps } = useFilterBar();
   const {
     getAllImagesInfiniteFunction,
     getAllImagesInfiniteQueryKey,
@@ -123,13 +123,17 @@ const Memories = memo(() => {
     refetch,
     isRefetching,
   } = useInfiniteQuery<ParseImage[], Error>(
-    getAllImagesInfiniteQueryKey(sortDirection),
+    getAllImagesInfiniteQueryKey({ sortDirection }),
     ({ pageParam: page = 0 }) =>
-      getAllImagesInfiniteFunction(online, sortDirection, {
-        showErrorsInSnackbar: true,
-        page,
-        pageSize: DEFAULT_PAGE_SIZE,
-      }),
+      getAllImagesInfiniteFunction(
+        online,
+        { sortDirection },
+        {
+          showErrorsInSnackbar: true,
+          page,
+          pageSize: DEFAULT_PAGE_SIZE,
+        }
+      ),
     getAllImagesInfiniteOptions()
   );
   useInfiniteScroll(fetchNextPage, { canExecute: !isFetchingNextPage });
@@ -197,8 +201,13 @@ const Memories = memo(() => {
         </ImageContextProvider>
       )}
       <Images
-        sortDirection={sortDirection}
-        setSortDirection={setSortDirection}
+        filterBar={
+          <FilterBar
+            showCaptionSearch={false}
+            {...restFilterBarProps}
+            sortDirection={sortDirection}
+          />
+        }
         status={isRefetching ? "refetching" : status}
         images={images}
         outlineColor={randomColor}
