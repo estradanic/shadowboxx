@@ -121,7 +121,17 @@ const useInfiniteQueryConfigs = () => {
           [filters.sortDirection](ParseImage.COLUMNS.dateTaken)
           .limit(options.pageSize)
           .skip(options.page * options.pageSize);
-        const tagSearch = filters.tagSearch;
+        let tagSearch = filters.tagSearch;
+        if (tagSearch?.includes("video")) {
+          query.equalTo(ParseImage.COLUMNS.type, "video");
+          tagSearch = tagSearch.filter((tag) => tag !== "video");
+        } else if (tagSearch?.includes("image")) {
+          query.equalTo(ParseImage.COLUMNS.type, "image");
+          tagSearch = tagSearch.filter((tag) => tag !== "image");
+        } else if (tagSearch?.includes("gif")) {
+          query.equalTo(ParseImage.COLUMNS.type, "gif");
+          tagSearch = tagSearch.filter((tag) => tag !== "gif");
+        }
         if (tagSearch?.length) {
           query.containsAll(ParseImage.COLUMNS.tags, tagSearch);
         }
@@ -169,8 +179,19 @@ const useInfiniteQueryConfigs = () => {
           );
           query.containedIn(ParseImage.COLUMNS.objectId, captions);
         }
-        if (filters.tagSearch?.length) {
-          query.containsAll(ParseImage.COLUMNS.tags, filters.tagSearch);
+        let tagSearch = filters.tagSearch;
+        if (tagSearch?.includes("video")) {
+          query.equalTo(ParseImage.COLUMNS.type, "video");
+          tagSearch = tagSearch.filter((tag) => tag !== "video");
+        } else if (tagSearch?.includes("image")) {
+          query.equalTo(ParseImage.COLUMNS.type, "image");
+          tagSearch = tagSearch.filter((tag) => tag !== "image");
+        } else if (tagSearch?.includes("gif")) {
+          query.equalTo(ParseImage.COLUMNS.type, "gif");
+          tagSearch = tagSearch.filter((tag) => tag !== "gif");
+        }
+        if (tagSearch?.length) {
+          query.containsAll(ParseImage.COLUMNS.tags, tagSearch);
         }
         return await query.find();
       },

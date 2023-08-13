@@ -160,7 +160,7 @@ const FilterBar = ({
       {!!showTagSearch && (
         <Grid item xs={12} md={4} lg={3} xl={2} className={classes.controlGrid}>
           <Autocomplete<string, true, false, true>
-            options={tagOptions}
+            options={[...tagOptions, "video", "image", "gif"]}
             value={tagSearch}
             fullWidth
             multiple
@@ -168,6 +168,17 @@ const FilterBar = ({
             inputValue={tagSearchInputValue}
             filterSelectedOptions
             disableCloseOnSelect
+            getOptionSelected={(option) => {
+              if (
+                ["video", "image", "gif"].includes(option) &&
+                (tagSearch.includes("video") ||
+                  tagSearch.includes("image") ||
+                  tagSearch.includes("gif"))
+              ) {
+                return true;
+              }
+              return tagSearch.includes(option);
+            }}
             onInputChange={(_, newInputValue) => {
               if (newInputValue.endsWith(" ") || newInputValue.endsWith(",")) {
                 setTagSearch(
