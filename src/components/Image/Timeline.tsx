@@ -101,7 +101,7 @@ const Timeline = ({
           const newImageProps = await getImageProps(image);
           setImageProps((prev) => ({
             ...prev,
-            [image.id]: newImageProps,
+            [image.objectId]: newImageProps,
           }));
         }
       });
@@ -123,7 +123,7 @@ const Timeline = ({
               images[i - 1]?.dateTaken?.toLocaleDateString() !==
               image.dateTaken.toLocaleDateString();
             return (
-              <TimelineItem key={image.id}>
+              <TimelineItem key={image.objectId}>
                 <TimelineOppositeContent
                   className={classes.oppositeContent}
                   style={right ? { paddingRight: 0 } : { paddingLeft: 0 }}
@@ -147,9 +147,9 @@ const Timeline = ({
                     parseImage={image}
                     showFullResolutionOnClick={true}
                     variant="bordered-no-padding"
-                    {...imageProps[image.id]}
+                    {...imageProps[image.objectId]}
                   />
-                  {imageProps[image.id]?.caption && (
+                  {imageProps[image.objectId]?.caption && (
                     <div className={classes.captionContainer}>
                       <Typography
                         className={classes.caption}
@@ -159,7 +159,7 @@ const Timeline = ({
                             : { marginRight: "auto" }
                         }
                       >
-                        {imageProps[image.id]?.caption}
+                        {imageProps[image.objectId]?.caption}
                       </Typography>
                     </div>
                   )}

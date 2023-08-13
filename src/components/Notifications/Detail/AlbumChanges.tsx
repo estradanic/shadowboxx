@@ -68,7 +68,7 @@ const AlbumChangesNotificationDetail = ({
           return undefined;
         }
         return oldData.filter(
-          (notification) => notification.id !== albumChange.id
+          (notification) => notification.objectId !== albumChange.objectId
         );
       }
     );

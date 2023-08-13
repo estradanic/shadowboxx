@@ -28,7 +28,7 @@ const notifyOfAlbumChange = async (album: ParseAlbum, user?: ParseUser) => {
           albumOwner.email,
         ])
         .find({ useMasterKey: true })
-    ).filter((u) => u.id !== user?.id),
+    ).filter((u) => u.objectId !== user?.objectId),
     getObjectId
   );
   console.log("Got users to notify", { usersToNotify });

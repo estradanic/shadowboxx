@@ -26,6 +26,10 @@ export interface AlbumAttributes {
   captions: { [imageId: string]: string };
 }
 
+type AlbumKeys = Required<{
+  [key in keyof AlbumAttributes]: key;
+}>;
+
 export interface AlbumSaveContext {
   /** Array of image ids removed from the album */
   removedImages?: ParsifyPointers<"Album">["images"];
@@ -49,38 +53,33 @@ export interface AlbumSaveContext {
   captions?: ParsifyPointers<"Album">["captions"];
 }
 
-class AlbumColumns extends Columns {
-  /** User that owns the album */
+class AlbumColumns extends Columns implements AlbumKeys {
   owner = "owner" as const;
-  /** Images in the album */
   images = "images" as const;
-  /** Name of the album */
   name = "name" as const;
-  /** Description of the album */
   description = "description" as const;
-  /** Collaborators with "put" access */
   collaborators = "collaborators" as const;
-  /** Collaborators with "view" access */
   viewers = "viewers" as const;
-  /** First image in album, or user selected cover image */
   coverImage = "coverImage" as const;
-  /** Map of image id to captions */
   captions = "captions" as const;
 }
 
 /**
  * Class wrapping the Parse.Album class and providing convenience methods/properties
  */
-export default class ParseAlbum extends ParseObject<"Album"> {
+export default class ParseAlbum
+  extends ParseObject<"Album">
+  implements AlbumAttributes
+{
   /** Columns for the Album class */
   static COLUMNS = new AlbumColumns();
 
   static sort(albums: ParseAlbum[], favoriteAlbums?: string[]) {
     return [...albums].sort((a, b) => {
       if (favoriteAlbums) {
-        if (a.id && favoriteAlbums.includes(a.id)) {
+        if (a.objectId && favoriteAlbums.includes(a.objectId)) {
           return -1;
-        } else if (b.id && favoriteAlbums.includes(b.id)) {
+        } else if (b.objectId && favoriteAlbums.includes(b.objectId)) {
           return 1;
         }
       }
@@ -157,7 +156,7 @@ export default class ParseAlbum extends ParseObject<"Album"> {
       ...attributes,
       owner: attributes.owner.toNativePointer(),
       coverImage: attributes.coverImage?.toNativePointer(),
-      objectId: this.id,
+      objectId: this.objectId,
       createdAt: this.createdAt,
       updatedAt: this.updatedAt,
     };
@@ -165,17 +164,15 @@ export default class ParseAlbum extends ParseObject<"Album"> {
     return this.save(changes);
   }
 
-  /** Pointer to the owner of this album */
-  get owner(): Attributes<"Album">["owner"] {
-    return new ParsePointer(this._album.get(ParseAlbum.COLUMNS.owner));
+  get owner() {
+    return new ParsePointer<"_User">(this._album.get(ParseAlbum.COLUMNS.owner));
   }
 
   set owner(owner) {
     this._album.set(ParseAlbum.COLUMNS.owner, owner.toNativePointer());
   }
 
-  /** List of image ids */
-  get images(): Attributes<"Album">["images"] {
+  get images() {
     return this._album.get(ParseAlbum.COLUMNS.images);
   }
 
@@ -183,8 +180,7 @@ export default class ParseAlbum extends ParseObject<"Album"> {
     this._album.set(ParseAlbum.COLUMNS.images, images);
   }
 
-  /** Name of the album */
-  get name(): Attributes<"Album">["name"] {
+  get name() {
     return this._album.get(ParseAlbum.COLUMNS.name);
   }
 
@@ -192,8 +188,7 @@ export default class ParseAlbum extends ParseObject<"Album"> {
     this._album.set(ParseAlbum.COLUMNS.name, name);
   }
 
-  /** Description for this album */
-  get description(): Attributes<"Album">["description"] {
+  get description() {
     return this._album.get(ParseAlbum.COLUMNS.description);
   }
 
@@ -201,8 +196,7 @@ export default class ParseAlbum extends ParseObject<"Album"> {
     this._album.set(ParseAlbum.COLUMNS.description, description);
   }
 
-  /** List of collaborator emails */
-  get collaborators(): Attributes<"Album">["collaborators"] {
+  get collaborators() {
     return this._album.get(ParseAlbum.COLUMNS.collaborators);
   }
 
@@ -210,8 +204,7 @@ export default class ParseAlbum extends ParseObject<"Album"> {
     this._album.set(ParseAlbum.COLUMNS.collaborators, collaborators);
   }
 
-  /** List of viewer emails */
-  get viewers(): Attributes<"Album">["viewers"] {
+  get viewers() {
     return this._album.get(ParseAlbum.COLUMNS.viewers);
   }
 
@@ -219,13 +212,12 @@ export default class ParseAlbum extends ParseObject<"Album"> {
     this._album.set(ParseAlbum.COLUMNS.viewers, viewers);
   }
 
-  /** Pointer to the cover image for this album */
-  get coverImage(): Attributes<"Album">["coverImage"] {
+  get coverImage() {
     const coverImage = this._album.get(ParseAlbum.COLUMNS.coverImage);
     if (coverImage) {
-      return new ParsePointer(coverImage);
+      return new ParsePointer<"Image">(coverImage);
     }
-    return new ParsePointer({
+    return new ParsePointer<"Image">({
       objectId: this.images[0],
       className: "Image",
       __type: "Object",
@@ -239,8 +231,7 @@ export default class ParseAlbum extends ParseObject<"Album"> {
     );
   }
 
-  /** Map of image ids to captions */
-  get captions(): Attributes<"Album">["captions"] {
+  get captions() {
     return this._album.get(ParseAlbum.COLUMNS.captions);
   }
 
@@ -290,7 +281,7 @@ export class UnpersistedParseAlbum extends ParseAlbum {
     );
   }
 
-  get id(): Attributes<"Album">["objectId"] {
+  get objectId(): Attributes<"Album">["objectId"] {
     console.warn("Unpersisted album has no id");
     return "";
   }

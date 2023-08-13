@@ -21,7 +21,7 @@ const equal = <T extends ParseObject<ClassName>>(a: In<T>, b: In<T>) => {
       return false;
     }
     page.forEach((object, j) => {
-      if (object.id !== b?.pages[i][j].id) {
+      if (object.objectId !== b?.pages[i][j].objectId) {
         equal = false;
         return false;
       }

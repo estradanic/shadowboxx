@@ -69,7 +69,7 @@ const useInfiniteQueryConfigs = () => {
           options.page === 0
             ? await ParseAlbum.query(online)
                 .containedIn(
-                  ParseAlbum.COLUMNS.id,
+                  ParseAlbum.COLUMNS.objectId,
                   getLoggedInUser().favoriteAlbums
                 )
                 .descending(ParseAlbum.COLUMNS.updatedAt)
@@ -78,7 +78,7 @@ const useInfiniteQueryConfigs = () => {
             : [];
         const nonFavoriteAlbums = await ParseAlbum.query(online)
           .notContainedIn(
-            ParseAlbum.COLUMNS.id,
+            ParseAlbum.COLUMNS.objectId,
             getLoggedInUser().favoriteAlbums
           )
           .descending(ParseAlbum.COLUMNS.updatedAt)
@@ -94,9 +94,10 @@ const useInfiniteQueryConfigs = () => {
     );
   };
 
-  type GetAllImagesInfiniteFilters = {
+  interface GetAllImagesInfiniteFilters {
     sortDirection: SortDirection;
-  };
+    tagSearch?: string[];
+  }
   /** ["GET_ALL_IMAGES_INFINITE"] */
   const getAllImagesInfiniteQueryKey = (
     filters: GetAllImagesInfiniteFilters = { sortDirection: "descending" }
@@ -120,17 +121,21 @@ const useInfiniteQueryConfigs = () => {
           [filters.sortDirection](ParseImage.COLUMNS.dateTaken)
           .limit(options.pageSize)
           .skip(options.page * options.pageSize);
+        const tagSearch = filters.tagSearch;
+        if (tagSearch?.length) {
+          query.containsAll(ParseImage.COLUMNS.tags, tagSearch);
+        }
         return await query.find();
       },
       { errorMessage: Strings.message.noImages, ...options }
     );
   };
 
-  type GetImagesByIdInfiniteFilters = {
+  interface GetImagesByIdInfiniteFilters extends GetAllImagesInfiniteFilters {
     sortDirection: SortDirection;
     captionSearch?: string;
     captions?: Record<string, string>;
-  };
+  }
   /** ["GET_IMAGES_BY_ID_INFINITE", imageIds] */
   const getImagesByIdInfiniteQueryKey = (
     imageIds: string[],
@@ -153,7 +158,7 @@ const useInfiniteQueryConfigs = () => {
     return await runFunctionInTryCatch<ParseImage[]>(
       async () => {
         const query = ParseImage.query(online)
-          .containedIn(ParseImage.COLUMNS.id, imageIds)
+          .containedIn(ParseImage.COLUMNS.objectId, imageIds)
           [filters.sortDirection](ParseImage.COLUMNS.dateTaken)
           .limit(options.pageSize)
           .skip(options.page * options.pageSize);
@@ -162,7 +167,10 @@ const useInfiniteQueryConfigs = () => {
           const captions = Object.keys(filters.captions).filter((key) =>
             filters.captions?.[key].toLowerCase().includes(search)
           );
-          query.containedIn(ParseImage.COLUMNS.id, captions);
+          query.containedIn(ParseImage.COLUMNS.objectId, captions);
+        }
+        if (filters.tagSearch?.length) {
+          query.containsAll(ParseImage.COLUMNS.tags, filters.tagSearch);
         }
         return await query.find();
       },
@@ -173,7 +181,7 @@ const useInfiniteQueryConfigs = () => {
   /** ["GET_IMAGES_BY_OWNER_INFINITE", owner.id] */
   const getImagesByOwnerInfiniteQueryKey = (owner: ParseUser) => [
     QueryCacheGroups.GET_IMAGES_BY_OWNER_INFINITE,
-    owner.id,
+    owner.objectId,
   ];
   /** Defaults to default + refetch on window focus: false */
   const getImagesByOwnerInfiniteOptions: InfiniteQueryOptionsFunction<
@@ -236,7 +244,7 @@ const useInfiniteQueryConfigs = () => {
                 )
               )
                 .containedIn(
-                  ParseAlbum.COLUMNS.id,
+                  ParseAlbum.COLUMNS.objectId,
                   getLoggedInUser().favoriteAlbums
                 )
                 .descending(ParseAlbum.COLUMNS.updatedAt)
@@ -254,7 +262,7 @@ const useInfiniteQueryConfigs = () => {
           )
         )
           .notContainedIn(
-            ParseAlbum.COLUMNS.id,
+            ParseAlbum.COLUMNS.objectId,
             getLoggedInUser().favoriteAlbums
           )
           .descending(ParseAlbum.COLUMNS.updatedAt)

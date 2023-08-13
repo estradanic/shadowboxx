@@ -92,7 +92,7 @@ const ImageSelectionDialog = ({
       if (!imageId) {
         return false;
       }
-      return value.findIndex((image) => image.id === imageId) !== -1;
+      return value.findIndex((image) => image.objectId === imageId) !== -1;
     },
     [value]
   );
@@ -100,15 +100,17 @@ const ImageSelectionDialog = ({
   const getImageProps = useCallback(
     async (image: ParseImage): Promise<Partial<ImageProps>> => ({
       className: classNames({
-        [classes.selected]: isSelected(image.id),
-        [classes.unselected]: !isSelected(image.id),
+        [classes.selected]: isSelected(image.objectId),
+        [classes.unselected]: !isSelected(image.objectId),
       }),
       showFullResolutionOnClick: false,
       onClick: () => {
         if (multiple) {
-          if (isSelected(image.id)) {
+          if (isSelected(image.objectId)) {
             setValue((prev) =>
-              prev.filter((selectedImage) => selectedImage.id !== image.id)
+              prev.filter(
+                (selectedImage) => selectedImage.objectId !== image.objectId
+              )
             );
           } else {
             setValue((prev) => [...prev, image]);

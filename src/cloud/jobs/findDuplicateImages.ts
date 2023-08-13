@@ -56,7 +56,7 @@ const findDuplicateImages = async () => {
         console.log(`Getting batch ${page} for image ${image.name}`);
         const otherImages = await ParseImage.cloudQuery(Parse)
           .equalTo(ParseImage.COLUMNS.owner, user.toNativePointer())
-          .notEqualTo(ParseImage.COLUMNS.objectId, image.id)
+          .notEqualTo(ParseImage.COLUMNS.objectId, image.objectId)
           .ascending(ParseImage.COLUMNS.createdAt)
           .limit(pageSize)
           .skip(page * pageSize)

@@ -153,9 +153,9 @@ const ImageField = memo(
     const { getImageUrlFunction, getImageUrlOptions, getImageUrlQueryKey } =
       useQueryConfigs();
     const { data: mobileUrl } = useQuery<string, Error>(
-      getImageUrlQueryKey(value[0]?.id ?? "", "mobile"),
-      () => getImageUrlFunction(value[0]?.id ?? "", "mobile"),
-      getImageUrlOptions({ enabled: !!value[0]?.id })
+      getImageUrlQueryKey(value[0]?.objectId ?? "", "mobile"),
+      () => getImageUrlFunction(value[0]?.objectId ?? "", "mobile"),
+      getImageUrlOptions({ enabled: !!value[0]?.objectId })
     );
 
     const [anchorEl, setAnchorEl] = useState<Element>();
@@ -363,7 +363,7 @@ const ImageField = memo(
                     );
                   }
                   if (coverImage) {
-                    const checked = coverImage.id === image.id;
+                    const checked = coverImage.id === image.objectId;
                     imageDecorations.push(
                       <CoverImageDecoration
                         checked={checked}
@@ -384,7 +384,7 @@ const ImageField = memo(
                       lg={4}
                       item
                       className={classes.imageWrapper}
-                      key={image.id}
+                      key={image.objectId}
                     >
                       <Image
                         borderColor={randomColor}

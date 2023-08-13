@@ -20,23 +20,25 @@ export interface DuplicateAttributes {
   acknowledged: boolean;
 }
 
-class DuplicateColumns extends Columns {
-  /** User that owns image1 and image2 */
+type DuplicateKeys = Required<{
+  [key in keyof DuplicateAttributes]: key;
+}>;
+
+class DuplicateColumns extends Columns implements DuplicateKeys {
   owner = "owner" as const;
-  /** The first image */
   image1 = "image1" as const;
-  /** The second image */
   image2 = "image2" as const;
-  /** How similar the images are (0 - 1) */
   similarity = "similarity" as const;
-  /** Whether the duplicate has been acknowledged by the user */
   acknowledged = "acknowledged" as const;
 }
 
 /**
  * Class wrapping the Parse.Duplicate class and providing convenience methods/properties
  */
-export default class ParseDuplicate extends ParseObject<"Duplicate"> {
+export default class ParseDuplicate
+  extends ParseObject<"Duplicate">
+  implements DuplicateAttributes
+{
   /** Columns for the Duplicate class */
   static COLUMNS = new DuplicateColumns();
 
@@ -79,27 +81,22 @@ export default class ParseDuplicate extends ParseObject<"Duplicate"> {
     await this._duplicate.save();
   }
 
-  /** User that owns image1 and image2 */
   get owner(): Attributes<"Duplicate">["owner"] {
     return new ParsePointer(this._duplicate.get(ParseDuplicate.COLUMNS.owner));
   }
 
-  /** User that owns image1 and image2 */
   get image1(): Attributes<"Duplicate">["image1"] {
     return new ParsePointer(this._duplicate.get(ParseDuplicate.COLUMNS.image1));
   }
 
-  /** The second image */
   get image2(): Attributes<"Duplicate">["image2"] {
     return new ParsePointer(this._duplicate.get(ParseDuplicate.COLUMNS.image2));
   }
 
-  /** How similar the images are (0 - 1) */
   get similarity(): Attributes<"Duplicate">["similarity"] {
     return this._duplicate.get(ParseDuplicate.COLUMNS.similarity);
   }
 
-  /** Whether the duplicate has been acknowledged by the user */
   get acknowledged(): Attributes<"Duplicate">["acknowledged"] {
     return this._duplicate.get(ParseDuplicate.COLUMNS.acknowledged);
   }

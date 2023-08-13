@@ -92,7 +92,7 @@ const Album = memo(() => {
     () => getAlbumFunction(online, id, { showErrorsInSnackbar: true }),
     getAlbumOptions()
   );
-  const { sortDirection, captionSearch, ...restFilterBarProps } =
+  const { sortDirection, captionSearch, tagSearch, ...restFilterBarProps } =
     useFilterBar();
   const {
     data,
@@ -106,12 +106,13 @@ const Album = memo(() => {
       sortDirection,
       captionSearch,
       captions: album?.captions,
+      tagSearch,
     }),
     ({ pageParam: page = 0 }) =>
       getImagesByIdInfiniteFunction(
         online,
         album?.images ?? [],
-        { sortDirection, captionSearch, captions: album?.captions },
+        { sortDirection, captionSearch, captions: album?.captions, tagSearch },
         {
           showErrorsInSnackbar: true,
           page,
@@ -145,7 +146,7 @@ const Album = memo(() => {
 
   const getImageCaption = useCallback(
     async (image: ParseImage) => {
-      return album?.captions?.[image.id] ?? "";
+      return album?.captions?.[image.objectId] ?? "";
     },
     [album?.captions]
   );
@@ -164,6 +165,7 @@ const Album = memo(() => {
 
   const filterBar = (
     <FilterBar
+      tagSearch={tagSearch}
       captionSearch={captionSearch}
       sortDirection={sortDirection}
       {...restFilterBarProps}

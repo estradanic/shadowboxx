@@ -30,34 +30,35 @@ export interface ImageAttributes {
   /** Hash of the image for comparisons */
   hash?: string;
   /** Type of the image */
-  type?: ImageType;
+  type: ImageType;
+  /** Tags on the image */
+  tags?: string[];
 }
 
-class ImageColumns extends Columns {
-  /** The actual saved file */
+type ImageKeys = Required<{
+  [key in keyof ImageAttributes]: key;
+}>;
+
+class ImageColumns extends Columns implements ImageKeys {
   file = "file" as const;
-  /** User that owns this image */
   owner = "owner" as const;
-  /** Name of the image */
   name = "name" as const;
-  /** The file resized for mobile */
   fileMobile = "fileMobile" as const;
-  /** The file resized for thumbnails */
   fileThumb = "fileThumb" as const;
-  /** The file in png format for older iPhones */
   fileLegacy = "fileLegacy" as const;
-  /** Date that the image was taken */
   dateTaken = "dateTaken" as const;
-  /** Hash of the image for comparisons */
   hash = "hash" as const;
-  /** Type of the image */
   type = "type" as const;
+  tags = "tags" as const;
 }
 
 /**
  * Class wrapping the Parse.Image class and providing convenience methods/properties
  */
-export default class ParseImage extends ParseObject<"Image"> {
+export default class ParseImage
+  extends ParseObject<"Image">
+  implements ImageAttributes
+{
   /**
    * Get a Parse.Query for the "Image" class. For client code only.
    * @param online Whether to query online, defaults to true
@@ -98,10 +99,10 @@ export default class ParseImage extends ParseObject<"Image"> {
   ): ParseImage[] {
     if (coverImage) {
       return [...images].sort((a, b) => {
-        if (a.id === coverImage.id) {
+        if (a.objectId === coverImage.id) {
           return -1;
         }
-        if (b.id === coverImage.id) {
+        if (b.objectId === coverImage.id) {
           return 1;
         }
         return a.compareTo(b);
@@ -178,8 +179,7 @@ export default class ParseImage extends ParseObject<"Image"> {
     return this._image.dirty(column);
   }
 
-  /** The actual saved file */
-  get file(): Attributes<"Image">["file"] {
+  get file() {
     return this._image.get(ParseImage.COLUMNS.file);
   }
 
@@ -187,8 +187,7 @@ export default class ParseImage extends ParseObject<"Image"> {
     this._image.set(ParseImage.COLUMNS.file, file);
   }
 
-  /** Thumbnail size of the file */
-  get fileThumb(): Attributes<"Image">["fileThumb"] {
+  get fileThumb() {
     return (
       this._image.get(ParseImage.COLUMNS.fileThumb) ??
       this.fileMobile ??
@@ -200,8 +199,7 @@ export default class ParseImage extends ParseObject<"Image"> {
     this._image.set(ParseImage.COLUMNS.fileThumb, fileThumb);
   }
 
-  /** Mobile size of the file (700px max edge) */
-  get fileMobile(): Attributes<"Image">["fileMobile"] {
+  get fileMobile() {
     return this._image.get(ParseImage.COLUMNS.fileMobile) ?? this.file;
   }
 
@@ -209,8 +207,7 @@ export default class ParseImage extends ParseObject<"Image"> {
     this._image.set(ParseImage.COLUMNS.fileMobile, fileMobile);
   }
 
-  /** PNG version of the file for mobile Safari and IE */
-  get fileLegacy(): Attributes<"Image">["fileLegacy"] {
+  get fileLegacy() {
     if (this.type !== "image") {
       return this.file;
     }
@@ -221,17 +218,15 @@ export default class ParseImage extends ParseObject<"Image"> {
     this._image.set(ParseImage.COLUMNS.fileLegacy, fileLegacy);
   }
 
-  /** Pointer to user who owns the image */
-  get owner(): Attributes<"Image">["owner"] {
-    return new ParsePointer(this._image.get(ParseImage.COLUMNS.owner));
+  get owner() {
+    return new ParsePointer<"_User">(this._image.get(ParseImage.COLUMNS.owner));
   }
 
   set owner(owner) {
     this._image.set(ParseImage.COLUMNS.owner, owner.toNativePointer());
   }
 
-  /** Image name */
-  get name(): Attributes<"Image">["name"] {
+  get name() {
     return (
       this._image.get(ParseImage.COLUMNS.name) ??
       removeExtension(this.file.name())
@@ -242,8 +237,7 @@ export default class ParseImage extends ParseObject<"Image"> {
     this._image.set(ParseImage.COLUMNS.name, name);
   }
 
-  /** Date that the image was taken */
-  get dateTaken(): Required<Attributes<"Image">>["dateTaken"] {
+  get dateTaken() {
     return this._image.get(ParseImage.COLUMNS.dateTaken) ?? this.createdAt;
   }
 
@@ -251,18 +245,24 @@ export default class ParseImage extends ParseObject<"Image"> {
     this._image.set(ParseImage.COLUMNS.dateTaken, dateTaken);
   }
 
-  /** Type of the image */
-  get type(): Attributes<"Image">["type"] {
+  get type() {
     return this._image.get(ParseImage.COLUMNS.type) ?? "image";
   }
 
-  /** Hash of the image for comparisons */
-  get hash(): Attributes<"Image">["hash"] {
+  get hash() {
     return this._image.get(ParseImage.COLUMNS.hash);
   }
 
   set hash(hash) {
     this._image.set(ParseImage.COLUMNS.hash, hash);
+  }
+
+  get tags() {
+    return this._image.get(ParseImage.COLUMNS.tags);
+  }
+
+  set tags(tags) {
+    this._image.set(ParseImage.COLUMNS.tags, tags);
   }
 
   hasBeenResized() {
@@ -301,7 +301,7 @@ export class UnpersistedParseImage extends ParseImage {
     );
   }
 
-  get id(): Attributes<"Image">["objectId"] {
+  get objectId(): Attributes<"Image">["objectId"] {
     console.warn("Unpersisted image has no id");
     return "";
   }

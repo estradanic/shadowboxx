@@ -188,13 +188,13 @@ const AlbumCard = memo(({ value, onChange, borderColor }: AlbumCardProps) => {
   const { getLoggedInUser, updateLoggedInUser } = useUserContext();
   const isViewer = useMemo(
     () =>
-      getLoggedInUser().id !== value.owner.id &&
+      getLoggedInUser().objectId !== value.owner.id &&
       !value.collaborators.includes(getLoggedInUser().email) &&
       value.viewers.includes(getLoggedInUser().email),
     [getLoggedInUser, value.owner.id, value.collaborators, value.viewers]
   );
   const isOwner = useMemo(
-    () => getLoggedInUser().id === value.owner.id,
+    () => getLoggedInUser().objectId === value.owner.id,
     [getLoggedInUser, value.owner.id]
   );
 
@@ -231,13 +231,14 @@ const AlbumCard = memo(({ value, onChange, borderColor }: AlbumCardProps) => {
   const closeMenu = () => setAnchorEl(undefined);
 
   const navigateToAlbum = () => {
-    if (value?.id) {
-      navigate(routes.Album.path.replace(":id", value.id), location);
+    if (value?.objectId) {
+      navigate(routes.Album.path.replace(":id", value.objectId), location);
     }
   };
 
   const [isFavorite, setIsFavorite] = useState(
-    !!value.id && getLoggedInUser().favoriteAlbums.includes(value.id)
+    !!value.objectId &&
+      getLoggedInUser().favoriteAlbums.includes(value.objectId)
   );
 
   const save = async (
@@ -364,22 +365,22 @@ const AlbumCard = memo(({ value, onChange, borderColor }: AlbumCardProps) => {
               <IconButton
                 name="favorite"
                 onClick={async () => {
-                  if (!value.id) {
+                  if (!value.objectId) {
                     return;
                   }
                   if (isFavorite) {
                     getLoggedInUser().favoriteAlbums.splice(
-                      getLoggedInUser().favoriteAlbums.indexOf(value.id),
+                      getLoggedInUser().favoriteAlbums.indexOf(value.objectId),
                       1
                     );
                   } else {
-                    getLoggedInUser().favoriteAlbums.push(value.id);
+                    getLoggedInUser().favoriteAlbums.push(value.objectId);
                   }
                   getLoggedInUser().update(async (loggedInUser, reason) => {
                     await updateLoggedInUser(loggedInUser, reason);
                     setIsFavorite(
-                      !!value.id &&
-                        loggedInUser.favoriteAlbums.includes(value.id)
+                      !!value.objectId &&
+                        loggedInUser.favoriteAlbums.includes(value.objectId)
                     );
                   });
                 }}
@@ -397,10 +398,10 @@ const AlbumCard = memo(({ value, onChange, borderColor }: AlbumCardProps) => {
                   variant="button"
                   value={images ?? []}
                   onAdd={async (...images) => {
-                    if (!value.id) {
+                    if (!value.objectId) {
                       return;
                     }
-                    const imageIds = images.map((image) => image.id);
+                    const imageIds = images.map((image) => image.objectId);
                     const newAttributes = { ...value.attributes };
                     newAttributes.images.push(...imageIds);
                     await save(newAttributes, { addedImages: imageIds });

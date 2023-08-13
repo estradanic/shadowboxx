@@ -79,7 +79,7 @@ const ShareImageDecoration = ({
 
   const downloadImage = async (image: ParseImage) => {
     const base64: string = await Parse.Cloud.run("getImage", {
-      imageId: image.id,
+      imageId: image.objectId,
       variant: "full",
     });
     const buffer = Buffer.from(base64, "base64");
@@ -110,7 +110,7 @@ const ShareImageDecoration = ({
   const downloadOther = async (image: ParseImage) => {
     const type = image.type === "gif" ? "image/gif" : "video/mp4";
     const base64: string = await Parse.Cloud.run("getImage", {
-      imageId: image.id,
+      imageId: image.objectId,
       variant: "full",
     });
     const buffer = Buffer.from(base64, "base64");

@@ -40,7 +40,7 @@ const Images = ({
           const newImageProps = await getImageProps(image);
           setImageProps((prev) => ({
             ...prev,
-            [image.id]: newImageProps,
+            [image.objectId]: newImageProps,
           }));
         }
       });
@@ -56,12 +56,12 @@ const Images = ({
     content = (
       <>
         {images.map((image) => (
-          <Grid key={image.id} item xs={12} md={6} lg={4} xl={3}>
+          <Grid key={image.objectId} item xs={12} md={6} lg={4} xl={3}>
             <Image
               borderColor={outlineColor}
               parseImage={image}
               showFullResolutionOnClick={true}
-              {...imageProps[image.id]}
+              {...imageProps[image.objectId]}
             />
           </Grid>
         ))}

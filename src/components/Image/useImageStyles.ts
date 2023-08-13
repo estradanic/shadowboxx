@@ -8,7 +8,7 @@ const useImageStyles = makeStyles((theme: Theme) => ({
   },
   unselected: {
     margin: theme.spacing(1),
-    "& > *": {
+    "& picture, & video": {
       opacity: 0.3,
     },
     cursor: "pointer",

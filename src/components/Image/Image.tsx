@@ -144,23 +144,23 @@ const Image = memo(
     const { getImageUrlFunction, getImageUrlOptions, getImageUrlQueryKey } =
       useQueryConfigs();
     const { data: mobileUrl } = useQuery<string, Error>(
-      getImageUrlQueryKey(parseImage.id, "mobile"),
-      () => getImageUrlFunction(parseImage.id, "mobile"),
+      getImageUrlQueryKey(parseImage.objectId, "mobile"),
+      () => getImageUrlFunction(parseImage.objectId, "mobile"),
       getImageUrlOptions({
-        enabled: !!parseImage.id && parseImage.type === "image",
+        enabled: !!parseImage.objectId && parseImage.type === "image",
       })
     );
     const { data: legacyUrl } = useQuery<string, Error>(
-      getImageUrlQueryKey(parseImage.id, "legacy"),
-      () => getImageUrlFunction(parseImage.id, "legacy"),
+      getImageUrlQueryKey(parseImage.objectId, "legacy"),
+      () => getImageUrlFunction(parseImage.objectId, "legacy"),
       getImageUrlOptions({
-        enabled: !!parseImage.id && parseImage.type === "image",
+        enabled: !!parseImage.objectId && parseImage.type === "image",
       })
     );
     const { data: fullUrl } = useQuery<string, Error>(
-      getImageUrlQueryKey(parseImage.id, "full"),
-      () => getImageUrlFunction(parseImage.id, "full"),
-      getImageUrlOptions({ enabled: !!parseImage.id })
+      getImageUrlQueryKey(parseImage.objectId, "full"),
+      () => getImageUrlFunction(parseImage.objectId, "full"),
+      getImageUrlOptions({ enabled: !!parseImage.objectId })
     );
     if (variant === "contained") {
       classes.image = "";

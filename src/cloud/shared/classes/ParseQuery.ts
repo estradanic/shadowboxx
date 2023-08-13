@@ -458,6 +458,10 @@ export default class ParseQuery<C extends ClassName> {
     this._query = this._query.withinRadians(key, point, maxDistance);
     return this;
   }
+  select<K extends keyof P<C>["attributes"]>(...keys: K[]): this {
+    this._query = this._query.select(...keys);
+    return this;
+  }
   toNativeQuery() {
     return this._query;
   }

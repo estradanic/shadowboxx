@@ -6,7 +6,7 @@ import EditIcon from "@material-ui/icons/Edit";
 import DeleteIcon from "@material-ui/icons/Delete";
 import AddIcon from "@material-ui/icons/Add";
 import { makeStyles, Theme } from "@material-ui/core/styles";
-import { useInfiniteQuery } from "@tanstack/react-query";
+import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
 import { SnackbarKey } from "notistack";
 import {
   FancyTitleTypography,
@@ -35,6 +35,9 @@ import {
 import { useNetworkDetectionContext } from "../../contexts/NetworkDetectionContext";
 import useFilterBar from "../../components/FilterBar/useFilterBar";
 import FilterBar from "../../components/FilterBar/FilterBar";
+import TagsImageDecoration from "../../components/Image/Decoration/TagsImageDecoration";
+import DateImageDecoration from "../../components/Image/Decoration/DateImageDecoration";
+import useQueryConfigs from "../../hooks/Query/useQueryConfigs";
 
 const useStyles = makeStyles((theme: Theme) => ({
   actionContainer: {
@@ -69,7 +72,7 @@ const ActionBar = ({ selectedImages, images, onDelete }: ActionBarProps) => {
             Strings.message.deleteImagesConfirm,
             async () => {
               const imagesToDelete = images.filter((image) =>
-                selectedImages.includes(image.id)
+                selectedImages.includes(image.objectId)
               );
               await Promise.all(
                 imagesToDelete.map((image) => deleteImage(image))
@@ -109,12 +112,19 @@ const Memories = memo(() => {
   const [editMode, setEditMode] = useState<boolean>(false);
   const randomColor = useRandomColor();
   const { online } = useNetworkDetectionContext();
-  const { sortDirection, ...restFilterBarProps } = useFilterBar();
+  const { sortDirection, tagSearch, ...restFilterBarProps } = useFilterBar();
   const {
     getAllImagesInfiniteFunction,
     getAllImagesInfiniteQueryKey,
     getAllImagesInfiniteOptions,
   } = useInfiniteQueryConfigs();
+  const { getAllTagsFunction, getAllTagsQueryKey, getAllTagsOptions } =
+    useQueryConfigs();
+  const { data: allTags } = useQuery<string[], Error>(
+    getAllTagsQueryKey(),
+    getAllTagsFunction,
+    getAllTagsOptions()
+  );
   const {
     data,
     status,
@@ -123,11 +133,11 @@ const Memories = memo(() => {
     refetch,
     isRefetching,
   } = useInfiniteQuery<ParseImage[], Error>(
-    getAllImagesInfiniteQueryKey({ sortDirection }),
+    getAllImagesInfiniteQueryKey({ sortDirection, tagSearch }),
     ({ pageParam: page = 0 }) =>
       getAllImagesInfiniteFunction(
         online,
-        { sortDirection },
+        { sortDirection, tagSearch },
         {
           showErrorsInSnackbar: true,
           page,
@@ -149,21 +159,50 @@ const Memories = memo(() => {
     }
   }, [online, setEditMode, closeSnackbar, snackbarKey]);
 
+  const getImageDecorations = useCallback(
+    (image: ParseImage) => {
+      if (editMode) {
+        return [
+          <TagsImageDecoration
+            options={allTags}
+            initialTags={image.tags}
+            onConfirm={async (tags) => {
+              image.tags = tags;
+              await image.save();
+            }}
+          />,
+          <DateImageDecoration
+            corner="topLeft"
+            initialDate={image.dateTaken}
+            onConfirm={async (date) => {
+              image.dateTaken = date;
+              await image.save();
+            }}
+          />,
+        ];
+      }
+      return [];
+    },
+    [editMode, allTags]
+  );
+
   const getImageProps = useCallback(
     async (image: ParseImage): Promise<Partial<ImageProps>> => ({
       className: classNames({
-        [imageClasses.selected]: editMode && selectedImages.includes(image.id),
+        [imageClasses.selected]:
+          editMode && selectedImages.includes(image.objectId),
         [imageClasses.unselected]:
-          editMode && !selectedImages.includes(image.id),
+          editMode && !selectedImages.includes(image.objectId),
       }),
       showFullResolutionOnClick: !editMode,
+      decorations: getImageDecorations(image),
       onClick: editMode
         ? () => {
             setSelectedImages((prev) => {
-              if (prev.includes(image.id)) {
-                return prev.filter((id) => id !== image.id);
+              if (prev.includes(image.objectId)) {
+                return prev.filter((id) => id !== image.objectId);
               }
-              return [...prev, image.id];
+              return [...prev, image.objectId];
             });
           }
         : undefined,
@@ -174,6 +213,7 @@ const Memories = memo(() => {
       editMode,
       imageClasses.selected,
       imageClasses.unselected,
+      getImageDecorations,
     ]
   );
 
@@ -206,6 +246,8 @@ const Memories = memo(() => {
             showCaptionSearch={false}
             {...restFilterBarProps}
             sortDirection={sortDirection}
+            tagSearch={tagSearch}
+            tagOptions={allTags}
           />
         }
         status={isRefetching ? "refetching" : status}

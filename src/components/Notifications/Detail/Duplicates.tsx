@@ -89,7 +89,7 @@ const DuplicatesNotificationDetail = ({
     try {
       startGlobalLoader();
       const ignoredDuplicates = duplicates.filter(
-        (duplicate) => !duplicateIds.includes(duplicate.id)
+        (duplicate) => !duplicateIds.includes(duplicate.objectId)
       );
       await Promise.all(
         ignoredDuplicates.map((duplicate) => duplicate.acknowledge())
@@ -110,7 +110,7 @@ const DuplicatesNotificationDetail = ({
   };
 
   const reset = () => {
-    setDuplicateIds(duplicates.map((duplicate) => duplicate.id));
+    setDuplicateIds(duplicates.map((duplicate) => duplicate.objectId));
   };
 
   const resolveDialogPortalNode = useMemo(() => createHtmlPortalNode(), []);
@@ -121,7 +121,7 @@ const DuplicatesNotificationDetail = ({
         {images && (
           <Grid container spacing={2}>
             {duplicates.map((duplicate) => (
-              <Grid item container xs={12} key={duplicate.id}>
+              <Grid item container xs={12} key={duplicate.objectId}>
                 <Grid item xs={12} container>
                   <Grid item xs={6}>
                     <Image
@@ -129,7 +129,7 @@ const DuplicatesNotificationDetail = ({
                       showFullResolutionOnClick
                       parseImage={
                         images.find(
-                          (image) => image.id === duplicate.image1.id
+                          (image) => image.objectId === duplicate.image1.id
                         )!
                       }
                     />
@@ -140,7 +140,7 @@ const DuplicatesNotificationDetail = ({
                       showFullResolutionOnClick
                       parseImage={
                         images.find(
-                          (image) => image.id === duplicate.image2.id
+                          (image) => image.objectId === duplicate.image2.id
                         )!
                       }
                     />
@@ -151,13 +151,18 @@ const DuplicatesNotificationDetail = ({
                     control={
                       <Switch
                         color="primary"
-                        checked={duplicateIds.includes(duplicate.id)}
+                        checked={duplicateIds.includes(duplicate.objectId)}
                         onChange={(event) => {
                           if (event.target.checked) {
-                            setDuplicateIds([...duplicateIds, duplicate.id]);
+                            setDuplicateIds([
+                              ...duplicateIds,
+                              duplicate.objectId,
+                            ]);
                           } else {
                             setDuplicateIds(
-                              duplicateIds.filter((id) => id !== duplicate.id)
+                              duplicateIds.filter(
+                                (id) => id !== duplicate.objectId
+                              )
                             );
                           }
                         }}

@@ -19,21 +19,27 @@ export interface AlbumChangeNotificationAttributes {
   owner: ParsePointer<"_User">;
 }
 
-class AlbumChangeNotificationColumns extends Columns {
-  /** Album that was changed */
+type AlbumChangedNotificationKeys = Required<{
+  [key in keyof AlbumChangeNotificationAttributes]: key;
+}>;
+
+class AlbumChangeNotificationColumns
+  extends Columns
+  implements AlbumChangedNotificationKeys
+{
   album = "album" as const;
-  /** User that changed the album */
   user = "user" as const;
-  /** The number of unacknowledged changes */
   count = "count" as const;
-  /** User that is being notified ("owns" this notification) */
   owner = "owner" as const;
 }
 
 /**
  * Class wrapping the Parse.AlbumChangeNotification class and providing convenience methods/properties
  */
-export default class ParseAlbumChangeNotification extends ParseObject<"AlbumChangeNotification"> {
+export default class ParseAlbumChangeNotification
+  extends ParseObject<"AlbumChangeNotification">
+  implements AlbumChangeNotificationAttributes
+{
   /** Columns for the AlbumChangeNotification class */
   static COLUMNS = new AlbumChangeNotificationColumns();
 
@@ -159,7 +165,7 @@ export class UnpersistedParseAlbumChangeNotification extends ParseAlbumChangeNot
     );
   }
 
-  get id(): Attributes<"AlbumChangeNotification">["objectId"] {
+  get objectId(): Attributes<"AlbumChangeNotification">["objectId"] {
     console.warn("Unpersisted albumChangeNotification has no id");
     return "";
   }

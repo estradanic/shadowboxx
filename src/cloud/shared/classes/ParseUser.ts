@@ -33,6 +33,10 @@ export interface UserAttributes {
   verificationCode?: string;
 }
 
+type UserKeys = Required<{
+  [key in keyof UserAttributes]: key;
+}>;
+
 export type UpdateLoggedInUser = (
   loggedInUser: ParseUser,
   reason: UserUpdateReason
@@ -45,35 +49,27 @@ export enum UserUpdateReason {
   LOG_OUT,
 }
 
-class UserColumns extends Columns {
-  /** Password for login */
+class UserColumns extends Columns implements UserKeys {
   password = "password" as const;
-  /** Email address */
   email = "email" as const;
-  /** Last name */
   lastName = "lastName" as const;
-  /** First name */
   firstName: "firstName" = "firstName";
-  /** Whether dark theme is enabled */
   isDarkThemeEnabled = "isDarkThemeEnabled" as const;
-  /** Pointer to Image record for profile picture */
   profilePicture = "profilePicture" as const;
-  /** Username (email) for login */
   username = "username" as const;
-  /** List of favorited album ids */
   favoriteAlbums = "favoriteAlbums" as const;
-  /** Old email address in case of email change */
   oldEmail = "oldEmail" as const;
-  /** Whether detailed logging is turned on for this user */
   isLoggingEnabled = "isLoggingEnabled" as const;
-  /** Ephemeral verification code for email changes */
   verificationCode = "verificationCode" as const;
 }
 
 /**
  * Class wrapping the Parse.User class and providing convenience methods/properties
  */
-export default class ParseUser extends ParseObject<"_User"> {
+export default class ParseUser
+  extends ParseObject<"_User">
+  implements UserAttributes
+{
   /**
    * Columns for the Parse.User ("_User") class
    */
@@ -151,7 +147,7 @@ export default class ParseUser extends ParseObject<"_User"> {
    * @returns Hashstring of the ParseUser
    */
   hashString(): string {
-    return this.id ?? `${this.firstName}${this.lastName}${this.email}`;
+    return this.objectId ?? `${this.firstName}${this.lastName}${this.email}`;
   }
 
   /**
@@ -259,7 +255,6 @@ export default class ParseUser extends ParseObject<"_User"> {
     }
   }
 
-  /** This user's username */
   get username(): UserAttributes["username"] {
     return this._user.get(ParseUser.COLUMNS.username);
   }
@@ -272,7 +267,6 @@ export default class ParseUser extends ParseObject<"_User"> {
     this._user.setPassword(password);
   }
 
-  /** This user's email */
   get email(): UserAttributes["email"] {
     return (
       this._user.get(ParseUser.COLUMNS.email) ??
@@ -285,7 +279,6 @@ export default class ParseUser extends ParseObject<"_User"> {
     this._user.setEmail(email);
   }
 
-  /** This user's last name */
   get lastName(): UserAttributes["lastName"] {
     return this._user.get(ParseUser.COLUMNS.lastName);
   }
@@ -294,7 +287,6 @@ export default class ParseUser extends ParseObject<"_User"> {
     this._user.set(ParseUser.COLUMNS.lastName, lastName);
   }
 
-  /** This user's first name */
   get firstName(): UserAttributes["firstName"] {
     return this._user.get(ParseUser.COLUMNS.firstName);
   }
@@ -303,7 +295,6 @@ export default class ParseUser extends ParseObject<"_User"> {
     this._user.set(ParseUser.COLUMNS.firstName, firstName);
   }
 
-  /** This user's full name */
   get name(): string {
     if (this.firstName && this.lastName) {
       return `${this.firstName} ${this.lastName}`;
@@ -311,7 +302,6 @@ export default class ParseUser extends ParseObject<"_User"> {
     return this.email;
   }
 
-  /** Whether the user has dark theme enabled */
   get isDarkThemeEnabled(): UserAttributes["isDarkThemeEnabled"] {
     return this._user.get(ParseUser.COLUMNS.isDarkThemeEnabled);
   }
@@ -320,10 +310,11 @@ export default class ParseUser extends ParseObject<"_User"> {
     this._user.set(ParseUser.COLUMNS.isDarkThemeEnabled, isDarkThemeEnabled);
   }
 
-  /** This user's profile picture, if it exists */
   get profilePicture(): UserAttributes["profilePicture"] {
     const profilePicture = this._user.get(ParseUser.COLUMNS.profilePicture);
-    return profilePicture ? new ParsePointer(profilePicture) : undefined;
+    return profilePicture
+      ? new ParsePointer<"Image">(profilePicture)
+      : undefined;
   }
 
   set profilePicture(profilePicture) {
@@ -333,7 +324,6 @@ export default class ParseUser extends ParseObject<"_User"> {
     );
   }
 
-  /** This user's list of favorited albums */
   get favoriteAlbums(): UserAttributes["favoriteAlbums"] {
     return this._user.get(ParseUser.COLUMNS.favoriteAlbums);
   }
@@ -342,7 +332,6 @@ export default class ParseUser extends ParseObject<"_User"> {
     this._user.set(ParseUser.COLUMNS.favoriteAlbums, favoriteAlbums);
   }
 
-  /** Old email in case of email change */
   get oldEmail(): UserAttributes["oldEmail"] {
     return this._user.get(ParseUser.COLUMNS.oldEmail);
   }
@@ -351,12 +340,10 @@ export default class ParseUser extends ParseObject<"_User"> {
     this._user.set(ParseUser.COLUMNS.oldEmail, oldEmail);
   }
 
-  /** Whether server logging is enabled for this user */
   get isLoggingEnabled(): UserAttributes["isLoggingEnabled"] {
     return this._user.get(ParseUser.COLUMNS.isLoggingEnabled);
   }
 
-  /** Ephemeral verification code for email changes */
   get verificationCode(): UserAttributes["verificationCode"] {
     return this._user.get(ParseUser.COLUMNS.verificationCode);
   }
@@ -399,7 +386,7 @@ export class UnpersistedParseUser extends ParseUser {
     );
   }
 
-  get id(): Attributes<"_User">["objectId"] {
+  get objectId(): Attributes<"_User">["objectId"] {
     console.warn("Unpersisted user has no id");
     return "";
   }

@@ -50,8 +50,8 @@ const setAlbumPermissions = async (album: ParseAlbum) => {
   const owner = await ParseUser.cloudQuery(Parse)
     .equalTo(ParseUser.COLUMNS.objectId, getObjectId(album.owner))
     .first({ useMasterKey: true });
-  const readRoleName = `${album.id}_r`;
-  const readWriteRoleName = `${album.id}_rw`;
+  const readRoleName = `${album.objectId}_r`;
+  const readWriteRoleName = `${album.objectId}_rw`;
   let readRole = new Parse.Role(readRoleName, new Parse.ACL());
   let readWriteRole = new Parse.Role(readWriteRoleName, new Parse.ACL());
   if (album.existed()) {

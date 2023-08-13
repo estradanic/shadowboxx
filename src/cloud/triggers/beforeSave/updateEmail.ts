@@ -3,9 +3,9 @@ import { ParseAlbum, ParseUser, Strings } from "../../shared";
 
 /** Function to update references to a user's email address when it changes */
 const updateEmail = async (user: ParseUser) => {
-  console.log("Updating email for user", user.id, "to", user.email);
+  console.log("Updating email for user", user.objectId, "to", user.email);
   const oldUser = await ParseUser.cloudQuery(Parse)
-    .equalTo(ParseUser.COLUMNS.objectId, user.id)
+    .equalTo(ParseUser.COLUMNS.objectId, user.objectId)
     .first({ useMasterKey: true });
 
   if (!oldUser) {
@@ -25,7 +25,7 @@ const updateEmail = async (user: ParseUser) => {
     return;
   }
 
-  console.log("Getting albums referencing old email for user", user.id);
+  console.log("Getting albums referencing old email for user", user.objectId);
   const albumsReferencingOldEmail = await Parse.Query.or(
     ParseAlbum.cloudQuery(Parse).contains(
       ParseAlbum.COLUMNS.collaborators,
@@ -34,7 +34,7 @@ const updateEmail = async (user: ParseUser) => {
     ParseAlbum.cloudQuery(Parse).contains(ParseAlbum.COLUMNS.viewers, oldEmail)
   ).find({ useMasterKey: true });
 
-  console.log("Updating albums referencing old email for user", user.id);
+  console.log("Updating albums referencing old email for user", user.objectId);
   for (const album of albumsReferencingOldEmail) {
     console.log("Updating album", album.get(ParseAlbum.COLUMNS.name));
     const collaborators = album.get(ParseAlbum.COLUMNS.collaborators);
@@ -55,7 +55,7 @@ const updateEmail = async (user: ParseUser) => {
     });
     console.log("Updated album", album.get(ParseAlbum.COLUMNS.name));
   }
-  console.log("Updated albums referencing old email for user", user.id);
+  console.log("Updated albums referencing old email for user", user.objectId);
 };
 
 export default loggerWrapper("updateEmail", updateEmail);

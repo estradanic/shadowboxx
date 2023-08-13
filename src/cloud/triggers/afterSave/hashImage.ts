@@ -20,19 +20,19 @@ const hashImage = async (image: ParseImage) => {
   }
   const file = image.fileThumb ?? image.fileMobile ?? image.file;
   if (!file) {
-    console.error("No file found for image", image.id);
+    console.error("No file found for image", image.objectId);
     return;
   }
   const { buffer } = await Parse.Cloud.httpRequest({
     url: file.url(),
   });
   if (!buffer) {
-    console.error("Could not get buffer for image", image.id);
+    console.error("Could not get buffer for image", image.objectId);
     return;
   }
   const imageData = getImageData(await imageFromBuffer(buffer));
   if (!imageData) {
-    console.error("Could not get ImageData for image", image.id);
+    console.error("Could not get ImageData for image", image.objectId);
     return;
   }
   const hash = hexToBinary(bmvbhash(imageData, 16));

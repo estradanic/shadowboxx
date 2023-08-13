@@ -1,19 +1,23 @@
-import React from "react";
-import { makeStyles, Theme, useTheme } from "@material-ui/core/styles";
+import React, { useState, KeyboardEvent } from "react";
+import { makeStyles, Theme } from "@material-ui/core/styles";
+import Autocomplete from "@material-ui/lab/Autocomplete";
 import Grid from "@material-ui/core/Grid";
 import CloseIcon from "@material-ui/icons/Close";
 import useFilterBar from "./useFilterBar";
 import { Button, IconButton } from "../Button";
 import { TextField } from "../Field";
 import { Strings } from "../../resources";
-import useMediaQuery from "@material-ui/core/useMediaQuery";
-import classNames from "classnames";
+import Tag from "../Tag/Tag";
 
 export interface FilterBarProps extends ReturnType<typeof useFilterBar> {
   /** Whether to show the sort direction buttons */
   showSortDirection?: boolean;
   /** Whether to show the caption search */
   showCaptionSearch?: boolean;
+  /** Whether to show the tag search */
+  showTagSearch?: boolean;
+  /** Options for the tag field */
+  tagOptions?: string[];
 }
 
 const useStyles = makeStyles((theme: Theme) => ({
@@ -25,7 +29,6 @@ const useStyles = makeStyles((theme: Theme) => ({
     borderRadius: theme.shape.borderRadius,
   },
   buttonText: {
-    padding: theme.spacing(2, 3),
     color: theme.palette.primary.contrastText,
     "&:hover,&:focus": {
       backgroundColor: theme.palette.primary.light,
@@ -37,19 +40,22 @@ const useStyles = makeStyles((theme: Theme) => ({
     },
   },
   buttonContained: {
-    padding: theme.spacing(2, 3),
     cursor: "default",
     "&,&:hover,&:focus,&:active": {
       backgroundColor: theme.palette.background.paper,
       color: theme.palette.text.primary,
     },
   },
-  firstButton: {
-    marginRight: theme.spacing(1),
+  button: {
+    flexGrow: 1,
   },
-  mobileButtons: {
-    justifyContent: "space-between",
-    marginBottom: theme.spacing(2),
+  controlGrid: {
+    padding: theme.spacing(0, 1),
+    gap: theme.spacing(0.5),
+    minHeight: theme.spacing(7),
+    [theme.breakpoints.down("xs")]: {
+      marginBottom: theme.spacing(1),
+    },
   },
 }));
 
@@ -58,12 +64,33 @@ const FilterBar = ({
   setSortDirection,
   captionSearch,
   setCaptionSearch,
+  tagSearch,
+  setTagSearch,
   showSortDirection = true,
   showCaptionSearch = true,
+  showTagSearch = true,
+  tagOptions = [],
 }: FilterBarProps) => {
   const classes = useStyles();
-  const theme = useTheme();
-  const xs = useMediaQuery(theme.breakpoints.down("xs"));
+  const [tagSearchInputValue, setTagSearchInputValue] = useState("");
+
+  const onKeyDown = (event: KeyboardEvent) => {
+    switch (event.key) {
+      case "Enter":
+      case " ":
+      case ",":
+      case "Tab": {
+        if (tagSearchInputValue.length > 0) {
+          setTagSearch(tagSearch.concat([tagSearchInputValue]));
+          setTagSearchInputValue("");
+        }
+        event.preventDefault();
+        break;
+      }
+      default:
+    }
+  };
+
   return (
     <Grid
       xs={12}
@@ -76,19 +103,18 @@ const FilterBar = ({
     >
       {!!showSortDirection && (
         <Grid
-          className={classNames({ [classes.mobileButtons]: xs })}
+          className={classes.controlGrid}
           item
           container
           xs={12}
           md={4}
-          lg={3}
           xl={2}
         >
           <Button
-            className={classes.firstButton}
             classes={{
               text: classes.buttonText,
               contained: classes.buttonContained,
+              root: classes.button,
             }}
             variant={sortDirection === "ascending" ? "contained" : "text"}
             onClick={() => setSortDirection("ascending")}
@@ -100,6 +126,7 @@ const FilterBar = ({
             classes={{
               text: classes.buttonText,
               contained: classes.buttonContained,
+              root: classes.button,
             }}
             variant={sortDirection === "descending" ? "contained" : "text"}
             onClick={() => setSortDirection("descending")}
@@ -110,7 +137,7 @@ const FilterBar = ({
         </Grid>
       )}
       {!!showCaptionSearch && (
-        <Grid item xs={12} md={4} lg={3} xl={2}>
+        <Grid item xs={12} md={4} lg={3} xl={2} className={classes.controlGrid}>
           <TextField
             fullWidth
             InputProps={{
@@ -127,6 +154,65 @@ const FilterBar = ({
             label={Strings.label.captionSearch}
             value={captionSearch}
             onChange={(e) => setCaptionSearch(e.target.value)}
+          />
+        </Grid>
+      )}
+      {!!showTagSearch && (
+        <Grid item xs={12} md={4} lg={3} xl={2} className={classes.controlGrid}>
+          <Autocomplete<string, true, false, true>
+            options={tagOptions}
+            value={tagSearch}
+            fullWidth
+            multiple
+            freeSolo
+            inputValue={tagSearchInputValue}
+            filterSelectedOptions
+            disableCloseOnSelect
+            onInputChange={(_, newInputValue) => {
+              if (newInputValue.endsWith(" ") || newInputValue.endsWith(",")) {
+                setTagSearch(
+                  tagSearch.concat([
+                    newInputValue.substring(0, newInputValue.length - 1),
+                  ])
+                );
+                setTagSearchInputValue("");
+              } else {
+                setTagSearchInputValue(newInputValue);
+              }
+            }}
+            onChange={(_, newTags) => {
+              setTagSearch(newTags);
+            }}
+            renderInput={(props) => (
+              <TextField
+                {...props}
+                InputProps={{
+                  ...props.InputProps,
+                  endAdornment: !!tagSearch.length && (
+                    <IconButton
+                      contrastText={false}
+                      color="error"
+                      onClick={() => setTagSearch([])}
+                    >
+                      <CloseIcon />
+                    </IconButton>
+                  ),
+                }}
+                label={Strings.label.tagSearch}
+                onKeyDown={onKeyDown}
+                onBlur={() => {
+                  if (tagSearchInputValue.length > 0) {
+                    setTagSearch(tagSearch.concat([tagSearchInputValue]));
+                    setTagSearchInputValue("");
+                  }
+                }}
+              />
+            )}
+            renderTags={(value, getTagProps) => {
+              return value.map((option, index) => (
+                <Tag label={option} {...getTagProps({ index })} key={index} />
+              ));
+            }}
           />
         </Grid>
       )}

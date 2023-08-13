@@ -43,29 +43,29 @@ const resolveDuplicates = async (
         continue;
       }
       const albumsToCorrect = await ParseAlbum.cloudQuery(Parse)
-        .contains(ParseAlbum.COLUMNS.images, imageToDelete.id)
+        .contains(ParseAlbum.COLUMNS.images, imageToDelete.objectId)
         .find({ useMasterKey: true });
       for (const album of albumsToCorrect) {
         try {
           console.log("Correcting album", album.get(ParseAlbum.COLUMNS.name));
           const imageIds: string[] = album.get(ParseAlbum.COLUMNS.images);
-          if (imageIds.includes(imageToKeep.id)) {
+          if (imageIds.includes(imageToKeep.objectId)) {
             album.set(
               ParseAlbum.COLUMNS.images,
-              imageIds.filter((id) => id !== imageToDelete.id)
+              imageIds.filter((id) => id !== imageToDelete.objectId)
             );
           } else {
             album.set(
               ParseAlbum.COLUMNS.images,
               imageIds.map((id) =>
-                id === imageToDelete.id ? imageToKeep.id : id
+                id === imageToDelete.objectId ? imageToKeep.objectId : id
               )
             );
           }
           await album.save(null, {
             useMasterKey: true,
             context: {
-              removedImages: [imageToDelete.id],
+              removedImages: [imageToDelete.objectId],
             },
           });
         } catch (error) {
@@ -78,7 +78,7 @@ const resolveDuplicates = async (
       }
       if (user) {
         await user.cloudFetch();
-        if (getObjectId(user.profilePicture) === imageToDelete.id) {
+        if (getObjectId(user.profilePicture) === imageToDelete.objectId) {
           console.log("Fixing profile picture for user", user.email);
           user.profilePicture = imageToKeep.toPointer();
           await user.cloudSave({

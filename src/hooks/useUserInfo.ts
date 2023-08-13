@@ -48,7 +48,7 @@ const useUserInfo = ({
   userPointer,
   queryFunctionOptions,
   queryOptions,
-  queryKey = email ?? userPointer?.id ?? user?.id,
+  queryKey = email ?? userPointer?.id ?? user?.objectId,
 }: UseUserInfoParams): ParseUser | undefined => {
   const [memoizedQueryKey] = useState<string | undefined>(queryKey);
   if (!memoizedQueryKey) {

@@ -1,4 +1,10 @@
-import React, { ForwardedRef, useCallback, useMemo } from "react";
+import React, {
+  ForwardedRef,
+  useCallback,
+  useMemo,
+  forwardRef,
+  useState,
+} from "react";
 import { makeStyles, Theme } from "@material-ui/core/styles";
 import NotesIcon from "@material-ui/icons/Notes";
 import Icon, { IconProps } from "@material-ui/core/Icon";
@@ -6,7 +12,6 @@ import classNames from "classnames";
 import { createHtmlPortalNode, InPortal } from "react-reverse-portal";
 import { Strings } from "../../../resources";
 import ImageDecoration, { ImageDecorationProps } from "./ImageDecoration";
-import { forwardRef } from "react";
 import { useActionDialogContext } from "../../Dialog/ActionDialog";
 import { TextField } from "../../Field";
 import useRefState from "../../../hooks/useRefState";
@@ -42,19 +47,21 @@ const CaptionImageDecorationIcon = forwardRef(
 /** Image decoration component to add/edit captions */
 const CaptionImageDecoration = ({
   corner = "bottomLeft",
-  className: userClassName,
+  className: piClassName,
   IconProps = {},
-  initialCaption,
+  initialCaption: piInitialCaption = "",
   onConfirm,
   ...rest
 }: CaptionImageDecorationProps) => {
   const classes = useStyles();
   const { openPrompt } = useActionDialogContext();
   const captionPortalNode = useMemo(() => createHtmlPortalNode(), []);
+  const [initialCaption, setInitialCaption] = useState(piInitialCaption);
   const [captionRef, caption, setCaption] = useRefState(initialCaption);
 
   const handleConfirm = useCallback(async () => {
     onConfirm(captionRef.current);
+    setInitialCaption(captionRef.current);
   }, [onConfirm, captionRef]);
 
   const handleCancel = useCallback(async () => {
@@ -84,7 +91,7 @@ const CaptionImageDecoration = ({
           fontSize: "large",
           ...IconProps,
         }}
-        className={classNames(classes.root, userClassName)}
+        className={classNames(classes.root, piClassName)}
         {...rest}
       />
     </>

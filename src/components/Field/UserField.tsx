@@ -4,7 +4,7 @@ import React, {
   useState,
   KeyboardEvent,
 } from "react";
-import { Autocomplete, AutocompleteProps } from "@material-ui/lab";
+import Autocomplete, { AutocompleteProps } from "@material-ui/lab/Autocomplete";
 import UserChip from "../User/UserChip";
 import TextField from "../Field/TextField";
 import { makeStyles, Theme } from "@material-ui/core/styles";

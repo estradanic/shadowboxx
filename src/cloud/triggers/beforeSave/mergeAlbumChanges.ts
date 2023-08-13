@@ -18,10 +18,10 @@ const mergeAlbumChanges = async (
       album.dirty(ParseAlbum.COLUMNS.coverImage)
     )
   ) {
-    console.log("No changes to merge in album", album.id);
+    console.log("No changes to merge in album", album.objectId);
     return;
   }
-  console.log("Merging changes in album", album.id);
+  console.log("Merging changes in album", album.objectId);
 
   const attributes = album.attributes;
 
@@ -87,7 +87,7 @@ const mergeAlbumChanges = async (
     coverImage = image?.toPointer();
   }
 
-  console.log("Saving album", album.id);
+  console.log("Saving album", album.objectId);
   album.set({
     ...attributes,
     owner: attributes.owner.toNativePointer(),

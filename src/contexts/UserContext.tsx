@@ -107,7 +107,7 @@ export const UserContextProvider = ({ children }: UserContextProviderProps) => {
           newLoggedInUser.profilePicture?.id &&
           (reason === UpdateReason.LOG_IN ||
             reason === UpdateReason.SIGN_UP ||
-            newLoggedInUser.profilePicture?.id !== profilePicture?.id)
+            newLoggedInUser.profilePicture?.id !== profilePicture?.objectId)
         ) {
           const profilePictureResponse = await ParseImage.query(online)
             .equalTo("objectId", newLoggedInUser.profilePicture.id)
@@ -122,7 +122,7 @@ export const UserContextProvider = ({ children }: UserContextProviderProps) => {
       setLoggedInUser,
       setProfilePicture,
       loggedInUser,
-      profilePicture?.id,
+      profilePicture?.objectId,
       redirectPath,
       location.pathname,
       navigate,

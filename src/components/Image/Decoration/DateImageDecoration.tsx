@@ -1,4 +1,4 @@
-import React, { ForwardedRef, useCallback, useMemo } from "react";
+import React, { ForwardedRef, useCallback, useMemo, useState } from "react";
 import { makeStyles, Theme } from "@material-ui/core/styles";
 import CalendarIcon from "@material-ui/icons/DateRange";
 import Icon, { IconProps } from "@material-ui/core/Icon";
@@ -18,6 +18,10 @@ const useStyles = makeStyles((theme: Theme) => ({
     color: theme.palette.primary.contrastText,
     borderRadius: "100%",
     border: `2px solid ${theme.palette.primary.contrastText}`,
+    display: "flex",
+    "& > svg": {
+      margin: "auto",
+    },
   },
 }));
 
@@ -45,19 +49,21 @@ const DateImageDecoration = ({
   corner = "topRight",
   className: userClassName,
   IconProps = {},
-  initialDate,
+  initialDate: piInitialDate = new Date(),
   onConfirm,
   ...rest
 }: DateImageDecorationProps) => {
   const classes = useStyles();
   const { openPrompt } = useActionDialogContext();
   const datePortalNode = useMemo(() => createHtmlPortalNode(), []);
+  const [initialDate, setInitialDate] = useState(piInitialDate);
   const [dateRef, date, setDate] = useRefState(
     DateTime.fromJSDate(initialDate)
   );
 
   const handleConfirm = useCallback(async () => {
     await onConfirm(dateRef.current.toJSDate());
+    setInitialDate(dateRef.current.toJSDate());
   }, [onConfirm, dateRef]);
 
   const handleCancel = useCallback(async () => {

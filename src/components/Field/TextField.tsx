@@ -6,9 +6,10 @@ import { makeStyles, Theme } from "@material-ui/core/styles";
 
 const useStyles = makeStyles((theme: Theme) => ({
   root: {
-    "&& > div": {
+    "&&& > div": {
       backgroundColor: theme.palette.background.paper,
       borderRadius: "4px",
+      paddingRight: 0,
     },
     "&& > label": {
       color: theme.palette.text.primary,

@@ -4,10 +4,10 @@ import { ParseAlbum } from "../../shared";
 /** Function to delete roles associated with this album */
 const deleteRoles = async (album: ParseAlbum) => {
   const readRole = await new Parse.Query(Parse.Role)
-    .equalTo("name", `${album.id}_r`)
+    .equalTo("name", `${album.objectId}_r`)
     .first({ useMasterKey: true });
   const readWriteRole = await new Parse.Query(Parse.Role)
-    .equalTo("name", `${album.id}_rw`)
+    .equalTo("name", `${album.objectId}_rw`)
     .first({ useMasterKey: true });
 
   if (readRole) {

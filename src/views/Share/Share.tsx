@@ -81,7 +81,7 @@ const AlbumsToShareTo = ({ albums, classes, files }: AlbumsListProps) => {
       <br />
       <Grid item spacing={2} container className={classes.albumsContainer}>
         {albums.map((album) => (
-          <Grid item key={album.id}>
+          <Grid item key={album.objectId}>
             <SmallAlbumCard
               className={classes.card}
               borderColor={borderColor}
@@ -93,13 +93,13 @@ const AlbumsToShareTo = ({ albums, classes, files }: AlbumsListProps) => {
                       await album.update(
                         {
                           ...album.attributes,
-                          images: [...album.images, image.id],
+                          images: [...album.images, image.objectId],
                         },
-                        { addedImages: [image.id] }
+                        { addedImages: [image.objectId] }
                       );
                     },
                   });
-                  navigate(routes.Album.path.replace(":id", album.id));
+                  navigate(routes.Album.path.replace(":id", album.objectId));
                 } catch (e) {
                   console.error(e);
                   enqueueErrorSnackbar(Strings.error.editingAlbum);

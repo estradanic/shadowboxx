@@ -4,6 +4,7 @@
  */
 const Strings = {
   error: {
+    gettingTags: "Error getting tags",
     verifyingEmail: "Error verifying email",
     resendingVerificationEmail: "Error resending verification email",
     undoingEmailChange: "Error undoing email change",
@@ -56,6 +57,7 @@ const Strings = {
     addFromLibrary: "Add from existing library",
     addFromUrl: "Add from URL",
     addOrEditCaption: "Add/Edit caption",
+    addOrRemoveTags: "Add/Remove tags",
     addOrEditDate: "Add/Edit date",
     addToAlbum: "Add to album",
     back: "Back",
@@ -88,6 +90,7 @@ const Strings = {
     unlockPassword: "Change Password",
     unsetCoverImage: "Unset this image as the album cover",
     setImageAsCover: "Set this image as the album cover",
+    tagImage: "Tag Image",
   },
   message: {
     uploading: (fileName: string) => `Uploading ${fileName}`,
@@ -129,6 +132,8 @@ const Strings = {
       `Please check your email ${email} for the verification code`,
   },
   label: {
+    tags: "Tags",
+    tagSearch: "Tag Search",
     caption: "Caption",
     captionSearch: "Caption Search",
     appName: "Shadowboxx",

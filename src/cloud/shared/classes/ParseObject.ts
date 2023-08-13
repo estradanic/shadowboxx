@@ -24,6 +24,10 @@ export interface ObjectAttributes {
   updatedAt: Date;
 }
 
+type ObjectKeys = Required<{
+  [key in keyof ObjectAttributes]: key;
+}>;
+
 /** Type encompassing the attributes of all kinds of ParseObjects */
 export type Attributes<C extends ClassName> = ObjectAttributes &
   (C extends "Album"
@@ -55,17 +59,18 @@ export type NativeAttributes<C extends ClassName> = Omit<
   "objectId" | "createdAt" | "updatedAt"
 >;
 
-export class Columns {
-  objectId = "objectId" as const;
+export class Columns implements ObjectKeys {
   createdAt = "createdAt" as const;
   updatedAt = "updatedAt" as const;
-  id = "objectId" as const;
+  objectId = "objectId" as const;
 }
 
 /**
  * Class wrapping the Parse.Object class and providing convenience methods/properties
  */
-export default class ParseObject<C extends ClassName> {
+export default class ParseObject<C extends ClassName>
+  implements ObjectAttributes
+{
   /** Basic columns for any class */
   static COLUMNS = new Columns();
 
@@ -112,7 +117,7 @@ export default class ParseObject<C extends ClassName> {
    * @returns Whether the two ParseObjects are equal
    */
   equals(that: ParseObject<C>): boolean {
-    return this.id === that.id;
+    return this.objectId === that.objectId;
   }
 
   /**
@@ -120,7 +125,7 @@ export default class ParseObject<C extends ClassName> {
    * @returns Hashstring of the ParseObject
    */
   hashString(): string {
-    return this.id ?? "";
+    return this.objectId ?? "";
   }
 
   /**
@@ -139,18 +144,15 @@ export default class ParseObject<C extends ClassName> {
     await this._object.pin();
   }
 
-  /** ObjectId for this object */
-  get id(): ObjectAttributes["objectId"] {
+  get objectId() {
     return this._object.id;
   }
 
-  /** Date that the object was saved to the db */
-  get createdAt(): ObjectAttributes["createdAt"] {
+  get createdAt() {
     return this._object.createdAt;
   }
 
-  /** Date that the object was last updated in the db */
-  get updatedAt(): ObjectAttributes["updatedAt"] {
+  get updatedAt() {
     return this._object.updatedAt;
   }
 

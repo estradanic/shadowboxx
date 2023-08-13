@@ -16,6 +16,7 @@ import { useUserContext } from "../../contexts/UserContext";
 import { ImageVariant, GetImageReturn } from "../../types";
 import { get, set, createStore, del } from "idb-keyval";
 import b64 from "base64-js";
+import { dedupe } from "../../utils";
 
 const imageStore = createStore("images", "images");
 
@@ -79,7 +80,7 @@ const useQueryConfigs = () => {
     return await runFunctionInTryCatch<ParseImage[]>(
       async () => {
         return await ParseImage.query(online)
-          .containedIn(ParseImage.COLUMNS.id, imageIds)
+          .containedIn(ParseImage.COLUMNS.objectId, imageIds)
           .findAll();
       },
       { errorMessage: Strings.error.gettingImages, ...options }
@@ -106,11 +107,11 @@ const useQueryConfigs = () => {
   ): Promise<ParseImage> => {
     return await runFunctionInTryCatch<ParseImage>(
       async () => {
-        if (profilePicture && imageId === profilePicture?.id) {
+        if (profilePicture && imageId === profilePicture?.objectId) {
           return profilePicture;
         }
         const image = await ParseImage.query(online)
-          .equalTo(ParseImage.COLUMNS.id, imageId)
+          .equalTo(ParseImage.COLUMNS.objectId, imageId)
           .first();
         if (!image) {
           throw new Error(Strings.error.imageNotFound(imageId));
@@ -141,7 +142,7 @@ const useQueryConfigs = () => {
   ): Promise<ParseUser> => {
     return await runFunctionInTryCatch<ParseUser>(
       async () => {
-        if (userId === getLoggedInUser().id) {
+        if (userId === getLoggedInUser().objectId) {
           return getLoggedInUser();
         }
         return await ParseUser.query(online).get(userId);
@@ -378,7 +379,33 @@ const useQueryConfigs = () => {
     );
   };
 
+  /** ["GET_ALL_TAGS"] */
+  const getAllTagsQueryKey = () => [QueryCacheGroups.GET_ALL_TAGS];
+  /** Defaults to default + placeholder=[] */
+  const getAllTagsOptions: QueryOptionsFunction<string[]> = (options = {}) => ({
+    placeholderData: [],
+    ...options,
+  });
+  /** Function to get all tags */
+  const getAllTagsFunction = async (
+    options: FunctionOptions = {}
+  ): Promise<string[]> => {
+    return await runFunctionInTryCatch<string[]>(
+      async () => {
+        const images = await ParseImage.query()
+          .select(ParseImage.COLUMNS.tags)
+          .exists(ParseImage.COLUMNS.tags)
+          .findAll();
+        return dedupe(images.flatMap((tag) => tag.tags as string[]));
+      },
+      { errorMessage: Strings.error.gettingTags, ...options }
+    );
+  };
+
   return {
+    getAllTagsQueryKey,
+    getAllTagsOptions,
+    getAllTagsFunction,
     getImageUrlQueryKey,
     getImageUrlOptions,
     getImageUrlFunction,

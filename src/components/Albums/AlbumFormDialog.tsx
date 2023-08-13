@@ -104,7 +104,7 @@ const AlbumFormDialog = ({
 
   const { getLoggedInUser } = useUserContext();
   const isCollaborator = useMemo(
-    () => getLoggedInUser().id !== value.owner?.id,
+    () => getLoggedInUser().objectId !== value.owner?.id,
     [getLoggedInUser, value.owner?.id]
   );
 
@@ -176,11 +176,11 @@ const AlbumFormDialog = ({
         <Grid item xs={12}>
           <ImageContextProvider>
             <ImageField
-              getCaption={(image) => captions[image.id]}
+              getCaption={(image) => captions[image.objectId]}
               setCaption={(image, caption) => {
                 setCaptions((captions) => ({
                   ...captions,
-                  [image.id]: caption,
+                  [image.objectId]: caption,
                 }));
               }}
               coverImage={coverImage ?? images?.[0]?.toPointer()}
@@ -189,14 +189,14 @@ const AlbumFormDialog = ({
               multiple
               value={
                 images?.filter?.(
-                  (image) => !removedImageIds.includes(image.id)
+                  (image) => !removedImageIds.includes(image.objectId)
                 ) ?? []
               }
               onRemove={async (...images) => {
-                await onRemove(...images.map((image) => image.id));
+                await onRemove(...images.map((image) => image.objectId));
               }}
               onAdd={async (...images) => {
-                await onAdd(...images.map((image) => image.id));
+                await onAdd(...images.map((image) => image.objectId));
               }}
             />
           </ImageContextProvider>
