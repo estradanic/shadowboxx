@@ -15,7 +15,8 @@ build/Release
 # Distribution directories
 **/dev-dist/
 **/build/
-/public
+/public/*
+!/public/.placeholder
 
 # Compiled distribution files
 /cloud/**/*.js

@@ -141,11 +141,17 @@ const useInfiniteQueryConfigs = () => {
     );
   };
 
-  interface GetImagesByIdInfiniteFilters extends GetAllImagesInfiniteFilters {
-    sortDirection: SortDirection;
-    captionSearch?: string;
-    captions?: Record<string, string>;
-  }
+  type GetImagesByIdInfiniteFilters = GetAllImagesInfiniteFilters &
+    (
+      | {
+          captionSearch?: never;
+          captions?: never;
+        }
+      | {
+          captionSearch: string;
+          captions: Record<string, string>;
+        }
+    );
   /** ["GET_IMAGES_BY_ID_INFINITE", imageIds] */
   const getImagesByIdInfiniteQueryKey = (
     imageIds: string[],

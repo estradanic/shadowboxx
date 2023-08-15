@@ -8,6 +8,7 @@ import { Button, IconButton } from "../Button";
 import { TextField } from "../Field";
 import { Strings } from "../../resources";
 import Tag from "../Tag/Tag";
+import { dedupe } from "../../utils";
 
 export interface FilterBarProps extends ReturnType<typeof useFilterBar> {
   /** Whether to show the sort direction buttons */
@@ -53,7 +54,7 @@ const useStyles = makeStyles((theme: Theme) => ({
     padding: theme.spacing(0, 1),
     gap: theme.spacing(0.5),
     minHeight: theme.spacing(7),
-    [theme.breakpoints.down("xs")]: {
+    [theme.breakpoints.down("sm")]: {
       marginBottom: theme.spacing(1),
     },
   },
@@ -160,7 +161,7 @@ const FilterBar = ({
       {!!showTagSearch && (
         <Grid item xs={12} md={4} lg={3} xl={2} className={classes.controlGrid}>
           <Autocomplete<string, true, false, true>
-            options={[...tagOptions, "video", "image", "gif"]}
+            options={dedupe([...tagOptions, "video", "image", "gif"])}
             value={tagSearch}
             fullWidth
             multiple

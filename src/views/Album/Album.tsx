@@ -80,8 +80,14 @@ const Album = memo(() => {
   const randomColor = useRandomColor();
   const classes = useStyles({ randomColor });
   const { online } = useNetworkDetectionContext();
-  const { getAlbumFunction, getAlbumQueryKey, getAlbumOptions } =
-    useQueryConfigs();
+  const {
+    getAlbumFunction,
+    getAlbumQueryKey,
+    getAlbumOptions,
+    getTagsByImageIdFunction,
+    getTagsByImageIdOptions,
+    getTagsByImageIdQueryKey,
+  } = useQueryConfigs();
   const {
     getImagesByIdInfiniteFunction,
     getImagesByIdInfiniteQueryKey,
@@ -94,6 +100,11 @@ const Album = memo(() => {
   );
   const { sortDirection, captionSearch, tagSearch, ...restFilterBarProps } =
     useFilterBar();
+  const { data: tags } = useQuery<string[], Error>(
+    getTagsByImageIdQueryKey(album?.images ?? []),
+    () => getTagsByImageIdFunction(album?.images ?? []),
+    getTagsByImageIdOptions({ enabled: !!album?.images })
+  );
   const {
     data,
     status: imagesStatus,
@@ -105,14 +116,19 @@ const Album = memo(() => {
     getImagesByIdInfiniteQueryKey(album?.images ?? [], {
       sortDirection,
       captionSearch,
-      captions: album?.captions,
+      captions: album?.captions ?? {},
       tagSearch,
     }),
     ({ pageParam: page = 0 }) =>
       getImagesByIdInfiniteFunction(
         online,
         album?.images ?? [],
-        { sortDirection, captionSearch, captions: album?.captions, tagSearch },
+        {
+          sortDirection,
+          captionSearch,
+          captions: album?.captions ?? {},
+          tagSearch,
+        },
         {
           showErrorsInSnackbar: true,
           page,
@@ -168,6 +184,7 @@ const Album = memo(() => {
       tagSearch={tagSearch}
       captionSearch={captionSearch}
       sortDirection={sortDirection}
+      tagOptions={tags}
       {...restFilterBarProps}
     />
   );

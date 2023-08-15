@@ -16,7 +16,6 @@ import { useUserContext } from "../../contexts/UserContext";
 import { ImageVariant, GetImageReturn } from "../../types";
 import { get, set, createStore, del } from "idb-keyval";
 import b64 from "base64-js";
-import { dedupe } from "../../utils";
 
 const imageStore = createStore("images", "images");
 
@@ -379,6 +378,36 @@ const useQueryConfigs = () => {
     );
   };
 
+  /** ["GET_TAGS_BY_IMAGE_ID"] */
+  const getTagsByImageIdQueryKey = (imageIds: string[]) => [
+    QueryCacheGroups.GET_TAGS_BY_IMAGE_ID,
+    imageIds,
+  ];
+  /** Defaults to default + placeholder=[] */
+  const getTagsByImageIdOptions: QueryOptionsFunction<string[]> = (
+    options = {}
+  ) => ({
+    placeholderData: [],
+    ...options,
+  });
+  /** Function to get tags by image id */
+  const getTagsByImageIdFunction = async (
+    imageIds: string[],
+    options: FunctionOptions = {}
+  ): Promise<string[]> => {
+    return await runFunctionInTryCatch<string[]>(
+      async () => {
+        const images = await ParseImage.query()
+          .containedIn(ParseImage.COLUMNS.objectId, imageIds)
+          .select(ParseImage.COLUMNS.tags)
+          .exists(ParseImage.COLUMNS.tags)
+          .findAll();
+        return images.flatMap((tag) => tag.tags as string[]);
+      },
+      { errorMessage: Strings.error.gettingTags, ...options }
+    );
+  };
+
   /** ["GET_ALL_TAGS"] */
   const getAllTagsQueryKey = () => [QueryCacheGroups.GET_ALL_TAGS];
   /** Defaults to default + placeholder=[] */
@@ -396,13 +425,16 @@ const useQueryConfigs = () => {
           .select(ParseImage.COLUMNS.tags)
           .exists(ParseImage.COLUMNS.tags)
           .findAll();
-        return dedupe(images.flatMap((tag) => tag.tags as string[]));
+        return images.flatMap((tag) => tag.tags as string[]);
       },
       { errorMessage: Strings.error.gettingTags, ...options }
     );
   };
 
   return {
+    getTagsByImageIdQueryKey,
+    getTagsByImageIdOptions,
+    getTagsByImageIdFunction,
     getAllTagsQueryKey,
     getAllTagsOptions,
     getAllTagsFunction,

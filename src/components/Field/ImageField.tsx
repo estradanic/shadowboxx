@@ -39,6 +39,7 @@ import useRefState from "../../hooks/useRefState";
 import { useImageContext } from "../../contexts/ImageContext";
 import useQueryConfigs from "../../hooks/Query/useQueryConfigs";
 import { useQuery } from "@tanstack/react-query";
+import FilterBar, { FilterBarProps } from "../FilterBar/FilterBar";
 
 const useStyles = makeStyles((theme: Theme) => ({
   endAdornment: {
@@ -103,6 +104,8 @@ export type ImageFieldProps = Omit<
         variant?: "field";
         /** Whether multiple images can be selected */
         multiple: true;
+        /** Props to pass down to the FilterBar component */
+        filterBarProps: FilterBarProps;
       }
     | {
         /** Function to run when an image is removed */
@@ -111,6 +114,8 @@ export type ImageFieldProps = Omit<
         variant: "field";
         /** Whether multiple images can be selected */
         multiple?: false;
+        /** Props to pass down to the FilterBar component */
+        filterBarProps?: never;
       }
     | {
         /** Function to run when an image is removed */
@@ -119,6 +124,8 @@ export type ImageFieldProps = Omit<
         variant: "button";
         /** Whether multiple images can be selected */
         multiple?: boolean;
+        /** Props to pass down to the FilterBar component */
+        filterBarProps?: never;
       }
   );
 
@@ -138,6 +145,7 @@ const ImageField = memo(
     setCoverImage,
     getCaption,
     setCaption,
+    filterBarProps,
     ...rest
   }: ImageFieldProps) => {
     const classes = useStyles();
@@ -339,6 +347,7 @@ const ImageField = memo(
             />
             {multiple && !!value.length && (
               <Grid container className={classes.multiImageContainer}>
+                <FilterBar {...filterBarProps!} />
                 {value.map((image: ParseImage) => {
                   const imageDecorations = [
                     <RemoveImageDecoration

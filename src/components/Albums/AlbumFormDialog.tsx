@@ -2,7 +2,7 @@ import React, { useMemo } from "react";
 import { useTheme } from "@material-ui/core/styles";
 import Grid from "@material-ui/core/Grid";
 import useMediaQuery from "@material-ui/core/useMediaQuery";
-import { useInfiniteQuery } from "@tanstack/react-query";
+import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
 import { Strings } from "../../resources";
 import { uniqueId } from "../../utils";
 import { ParseImage, AlbumAttributes } from "../../classes";
@@ -18,6 +18,8 @@ import useAlbumForm, { UseAlbumFormOptions } from "../../hooks/useAlbumForm";
 import { useUserContext } from "../../contexts/UserContext";
 import { ImageContextProvider } from "../../contexts/ImageContext";
 import { useNetworkDetectionContext } from "../../contexts/NetworkDetectionContext";
+import useFilterBar from "../FilterBar/useFilterBar";
+import useQueryConfigs from "../../hooks/Query/useQueryConfigs";
 
 /** Interface defining props for AlbumFormDialog */
 export interface AlbumFormDialogProps
@@ -65,6 +67,18 @@ const AlbumFormDialog = ({
     resetOnSubmit: resetOnConfirm,
   });
   const { online } = useNetworkDetectionContext();
+  const { tagSearch, captionSearch, sortDirection, ...filterBarProps } =
+    useFilterBar();
+  const {
+    getTagsByImageIdFunction,
+    getTagsByImageIdOptions,
+    getTagsByImageIdQueryKey,
+  } = useQueryConfigs();
+  const { data: tags } = useQuery<string[], Error>(
+    getTagsByImageIdQueryKey(allImageIds),
+    () => getTagsByImageIdFunction(allImageIds),
+    getTagsByImageIdOptions()
+  );
   const {
     getImagesByIdInfiniteOptions,
     getImagesByIdInfiniteFunction,
@@ -74,12 +88,17 @@ const AlbumFormDialog = ({
     ParseImage[],
     Error
   >(
-    getImagesByIdInfiniteQueryKey(allImageIds),
+    getImagesByIdInfiniteQueryKey(allImageIds, {
+      tagSearch,
+      captionSearch,
+      sortDirection,
+      captions,
+    }),
     ({ pageParam: page = 0 }) =>
       getImagesByIdInfiniteFunction(
         online,
         allImageIds,
-        { sortDirection: "descending" },
+        { tagSearch, captionSearch, sortDirection, captions },
         {
           showErrorsInSnackbar: true,
           page,
@@ -176,6 +195,13 @@ const AlbumFormDialog = ({
         <Grid item xs={12}>
           <ImageContextProvider>
             <ImageField
+              filterBarProps={{
+                tagSearch,
+                captionSearch,
+                sortDirection,
+                tagOptions: tags,
+                ...filterBarProps,
+              }}
               getCaption={(image) => captions[image.objectId]}
               setCaption={(image, caption) => {
                 setCaptions((captions) => ({
