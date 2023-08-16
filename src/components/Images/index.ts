@@ -1,1 +1,1 @@
-export { default as ImageSelectionDialog } from "./ImageSelectionDialog";
+export { default as AddImageDialog } from "./AddImageDialog";

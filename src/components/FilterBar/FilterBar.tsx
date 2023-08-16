@@ -109,7 +109,7 @@ const FilterBar = ({
           container
           xs={12}
           md={4}
-          xl={2}
+          xl={3}
         >
           <Button
             classes={{
@@ -138,7 +138,7 @@ const FilterBar = ({
         </Grid>
       )}
       {!!showCaptionSearch && (
-        <Grid item xs={12} md={4} lg={3} xl={2} className={classes.controlGrid}>
+        <Grid item xs={12} md={4} lg={3} xl={3} className={classes.controlGrid}>
           <TextField
             fullWidth
             InputProps={{
@@ -159,7 +159,7 @@ const FilterBar = ({
         </Grid>
       )}
       {!!showTagSearch && (
-        <Grid item xs={12} md={4} lg={3} xl={2} className={classes.controlGrid}>
+        <Grid item xs={12} md={4} lg={3} xl={3} className={classes.controlGrid}>
           <Autocomplete<string, true, false, true>
             options={dedupe([...tagOptions, "video", "image", "gif"])}
             value={tagSearch}

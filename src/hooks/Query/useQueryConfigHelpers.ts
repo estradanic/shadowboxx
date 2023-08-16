@@ -4,6 +4,8 @@ import { Strings } from "../../resources";
 import { Interdependent } from "../../types";
 import { useUserContext } from "../../contexts/UserContext";
 import { useNetworkDetectionContext } from "../../contexts/NetworkDetectionContext";
+import ParseQuery from "../../cloud/shared/classes/ParseQuery";
+import { ParseImage } from "../../classes";
 
 export type FunctionOptions = Interdependent<
   {
@@ -108,6 +110,38 @@ const useQueryConfigHelpers = () => {
     }
   };
 
+  /** Mutates query to apply the given tagSearch to it */
+  const applyTagSearch = (query: ParseQuery<"Image">, tagSearch?: string[]) => {
+    if (tagSearch?.includes("video")) {
+      query.equalTo(ParseImage.COLUMNS.type, "video");
+      tagSearch = tagSearch.filter((tag) => tag !== "video");
+    } else if (tagSearch?.includes("image")) {
+      query.equalTo(ParseImage.COLUMNS.type, "image");
+      tagSearch = tagSearch.filter((tag) => tag !== "image");
+    } else if (tagSearch?.includes("gif")) {
+      query.equalTo(ParseImage.COLUMNS.type, "gif");
+      tagSearch = tagSearch.filter((tag) => tag !== "gif");
+    }
+    if (tagSearch?.length) {
+      query.containsAll(ParseImage.COLUMNS.tags, tagSearch);
+    }
+  };
+
+  /** Mutates query to apply the given captionSearch to it */
+  const applyCaptionSearch = (
+    query: ParseQuery<"Image">,
+    captionSearch?: string,
+    captions?: Record<string, string>
+  ) => {
+    if (captionSearch && captions) {
+      const search = captionSearch.toLowerCase();
+      const captionsToApply = Object.keys(captions).filter((key) =>
+        captions?.[key].toLowerCase().includes(search)
+      );
+      query.containedIn(ParseImage.COLUMNS.objectId, captionsToApply);
+    }
+  };
+
   const runFunctionInTryCatch = async <T>(
     requestFunction: () => Promise<T>,
     {
@@ -144,7 +178,7 @@ const useQueryConfigHelpers = () => {
     return returnValue;
   };
 
-  return { runFunctionInTryCatch };
+  return { runFunctionInTryCatch, applyTagSearch, applyCaptionSearch };
 };
 
 export default useQueryConfigHelpers;

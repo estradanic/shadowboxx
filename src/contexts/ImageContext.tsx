@@ -15,7 +15,7 @@ import {
 import { makeValidFileName, removeExtension } from "../utils";
 import { useSnackbar } from "../components/Snackbar";
 import { useUserContext } from "./UserContext";
-import ImageSelectionDialog from "../components/Images/ImageSelectionDialog";
+import AddImageDialog from "../components/Images/AddImageDialog";
 import { LinearProgress } from "../components/Progress";
 import { useGlobalLoadingStore } from "../stores";
 import { Notification, useNotificationsContext } from "./NotificationsContext";
@@ -445,7 +445,7 @@ export const ImageContextProvider = ({
 
   return (
     <ImageContext.Provider value={value}>
-      <ImageSelectionDialog
+      <AddImageDialog
         alreadySelected={alreadySelected}
         open={selectionDialogOpen}
         handleConfirm={handleConfirm}

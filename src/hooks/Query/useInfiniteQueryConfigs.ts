@@ -44,7 +44,8 @@ const DEFAULT_FUNCTION_OPTIONS: InfiniteFunctionOptions = {
  */
 const useInfiniteQueryConfigs = () => {
   const { getLoggedInUser } = useUserContext();
-  const { runFunctionInTryCatch } = useQueryConfigHelpers();
+  const { runFunctionInTryCatch, applyTagSearch, applyCaptionSearch } =
+    useQueryConfigHelpers();
 
   /** ["GET_ALL_ALBUMS_INFINITE"] */
   const getAllAlbumsInfiniteQueryKey = () => [
@@ -121,20 +122,7 @@ const useInfiniteQueryConfigs = () => {
           [filters.sortDirection](ParseImage.COLUMNS.dateTaken)
           .limit(options.pageSize)
           .skip(options.page * options.pageSize);
-        let tagSearch = filters.tagSearch;
-        if (tagSearch?.includes("video")) {
-          query.equalTo(ParseImage.COLUMNS.type, "video");
-          tagSearch = tagSearch.filter((tag) => tag !== "video");
-        } else if (tagSearch?.includes("image")) {
-          query.equalTo(ParseImage.COLUMNS.type, "image");
-          tagSearch = tagSearch.filter((tag) => tag !== "image");
-        } else if (tagSearch?.includes("gif")) {
-          query.equalTo(ParseImage.COLUMNS.type, "gif");
-          tagSearch = tagSearch.filter((tag) => tag !== "gif");
-        }
-        if (tagSearch?.length) {
-          query.containsAll(ParseImage.COLUMNS.tags, tagSearch);
-        }
+        applyTagSearch(query, filters.tagSearch);
         return await query.find();
       },
       { errorMessage: Strings.message.noImages, ...options }
@@ -178,38 +166,20 @@ const useInfiniteQueryConfigs = () => {
           [filters.sortDirection](ParseImage.COLUMNS.dateTaken)
           .limit(options.pageSize)
           .skip(options.page * options.pageSize);
-        if (filters.captionSearch && filters.captions) {
-          const search = filters.captionSearch.toLowerCase();
-          const captions = Object.keys(filters.captions).filter((key) =>
-            filters.captions?.[key].toLowerCase().includes(search)
-          );
-          query.containedIn(ParseImage.COLUMNS.objectId, captions);
-        }
-        let tagSearch = filters.tagSearch;
-        if (tagSearch?.includes("video")) {
-          query.equalTo(ParseImage.COLUMNS.type, "video");
-          tagSearch = tagSearch.filter((tag) => tag !== "video");
-        } else if (tagSearch?.includes("image")) {
-          query.equalTo(ParseImage.COLUMNS.type, "image");
-          tagSearch = tagSearch.filter((tag) => tag !== "image");
-        } else if (tagSearch?.includes("gif")) {
-          query.equalTo(ParseImage.COLUMNS.type, "gif");
-          tagSearch = tagSearch.filter((tag) => tag !== "gif");
-        }
-        if (tagSearch?.length) {
-          query.containsAll(ParseImage.COLUMNS.tags, tagSearch);
-        }
+        applyCaptionSearch(query, filters.captionSearch, filters.captions);
+        applyTagSearch(query, filters.tagSearch);
         return await query.find();
       },
       { errorMessage: Strings.error.gettingImages, ...options }
     );
   };
 
+  type GetImagesByOwnerFilters = GetAllImagesInfiniteFilters;
   /** ["GET_IMAGES_BY_OWNER_INFINITE", owner.id] */
-  const getImagesByOwnerInfiniteQueryKey = (owner: ParseUser) => [
-    QueryCacheGroups.GET_IMAGES_BY_OWNER_INFINITE,
-    owner.objectId,
-  ];
+  const getImagesByOwnerInfiniteQueryKey = (
+    owner: ParseUser,
+    filters: GetImagesByOwnerFilters = { sortDirection: "descending" }
+  ) => [QueryCacheGroups.GET_IMAGES_BY_OWNER_INFINITE, owner.objectId, filters];
   /** Defaults to default + refetch on window focus: false */
   const getImagesByOwnerInfiniteOptions: InfiniteQueryOptionsFunction<
     ParseImage[]
@@ -222,16 +192,18 @@ const useInfiniteQueryConfigs = () => {
   const getImagesByOwnerInfiniteFunction = async (
     online: boolean,
     owner: ParseUser,
+    filters: GetImagesByOwnerFilters = { sortDirection: "descending" },
     options: InfiniteFunctionOptions = DEFAULT_FUNCTION_OPTIONS
   ): Promise<ParseImage[]> => {
     return await runFunctionInTryCatch<ParseImage[]>(
       async () => {
-        return await ParseImage.query(online)
+        let query = ParseImage.query(online)
+          [filters.sortDirection](ParseImage.COLUMNS.dateTaken)
           .equalTo(ParseImage.COLUMNS.owner, owner.toNativePointer())
-          .descending(ParseImage.COLUMNS.dateTaken)
           .limit(options.pageSize)
-          .skip(options.page * options.pageSize)
-          .find();
+          .skip(options.page * options.pageSize);
+        applyTagSearch(query, filters.tagSearch);
+        return await query.find();
       },
       { errorMessage: Strings.error.gettingImage, ...options }
     );

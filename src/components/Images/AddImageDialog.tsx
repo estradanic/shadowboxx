@@ -2,7 +2,7 @@ import React, { useCallback, useMemo, useState } from "react";
 import useMediaQuery from "@material-ui/core/useMediaQuery";
 import { useTheme } from "@material-ui/core/styles";
 import classNames from "classnames";
-import { useInfiniteQuery } from "@tanstack/react-query";
+import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
 import { difference } from "../../utils";
 import { Strings } from "../../resources";
 import { ParseImage } from "../../classes";
@@ -16,25 +16,28 @@ import { useUserContext } from "../../contexts/UserContext";
 import useInfiniteQueryConfigs from "../../hooks/Query/useInfiniteQueryConfigs";
 import useInfiniteScroll from "../../hooks/useInfiniteScroll";
 import useRandomColor from "../../hooks/useRandomColor";
+import useFilterBar from "../FilterBar/useFilterBar";
+import useQueryConfigs from "../../hooks/Query/useQueryConfigs";
+import FilterBar from "../FilterBar/FilterBar";
 
-export interface ImageSelectionDialogProps
+export interface AddImageDialogProps
   extends Pick<ActionDialogProps, "open" | "handleCancel"> {
   /** Function to run when the confirm button is clicked */
   handleConfirm: (value: ParseImage[]) => Promise<void>;
   /** List of already selected images */
   alreadySelected: ParseImage[];
-  /** Whether multiple images can be selected */
+  /** Whether multiple images can be added */
   multiple?: boolean;
 }
 
-/** Component to select images from existing library */
-const ImageSelectionDialog = ({
+/** Component to add images from existing library */
+const AddImageDialog = ({
   handleConfirm: piHandleConfirm,
   handleCancel: piHandleCancel,
   alreadySelected,
   open,
   multiple = true,
-}: ImageSelectionDialogProps) => {
+}: AddImageDialogProps) => {
   const [value, setValue] = useState<ParseImage[]>([]);
   const classes = useImageStyles();
   const { getLoggedInUser } = useUserContext();
@@ -48,18 +51,35 @@ const ImageSelectionDialog = ({
   } = useInfiniteQueryConfigs();
   const { online } = useNetworkDetectionContext();
 
+  const { tagSearch, sortDirection, ...filterBarProps } = useFilterBar();
+  const { getAllTagsFunction, getAllTagsOptions, getAllTagsQueryKey } =
+    useQueryConfigs();
+  const { data: allTags } = useQuery<string[], Error>(
+    getAllTagsQueryKey(),
+    getAllTagsFunction,
+    getAllTagsOptions({ enabled: open })
+  );
+
   // Images that the current user owns, not those shared to them.
   const { data, status, fetchNextPage, isFetchingNextPage } = useInfiniteQuery<
     ParseImage[],
     Error
   >(
-    getImagesByOwnerInfiniteQueryKey(getLoggedInUser()),
+    getImagesByOwnerInfiniteQueryKey(getLoggedInUser(), {
+      tagSearch,
+      sortDirection,
+    }),
     ({ pageParam: page = 0 }) =>
-      getImagesByOwnerInfiniteFunction(online, getLoggedInUser(), {
-        showErrorsInSnackbar: true,
-        page,
-        pageSize: DEFAULT_PAGE_SIZE,
-      }),
+      getImagesByOwnerInfiniteFunction(
+        online,
+        getLoggedInUser(),
+        { tagSearch, sortDirection },
+        {
+          showErrorsInSnackbar: true,
+          page,
+          pageSize: DEFAULT_PAGE_SIZE,
+        }
+      ),
     getImagesByOwnerInfiniteOptions({ enabled: open })
   );
   const SCROLLABLE_ELEMENT_ID = "image-selection-dialog-content";
@@ -72,7 +92,7 @@ const ImageSelectionDialog = ({
     [data?.pages]
   );
 
-  // Images that the current user owns + those in the passed in value
+  // Images that the current user owns, minus those in the passed in value
   const images = useMemo(
     () => difference(userOwnedImages ?? [], alreadySelected),
     [alreadySelected, userOwnedImages]
@@ -140,6 +160,15 @@ const ImageSelectionDialog = ({
       DialogContentProps={{ id: SCROLLABLE_ELEMENT_ID }}
     >
       <Images
+        filterBar={
+          <FilterBar
+            tagOptions={allTags}
+            tagSearch={tagSearch}
+            sortDirection={sortDirection}
+            showCaptionSearch={false}
+            {...filterBarProps}
+          />
+        }
         status={status}
         images={images}
         outlineColor={randomColor}
@@ -149,4 +178,4 @@ const ImageSelectionDialog = ({
   );
 };
 
-export default ImageSelectionDialog;
+export default AddImageDialog;
