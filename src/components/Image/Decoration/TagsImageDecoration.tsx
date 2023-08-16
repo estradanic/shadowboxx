@@ -20,6 +20,7 @@ import { useActionDialogContext } from "../../Dialog/ActionDialog";
 import useRefState from "../../../hooks/useRefState";
 import Tag from "../../Tag/Tag";
 import { IconButton } from "../../Button";
+import { dedupe } from "../../../utils";
 
 const useStyles = makeStyles((theme: Theme) => ({
   root: {
@@ -102,7 +103,7 @@ const TagsImageDecoration = ({
     <>
       <InPortal node={tagsPortalNode}>
         <Autocomplete<string, true, false, true>
-          options={options}
+          options={dedupe(options)}
           value={tags}
           fullWidth
           multiple
@@ -152,7 +153,7 @@ const TagsImageDecoration = ({
           )}
           renderTags={(value, getTagProps) => {
             return value.map((option, index) => (
-              <Tag label={option} {...getTagProps({ index })} key={index} />
+              <Tag label={option} {...getTagProps({ index })} key={option} />
             ));
           }}
         />

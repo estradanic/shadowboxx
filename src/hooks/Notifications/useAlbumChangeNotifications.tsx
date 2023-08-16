@@ -34,6 +34,7 @@ const useAlbumChangeNotifications = () => {
     getAlbumChangeNotificationsOptions({
       enabled: isUserLoggedIn,
       staleTime: 1000 * 60 * 5, // 5 minutes
+      cacheTime: 0,
     })
   );
 
