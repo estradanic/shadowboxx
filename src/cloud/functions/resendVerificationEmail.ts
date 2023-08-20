@@ -3,6 +3,7 @@ import loggerWrapper from "../loggerWrapper";
 import { ParseUser, Strings } from "../shared";
 
 export type ResendVerificationEmailParams = {
+  /** Email of user to resend verification email to */
   email: string;
 };
 

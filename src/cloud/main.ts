@@ -11,7 +11,7 @@ import {
   sendVerificationEmail,
   isEmailVerified,
 } from "./triggers";
-import { findDuplicateImages, hashImages, populateDateTaken } from "./jobs";
+import { findDuplicateImages } from "./jobs";
 import {
   getImage,
   GetImageParams,
@@ -129,16 +129,6 @@ Parse.Cloud.beforeDelete<Image>("Image", async (request) => {
 
 Parse.Cloud.job("findDuplicates", async (request) => {
   await findDuplicateImages();
-  request.message("Done");
-});
-
-Parse.Cloud.job("hashImages", async (request) => {
-  await hashImages();
-  request.message("Done");
-});
-
-Parse.Cloud.job("populateDateTaken", async (request) => {
-  await populateDateTaken();
   request.message("Done");
 });
 

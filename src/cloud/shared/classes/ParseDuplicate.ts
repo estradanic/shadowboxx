@@ -76,6 +76,7 @@ export default class ParseDuplicate
     this._duplicate = duplicate;
   }
 
+  /** Acknowledge the duplicate */
   async acknowledge() {
     this._duplicate.set(ParseDuplicate.COLUMNS.acknowledged, true);
     await this._duplicate.save();

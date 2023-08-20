@@ -25,8 +25,11 @@ export interface CoverImageDecorationProps
     ImageDecorationProps<IconProps>,
     "Component" | "description" | "corner" | "ComponentProps"
   > {
+  /** Which corner of the image to render the decoration */
   corner?: ImageDecorationProps<IconProps>["corner"];
+  /** Whether the image is the cover image */
   checked: boolean;
+  /** Props to pass down to the icon */
   IconProps?: IconProps;
 }
 

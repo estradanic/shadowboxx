@@ -37,11 +37,13 @@ type UserKeys = Required<{
   [key in keyof UserAttributes]: key;
 }>;
 
+/** Function to run when the logged in user is updated */
 export type UpdateLoggedInUser = (
   loggedInUser: ParseUser,
   reason: UserUpdateReason
 ) => Promise<void>;
 
+/** Reason the logged in user is updated */
 export enum UserUpdateReason {
   LOG_IN,
   SIGN_UP,

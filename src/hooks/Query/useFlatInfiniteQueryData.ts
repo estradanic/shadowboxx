@@ -31,6 +31,7 @@ const equal = <T extends ParseObject<ClassName>>(a: In<T>, b: In<T>) => {
   return equal;
 };
 
+/** Hook to flatten an InfiniteData object to an array of results */
 const useFlatInfiniteQueryData = <T extends ParseObject<ClassName>>(
   data: In<T>
 ) => {

@@ -30,9 +30,13 @@ export interface DateImageDecorationProps
     ImageDecorationProps<IconProps>,
     "Component" | "description" | "corner" | "ComponentProps" | "onClick"
   > {
+  /** Which corner of the image to render the decoration */
   corner?: ImageDecorationProps<IconProps>["corner"];
+  /** Props to pass down to the icon */
   IconProps?: IconProps;
+  /** The initial state of the date */
   initialDate: Date;
+  /** Callback fired when the date is confirmed */
   onConfirm: (date: Date) => void | Promise<void>;
 }
 

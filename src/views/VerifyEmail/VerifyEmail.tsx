@@ -28,6 +28,7 @@ const useStyles = makeStyles(() => ({
   },
 }));
 
+/** Page to verify email address */
 const VerifyEmail = memo(() => {
   const classes = useStyles();
 

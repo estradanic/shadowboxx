@@ -76,10 +76,13 @@ const useStyles = makeStyles((theme: Theme) => ({
 }));
 
 export interface ButtonProps extends Omit<MuiButtonProps, "color"> {
+  /** The color of the button */
   color?: VariableColor;
+  /** The variant of the button when disabled */
   disabledVariant?: MuiButtonProps["variant"];
 }
 
+/** Custom button component */
 const Button = forwardRef(
   (
     {

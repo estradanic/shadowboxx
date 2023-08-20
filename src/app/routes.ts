@@ -46,6 +46,7 @@ const routes = {
     queryCacheGroups: [
       QueryCacheGroups.GET_IMAGES_BY_ID_INFINITE,
       QueryCacheGroups.GET_ALBUM,
+      QueryCacheGroups.GET_ALL_TAGS,
     ],
     parent: "Home",
   },
@@ -79,7 +80,10 @@ const routes = {
     path: "/memories",
     tryAuthenticate: true,
     redirectOnAuthFail: true,
-    queryCacheGroups: [QueryCacheGroups.GET_ALL_IMAGES_INFINITE],
+    queryCacheGroups: [
+      QueryCacheGroups.GET_ALL_IMAGES_INFINITE,
+      QueryCacheGroups.GET_ALL_TAGS,
+    ],
     parent: "Home",
   },
   Settings: {

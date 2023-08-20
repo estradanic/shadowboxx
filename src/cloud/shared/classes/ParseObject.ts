@@ -59,15 +59,14 @@ export type NativeAttributes<C extends ClassName> = Omit<
   "objectId" | "createdAt" | "updatedAt"
 >;
 
+/** Base columns for a ParseObject */
 export class Columns implements ObjectKeys {
   createdAt = "createdAt" as const;
   updatedAt = "updatedAt" as const;
   objectId = "objectId" as const;
 }
 
-/**
- * Class wrapping the Parse.Object class and providing convenience methods/properties
- */
+/** Class wrapping the Parse.Object class and providing convenience methods/properties */
 export default class ParseObject<C extends ClassName>
   implements ObjectAttributes
 {
@@ -75,9 +74,14 @@ export default class ParseObject<C extends ClassName>
   static COLUMNS = new Columns();
 
   private _object: Parse.Object<ParsifyPointers<C>>;
+  private _cloud: boolean;
 
-  constructor(object: Parse.Object<ParsifyPointers<C>>) {
+  constructor(
+    object: Parse.Object<ParsifyPointers<C>>,
+    cloud: boolean = false
+  ) {
     this._object = object;
+    this._cloud = cloud;
   }
 
   /**
@@ -156,34 +160,45 @@ export default class ParseObject<C extends ClassName>
     return this._object.updatedAt;
   }
 
+  /** Whether this object is new (not persisted yet) */
   isNew() {
     return this._object.isNew();
   }
 
+  /**
+   * Whether this object existed before this cloud code run
+   * Only for use in cloud code
+   */
   existed() {
     return this._object.existed();
   }
 
+  /** Whether this object has been changed */
   dirty(key?: Parameters<typeof this._object.dirty>[0]) {
     return this._object.dirty(key);
   }
 
+  /** Gets underlying Parse.Object */
   toNative() {
     return this._object;
   }
 
+  /** Gets the ACL of this object */
   getACL() {
     return this._object.getACL();
   }
 
+  /** Updates this object with latest version from the db. For client code only */
   async fetch(options?: Parse.Object.FetchOptions) {
     return new ParseObject(await this._object.fetch(options));
   }
 
+  /** Updates this object with latest version from the db. For cloud code only */
   async cloudFetch(options?: Parse.Object.FetchOptions) {
-    return new ParseObject(await this._object.fetch(options));
+    return new ParseObject(await this._object.fetch(options), true);
   }
 
+  /** Function to set multiple attributes at once */
   set(attributes: ParsifyPointers<C>, options?: Parse.Object.SetOptions) {
     return this._object.set(attributes, options);
   }

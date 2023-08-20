@@ -5,6 +5,7 @@ import ParseObject, {
   Columns,
   ParsifyPointers,
 } from "./ParseObject";
+import ParseQuery from "./ParseQuery";
 
 /** Interface defining Album-specific attributes */
 export interface AlbumAttributes {
@@ -74,31 +75,22 @@ export default class ParseAlbum
   /** Columns for the Album class */
   static COLUMNS = new AlbumColumns();
 
-  static sort(albums: ParseAlbum[], favoriteAlbums?: string[]) {
-    return [...albums].sort((a, b) => {
-      if (favoriteAlbums) {
-        if (a.objectId && favoriteAlbums.includes(a.objectId)) {
-          return -1;
-        } else if (b.objectId && favoriteAlbums.includes(b.objectId)) {
-          return 1;
-        }
-      }
-      return a.compareTo(b);
-    });
-  }
-
   /**
    * Create a new Parse.Query for Albums. For client code only.
    * @param online Whether to query online or from local datastore
    * @returns Parse.Query for Albums
    */
   static query(online = true) {
+    let nativeQuery;
     if (online) {
-      return new Parse.Query<Parse.Object<ParsifyPointers<"Album">>>("Album");
+      nativeQuery = new Parse.Query<Parse.Object<ParsifyPointers<"Album">>>(
+        "Album"
+      );
     }
-    return new Parse.Query<Parse.Object<ParsifyPointers<"Album">>>(
+    nativeQuery = new Parse.Query<Parse.Object<ParsifyPointers<"Album">>>(
       "Album"
     ).fromLocalDatastore();
+    return new ParseQuery(nativeQuery);
   }
 
   /**
@@ -123,6 +115,7 @@ export default class ParseAlbum
     }
   }
 
+  /** Compare to another ParseAlbum by name */
   compareTo(that: ParseAlbum): number {
     return this.name.localeCompare(that.name);
   }
@@ -131,14 +124,26 @@ export default class ParseAlbum
     return new ParseAlbum(await this._album.save(null, { context }));
   }
 
+  /**
+   * Call the underlying Parse save function with the given options
+   * Only for use in cloud code
+   */
   async cloudSave(options?: Parse.Object.SaveOptions) {
     return new ParseAlbum(await this._album.save(null, options), true);
   }
 
+  /**
+   * Whether this album existed before this cloud code run.
+   * Only for use in cloud code
+   */
   existed() {
     return this._album.existed();
   }
 
+  /**
+   * Save this as a new album with no id yet
+   * Only for use in client code
+   */
   async saveNew() {
     return this.save({
       addedImages: this.images,
@@ -151,6 +156,10 @@ export default class ParseAlbum
     });
   }
 
+  /**
+   * Update this album with the given changes
+   * Only for use in client code
+   */
   async update(attributes: AlbumAttributes, changes: AlbumSaveContext) {
     const newAttributes: ParsifyPointers<"Album"> = {
       ...attributes,
@@ -260,6 +269,7 @@ export default class ParseAlbum
   }
 }
 
+/** Class for unpersisted ParseAlbums */
 export class UnpersistedParseAlbum extends ParseAlbum {
   constructor(attributes: Partial<Attributes<"Album">> = {}) {
     super(

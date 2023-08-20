@@ -1,11 +1,10 @@
 import { useSnackbar } from "../../components";
 import { useGlobalLoadingStore } from "../../stores";
 import { Strings } from "../../resources";
-import { Interdependent } from "../../types";
+import { Interdependent, OwnershipFilter } from "../../types";
 import { useUserContext } from "../../contexts/UserContext";
 import { useNetworkDetectionContext } from "../../contexts/NetworkDetectionContext";
-import ParseQuery from "../../cloud/shared/classes/ParseQuery";
-import { ParseImage } from "../../classes";
+import { ParseAlbum, ParseImage, ParseQuery } from "../../classes";
 
 export type FunctionOptions = Interdependent<
   {
@@ -142,6 +141,47 @@ const useQueryConfigHelpers = () => {
     }
   };
 
+  /** Mutates query to apply the given OwnershipFilter to it */
+  const applyOwnershipFilter = (
+    query: ParseQuery<"Album">,
+    ownership: OwnershipFilter
+  ) => {
+    if (ownership === "mine") {
+      query.equalTo(
+        ParseAlbum.COLUMNS.owner,
+        getLoggedInUser().toNativePointer()
+      );
+    } else if (ownership === "shared") {
+      query.notEqualTo(
+        ParseAlbum.COLUMNS.owner,
+        getLoggedInUser().toNativePointer()
+      );
+    }
+  };
+
+  /** Returns new query w/ the given name/description search applied to it */
+  const applyNameDescriptionSearch = (
+    query: ParseQuery<"Album">,
+    nameDescriptionSearch?: string
+  ) => {
+    if (nameDescriptionSearch) {
+      const queryJSON = query.toJSON();
+      const orJSON = ParseQuery.or(
+        ParseQuery.for("Album").contains(
+          ParseAlbum.COLUMNS.name,
+          nameDescriptionSearch
+        ),
+        ParseQuery.for("Album").contains(
+          ParseAlbum.COLUMNS.description,
+          nameDescriptionSearch
+        )
+      ).toJSON();
+      queryJSON.where.$or = orJSON.where.$or;
+      return ParseQuery.fromJSON("Album", queryJSON);
+    }
+    return query;
+  };
+
   const runFunctionInTryCatch = async <T>(
     requestFunction: () => Promise<T>,
     {
@@ -178,7 +218,13 @@ const useQueryConfigHelpers = () => {
     return returnValue;
   };
 
-  return { runFunctionInTryCatch, applyTagSearch, applyCaptionSearch };
+  return {
+    runFunctionInTryCatch,
+    applyTagSearch,
+    applyCaptionSearch,
+    applyOwnershipFilter,
+    applyNameDescriptionSearch,
+  };
 };
 
 export default useQueryConfigHelpers;

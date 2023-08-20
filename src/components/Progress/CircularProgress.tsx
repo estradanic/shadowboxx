@@ -15,9 +15,11 @@ const useStyles = makeStyles((theme: Theme) => ({
 
 export interface CircularProgressProps
   extends Omit<MuiCircularProgressProps, "color"> {
+  /** The color of the progress circle */
   color?: VariableColor;
 }
 
+/** A component to display a circular progress wheel */
 const CircularProgress = ({
   color = "primary",
   ...rest

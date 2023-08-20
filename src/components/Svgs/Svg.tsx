@@ -5,6 +5,7 @@ export interface SvgProps {
   children: ReactNode;
 }
 
+/** A component to display an SVG */
 const Svg = ({ height, children }: SvgProps) => {
   return <div style={{ height }}>{children}</div>;
 };

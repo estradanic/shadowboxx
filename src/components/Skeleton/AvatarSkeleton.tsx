@@ -6,6 +6,7 @@ export type AvatarSkeletonProps = Omit<
   "height" | "width" | "variant"
 >;
 
+/** A component to display a skeleton avatar (profile pic) */
 const AvatarSkeleton = (props: AvatarSkeletonProps) => (
   <Skeleton {...props} variant="circle" height={40} width={40} />
 );

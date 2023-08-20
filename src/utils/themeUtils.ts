@@ -1,3 +1,4 @@
+/** apply opacity to a color */
 export const opacity = (color: string, opacity: number): string => {
   // coerce values so it is between 0 and 1.
   const normalizedOpacity = Math.round(

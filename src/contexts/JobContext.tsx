@@ -8,7 +8,9 @@ import React, {
 import PQueue from "p-queue";
 
 export interface JobContextValue {
+  /** Number of currently running jobs */
   jobCount: number;
+  /** Adds a job to the queue. Returns a promise that resolves when the job is done. */
   addJob: <T>(fn: () => Promise<T>) => Promise<void | T>;
 }
 
@@ -18,6 +20,7 @@ export interface JobContextProviderProps {
 
 const JobContext = createContext<JobContextValue | undefined>(undefined);
 
+/** Provides a context that allows adding jobs to a queue. */
 export const JobContextProvider = ({ children }: JobContextProviderProps) => {
   const promiseQueue = new PQueue({ concurrency: 4 });
   const [jobCount, setJobCount] = useState(0);

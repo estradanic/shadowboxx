@@ -40,10 +40,15 @@ export interface TagsImageDecorationProps
     ImageDecorationProps<IconProps>,
     "Component" | "description" | "corner" | "ComponentProps" | "onClick"
   > {
+  /** Which corner of the image to render the decoration */
   corner?: ImageDecorationProps<IconProps>["corner"];
+  /** Props to pass down to the icon */
   IconProps?: IconProps;
+  /** The initial state of the tags */
   initialTags?: string[];
+  /** Callback fired when the tags are confirmed */
   onConfirm: (tags: string[]) => Promise<void>;
+  /** The tags to choose from */
   options?: string[];
 }
 

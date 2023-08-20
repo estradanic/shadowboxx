@@ -18,10 +18,13 @@ const useStyles = makeStyles((theme: Theme) => ({
 }));
 
 export interface IconButtonProps extends Omit<MuiIconButtonProps, "color"> {
+  /** Color of the button */
   color?: VariableColor;
+  /** Whether to use the contrast text color */
   contrastText?: boolean;
 }
 
+/** Button to wrap an icon */
 const IconButton = ({
   color = "primary",
   contrastText = true,

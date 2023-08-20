@@ -31,15 +31,23 @@ const useStyles = makeStyles((theme: Theme) => ({
 }));
 
 export interface ImageDecorationProps<P> {
+  /** Component to render as the decoration */
   Component: ForwardRefExoticComponent<P>;
+  /** Props to pass down to the rendered component */
   ComponentProps: P;
+  /** Which corner of the image to render the decoration */
   corner: "topLeft" | "bottomLeft" | "topRight" | "bottomRight";
+  /** Description to show in a tooltip */
   description?: string;
+  /** Class name to apply to the root element */
   className?: string;
+  /** Children to render */
   children?: ReactNode;
+  /** Callback fired when the decoration is clicked */
   onClick?: MouseEventHandler;
 }
 
+/** Component to render a functional "decoration" on a corner of an image */
 const ImageDecoration = <P,>({
   Component,
   ComponentProps,

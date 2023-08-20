@@ -26,6 +26,7 @@ const useStyles = makeStyles((theme: Theme) => ({
   },
 }));
 
+/** A skeleton component to display a small album card */
 const SmallAlbumCardSkeleton = () => {
   const classes = useStyles();
 

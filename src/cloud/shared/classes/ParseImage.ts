@@ -128,9 +128,8 @@ export default class ParseImage
   }
 
   /**
-   * Compare to another image
+   * Compare to another image by createdAt date, then name
    * @param image Image to compare to
-   * @returns 0 if equal, -1 if this image is less than the other, 1 if this image is greater than the other
    */
   compareTo(that: ParseImage): number {
     if (this.createdAt! > that.createdAt!) {
@@ -159,9 +158,7 @@ export default class ParseImage
     return new ParseImage(await this._image.save(null, options));
   }
 
-  /**
-   * Save the image - Only for cloud code
-   */
+  /** Save the image - Only for cloud code */
   async cloudSave(options?: Parse.Object.SaveOptions) {
     if (!this._image.getACL()) {
       const owner = await ParseUser.cloudQuery(Parse).get(this.owner.id);
@@ -281,9 +278,7 @@ export default class ParseImage
   }
 }
 
-export interface UnpersistedParseImageAttributes
-  extends Omit<ImageAttributes, "fileMobile" | "fileLegacy" | "fileThumb"> {}
-
+/** Class for unpersisted ParseImages */
 export class UnpersistedParseImage extends ParseImage {
   constructor(attributes: Partial<Attributes<"Image">> = {}) {
     super(

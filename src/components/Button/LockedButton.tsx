@@ -5,6 +5,7 @@ import Button, { ButtonProps } from "./Button";
 
 export interface LockedButtonProps extends Omit<ButtonProps, "color"> {}
 
+/** Button that must be clicked once to unlock, then clicked again for the action */
 const LockedButton = ({
   onClick: userOnClick,
   children,

@@ -22,22 +22,6 @@ import { Notification, useNotificationsContext } from "./NotificationsContext";
 import { useJobContext } from "./JobContext";
 import useRandomColor from "../hooks/useRandomColor";
 
-export enum ImageActionCommand {
-  DELETE,
-  UPLOAD,
-  PROCESS,
-}
-
-/** Interface defining an action being done to an image */
-export interface ImageAction {
-  /** The command being performed on the image */
-  command: ImageActionCommand;
-  /** Whether action is completed */
-  completed?: boolean;
-  /** Fractional progress (0-1) of the action */
-  progress?: number;
-}
-
 export type PromptImageSelectionDialogProps = {
   /** Function to run when prompt is canceled */
   handleCancel?: () => Promise<void>;
@@ -109,6 +93,7 @@ const ACCEPTABLE_VIDEO_TYPES = [
 ];
 const MAX_FILE_SIZE = 20000000; // 20 MB
 
+/** Context provider to manage Images */
 export const ImageContextProvider = ({
   children,
 }: ImageContextProviderProps) => {

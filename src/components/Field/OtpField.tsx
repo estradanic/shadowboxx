@@ -31,7 +31,9 @@ const LENGTH = 6 as const;
 
 export interface OtpProps
   extends Omit<TextFieldProps, "type" | "onChange" | "value"> {
+  /** Callback fired when the value is changed */
   onChange: (value: string) => void | Promise<void>;
+  /** The value of the input */
   value: string;
 }
 

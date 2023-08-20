@@ -31,9 +31,13 @@ export interface ShareImageDecorationProps
     ImageDecorationProps<IconProps>,
     "Component" | "description" | "corner" | "ComponentProps" | "onClick"
   > {
+  /** Which corner of the image to render the decoration */
   corner?: ImageDecorationProps<IconProps>["corner"];
+  /** Props to pass down to the icon */
   IconProps?: IconProps;
+  /** The image to share */
   image: ParseImage;
+  /** Callback fired when the image is shared */
   onClick?: (image: ParseImage) => void | Promise<void>;
 }
 
@@ -45,6 +49,7 @@ const ShareImageDecorationIcon = forwardRef(
   )
 );
 
+/** Image decoration component to share the decorated image */
 const ShareImageDecoration = ({
   corner = "bottomLeft",
   className: userClassName,

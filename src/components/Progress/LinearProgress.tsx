@@ -39,9 +39,11 @@ const useStyles = makeStyles((theme: Theme) => ({
 
 export interface LinearProgressProps
   extends Omit<MuiLinearProgressProps, "color"> {
+  /** The color of the progress bar */
   color?: VariableColor;
 }
 
+/** A component to display a linear progress bar */
 const LinearProgress = ({
   color = "primary",
   ...rest

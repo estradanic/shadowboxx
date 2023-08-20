@@ -30,9 +30,11 @@ const useStyles = makeStyles((theme: Theme) => ({
 }));
 
 export interface FabProps extends Omit<MuiFabProps, "color"> {
+  /** Color of the fab */
   color?: VariableColor;
 }
 
+/** Floating action button component */
 const Fab = ({ children, className, color = "success", ...rest }: FabProps) => {
   const visible = useHideOnScroll();
   const classes = useStyles({ color });

@@ -10,6 +10,7 @@ export {
   UnpersistedParseImage,
   UnpersistedParseAlbum,
   UpdateReason,
+  ParseQuery,
 } from "../cloud/shared/classes";
 
 export type {

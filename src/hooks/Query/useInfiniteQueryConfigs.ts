@@ -1,6 +1,6 @@
 import Parse from "parse";
 import { Strings } from "../../resources";
-import { ParseAlbum, ParseImage, ParseUser } from "../../classes";
+import { ParseAlbum, ParseImage, ParseUser, ParseQuery } from "../../classes";
 import { InfiniteQueryObserverOptions } from "@tanstack/react-query";
 import useQueryConfigHelpers, {
   FunctionOptions,
@@ -8,7 +8,7 @@ import useQueryConfigHelpers, {
 import { DEFAULT_PAGE_SIZE } from "../../constants";
 import QueryCacheGroups from "./QueryCacheGroups";
 import { useUserContext } from "../../contexts/UserContext";
-import { SortDirection } from "../../types";
+import { OwnershipFilter, SortDirection } from "../../types";
 
 export type InfiniteFunctionOptions = FunctionOptions & {
   /** Page index */
@@ -44,13 +44,26 @@ const DEFAULT_FUNCTION_OPTIONS: InfiniteFunctionOptions = {
  */
 const useInfiniteQueryConfigs = () => {
   const { getLoggedInUser } = useUserContext();
-  const { runFunctionInTryCatch, applyTagSearch, applyCaptionSearch } =
-    useQueryConfigHelpers();
+  const {
+    runFunctionInTryCatch,
+    applyTagSearch,
+    applyCaptionSearch,
+    applyOwnershipFilter,
+    applyNameDescriptionSearch,
+  } = useQueryConfigHelpers();
 
-  /** ["GET_ALL_ALBUMS_INFINITE"] */
-  const getAllAlbumsInfiniteQueryKey = () => [
-    QueryCacheGroups.GET_ALL_ALBUMS_INFINITE,
-  ];
+  type GetAllAlbumsInfiniteFilters = {
+    sortDirection: SortDirection;
+    ownership: OwnershipFilter;
+    nameDescriptionSearch?: string;
+  };
+  /** ["GET_ALL_ALBUMS_INFINITE", filters] */
+  const getAllAlbumsInfiniteQueryKey = (
+    filters: GetAllAlbumsInfiniteFilters = {
+      sortDirection: "descending",
+      ownership: "all",
+    }
+  ) => [QueryCacheGroups.GET_ALL_ALBUMS_INFINITE, filters];
   /** Defaults to default + refetch interval: 5 minutes */
   const getAllAlbumsInfiniteOptions: InfiniteQueryOptionsFunction<
     ParseAlbum[]
@@ -62,34 +75,44 @@ const useInfiniteQueryConfigs = () => {
   /** Infinite function to get all albums, sorted by favoriteAlbums, then desc updatedAt */
   const getAllAlbumsInfiniteFunction = async (
     online: boolean,
+    filters: GetAllAlbumsInfiniteFilters = {
+      sortDirection: "descending",
+      ownership: "all",
+    },
     options: InfiniteFunctionOptions = DEFAULT_FUNCTION_OPTIONS
   ): Promise<ParseAlbum[]> => {
     return await runFunctionInTryCatch<ParseAlbum[]>(
       async () => {
+        let favoriteAlbumsQuery = ParseAlbum.query(online)
+          .limit(1000) // Set limit extremely high to get all favorite albums while still being able to filter/sort in-query
+          .containedIn(
+            ParseAlbum.COLUMNS.objectId,
+            getLoggedInUser().favoriteAlbums
+          )
+          [filters.sortDirection](ParseAlbum.COLUMNS.updatedAt);
+        applyOwnershipFilter(favoriteAlbumsQuery, filters.ownership);
+        favoriteAlbumsQuery = applyNameDescriptionSearch(
+          favoriteAlbumsQuery,
+          filters.nameDescriptionSearch
+        );
         const favoriteAlbums =
-          options.page === 0
-            ? await ParseAlbum.query(online)
-                .containedIn(
-                  ParseAlbum.COLUMNS.objectId,
-                  getLoggedInUser().favoriteAlbums
-                )
-                .descending(ParseAlbum.COLUMNS.updatedAt)
-                .limit(1000)
-                .find()
-            : [];
-        const nonFavoriteAlbums = await ParseAlbum.query(online)
+          options.page === 0 ? await favoriteAlbumsQuery.find() : [];
+        let nonFavoriteAlbumsQuery = ParseAlbum.query(online)
           .notContainedIn(
             ParseAlbum.COLUMNS.objectId,
             getLoggedInUser().favoriteAlbums
           )
-          .descending(ParseAlbum.COLUMNS.updatedAt)
+          [filters.sortDirection](ParseAlbum.COLUMNS.updatedAt)
           .limit(options.pageSize)
-          .skip(options.page * options.pageSize)
-          .find();
-
-        return [...favoriteAlbums, ...nonFavoriteAlbums].map(
-          (album) => new ParseAlbum(album)
+          .skip(options.page * options.pageSize);
+        applyOwnershipFilter(nonFavoriteAlbumsQuery, filters.ownership);
+        nonFavoriteAlbumsQuery = applyNameDescriptionSearch(
+          nonFavoriteAlbumsQuery,
+          filters.nameDescriptionSearch
         );
+        const nonFavoriteAlbums = await nonFavoriteAlbumsQuery.find();
+
+        return [...favoriteAlbums, ...nonFavoriteAlbums];
       },
       { errorMessage: Strings.message.noAlbums, ...options }
     );
@@ -99,7 +122,7 @@ const useInfiniteQueryConfigs = () => {
     sortDirection: SortDirection;
     tagSearch?: string[];
   }
-  /** ["GET_ALL_IMAGES_INFINITE"] */
+  /** ["GET_ALL_IMAGES_INFINITE", filters] */
   const getAllImagesInfiniteQueryKey = (
     filters: GetAllImagesInfiniteFilters = { sortDirection: "descending" }
   ) => [QueryCacheGroups.GET_ALL_IMAGES_INFINITE, filters];
@@ -140,7 +163,7 @@ const useInfiniteQueryConfigs = () => {
           captions: Record<string, string>;
         }
     );
-  /** ["GET_IMAGES_BY_ID_INFINITE", imageIds] */
+  /** ["GET_IMAGES_BY_ID_INFINITE", imageIds, filters] */
   const getImagesByIdInfiniteQueryKey = (
     imageIds: string[],
     filters: GetImagesByIdInfiniteFilters = { sortDirection: "descending" }
@@ -175,7 +198,7 @@ const useInfiniteQueryConfigs = () => {
   };
 
   type GetImagesByOwnerFilters = GetAllImagesInfiniteFilters;
-  /** ["GET_IMAGES_BY_OWNER_INFINITE", owner.id] */
+  /** ["GET_IMAGES_BY_OWNER_INFINITE", owner.id, filters] */
   const getImagesByOwnerInfiniteQueryKey = (
     owner: ParseUser,
     filters: GetImagesByOwnerFilters = { sortDirection: "descending" }
@@ -232,7 +255,7 @@ const useInfiniteQueryConfigs = () => {
       async () => {
         const favoriteAlbums =
           options.page === 0
-            ? await Parse.Query.or(
+            ? await ParseQuery.or(
                 ParseAlbum.query(online).contains(
                   ParseAlbum.COLUMNS.collaborators,
                   getLoggedInUser().email
@@ -250,7 +273,7 @@ const useInfiniteQueryConfigs = () => {
                 .limit(1000)
                 .find()
             : [];
-        const nonFavoriteAlbums = await Parse.Query.or(
+        const nonFavoriteAlbums = await ParseQuery.or(
           ParseAlbum.query(online).contains(
             ParseAlbum.COLUMNS.collaborators,
             getLoggedInUser().email
@@ -269,9 +292,7 @@ const useInfiniteQueryConfigs = () => {
           .skip(options.page * options.pageSize)
           .find();
 
-        return [...favoriteAlbums, ...nonFavoriteAlbums].map(
-          (album) => new ParseAlbum(album)
-        );
+        return [...favoriteAlbums, ...nonFavoriteAlbums];
       },
       { errorMessage: Strings.message.noAlbums, ...options }
     );

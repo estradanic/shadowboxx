@@ -132,6 +132,11 @@ const Strings = {
       `Please check your email ${email} for the verification code`,
   },
   label: {
+    all: "All",
+    mine: "Mine",
+    shared: "Shared",
+    ascending: "Ascending",
+    descending: "Descending",
     tags: "Tags",
     tagSearch: "Tag Search",
     caption: "Caption",

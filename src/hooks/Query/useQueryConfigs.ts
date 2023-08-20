@@ -7,6 +7,7 @@ import {
   ParseUser,
   ParseDuplicate,
   ParseAlbumChangeNotification,
+  ParseQuery,
 } from "../../classes";
 import useQueryConfigHelpers, {
   FunctionOptions,
@@ -52,8 +53,7 @@ const useQueryConfigs = () => {
     }
     return await runFunctionInTryCatch<ParseAlbum>(
       async () => {
-        const album = await ParseAlbum.query(online).get(albumId);
-        return new ParseAlbum(album);
+        return await ParseAlbum.query(online).get(albumId);
       },
       { errorMessage: Strings.error.albumNotFound(), ...options }
     );
@@ -232,7 +232,7 @@ const useQueryConfigs = () => {
   ): Promise<string[]> => {
     return await runFunctionInTryCatch<string[]>(
       async () => {
-        const query = Parse.Query.or(
+        const query = ParseQuery.or(
           ParseAlbum.query(online).equalTo(
             ParseAlbum.COLUMNS.owner,
             getLoggedInUser().toNativePointer()
@@ -251,8 +251,7 @@ const useQueryConfigs = () => {
         const albums = await query.findAll();
         const relatedEmails = [];
         const gotUsers: { [key: string]: ParseUser } = {};
-        for (const albumResponse of albums) {
-          const album = new ParseAlbum(albumResponse);
+        for (const album of albums) {
           relatedEmails.push(...album.collaborators, ...album.viewers);
           if (!gotUsers[album.owner.id]) {
             gotUsers[album.owner.id] = await getUserByIdFunction(
@@ -378,7 +377,7 @@ const useQueryConfigs = () => {
     );
   };
 
-  /** ["GET_TAGS_BY_IMAGE_ID"] */
+  /** ["GET_TAGS_BY_IMAGE_ID", imageIds] */
   const getTagsByImageIdQueryKey = (imageIds: string[]) => [
     QueryCacheGroups.GET_TAGS_BY_IMAGE_ID,
     imageIds,

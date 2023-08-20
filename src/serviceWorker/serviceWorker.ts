@@ -11,7 +11,7 @@ import {
   SHARE_TARGET_DB_NAME,
   SHARE_TARGET_STORE_NAME,
   SHARE_TARGET_STORE_KEY,
-} from "./sharedExports";
+} from "./constants";
 
 declare let self: ServiceWorkerGlobalScope;
 

@@ -67,8 +67,12 @@ const AlbumFormDialog = ({
     resetOnSubmit: resetOnConfirm,
   });
   const { online } = useNetworkDetectionContext();
-  const { tagSearch, captionSearch, sortDirection, ...filterBarProps } =
-    useFilterBar();
+  const {
+    tagSearch,
+    sortDirection,
+    debouncedCaptionSearch,
+    ...filterBarProps
+  } = useFilterBar();
   const {
     getTagsByImageIdFunction,
     getTagsByImageIdOptions,
@@ -90,7 +94,7 @@ const AlbumFormDialog = ({
   >(
     getImagesByIdInfiniteQueryKey(allImageIds, {
       tagSearch,
-      captionSearch,
+      captionSearch: debouncedCaptionSearch,
       sortDirection,
       captions,
     }),
@@ -98,7 +102,12 @@ const AlbumFormDialog = ({
       getImagesByIdInfiniteFunction(
         online,
         allImageIds,
-        { tagSearch, captionSearch, sortDirection, captions },
+        {
+          tagSearch,
+          captionSearch: debouncedCaptionSearch,
+          sortDirection,
+          captions,
+        },
         {
           showErrorsInSnackbar: true,
           page,
@@ -197,7 +206,6 @@ const AlbumFormDialog = ({
             <ImageField
               filterBarProps={{
                 tagSearch,
-                captionSearch,
                 sortDirection,
                 tagOptions: tags,
                 ...filterBarProps,

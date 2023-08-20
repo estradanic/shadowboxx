@@ -4,7 +4,7 @@ import {
   ParseAlbum,
   ParseAlbumChangeNotification,
   ParseUser,
-  distinctBy,
+  distinct,
 } from "../../shared";
 import { UnpersistedParseAlbumChangeNotification } from "../../shared/classes/ParseAlbumChangeNotification";
 
@@ -19,7 +19,7 @@ const notifyOfAlbumChange = async (album: ParseAlbum, user?: ParseUser) => {
     { useMasterKey: true }
   );
   console.log("Getting users to notify of album change");
-  const usersToNotify = distinctBy(
+  const usersToNotify = distinct(
     (
       await ParseUser.cloudQuery(Parse)
         .containedIn(ParseUser.COLUMNS.email, [

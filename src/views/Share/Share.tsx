@@ -25,7 +25,7 @@ import {
   SHARE_TARGET_DB_NAME,
   SHARE_TARGET_STORE_KEY,
   SHARE_TARGET_STORE_NAME,
-} from "../../serviceWorker/sharedExports";
+} from "../../serviceWorker/constants";
 import useInfiniteScroll from "../../hooks/useInfiniteScroll";
 import useInfiniteQueryConfigs from "../../hooks/Query/useInfiniteQueryConfigs";
 import { useNavigate } from "react-router-dom";
@@ -113,6 +113,7 @@ const AlbumsToShareTo = ({ albums, classes, files }: AlbumsListProps) => {
   );
 };
 
+/** Page user is directed to when sharing an image from the Android share menu */
 const Share = memo(() => {
   useView("Share");
 

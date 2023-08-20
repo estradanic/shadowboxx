@@ -70,6 +70,7 @@ export const deepEqual = (
   return equal;
 };
 
+/** Typed wrapper for {@link Object.fromEntries} */
 export const fromEntries = <Key extends PropertyKey, Value>(
   entries: [Key, Value][]
 ): { [key in Key]: Value } => {

@@ -54,9 +54,11 @@ const useStyles = makeStyles((theme: Theme) => ({
 }));
 
 export interface TypographyProps extends Omit<MuiTypographyProps, "color"> {
+  /** The color of the text */
   color?: TypographyColor;
 }
 
+/** A component to display some text */
 const Typography = ({
   color = "textPrimary",
   children,

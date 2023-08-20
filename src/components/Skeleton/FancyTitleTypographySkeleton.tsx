@@ -9,6 +9,7 @@ import Skeleton from "./Skeleton";
 export interface FancyTitleTypographySkeletonProps
   extends Pick<FancyTitleTypographyProps, "outlineColor"> {}
 
+/** A skeleton component to display a fancy title */
 const FancyTitleTypographySkeleton = ({
   outlineColor,
 }: FancyTitleTypographySkeletonProps) => {

@@ -2,7 +2,9 @@ import loggerWrapper from "../loggerWrapper";
 import { ParseImage, Strings, GetImageReturn, ImageVariant } from "../shared";
 
 export interface GetImageParams {
+  /** Id of the requested image */
   imageId: string;
+  /** Variant of the requested image */
   variant: ImageVariant;
 }
 

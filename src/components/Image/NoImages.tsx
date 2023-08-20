@@ -16,9 +16,11 @@ const useStyles = makeStyles(() => ({
 }));
 
 export type NoImagesProps = {
+  /** The text to display */
   text?: string;
 };
 
+/** A component to display an svg when no images are found */
 const NoImages = ({ text = Strings.message.noImages }: NoImagesProps) => {
   const classes = useStyles();
 

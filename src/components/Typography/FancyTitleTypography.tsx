@@ -80,10 +80,13 @@ export const useStyles = makeStyles((theme: Theme) => ({
 }));
 
 export interface FancyTitleTypographyProps {
+  /** The color of the outline */
   outlineColor?: VariableColor;
+  /** The text to display */
   children: React.ReactNode;
 }
 
+/** A component to display a fancy title */
 const FancyTitleTypography = ({
   children,
   outlineColor = "primary",

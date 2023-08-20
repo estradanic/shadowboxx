@@ -1,5 +1,6 @@
 import VariableColor from "./VariableColor";
 
+/** Colors that typography can have */
 type TypographyColor =
   | VariableColor
   | "inherit"

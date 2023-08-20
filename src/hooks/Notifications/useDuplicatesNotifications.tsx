@@ -11,6 +11,7 @@ import {
 } from "../../contexts/NotificationsContext";
 import { useUserContext } from "../../contexts/UserContext";
 
+/** Hook to get/manage duplicate notifications */
 const useDuplicatesNotifications = () => {
   const { addNotification } = useNotificationsContext();
 

@@ -15,9 +15,11 @@ const useStyles = makeStyles(() => ({
 }));
 
 export type NoAlbumsProps = {
+  /** The text to display */
   text?: string;
 };
 
+/** Component to display an svg when no albums exist */
 const NoAlbums = ({ text = Strings.message.noAlbums }) => {
   const classes = useStyles();
 

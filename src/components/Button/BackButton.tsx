@@ -8,6 +8,7 @@ import useNavigate from "../../hooks/useNavigate";
 /** Interface defining props for BackButton */
 interface BackButtonProps
   extends Omit<ButtonProps, "onClick" | "children" | "startIcon"> {
+  /** Whether the button placement is in the header or body of the content (for styling) */
   placement?: "header" | "body";
 }
 

@@ -2,6 +2,7 @@ import loggerWrapper from "../loggerWrapper";
 import { ParseUser, Strings } from "../shared";
 
 export type UndoEmailChangeParams = {
+  /** Email of user to undo email change for */
   email: string;
 };
 

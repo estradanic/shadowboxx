@@ -98,8 +98,12 @@ const Album = memo(() => {
     () => getAlbumFunction(online, id, { showErrorsInSnackbar: true }),
     getAlbumOptions()
   );
-  const { sortDirection, captionSearch, tagSearch, ...restFilterBarProps } =
-    useFilterBar();
+  const {
+    sortDirection,
+    debouncedCaptionSearch,
+    tagSearch,
+    ...restFilterBarProps
+  } = useFilterBar();
   const { data: tags } = useQuery<string[], Error>(
     getTagsByImageIdQueryKey(album?.images ?? []),
     () => getTagsByImageIdFunction(album?.images ?? []),
@@ -115,7 +119,7 @@ const Album = memo(() => {
   } = useInfiniteQuery<ParseImage[], Error>(
     getImagesByIdInfiniteQueryKey(album?.images ?? [], {
       sortDirection,
-      captionSearch,
+      captionSearch: debouncedCaptionSearch,
       captions: album?.captions ?? {},
       tagSearch,
     }),
@@ -125,7 +129,7 @@ const Album = memo(() => {
         album?.images ?? [],
         {
           sortDirection,
-          captionSearch,
+          captionSearch: debouncedCaptionSearch,
           captions: album?.captions ?? {},
           tagSearch,
         },
@@ -182,7 +186,6 @@ const Album = memo(() => {
   const filterBar = (
     <FilterBar
       tagSearch={tagSearch}
-      captionSearch={captionSearch}
       sortDirection={sortDirection}
       tagOptions={tags}
       {...restFilterBarProps}

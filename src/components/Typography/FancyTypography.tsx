@@ -14,9 +14,11 @@ const useStyles = makeStyles((theme: Theme) => ({
 }));
 
 export interface FancyTypographyProps extends Omit<TypographyProps, "variant"> {
+  /** The variant of the text to display */
   variant?: "loading" | TypographyProps["variant"];
 }
 
+/** A component to display some fancy text */
 const FancyTypography = ({
   className,
   children,

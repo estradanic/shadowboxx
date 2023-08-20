@@ -11,6 +11,7 @@ import {
 } from "../../contexts/NotificationsContext";
 import { useUserContext } from "../../contexts/UserContext";
 
+/** Hook to get/manage album change notifications */
 const useAlbumChangeNotifications = () => {
   const { addNotification } = useNotificationsContext();
   const { isUserLoggedIn } = useUserContext();

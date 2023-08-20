@@ -8,9 +8,11 @@ import {
 } from "../shared";
 
 export interface ResolveDuplicatesParams {
+  /** List of image ids to resolve duplicates for */
   duplicateIds: string[];
 }
 
+/** Function to resolve duplicates */
 const resolveDuplicates = async (
   { duplicateIds }: ResolveDuplicatesParams,
   user?: ParseUser

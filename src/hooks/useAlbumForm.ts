@@ -8,14 +8,18 @@ import { useActionDialogContext } from "../components/Dialog/ActionDialog";
 export type AlbumFormChanges = AlbumSaveContext;
 
 export type UseAlbumFormOptions = {
+  /** Whether to reset the form after submitting */
   resetOnSubmit?: boolean;
+  /** Callback when the form is submitted */
   onSubmit: (
     album: AlbumAttributes,
     changes: AlbumFormChanges
   ) => Promise<void> | void;
+  /** Callback when the form is cancelled */
   onCancel?: () => Promise<void> | void;
 };
 
+/** Hook to manage an album form */
 const useAlbumForm = (
   album: AlbumAttributes,
   {

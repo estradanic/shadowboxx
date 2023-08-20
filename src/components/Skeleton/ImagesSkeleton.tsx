@@ -3,6 +3,7 @@ import Grid from "@material-ui/core/Grid";
 import ImageSkeleton from "./ImageSkeleton";
 import useImageStyles from "../Image/useImageStyles";
 
+/** A skeleton component to display multiple images */
 const ImagesSkeleton = () => {
   const classes = useImageStyles();
 

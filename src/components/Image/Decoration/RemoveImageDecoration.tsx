@@ -21,7 +21,9 @@ export interface RemoveImageDecorationProps
     ImageDecorationProps<IconProps>,
     "Component" | "description" | "corner" | "ComponentProps"
   > {
+  /** Which corner of the image to render the decoration */
   corner?: ImageDecorationProps<IconProps>["corner"];
+  /** Props to pass down to the icon */
   IconProps?: IconProps;
 }
 
@@ -33,6 +35,7 @@ const RemoveImageDecorationIcon = forwardRef(
   )
 );
 
+/** Image decoration component to remove the decorated image */
 const RemoveImageDecoration = ({
   corner = "topLeft",
   className: userClassName,

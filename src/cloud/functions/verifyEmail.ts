@@ -3,7 +3,9 @@ import { ParseUser, Strings } from "../shared";
 import { updateEmail } from "../triggers";
 
 export interface VerifyEmailParams {
+  /** Verification code to verify email */
   code: string;
+  /** Email to verify */
   email: string;
 }
 

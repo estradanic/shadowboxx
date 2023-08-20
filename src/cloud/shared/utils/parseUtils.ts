@@ -1,5 +1,6 @@
 import { ClassName, ParseObject, ParsePointer } from "../classes";
 
+/** Get the object id of a Parse.Object, Parse.Pointer, or ParseObject */
 export const getObjectId = (
   entity?:
     | Parse.Pointer

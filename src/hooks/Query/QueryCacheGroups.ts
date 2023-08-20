@@ -1,3 +1,4 @@
+/** Cache groups used in @tanstack/query useQuery and useInfiniteQuery */
 enum QueryCacheGroups {
   GET_ALBUM = "GET_ALBUM",
   GET_IMAGES_BY_ID = "GET_IMAGES_BY_ID",

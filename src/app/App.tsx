@@ -18,7 +18,7 @@ import {
   SHARE_TARGET_DB_NAME,
   SHARE_TARGET_STORE_KEY,
   SHARE_TARGET_STORE_NAME,
-} from "../serviceWorker/sharedExports";
+} from "../serviceWorker/constants";
 import { useUserContext } from "../contexts/UserContext";
 import { useNotificationsContext } from "../contexts/NotificationsContext";
 

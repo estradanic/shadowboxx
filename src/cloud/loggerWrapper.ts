@@ -1,5 +1,6 @@
 type LoggedCallback<TIn extends any[], TOut> = (...args: TIn) => Promise<TOut>;
 
+/** Function to wrap an async function in a try-catch block and log the error */
 const loggerWrapper = <TIn extends any[], TOut>(
   name: string,
   callback: LoggedCallback<TIn, TOut>

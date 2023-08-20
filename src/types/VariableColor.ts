@@ -1,3 +1,4 @@
+/** Colors available to use in the theme */
 type VariableColor =
   | "info"
   | "warning"

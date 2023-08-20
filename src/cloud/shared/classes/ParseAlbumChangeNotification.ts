@@ -62,6 +62,11 @@ export default class ParseAlbumChangeNotification
     return new ParseQuery(nativeQuery);
   }
 
+  /**
+   * Get a ParseQuery for the "AlbumChangeNotification" class. For cloud code only.
+   * @param parse Parse instance
+   * @returns ParseQuery for the "AlbumChangeNotification" class
+   */
   static cloudQuery(parse: typeof Parse) {
     return ParseQuery.for("AlbumChangeNotification", parse);
   }
@@ -79,6 +84,7 @@ export default class ParseAlbumChangeNotification
     this._albumChangeNotification = albumChangeNotification;
   }
 
+  /** Acknowledge the change notification */
   async acknowledge() {
     this.count = 0;
     await this._albumChangeNotification.save();
@@ -136,6 +142,7 @@ export default class ParseAlbumChangeNotification
   }
 }
 
+/** Class for unpersisted AlbumChangeNotification objects */
 export class UnpersistedParseAlbumChangeNotification extends ParseAlbumChangeNotification {
   constructor(attributes: Partial<Attributes<"AlbumChangeNotification">> = {}) {
     super(

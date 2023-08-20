@@ -13,9 +13,9 @@ const useStyles = makeStyles((theme: Theme) => ({
   },
 }));
 
+/** A component to display a skeleton (shimmering placeholder) */
 const Skeleton = ({ className, ...rest }: SkeletonProps) => {
   const classes = useStyles();
-
   return (
     <MuiSkeleton className={classNames(className, classes.root)} {...rest} />
   );

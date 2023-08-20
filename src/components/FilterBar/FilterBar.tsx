@@ -10,7 +10,8 @@ import { Strings } from "../../resources";
 import Tag from "../Tag/Tag";
 import { dedupe } from "../../utils";
 
-export interface FilterBarProps extends ReturnType<typeof useFilterBar> {
+export interface FilterBarProps
+  extends Omit<ReturnType<typeof useFilterBar>, "debouncedCaptionSearch"> {
   /** Whether to show the sort direction buttons */
   showSortDirection?: boolean;
   /** Whether to show the caption search */
@@ -60,6 +61,7 @@ const useStyles = makeStyles((theme: Theme) => ({
   },
 }));
 
+/** Component to handle filter state for images */
 const FilterBar = ({
   sortDirection,
   setSortDirection,
@@ -96,7 +98,6 @@ const FilterBar = ({
     <Grid
       xs={12}
       className={classes.toolbar}
-      direction="row"
       justifyContent="space-between"
       item
       alignContent="flex-end"
@@ -121,7 +122,7 @@ const FilterBar = ({
             onClick={() => setSortDirection("ascending")}
             size="large"
           >
-            Ascending
+            {Strings.label.ascending}
           </Button>
           <Button
             classes={{
@@ -133,7 +134,7 @@ const FilterBar = ({
             onClick={() => setSortDirection("descending")}
             size="large"
           >
-            Descending
+            {Strings.label.descending}
           </Button>
         </Grid>
       )}

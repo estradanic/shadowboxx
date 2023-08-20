@@ -15,9 +15,11 @@ const useStyles = makeStyles(() => ({
 }));
 
 export type NoConnectionProps = {
+  /** The text to display */
   text?: string;
 };
 
+/** A component to display an svg when no connection is found */
 const NoConnection = ({ text = Strings.error.noConnection }) => {
   const classes = useStyles();
 

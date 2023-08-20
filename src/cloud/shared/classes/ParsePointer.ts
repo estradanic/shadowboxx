@@ -96,6 +96,7 @@ export default class ParsePointer<C extends ClassName> {
     return getObjectId(this._pointer);
   }
 
+  /** Gets the underlying Parse.Pointer */
   toNativePointer(): Parse.Pointer {
     return this._pointer;
   }

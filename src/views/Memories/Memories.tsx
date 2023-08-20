@@ -104,7 +104,7 @@ const ActionBar = ({ selectedImages, images, onDelete }: ActionBarProps) => {
 };
 
 /**
- * Page for viewing all the logged in users's images
+ * Page for viewing all the logged in users's images/videos
  */
 const Memories = memo(() => {
   useView("Memories");

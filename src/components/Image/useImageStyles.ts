@@ -1,5 +1,6 @@
 import { makeStyles, Theme } from "@material-ui/core/styles";
 
+/** Custom hook for styling Image components in a group */
 const useImageStyles = makeStyles((theme: Theme) => ({
   imageContainer: {
     display: "flex",
