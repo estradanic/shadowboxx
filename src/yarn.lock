@@ -4248,9 +4248,10 @@ normalize-path@^3.0.0, normalize-path@~3.0.0:
   resolved "https://registry.yarnpkg.com/normalize-path/-/normalize-path-3.0.0.tgz#0dcd69ff23a1c9b11fd0978316644a0388216a65"
   integrity sha512-6eZs5Ls3WtCisHWp9S2GUy8dqkpGi4BVSz3GaqiE6ezub0512ESztXUwUB6C6IKbQkY2Pnb/mD4WYojCRwcwLA==
 
-"nosleep.js@git+https://github.com/ViRPo/NoSleep.js.git#f7a6122f5d6700f18a68bff2c4114b81fdf6fa55":
+"nosleep.js@https://github.com/ViRPo/NoSleep.js#f7a6122f5d6700f18a68bff2c4114b81fdf6fa55":
   version "0.9.0"
-  resolved "git+https://github.com/ViRPo/NoSleep.js.git#f7a6122f5d6700f18a68bff2c4114b81fdf6fa55"
+  uid f7a6122f5d6700f18a68bff2c4114b81fdf6fa55
+  resolved "https://github.com/ViRPo/NoSleep.js#f7a6122f5d6700f18a68bff2c4114b81fdf6fa55"
 
 notistack@^1.0.5:
   version "1.0.10"
@@ -4840,7 +4841,7 @@ scheduler@^0.20.2:
     loose-envify "^1.1.0"
     object-assign "^4.1.1"
 
-semver@7.0.0, semver@^6.1.1, semver@^6.1.2, semver@^6.3.0, semver@^7.3.4, semver@^7.3.7, semver@^7.5.2:
+semver@7.0.0, semver@^6.1.1, semver@^6.1.2, semver@^6.3.0, semver@^7.3.4, semver@^7.3.7, semver@^7.5.0, semver@^7.5.2:
   version "7.5.4"
   resolved "https://registry.yarnpkg.com/semver/-/semver-7.5.4.tgz#483986ec4ed38e1c6c48c34894a9182dbff68a6e"
   integrity sha512-1bCSESV6Pv+i21Hvpxp3Dx+pSD8lIPt8uVjRrxAUt/nbswYc+tK6Y2btiULjd4+fnq15PX+nqQDC7Oft7WkwcA==
@@ -5282,10 +5283,10 @@ uuid@^9.0.0:
   resolved "https://registry.yarnpkg.com/uuid/-/uuid-9.0.0.tgz#592f550650024a38ceb0c562f2f6aa435761efb5"
   integrity sha512-MXcSTerfPa4uqyzStbRoTgt5XIe3x5+42+q1sDuy3R5MDk66URdLMOZe5aPX/SQd+kuYAh0FdP/pO28IkQyTeg==
 
-vite-plugin-checker@^0.5.6:
-  version "0.5.6"
-  resolved "https://registry.yarnpkg.com/vite-plugin-checker/-/vite-plugin-checker-0.5.6.tgz#233978091dfadef0873f0a8aacfe7fc431212b95"
-  integrity sha512-ftRyON0gORUHDxcDt2BErmsikKSkfvl1i2DoP6Jt2zDO9InfvM6tqO1RkXhSjkaXEhKPea6YOnhFaZxW3BzudQ==
+vite-plugin-checker@^0.6.2:
+  version "0.6.2"
+  resolved "https://registry.yarnpkg.com/vite-plugin-checker/-/vite-plugin-checker-0.6.2.tgz#3790381734440033e6cb3cee9d92fcfdd69a4d71"
+  integrity sha512-YvvvQ+IjY09BX7Ab+1pjxkELQsBd4rPhWNw8WLBeFVxu/E7O+n6VYAqNsKdK/a2luFlX/sMpoWdGFfg4HvwdJQ==
   dependencies:
     "@babel/code-frame" "^7.12.13"
     ansi-escapes "^4.3.0"
@@ -5297,6 +5298,7 @@ vite-plugin-checker@^0.5.6:
     lodash.debounce "^4.0.8"
     lodash.pick "^4.4.0"
     npm-run-path "^4.0.1"
+    semver "^7.5.0"
     strip-ansi "^6.0.0"
     tiny-invariant "^1.1.0"
     vscode-languageclient "^7.0.0"
