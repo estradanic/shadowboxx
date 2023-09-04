@@ -129,6 +129,7 @@ const Home = memo(() => {
     getAllAlbumsInfiniteOptions()
   );
   useInfiniteScroll(fetchNextPage, { canExecute: !isFetchingNextPage });
+
   const { getLoggedInUser } = useUserContext();
 
   const albums = useFlatInfiniteQueryData(data);

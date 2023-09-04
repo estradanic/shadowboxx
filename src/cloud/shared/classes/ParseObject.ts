@@ -6,6 +6,9 @@ import { ImageAttributes } from "./ParseImage";
 import ParsePointer from "./ParsePointer";
 import { UserAttributes } from "./ParseUser";
 
+/** Type defining whether a ParseObject is persisted or unpersisted (boolean, but more readable) */
+export type PersistenceState = "persisted" | "unpersisted";
+
 /** Type encompassing the classNames allowed for ParseObjects */
 export type ClassName =
   | "Album"

@@ -70,7 +70,7 @@ interface AlbumsListProps {
 const AlbumsToShareTo = ({ albums, classes, files }: AlbumsListProps) => {
   const borderColor = useRandomColor();
   const { uploadImagesFromFiles } = useImageContext();
-  const { enqueueErrorSnackbar } = useSnackbar();
+  const { enqueueErrorSnackbar, enqueueSuccessSnackbar } = useSnackbar();
   const navigate = useNavigate();
 
   return (
@@ -86,9 +86,9 @@ const AlbumsToShareTo = ({ albums, classes, files }: AlbumsListProps) => {
               className={classes.card}
               borderColor={borderColor}
               value={album}
-              onClick={async () => {
+              onClick={() => {
                 try {
-                  await uploadImagesFromFiles(files, {
+                  uploadImagesFromFiles(files, {
                     onEachCompleted: async (image) => {
                       await album.update(
                         {
@@ -99,6 +99,7 @@ const AlbumsToShareTo = ({ albums, classes, files }: AlbumsListProps) => {
                       );
                     },
                   });
+                  enqueueSuccessSnackbar(Strings.message.startedUploading);
                   navigate(routes.Album.path.replace(":id", album.objectId));
                 } catch (e) {
                   console.error(e);

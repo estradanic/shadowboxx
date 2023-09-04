@@ -81,15 +81,12 @@ export default class ParseAlbum
    * @returns Parse.Query for Albums
    */
   static query(online = true) {
-    let nativeQuery;
-    if (online) {
-      nativeQuery = new Parse.Query<Parse.Object<ParsifyPointers<"Album">>>(
-        "Album"
-      );
-    }
-    nativeQuery = new Parse.Query<Parse.Object<ParsifyPointers<"Album">>>(
+    let nativeQuery = new Parse.Query<Parse.Object<ParsifyPointers<"Album">>>(
       "Album"
-    ).fromLocalDatastore();
+    );
+    if (!online) {
+      nativeQuery.fromLocalDatastore();
+    }
     return new ParseQuery(nativeQuery);
   }
 

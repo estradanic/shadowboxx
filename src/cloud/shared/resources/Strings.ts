@@ -93,6 +93,7 @@ const Strings = {
     tagImage: "Tag Image",
   },
   message: {
+    startedUploading: "Started uploading...",
     uploading: (fileName: string) => `Uploading ${fileName}`,
     processing: (fileName: string) => `Processing ${fileName}`,
     uploaded: (fileName: string) => `Uploaded ${fileName}`,

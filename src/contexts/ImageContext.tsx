@@ -6,12 +6,7 @@ import ErrorIcon from "@material-ui/icons/Error";
 import CloudUploadIcon from "@material-ui/icons/CloudUpload";
 import HourglassIcon from "@material-ui/icons/HourglassEmpty";
 import { Strings } from "../resources";
-import {
-  ParseImage,
-  ImageAttributes,
-  UnpersistedParseImage,
-  UnpersistedParseImageAttributes,
-} from "../classes";
+import { ParseImage, ImageAttributes, UnpersistedParseImage } from "../classes";
 import { makeValidFileName, removeExtension } from "../utils";
 import { useSnackbar } from "../components/Snackbar";
 import { useUserContext } from "./UserContext";
@@ -147,7 +142,7 @@ export const ImageContextProvider = ({
   );
 
   const uploadImage = async (
-    image: UnpersistedParseImageAttributes,
+    image: ImageAttributes<"unpersisted">,
     acl?: Parse.ACL
   ) => {
     try {

@@ -24,5 +24,4 @@ export type {
   AlbumChangeNotificationAttributes,
   ParsifyPointers,
   ClassName,
-  UnpersistedParseImageAttributes,
 } from "../cloud/shared/classes";

@@ -5,6 +5,7 @@ import ParseObject, {
   Attributes,
   Columns,
   ParsifyPointers,
+  PersistenceState,
 } from "./ParseObject";
 import ParseUser from "./ParseUser";
 import ParseQuery from "./ParseQuery";
@@ -12,15 +13,11 @@ import ParseQuery from "./ParseQuery";
 export type ImageType = "image" | "video" | "gif";
 
 /** Interface defining Image-specific attributes */
-export interface ImageAttributes {
+export type ImageAttributes<
+  TPersistenceState extends PersistenceState = "persisted"
+> = {
   /** The actual saved file */
   file: Parse.File;
-  /** The file resized for mobile */
-  fileMobile: Parse.File;
-  /** The file resized for thumbnails */
-  fileThumb: Parse.File;
-  /** The file in png format for older iPhones */
-  fileLegacy: Parse.File;
   /** User that owns this image */
   owner: ParsePointer<"_User">;
   /** Name of the image */
@@ -33,7 +30,16 @@ export interface ImageAttributes {
   type: ImageType;
   /** Tags on the image */
   tags?: string[];
-}
+} & (TPersistenceState extends "unpersisted"
+  ? {}
+  : {
+      /** The file resized for mobile */
+      fileMobile: Parse.File;
+      /** The file resized for thumbnails */
+      fileThumb: Parse.File;
+      /** The file in png format for older iPhones */
+      fileLegacy: Parse.File;
+    });
 
 type ImageKeys = Required<{
   [key in keyof ImageAttributes]: key;
