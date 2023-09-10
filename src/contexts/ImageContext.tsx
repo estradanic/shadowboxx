@@ -11,7 +11,8 @@ import { makeValidFileName, removeExtension } from "../utils";
 import { useSnackbar } from "../components/Snackbar";
 import { useUserContext } from "./UserContext";
 import AddImageDialog from "../components/Images/AddImageDialog";
-import { LinearProgress } from "../components/Progress";
+import LinearProgress from "../components/Progress/LinearProgress";
+import Typography from "../components/Typography/Typography";
 import { useGlobalLoadingStore } from "../stores";
 import { Notification, useNotificationsContext } from "./NotificationsContext";
 import { useJobContext } from "./JobContext";
@@ -348,10 +349,10 @@ export const ImageContextProvider = ({
                       : Strings.error.common;
                   notification.update((prev) => ({
                     ...prev,
-                    title: message,
+                    title: Strings.error.uploadingImage(file.name),
                     icon: <ErrorIcon />,
                     removeable: true,
-                    detail: undefined,
+                    detail: <Typography>{message}</Typography>,
                   }));
                   return undefined;
                 }
