@@ -152,7 +152,6 @@ const AddImageDialog = ({
       title={
         multiple ? Strings.action.selectImages : Strings.action.selectImage
       }
-      message=""
       handleConfirm={handleConfirm}
       handleCancel={handleCancel}
       type="prompt"

@@ -65,10 +65,10 @@ const useStyles = makeStyles((theme: Theme) => ({
   },
 }));
 
+type ActionDialogType = "alert" | "confirm" | "prompt";
+
 /** Interface defining props for ActionDialog */
-export interface ActionDialogProps extends DialogProps {
-  /** Message about the dialog */
-  message: string;
+export type ActionDialogProps<T extends ActionDialogType> = DialogProps & {
   /** Function to run when the cancel button is clicked */
   handleCancel?: () => void;
   /** Function to run when the confirm button is clicked */
@@ -76,19 +76,22 @@ export interface ActionDialogProps extends DialogProps {
   /** Function to run when the close button is clicked */
   handleClose?: () => void;
   /** What type of dialog this is, similar to builtin javascript alert, confirm, and prompt */
-  type: "alert" | "confirm" | "prompt";
+  type: T;
   /** Color of the confirm button */
   confirmButtonColor?: "error" | "warning" | "success" | "default";
   /** Text for the confirm button */
   confirmButtonText?: string;
   /** Props to be passed to the DialogContent component */
   DialogContentProps?: Omit<DialogContentProps, "children">;
-}
+} & (T extends "prompt"
+  ? {message?: never}
+  : {message: string}
+);
 
 /** ActionDialogProps overridable by a function call from the context */
 export type ActionDialogHookProps = Partial<
   Omit<
-    ActionDialogProps,
+    ActionDialogProps<ActionDialogType>,
     | "open"
     | "type"
     | "message"
@@ -140,7 +143,7 @@ export const ActionDialogContextProvider = ({
   children,
 }: ActionDialogContextProviderProps) => {
   const [open, setOpen] = useState<boolean>(false);
-  const [type, setType] = useState<ActionDialogProps["type"]>("alert");
+  const [type, setType] = useState<ActionDialogType>("alert");
   const [message, setMessage] = useState<string>("");
   const [fieldsPortalNode, setFieldsPortalNode] = useState<HtmlPortalNode>();
   const [handleConfirm, setHandleConfirm] = useState(() => async () => {});
@@ -203,7 +206,7 @@ export const ActionDialogContextProvider = ({
   return (
     <ActionDialogContext.Provider value={value}>
       <>
-        <ActionDialog
+        <ActionDialog<typeof type>
           message={message}
           open={open}
           handleCancel={handleCancel}
@@ -223,14 +226,14 @@ export const ActionDialogContextProvider = ({
 /** Alias to useContext(ActionDialogContext) */
 export const useActionDialogContext = () => useContext(ActionDialogContext);
 
-interface ActionDialogContentProps
-  extends Pick<ActionDialogProps, "message" | "type" | "children">,
+interface ActionDialogContentProps<T extends ActionDialogType>
+  extends Pick<ActionDialogProps<T>, "message" | "type" | "children">,
     Omit<DialogContentProps, "children"> {}
 
 // This is broken into a separate component and memoized to prevent rerenders
 // when handleCancel, handleConfirm, and handleClose change.
 const ActionDialogContent = memo(
-  ({ message, type, children, ...rest }: ActionDialogContentProps) => {
+  <T extends ActionDialogType>({ message, type, children, ...rest }: ActionDialogContentProps<T>) => {
     return (
       <DialogContent {...rest}>
         {type === "prompt" ? (
@@ -244,7 +247,7 @@ const ActionDialogContent = memo(
 );
 
 /** Component to replace the builtin javascript alert, confirm, and prompt functionality */
-const ActionDialog = ({
+const ActionDialog = <T extends ActionDialogType>({
   title,
   message,
   handleCancel,
@@ -257,7 +260,7 @@ const ActionDialog = ({
   DialogContentProps = {},
   className,
   ...rest
-}: ActionDialogProps) => {
+}: ActionDialogProps<T>) => {
   const randomColor = useRandomColor();
   const classes = useStyles({ borderColor: randomColor });
 
@@ -268,7 +271,7 @@ const ActionDialog = ({
           {title}
         </Typography>
       </DialogTitle>
-      <ActionDialogContent
+      <ActionDialogContent<T>
         message={message}
         type={type}
         className={classes.content}
