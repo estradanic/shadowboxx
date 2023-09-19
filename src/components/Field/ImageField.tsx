@@ -45,10 +45,12 @@ const useStyles = makeStyles((theme: Theme) => ({
   endAdornment: {
     color: theme.palette.primary.light,
     cursor: "pointer",
+    marginRight: theme.spacing(2),
   },
   endAdornmentAvatar: {
     backgroundColor: theme.palette.primary.light,
     cursor: "default",
+    marginRight: theme.spacing(2),
   },
   input: {
     cursor: "text",

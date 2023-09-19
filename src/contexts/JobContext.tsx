@@ -18,11 +18,13 @@ export interface JobContextProviderProps {
   children: React.ReactNode;
 }
 
+const MAX_CURRENT_JOBS = 4 as const;
+
 const JobContext = createContext<JobContextValue | undefined>(undefined);
 
 /** Provides a context that allows adding jobs to a queue. */
 export const JobContextProvider = ({ children }: JobContextProviderProps) => {
-  const promiseQueue = new PQueue({ concurrency: 4 });
+  const promiseQueue = new PQueue({ concurrency: MAX_CURRENT_JOBS });
   const [jobCount, setJobCount] = useState(0);
   const wakeLockRef = useRef<WakeLockSentinel>();
 

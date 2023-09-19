@@ -14,6 +14,7 @@ import { useNetworkDetectionContext } from "../../contexts/NetworkDetectionConte
 
 const useStyles = makeStyles((theme: Theme) => ({
   endAdornment: {
+    marginRight: theme.spacing(2),
     "& *": {
       color: theme.palette.error.main,
       "&:hover, &:active, &:focus": {

@@ -11,6 +11,7 @@ const useStyles = makeStyles((theme: Theme) => ({
   endAdornment: {
     color: theme.palette.primary.light,
     cursor: "pointer",
+    marginRight: theme.spacing(2),
   },
   input: {
     backgroundColor: `${theme.palette.background.paper} !important`,
