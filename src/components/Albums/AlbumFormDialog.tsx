@@ -23,7 +23,7 @@ import useQueryConfigs from "../../hooks/Query/useQueryConfigs";
 
 /** Interface defining props for AlbumFormDialog */
 export interface AlbumFormDialogProps
-  extends Pick<ActionDialogProps, "open" | "handleCancel"> {
+  extends Pick<ActionDialogProps<"prompt">, "open" | "handleCancel"> {
   /** Value for the component */
   value: AlbumAttributes;
   /** Function to run when the confirm button is clicked */
@@ -146,7 +146,6 @@ const AlbumFormDialog = ({
       maxWidth="lg"
       open={open}
       title={name ?? Strings.label.untitledAlbum}
-      message=""
       handleConfirm={onSubmit}
       handleCancel={onCancel}
       type="prompt"

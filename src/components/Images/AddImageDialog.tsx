@@ -21,7 +21,7 @@ import useQueryConfigs from "../../hooks/Query/useQueryConfigs";
 import FilterBar from "../FilterBar/FilterBar";
 
 export interface AddImageDialogProps
-  extends Pick<ActionDialogProps, "open" | "handleCancel"> {
+  extends Pick<ActionDialogProps<"prompt">, "open" | "handleCancel"> {
   /** Function to run when the confirm button is clicked */
   handleConfirm: (value: ParseImage[]) => Promise<void>;
   /** List of already selected images */

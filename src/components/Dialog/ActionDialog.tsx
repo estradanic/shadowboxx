@@ -271,7 +271,7 @@ const ActionDialog = <T extends ActionDialogType>({
           {title}
         </Typography>
       </DialogTitle>
-      <ActionDialogContent<T>
+      <ActionDialogContent
         message={message}
         type={type}
         className={classes.content}
