@@ -191,6 +191,9 @@ export const ImageContextProvider = ({
     await ffmpeg.load();
     let success = true;
     ffmpeg.setLogger(({ message }) => {
+      if (!message) {
+        return;
+      }
       if (message.includes("Conversion failed!")) {
         success = false;
         return;
