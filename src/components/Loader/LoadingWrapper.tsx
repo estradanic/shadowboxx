@@ -14,6 +14,10 @@ const useStyles = makeStyles((theme: Theme) => ({
   wrapper: {
     pointerEvents: ({ loading }: any) => (loading ? "none" : "auto"),
   },
+  globalLoaderWrapper: {
+    width: "100vw",
+    height: "100vh",
+  },
   loaderWrapper: {
     position: "absolute",
     top: 0,
@@ -26,18 +30,20 @@ const useStyles = makeStyles((theme: Theme) => ({
       opacity(backgroundColor ?? theme.palette.background.default, 0.7),
     zIndex: theme.zIndex.snackbar,
   },
+  globalLoader: {
+    left: "25vw",
+    right: "25vw",
+    width: "50vw",
+  },
   loader: {
     position: "absolute",
     display: "flex",
     flexDirection: "column",
     alignItems: "center",
     justifyContent: "center",
-    left: "25vw",
-    right: "25vw",
-    width: "50vw",
   },
   centerPositionLoader: {
-    top: `calc(50vh - 16rem)`,
+    top: `calc(50% - 16rem)`,
   },
   topPositionLoader: {
     top: theme.spacing(1),
@@ -56,6 +62,8 @@ const useStyles = makeStyles((theme: Theme) => ({
 export interface LoadingWrapperProps
   extends Omit<CircularProgressProps, "variant" | "classes">,
     Omit<LinearProgressProps, "variant" | "classes" | "value"> {
+  /** Whether the wrapper should cover the whole screen */
+  global?: boolean;
   /** Whether to display the LoadingWrapper */
   loading?: boolean;
   /** Content to display under the loader */
@@ -72,7 +80,7 @@ export interface LoadingWrapperProps
   progress?: LinearProgressProps["value"];
 }
 
-/** Component to disable input on elements and show visual clues while they are loading */
+/** Component to show a loading overlay over elements */
 const LoadingWrapper = ({
   loading = false,
   content,
@@ -82,6 +90,7 @@ const LoadingWrapper = ({
   verticalPosition = "center",
   type = "indeterminate",
   progress,
+  global = true,
   ...rest
 }: LoadingWrapperProps) => {
   const classes = useStyles({ loading, backgroundColor });
@@ -91,12 +100,12 @@ const LoadingWrapper = ({
     <div className={className}>
       <div className={classes.wrapper}>{children}</div>
       {loading && (
-        <div className={classes.loaderWrapper}>
+        <div className={classNames(classes.loaderWrapper, {[classes.globalLoaderWrapper]: global})}>
           <div
-            className={classNames({
-              [classes.loader]: true,
+            className={classNames(classes.loader, {
               [classes.topPositionLoader]: verticalPosition === "top",
               [classes.centerPositionLoader]: verticalPosition === "center",
+              [classes.globalLoader]: global,
             })}
           >
             {type === "indeterminate" ? (

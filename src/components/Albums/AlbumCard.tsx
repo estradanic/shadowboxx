@@ -38,6 +38,9 @@ import { ImageContextProvider } from "../../contexts/ImageContext";
 import { useNetworkDetectionContext } from "../../contexts/NetworkDetectionContext";
 import { useUserContext } from "../../contexts/UserContext";
 import useQueryConfigs from "../../hooks/Query/useQueryConfigs";
+import { useJobContext } from "../../contexts/JobContext";
+import { CircularProgress } from "@material-ui/core";
+import { LoadingWrapper } from "../Loader";
 
 interface UseStylesParams {
   borderColor: VariableColor;
@@ -198,6 +201,11 @@ const AlbumCard = memo(({ value, onChange, borderColor }: AlbumCardProps) => {
     [getLoggedInUser, value.owner.id]
   );
 
+  const {jobInfo} = useJobContext();
+  const jobsForAlbum = Object.values(jobInfo).filter((j) => j.albumId === value.objectId);
+  const jobProgress = jobsForAlbum.length ? jobsForAlbum.reduce((acc, j) => acc + (j.progress ?? 0), 0) : -1;
+  console.log({jobsForAlbum, jobProgress, jobInfo});
+
   const location = useLocation();
 
   const { enqueueErrorSnackbar, enqueueSuccessSnackbar } = useSnackbar();
@@ -288,14 +296,21 @@ const AlbumCard = memo(({ value, onChange, borderColor }: AlbumCardProps) => {
           }`}
         />
         {coverImage ? (
-          <CardMedia
-            className={classes.media}
-            parseImage={coverImage}
-            variant="contained"
-            component={Image}
-            title={coverImage?.name}
-            onClick={navigateToAlbum}
-          />
+          <LoadingWrapper
+            global={false}
+            loading={!!jobsForAlbum.length}
+            type={jobProgress === -1 ? "indeterminate" : "determinate"}
+            progress={jobProgress}
+          >
+            <CardMedia
+              className={classes.media}
+              parseImage={coverImage}
+              variant="contained"
+              component={Image}
+              title={coverImage?.name}
+              onClick={navigateToAlbum}
+            />
+          </LoadingWrapper>
         ) : (
           <Empty height={300} />
         )}
@@ -397,6 +412,7 @@ const AlbumCard = memo(({ value, onChange, borderColor }: AlbumCardProps) => {
                   ButtonProps={{ className: classes.addImages }}
                   variant="button"
                   value={images ?? []}
+                  albumId={value.objectId}
                   onAdd={async (...images) => {
                     if (!value.objectId) {
                       return;

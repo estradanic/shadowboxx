@@ -43,6 +43,7 @@ interface ImageContextValue {
     options?: {
       acl?: Parse.ACL;
       onEachCompleted?: (uploadedImage: ParseImage) => Promise<void>;
+      albumId?: string;
     }
   ) => Promise<ParseImage[]>;
   /** Function to upload image from url */
@@ -178,7 +179,7 @@ export const ImageContextProvider = ({
     }
   };
 
-  const compressVideo = async (file: File, notification: Notification) => {
+  const compressVideo = async (file: File, notification: Notification, update: (newInfo: {progress: number}) => void) => {
     const videoEl = document.createElement("video");
     videoEl.preload = "metadata";
     let duration = Number.MAX_SAFE_INTEGER;
@@ -203,6 +204,7 @@ export const ImageContextProvider = ({
         const [hours, minutes, seconds] = time.split(":").map(Number);
         const totalSeconds = hours * 3600 + minutes * 60 + seconds;
         const progressPercentage = (totalSeconds / duration) * 100;
+        update({progress: progressPercentage});
         notification.update((prev) => ({
           ...prev,
           detail: (
@@ -251,9 +253,9 @@ export const ImageContextProvider = ({
     return compressedFile;
   };
 
-  const processFile = (file: File, notification: Notification) => {
+  const processFile = (file: File, notification: Notification, update: (newInfo: {progress: number}) => void) => {
     if (ACCEPTABLE_VIDEO_TYPES.includes(file.type)) {
-      return compressVideo(file, notification);
+      return compressVideo(file, notification, update);
     }
     if (ACCEPTABLE_IMAGE_TYPES.includes(file.type)) {
       if (file.size > MAX_FILE_SIZE) {
@@ -289,9 +291,10 @@ export const ImageContextProvider = ({
   const processAndUploadFile = async (
     file: File,
     notification: Notification,
+    update: (newInfo: { progress: number }) => void,
     acl?: Parse.ACL
   ) => {
-    const processedFile = await processFile(file, notification);
+    const processedFile = await processFile(file, notification, update);
     notification.update((prev) => ({
       ...prev,
       title: Strings.message.uploading(file.name),
@@ -307,6 +310,7 @@ export const ImageContextProvider = ({
     options: {
       acl?: Parse.ACL;
       onEachCompleted?: (uploadedImage: ParseImage) => Promise<void>;
+      albumId?: string;
     } = {}
   ) => {
     return new Promise<ParseImage[]>((resolve, reject) => {
@@ -324,43 +328,43 @@ export const ImageContextProvider = ({
                 <LinearProgress color={variableColor} variant="indeterminate" />
               ),
             });
-            promises.push(
-              addJob(async () => {
-                try {
-                  const uploadedImage = await processAndUploadFile(
-                    file,
-                    notification,
-                    options.acl
-                  );
-                  notification.update((prev) => ({
-                    ...prev,
-                    title: Strings.message.uploaded(file.name),
-                    icon: <CloudUploadIcon />,
-                    removeable: true,
-                    detail: undefined,
-                  }));
-                  await options.onEachCompleted?.(uploadedImage);
-                  return uploadedImage;
-                } catch (error: unknown) {
-                  console.error(error);
-                  const message =
-                    error &&
-                    typeof error === "object" &&
-                    "message" in error &&
-                    error.message?.toString()
-                      ? error.message.toString()
-                      : Strings.error.common;
-                  notification.update((prev) => ({
-                    ...prev,
-                    title: Strings.error.uploadingImage(file.name),
-                    icon: <ErrorIcon />,
-                    removeable: true,
-                    detail: <Typography>{message}</Typography>,
-                  }));
-                  return undefined;
-                }
-              })
-            );
+            const {result} = addJob((update) => async () => {
+              try {
+                const uploadedImage = await processAndUploadFile(
+                  file,
+                  notification,
+                  update,
+                  options.acl
+                );
+                notification.update((prev) => ({
+                  ...prev,
+                  title: Strings.message.uploaded(file.name),
+                  icon: <CloudUploadIcon />,
+                  removeable: true,
+                  detail: undefined,
+                }));
+                await options.onEachCompleted?.(uploadedImage);
+                return uploadedImage;
+              } catch (error: unknown) {
+                console.error(error);
+                const message =
+                  error &&
+                  typeof error === "object" &&
+                  "message" in error &&
+                  error.message?.toString()
+                    ? error.message.toString()
+                    : Strings.error.common;
+                notification.update((prev) => ({
+                  ...prev,
+                  title: Strings.error.uploadingImage(file.name),
+                  icon: <ErrorIcon />,
+                  removeable: true,
+                  detail: <Typography>{message}</Typography>,
+                }));
+                return undefined;
+              }
+            }, options.albumId ? {albumId: options.albumId} : undefined);
+            promises.push(result);
           }
           const results = await Promise.all(promises);
           const uploadedImages: ParseImage[] = [];

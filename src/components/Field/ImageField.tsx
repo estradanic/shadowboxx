@@ -98,6 +98,8 @@ export type ImageFieldProps = Omit<
   setCaption?: (image: ParseImage, caption: string) => void;
   /** Function to get caption for an image */
   getCaption?: (image: ParseImage) => string;
+  /** Id of the album associated with this field */
+  albumId?: string;
 } & (
     | {
         /** Function to run when an image is removed */
@@ -148,6 +150,7 @@ const ImageField = memo(
     getCaption,
     setCaption,
     filterBarProps,
+    albumId,
     ...rest
   }: ImageFieldProps) => {
     const classes = useStyles();
@@ -200,6 +203,7 @@ const ImageField = memo(
             onEachCompleted: async (image) => {
               await onAdd(image);
             },
+            albumId,
           });
         } catch (error: any) {
           console.error(error);
