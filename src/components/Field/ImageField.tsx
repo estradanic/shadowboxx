@@ -40,6 +40,9 @@ import { useImageContext } from "../../contexts/ImageContext";
 import useQueryConfigs from "../../hooks/Query/useQueryConfigs";
 import { useQuery } from "@tanstack/react-query";
 import FilterBar, { FilterBarProps } from "../FilterBar/FilterBar";
+import { useJobContext } from "../../contexts/JobContext";
+import { ImageSkeleton } from "../Skeleton";
+import { LoadingWrapper } from "../Loader";
 
 const useStyles = makeStyles((theme: Theme) => ({
   endAdornment: {
@@ -66,6 +69,7 @@ const useStyles = makeStyles((theme: Theme) => ({
   imageWrapper: {
     marginBottom: theme.spacing(2),
     padding: theme.spacing(0, 1),
+    position: "relative",
   },
   main: {
     "& > div": {
@@ -160,6 +164,12 @@ const ImageField = memo(
       uploadImagesFromFiles,
       uploadImageFromUrl,
     } = useImageContext();
+    const { jobInfo } = useJobContext();
+    const jobsForAlbum = albumId
+      ? Object.values(jobInfo).filter(
+          (job) => job.albumId === albumId && !!job.file
+        )
+      : [];
     const [showUrlInput, setShowUrlInput] = useState<boolean>(false);
     const [imageUrlRef, imageUrl, setImageUrl] = useRefState("");
 
@@ -354,7 +364,21 @@ const ImageField = memo(
             {multiple && !!value.length && (
               <Grid container className={classes.multiImageContainer}>
                 <FilterBar {...filterBarProps!} />
-                {value.map((image: ParseImage) => {
+                {jobsForAlbum.map((job) => (
+                  <ImageSkeleton
+                    key={job.id}
+                    className={classes.imageWrapper}
+                    height="300px"
+                  >
+                    <LoadingWrapper
+                      loading={![0, 100, undefined].includes(job.progress)}
+                      global={false}
+                      progress={job.progress}
+                      type="determinate"
+                    />
+                  </ImageSkeleton>
+                ))}
+                {value.map((image) => {
                   const imageDecorations = [
                     <RemoveImageDecoration
                       onClick={async () => {

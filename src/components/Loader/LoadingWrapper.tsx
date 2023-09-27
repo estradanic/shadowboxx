@@ -15,8 +15,12 @@ const useStyles = makeStyles((theme: Theme) => ({
     pointerEvents: ({ loading }: any) => (loading ? "none" : "auto"),
   },
   globalLoaderWrapper: {
-    width: "100vw",
-    height: "100vh",
+    "&&": {
+      width: "100vw",
+      height: "100vh",
+      display: "block",
+      zIndex: theme.zIndex.snackbar,
+    },
   },
   loaderWrapper: {
     position: "absolute",
@@ -24,23 +28,27 @@ const useStyles = makeStyles((theme: Theme) => ({
     left: 0,
     right: 0,
     bottom: 0,
-    width: "100vw",
-    height: "100vh",
     backgroundColor: ({ backgroundColor }) =>
       opacity(backgroundColor ?? theme.palette.background.default, 0.7),
-    zIndex: theme.zIndex.snackbar,
+    display: "flex",
+    zIndex: theme.zIndex.appBar,
   },
   globalLoader: {
-    left: "25vw",
-    right: "25vw",
-    width: "50vw",
+    "&&": {
+      left: "25vw",
+      right: "25vw",
+      width: "50vw",
+      position: "absolute",
+      margin: 0,
+    },
   },
   loader: {
-    position: "absolute",
     display: "flex",
     flexDirection: "column",
     alignItems: "center",
     justifyContent: "center",
+    margin: "auto",
+    width: "80%",
   },
   centerPositionLoader: {
     top: `calc(50% - 16rem)`,
@@ -91,16 +99,21 @@ const LoadingWrapper = ({
   type = "indeterminate",
   progress,
   global = true,
+  onClick,
   ...rest
 }: LoadingWrapperProps) => {
   const classes = useStyles({ loading, backgroundColor });
   const variableColor = useRandomColor();
 
   return (
-    <div className={className}>
+    <div className={className} onClick={onClick}>
       <div className={classes.wrapper}>{children}</div>
       {loading && (
-        <div className={classNames(classes.loaderWrapper, {[classes.globalLoaderWrapper]: global})}>
+        <div
+          className={classNames(classes.loaderWrapper, {
+            [classes.globalLoaderWrapper]: global,
+          })}
+        >
           <div
             className={classNames(classes.loader, {
               [classes.topPositionLoader]: verticalPosition === "top",
@@ -111,6 +124,7 @@ const LoadingWrapper = ({
             {type === "indeterminate" ? (
               <CircularProgress
                 disableShrink
+                color={variableColor}
                 className={classes.spinner}
                 {...rest}
               />
@@ -120,6 +134,7 @@ const LoadingWrapper = ({
                 variant="determinate"
                 value={progress}
                 className={classes.progress}
+                {...rest}
               />
             )}
             {content}

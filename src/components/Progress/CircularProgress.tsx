@@ -9,7 +9,7 @@ type UseStylesProps = { color: VariableColor };
 
 const useStyles = makeStyles((theme: Theme) => ({
   circle: {
-    backgroundColor: ({ color }: UseStylesProps) => theme.palette[color].main,
+    color: ({ color }: UseStylesProps) => theme.palette[color].main,
   },
 }));
 

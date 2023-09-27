@@ -15,7 +15,7 @@ import LinearProgress from "../components/Progress/LinearProgress";
 import Typography from "../components/Typography/Typography";
 import { useGlobalLoadingStore } from "../stores";
 import { Notification, useNotificationsContext } from "./NotificationsContext";
-import { useJobContext } from "./JobContext";
+import { UpdateJobInfo, useJobContext } from "./JobContext";
 import useRandomColor from "../hooks/useRandomColor";
 
 export type PromptImageSelectionDialogProps = {
@@ -179,7 +179,11 @@ export const ImageContextProvider = ({
     }
   };
 
-  const compressVideo = async (file: File, notification: Notification, update: (newInfo: {progress: number}) => void) => {
+  const compressVideo = async (
+    file: File,
+    notification: Notification,
+    update: UpdateJobInfo
+  ) => {
     const videoEl = document.createElement("video");
     videoEl.preload = "metadata";
     let duration = Number.MAX_SAFE_INTEGER;
@@ -204,7 +208,7 @@ export const ImageContextProvider = ({
         const [hours, minutes, seconds] = time.split(":").map(Number);
         const totalSeconds = hours * 3600 + minutes * 60 + seconds;
         const progressPercentage = (totalSeconds / duration) * 100;
-        update({progress: progressPercentage});
+        update({ progress: progressPercentage });
         notification.update((prev) => ({
           ...prev,
           detail: (
@@ -253,7 +257,11 @@ export const ImageContextProvider = ({
     return compressedFile;
   };
 
-  const processFile = (file: File, notification: Notification, update: (newInfo: {progress: number}) => void) => {
+  const processFile = (
+    file: File,
+    notification: Notification,
+    update: UpdateJobInfo
+  ) => {
     if (ACCEPTABLE_VIDEO_TYPES.includes(file.type)) {
       return compressVideo(file, notification, update);
     }
@@ -291,10 +299,11 @@ export const ImageContextProvider = ({
   const processAndUploadFile = async (
     file: File,
     notification: Notification,
-    update: (newInfo: { progress: number }) => void,
+    update: UpdateJobInfo,
     acl?: Parse.ACL
   ) => {
     const processedFile = await processFile(file, notification, update);
+    update({ progress: 100 });
     notification.update((prev) => ({
       ...prev,
       title: Strings.message.uploading(file.name),
@@ -328,42 +337,45 @@ export const ImageContextProvider = ({
                 <LinearProgress color={variableColor} variant="indeterminate" />
               ),
             });
-            const {result} = addJob((update) => async () => {
-              try {
-                const uploadedImage = await processAndUploadFile(
-                  file,
-                  notification,
-                  update,
-                  options.acl
-                );
-                notification.update((prev) => ({
-                  ...prev,
-                  title: Strings.message.uploaded(file.name),
-                  icon: <CloudUploadIcon />,
-                  removeable: true,
-                  detail: undefined,
-                }));
-                await options.onEachCompleted?.(uploadedImage);
-                return uploadedImage;
-              } catch (error: unknown) {
-                console.error(error);
-                const message =
-                  error &&
-                  typeof error === "object" &&
-                  "message" in error &&
-                  error.message?.toString()
-                    ? error.message.toString()
-                    : Strings.error.common;
-                notification.update((prev) => ({
-                  ...prev,
-                  title: Strings.error.uploadingImage(file.name),
-                  icon: <ErrorIcon />,
-                  removeable: true,
-                  detail: <Typography>{message}</Typography>,
-                }));
-                return undefined;
-              }
-            }, options.albumId ? {albumId: options.albumId} : undefined);
+            const { result } = addJob(
+              (update) => async () => {
+                try {
+                  const uploadedImage = await processAndUploadFile(
+                    file,
+                    notification,
+                    update,
+                    options.acl
+                  );
+                  notification.update((prev) => ({
+                    ...prev,
+                    title: Strings.message.uploaded(file.name),
+                    icon: <CloudUploadIcon />,
+                    removeable: true,
+                    detail: undefined,
+                  }));
+                  await options.onEachCompleted?.(uploadedImage);
+                  return uploadedImage;
+                } catch (error: unknown) {
+                  console.error(error);
+                  const message =
+                    error &&
+                    typeof error === "object" &&
+                    "message" in error &&
+                    error.message?.toString()
+                      ? error.message.toString()
+                      : Strings.error.common;
+                  notification.update((prev) => ({
+                    ...prev,
+                    title: Strings.error.uploadingImage(file.name),
+                    icon: <ErrorIcon />,
+                    removeable: true,
+                    detail: <Typography>{message}</Typography>,
+                  }));
+                  return undefined;
+                }
+              },
+              options.albumId ? { albumId: options.albumId, file } : undefined
+            );
             promises.push(result);
           }
           const results = await Promise.all(promises);

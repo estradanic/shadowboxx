@@ -4,7 +4,7 @@ import { makeStyles, Theme } from "@material-ui/core/styles";
 import ShareIcon from "@material-ui/icons/Share";
 import Icon, { IconProps } from "@material-ui/core/Icon";
 import classNames from "classnames";
-import { Buffer } from "buffer";
+import b64 from "base64-js";
 import { readAndCompressImage } from "browser-image-resizer";
 import { Strings } from "../../../resources";
 import ImageDecoration, { ImageDecorationProps } from "./ImageDecoration";
@@ -12,6 +12,7 @@ import { forwardRef } from "react";
 import { ParseImage } from "../../../classes";
 import { useSnackbar } from "../../Snackbar/Snackbar";
 import { useGlobalLoadingStore } from "../../../stores";
+import { GetImageReturn } from "../../../types";
 
 const useStyles = makeStyles((theme: Theme) => ({
   root: {
@@ -60,7 +61,7 @@ const ShareImageDecoration = ({
 }: ShareImageDecorationProps) => {
   const classes = useStyles();
 
-  const { enqueueErrorSnackbar } = useSnackbar();
+  const { enqueueWarningSnackbar } = useSnackbar();
   const { startGlobalLoader, stopGlobalLoader } = useGlobalLoadingStore(
     (state) => ({
       startGlobalLoader: state.startGlobalLoader,
@@ -68,11 +69,11 @@ const ShareImageDecoration = ({
     })
   );
 
-  const download = (input: File | string) => {
+  const download = (input: File | string, extension: string = "png") => {
     const a = document.createElement("a");
     a.download = image.name;
     a.target = "_blank";
-    a.download = image.name + ".png";
+    a.download = image.name + "." + extension;
     if (typeof input !== "string") {
       const base64 = URL.createObjectURL(input);
       a.href = base64;
@@ -83,12 +84,13 @@ const ShareImageDecoration = ({
   };
 
   const downloadImage = async (image: ParseImage) => {
-    const base64: string = await Parse.Cloud.run("getImage", {
+    const result: GetImageReturn = await Parse.Cloud.run("getImage", {
       imageId: image.objectId,
       variant: "full",
     });
-    const buffer = Buffer.from(base64, "base64");
-    const file = new File([buffer], image.name, { type: "image/webp" });
+    const arrayBuffer = b64.toByteArray(result.base64).buffer;
+    const blob = new Blob([arrayBuffer], { type: result.mimeType });
+    const file = new File([blob], image.name, { type: result.mimeType });
     const pngFile = await readAndCompressImage(file, {
       quality: 1,
       maxHeight: 2400,
@@ -104,7 +106,7 @@ const ShareImageDecoration = ({
         await navigator.share(shareData);
       } catch (error) {
         console.error(error);
-        enqueueErrorSnackbar(Strings.error.sharingImage);
+        enqueueWarningSnackbar(Strings.error.sharingImage);
         download(pngFile);
       }
     } else {
@@ -113,27 +115,28 @@ const ShareImageDecoration = ({
   };
 
   const downloadOther = async (image: ParseImage) => {
-    const type = image.type === "gif" ? "image/gif" : "video/mp4";
-    const base64: string = await Parse.Cloud.run("getImage", {
+    const result: GetImageReturn = await Parse.Cloud.run("getImage", {
       imageId: image.objectId,
       variant: "full",
     });
-    const buffer = Buffer.from(base64, "base64");
-    const file = new File([buffer], image.name, { type });
+    const arrayBuffer = b64.toByteArray(result.base64).buffer;
+    const blob = new Blob([arrayBuffer], { type: result.mimeType });
+    const file = new File([blob], image.name, { type: result.mimeType });
     const shareData = {
-      files: [new File([file], `${image.name}.png`, { type: "image/png" })],
+      files: [file],
       title: image.name,
     };
+    const extension = result.mimeType.split("/")[1];
     if (navigator?.canShare?.(shareData)) {
       try {
         await navigator.share(shareData);
       } catch (error) {
         console.error(error);
-        enqueueErrorSnackbar(Strings.error.sharingImage);
-        download(file);
+        enqueueWarningSnackbar(Strings.error.sharingImage);
+        download(file, extension);
       }
     } else {
-      download(file);
+      download(file, extension);
     }
   };
 
@@ -148,7 +151,7 @@ const ShareImageDecoration = ({
       piOnClick?.(image);
     } catch (error) {
       console.error(error);
-      enqueueErrorSnackbar(Strings.error.sharingImage);
+      enqueueWarningSnackbar(Strings.error.sharingImage);
     } finally {
       stopGlobalLoader();
     }

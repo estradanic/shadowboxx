@@ -16,7 +16,7 @@ import { opacity } from "../../utils";
 import Tooltip from "../Tooltip/Tooltip";
 import { ImageDecorationProps } from "./Decoration/ImageDecoration";
 import Skeleton from "../Skeleton/Skeleton";
-import { IMAGE_SKELETON_HEIGHT } from "../Skeleton/ImageSkeleton";
+import { DEFAULT_IMAGE_SKELETON_HEIGHT } from "../Skeleton/ImageSkeleton";
 import Typography from "@material-ui/core/Typography";
 import useQueryConfigs from "../../hooks/Query/useQueryConfigs";
 import { useQuery } from "@tanstack/react-query";
@@ -242,7 +242,7 @@ const Image = memo(
                 <Skeleton
                   variant="rect"
                   width="100%"
-                  height={IMAGE_SKELETON_HEIGHT}
+                  height={DEFAULT_IMAGE_SKELETON_HEIGHT}
                 />
               )}
             </>
@@ -269,7 +269,7 @@ const Image = memo(
                 <Skeleton
                   variant="rect"
                   width="100%"
-                  height={IMAGE_SKELETON_HEIGHT}
+                  height={DEFAULT_IMAGE_SKELETON_HEIGHT}
                 />
               )}
             </>
@@ -319,7 +319,7 @@ const Image = memo(
                   <Skeleton
                     variant="rect"
                     width="100%"
-                    height={IMAGE_SKELETON_HEIGHT}
+                    height={DEFAULT_IMAGE_SKELETON_HEIGHT}
                   />
                 )}
               </>

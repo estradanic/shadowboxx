@@ -10,6 +10,7 @@ type UseStylesProps = { color: VariableColor };
 const useStyles = makeStyles((theme: Theme) => ({
   root: {
     width: "100%",
+    borderRadius: "4px",
   },
   bar: {
     backgroundColor: ({ color }: UseStylesProps) => theme.palette[color].main,

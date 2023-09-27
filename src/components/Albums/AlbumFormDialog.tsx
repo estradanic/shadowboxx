@@ -203,6 +203,7 @@ const AlbumFormDialog = ({
         <Grid item xs={12}>
           <ImageContextProvider>
             <ImageField
+              albumId={value.objectId}
               filterBarProps={{
                 tagSearch,
                 sortDirection,

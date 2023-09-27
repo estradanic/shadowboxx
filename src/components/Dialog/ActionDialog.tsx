@@ -83,10 +83,7 @@ export type ActionDialogProps<T extends ActionDialogType> = DialogProps & {
   confirmButtonText?: string;
   /** Props to be passed to the DialogContent component */
   DialogContentProps?: Omit<DialogContentProps, "children">;
-} & (T extends "prompt"
-  ? {message?: never}
-  : {message: string}
-);
+} & (T extends "prompt" ? { message?: never } : { message: string });
 
 /** ActionDialogProps overridable by a function call from the context */
 export type ActionDialogHookProps = Partial<
@@ -233,7 +230,12 @@ interface ActionDialogContentProps<T extends ActionDialogType>
 // This is broken into a separate component and memoized to prevent rerenders
 // when handleCancel, handleConfirm, and handleClose change.
 const ActionDialogContent = memo(
-  <T extends ActionDialogType>({ message, type, children, ...rest }: ActionDialogContentProps<T>) => {
+  <T extends ActionDialogType>({
+    message,
+    type,
+    children,
+    ...rest
+  }: ActionDialogContentProps<T>) => {
     return (
       <DialogContent {...rest}>
         {type === "prompt" ? (

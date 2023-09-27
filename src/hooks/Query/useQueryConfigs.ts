@@ -363,10 +363,10 @@ const useQueryConfigs = () => {
           blob = undefined;
         }
         if (!blob) {
-          const result = (await Parse.Cloud.run("getImage", {
+          const result: GetImageReturn = await Parse.Cloud.run("getImage", {
             imageId,
             variant,
-          })) as GetImageReturn;
+          });
           const arrayBuffer = b64.toByteArray(result.base64).buffer;
           blob = new Blob([arrayBuffer], { type: result.mimeType });
           await set(cacheKey, blob, imageStore);

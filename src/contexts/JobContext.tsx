@@ -11,6 +11,8 @@ import PQueue from "p-queue";
 export interface JobInfo extends Record<string, any> {
   albumId?: string;
   progress?: number;
+  file?: File;
+  jobId?: string;
 }
 
 export type UpdateJobInfo = (newInfo: Omit<JobInfo, "jobId">) => void;
@@ -26,7 +28,10 @@ export interface JobContextValue {
   /** Number of currently running jobs */
   jobCount: number;
   /** Adds a job to the queue. Returns a promise that resolves when the job is done. */
-  addJob: <T>(fn: (update: UpdateJobInfo) => () => Promise<T>, info?: JobInfo) => Job<T>;
+  addJob: <T>(
+    fn: (update: UpdateJobInfo) => () => Promise<T>,
+    info?: Omit<JobInfo, "jobId">
+  ) => Job<T>;
   /** List of information associated with each job */
   jobInfo: Record<string, JobInfo>;
 }
@@ -66,31 +71,33 @@ export const JobContextProvider = ({ children }: JobContextProviderProps) => {
     }
   }, [jobCount]);
 
-  function addJob<T>(fn: (update: UpdateJobInfo) => () => Promise<T>, info?: JobInfo) {
+  function addJob<T>(
+    fn: (update: UpdateJobInfo) => () => Promise<T>,
+    info?: Omit<JobInfo, "jobId">
+  ) {
     const jobId = Math.random().toString(36).substring(2, 9);
     if (info) {
-      setJobInfo((prev) => ({...prev, [jobId]: info}));
+      setJobInfo((prev) => ({ ...prev, [jobId]: info }));
     }
     const update = (newInfo: Omit<JobInfo, "jobId">) => {
-      setJobInfo((prev) => ({...prev, [jobId]: {...newInfo}}));
+      setJobInfo((prev) => {
+        const oldInfo = prev[jobId] || {};
+        return { ...prev, [jobId]: { ...oldInfo, ...newInfo } };
+      });
     };
     setJobCount((prev) => prev + 1);
-    let result: Promise<T | void>;
-    try {
-      result = promiseQueue.add<T>(fn(update));
-    } catch (e) {
-      throw e;
-    } finally {
+    let result = promiseQueue.add<T>(fn(update));
+    result.finally(() => {
       if (info) {
         setJobInfo((prev) => {
-          const newInfo = {...prev};
+          const newInfo = { ...prev };
           delete newInfo[jobId];
           return newInfo;
         });
       }
       setJobCount((prev) => prev - 1);
-    }
-    return {result, update};
+    });
+    return { result, update };
   }
 
   const value: JobContextValue = {

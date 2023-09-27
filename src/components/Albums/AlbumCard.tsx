@@ -39,7 +39,6 @@ import { useNetworkDetectionContext } from "../../contexts/NetworkDetectionConte
 import { useUserContext } from "../../contexts/UserContext";
 import useQueryConfigs from "../../hooks/Query/useQueryConfigs";
 import { useJobContext } from "../../contexts/JobContext";
-import { CircularProgress } from "@material-ui/core";
 import { LoadingWrapper } from "../Loader";
 
 interface UseStylesParams {
@@ -93,6 +92,10 @@ const useStyles = makeStyles((theme: Theme) => ({
   },
   collaborators: {
     marginTop: theme.spacing(1),
+  },
+  loadingWrapper: {
+    position: "relative",
+    cursor: "pointer",
   },
 }));
 
@@ -201,10 +204,17 @@ const AlbumCard = memo(({ value, onChange, borderColor }: AlbumCardProps) => {
     [getLoggedInUser, value.owner.id]
   );
 
-  const {jobInfo} = useJobContext();
-  const jobsForAlbum = Object.values(jobInfo).filter((j) => j.albumId === value.objectId);
-  const jobProgress = jobsForAlbum.length ? jobsForAlbum.reduce((acc, j) => acc + (j.progress ?? 0), 0) : -1;
-  console.log({jobsForAlbum, jobProgress, jobInfo});
+  const { jobInfo } = useJobContext();
+  const jobsForAlbum = Object.values(jobInfo).filter(
+    (j) => j.albumId === value.objectId
+  );
+  let totalJobProgress = 0;
+  for (const job of jobsForAlbum) {
+    totalJobProgress += job.progress ?? 0;
+  }
+  const jobProgress = jobsForAlbum.length
+    ? totalJobProgress / jobsForAlbum.length
+    : -1;
 
   const location = useLocation();
 
@@ -297,10 +307,17 @@ const AlbumCard = memo(({ value, onChange, borderColor }: AlbumCardProps) => {
         />
         {coverImage ? (
           <LoadingWrapper
+            className={classes.loadingWrapper}
             global={false}
             loading={!!jobsForAlbum.length}
-            type={jobProgress === -1 ? "indeterminate" : "determinate"}
+            type={
+              [0, -1, 100].includes(jobProgress)
+                ? "indeterminate"
+                : "determinate"
+            }
             progress={jobProgress}
+            onClick={navigateToAlbum}
+            color={borderColor}
           >
             <CardMedia
               className={classes.media}

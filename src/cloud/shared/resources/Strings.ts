@@ -9,7 +9,7 @@ const Strings = {
     resendingVerificationEmail: "Error resending verification email",
     undoingEmailChange: "Error undoing email change",
     addingAlbum: "Error adding album",
-    sharingImage: "Error sharing image",
+    sharingImage: "Error sharing image. Downloading instead.",
     gettingDuplicates: "Error getting duplicates",
     gettingImageUrl: "Error getting image url",
     gettingUserInfo: "Error getting user info",

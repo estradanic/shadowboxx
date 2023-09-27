@@ -3,12 +3,13 @@ import ParsePointer from "./ParsePointer";
 import ParseObject, {
   Attributes,
   Columns,
+  ObjectAttributes,
   ParsifyPointers,
 } from "./ParseObject";
 import ParseQuery from "./ParseQuery";
 
 /** Interface defining Album-specific attributes */
-export interface AlbumAttributes {
+export interface AlbumAttributes extends Partial<ObjectAttributes> {
   /** User that owns the album */
   owner: ParsePointer<"_User">;
   /** Images in the album */
@@ -262,6 +263,9 @@ export default class ParseAlbum
       ...this._album.attributes,
       owner: this.owner,
       coverImage: this.coverImage,
+      objectId: this.objectId,
+      createdAt: this.createdAt,
+      updatedAt: this.updatedAt,
     };
   }
 }
