@@ -31,7 +31,6 @@ const useStyles = makeStyles((theme: Theme) => ({
     backgroundColor: ({ backgroundColor }) =>
       opacity(backgroundColor ?? theme.palette.background.default, 0.7),
     display: "flex",
-    zIndex: theme.zIndex.appBar,
   },
   globalLoader: {
     "&&": {
