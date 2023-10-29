@@ -1,5 +1,5 @@
 import { useCallback, useMemo, useState } from "react";
-import { AlbumAttributes, AlbumSaveContext, ParseUser } from "../classes";
+import { AlbumAttributes, AlbumSaveContext, ParseImage, ParseUser } from "../classes";
 import { useSnackbar } from "../components";
 import { Strings } from "../resources";
 import { dedupe, ErrorState, isNullOrWhitespace, deepEqual } from "../utils";
@@ -7,12 +7,16 @@ import { useActionDialogContext } from "../components/Dialog/ActionDialog";
 
 export type AlbumFormChanges = AlbumSaveContext;
 
+export type HydratedAlbumAttributes = Omit<AlbumAttributes, "images"> & {
+  images: ParseImage[],
+}
+
 export type UseAlbumFormOptions = {
   /** Whether to reset the form after submitting */
   resetOnSubmit?: boolean;
   /** Callback when the form is submitted */
   onSubmit: (
-    album: AlbumAttributes,
+    album: HydratedAlbumAttributes,
     changes: AlbumFormChanges
   ) => Promise<void> | void;
   /** Callback when the form is cancelled */
@@ -21,7 +25,7 @@ export type UseAlbumFormOptions = {
 
 /** Hook to manage an album form */
 const useAlbumForm = (
-  album: AlbumAttributes,
+  album: HydratedAlbumAttributes,
   {
     resetOnSubmit = true,
     onSubmit: piOnSubmit,
@@ -31,11 +35,11 @@ const useAlbumForm = (
   const { openConfirm } = useActionDialogContext();
   const { enqueueErrorSnackbar } = useSnackbar();
 
-  const [allImageIds, setAllImageIds] = useState<string[]>(album.images);
-  const [removedImages, setRemovedImageIds] = useState<string[]>([]);
-  const imageIds = useMemo(
-    () => allImageIds.filter((imageId) => !removedImages.includes(imageId)),
-    [allImageIds, removedImages]
+  const [allImages, setAllImages] = useState<ParseImage[]>(album.images);
+  const [removedImages, setRemovedImages] = useState<ParseImage[]>([]);
+  const images = useMemo(
+    () => allImages.filter((imageId) => !removedImages.includes(imageId)),
+    [allImages, removedImages]
   );
 
   const [coverImage, setCoverImage] = useState<AlbumAttributes["coverImage"]>(
@@ -65,6 +69,15 @@ const useAlbumForm = (
   );
   const [errors, setErrors] = useState<ErrorState<"name">>(defaultErrors);
 
+  const isDirty = removedImages.length > 0
+    || allImages.length !== album.images.length
+    || coverImage?.id !== album.coverImage?.id
+    || name !== album.name
+    || description !== album.description
+    || !deepEqual(captions, (album.captions ?? {}))
+    || !deepEqual(collaborators, album.collaborators)
+    || !deepEqual(viewers, album.viewers);
+
   const reinitialize = useCallback(() => {
     setName(album.name);
     setDescription(album.description);
@@ -72,7 +85,7 @@ const useAlbumForm = (
     setViewers(album.viewers);
     setErrors(defaultErrors);
     setCaptions(album.captions ?? {});
-    setAllImageIds(album.images);
+    setAllImages(album.images);
   }, [
     setName,
     setDescription,
@@ -125,7 +138,7 @@ const useAlbumForm = (
       album.viewers.filter((viewer) => !viewers.includes(viewer))
     );
     const addedImages = dedupe(
-      imageIds.filter((imageId) => !album.images.includes(imageId))
+      images.filter((imageId) => !album.images.includes(imageId))
     );
     const changes: AlbumFormChanges = {};
     if (addedCollaborators.length > 0) {
@@ -150,10 +163,10 @@ const useAlbumForm = (
       changes.description = description;
     }
     if (removedImages.length > 0) {
-      changes.removedImages = removedImages;
+      changes.removedImages = removedImages.map((image) => image.objectId);
     }
     if (addedImages.length > 0) {
-      changes.addedImages = addedImages;
+      changes.addedImages = addedImages.map((image) => image.objectId);
     }
     if (!deepEqual(captions, album.captions)) {
       changes.captions = captions;
@@ -172,7 +185,7 @@ const useAlbumForm = (
           await piOnSubmit(
             {
               ...album,
-              images: imageIds,
+              images: images,
               name,
               description,
               collaborators,
@@ -190,7 +203,7 @@ const useAlbumForm = (
         await piOnSubmit(
           {
             ...album,
-            images: imageIds,
+            images: images,
             name,
             description,
             collaborators,
@@ -209,21 +222,21 @@ const useAlbumForm = (
     await piOnCancel?.();
   };
 
-  const onAdd = async (...imageIds: string[]) => {
-    setAllImageIds(dedupe([...allImageIds, ...imageIds]));
-    setRemovedImageIds(
-      removedImages.filter((imageId) => !imageIds.includes(imageId))
+  const onAdd = async (...images: ParseImage[]) => {
+    setAllImages(dedupe([...images, ...allImages]));
+    setRemovedImages(
+      removedImages.filter((image) => !images.includes(image))
     );
   };
 
-  const onRemove = async (...imageIds: string[]) => {
-    setRemovedImageIds(dedupe([...removedImages, ...imageIds]));
+  const onRemove = async (...images: ParseImage[]) => {
+    setRemovedImages(dedupe([...removedImages, ...images]));
   };
 
   return {
-    imageIds,
-    allImageIds,
-    removedImageIds: removedImages,
+    images,
+    allImages,
+    removedImages,
     coverImage,
     name,
     description,
@@ -243,6 +256,7 @@ const useAlbumForm = (
     setCaptions,
     onAdd,
     onRemove,
+    isDirty,
   };
 };
 

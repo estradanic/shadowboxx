@@ -68,7 +68,6 @@ const Strings = {
     dateImage: "Date Image",
     delete: "Delete",
     deleteAlbum: "Delete Album",
-    editAlbum: "Edit Album",
     goBack: "Go Back",
     goSee: "Take me there!",
     install: "Install App",

@@ -41,7 +41,7 @@ import useQueryConfigs from "../../hooks/Query/useQueryConfigs";
 import { useQuery } from "@tanstack/react-query";
 import FilterBar, { FilterBarProps } from "../FilterBar/FilterBar";
 import { useJobContext } from "../../contexts/JobContext";
-import { ImageSkeleton } from "../Skeleton";
+import { Skeleton } from "../Skeleton";
 import { LoadingWrapper } from "../Loader";
 
 const useStyles = makeStyles((theme: Theme) => ({
@@ -79,6 +79,9 @@ const useStyles = makeStyles((theme: Theme) => ({
   success: {
     color: theme.palette.success.main,
   },
+  skeletonWrapper: {
+    padding: theme.spacing(2),
+  },
 }));
 
 /** Interface defining props for ImageField */
@@ -113,7 +116,7 @@ export type ImageFieldProps = Omit<
         /** Whether multiple images can be selected */
         multiple: true;
         /** Props to pass down to the FilterBar component */
-        filterBarProps: FilterBarProps;
+        filterBarProps?: FilterBarProps;
       }
     | {
         /** Function to run when an image is removed */
@@ -361,22 +364,21 @@ const ImageField = memo(
               disabled={disabled}
               {...rest}
             />
-            {multiple && !!value.length && (
+            {multiple && (
               <Grid container className={classes.multiImageContainer}>
-                <FilterBar {...filterBarProps!} />
+                {!!filterBarProps && <FilterBar {...filterBarProps!} />}
                 {jobsForAlbum.map((job) => (
-                  <ImageSkeleton
-                    key={job.id}
-                    className={classes.imageWrapper}
-                    height="300px"
-                  >
+                  <Grid key={`job-${job.id}`} item xs={12} md={6} lg={4} xl={3} className={classes.imageWrapper}>
                     <LoadingWrapper
-                      loading={![0, 100, undefined].includes(job.progress)}
+                      className={classes.skeletonWrapper}
+                      loading={true}
                       global={false}
                       progress={job.progress}
-                      type="determinate"
-                    />
-                  </ImageSkeleton>
+                      type={[0, 100, undefined].includes(job.progress) ? "indeterminate" : "determinate"}
+                    >
+                      <Skeleton variant="rect" width="100%" height="300px" />
+                    </LoadingWrapper>
+                  </Grid>
                 ))}
                 {value.map((image) => {
                   const imageDecorations = [

@@ -7,7 +7,6 @@ import CloseIcon from "@material-ui/icons/Close";
 import {
   PageContainer,
   AlbumCard,
-  AlbumFormDialog,
   useSnackbar,
   AlbumCardSkeleton,
   Fab,
@@ -21,7 +20,6 @@ import { ParseAlbum } from "../../classes";
 import { useView } from "../View";
 import { DEFAULT_PAGE_SIZE } from "../../constants";
 import NoAlbums from "../../components/Albums/NoAlbums";
-import { UnpersistedParseAlbum } from "../../classes";
 import useRandomColor from "../../hooks/useRandomColor";
 import useFlatInfiniteQueryData from "../../hooks/Query/useFlatInfiniteQueryData";
 import useInfiniteScroll from "../../hooks/useInfiniteScroll";
@@ -30,6 +28,7 @@ import { useNetworkDetectionContext } from "../../contexts/NetworkDetectionConte
 import { useUserContext } from "../../contexts/UserContext";
 import { OwnershipFilter, SortDirection } from "../../types";
 import { useDebounce } from "use-debounce";
+import useNavigate from "../../hooks/useNavigate";
 
 const useStyles = makeStyles((theme: Theme) => ({
   title: {
@@ -91,8 +90,6 @@ const Home = memo(() => {
   useView("Home");
 
   const classes = useStyles();
-  const [addAlbumDialogOpen, setAddAlbumDialogOpen] = useState(false);
-  const { enqueueErrorSnackbar, enqueueSuccessSnackbar } = useSnackbar();
   const {
     getAllAlbumsInfiniteFunction,
     getAllAlbumsInfiniteQueryKey,
@@ -135,6 +132,8 @@ const Home = memo(() => {
   const albums = useFlatInfiniteQueryData(data);
 
   const randomColor = useRandomColor();
+
+  const navigate = useNavigate();
 
   return (
     <PageContainer>
@@ -280,36 +279,10 @@ const Home = memo(() => {
         </>
       )}
       <Online>
-        <Fab onClick={() => setAddAlbumDialogOpen(true)}>
+        <Fab onClick={() => navigate("/album/new")}>
           <AddIcon />
         </Fab>
       </Online>
-      <AlbumFormDialog
-        resetOnConfirm
-        value={{
-          owner: getLoggedInUser().toPointer(),
-          images: [],
-          name: Strings.label.untitledAlbum,
-          collaborators: [],
-          viewers: [],
-          captions: {},
-        }}
-        open={addAlbumDialogOpen}
-        handleCancel={() => setAddAlbumDialogOpen(false)}
-        handleConfirm={async (attributes) => {
-          setAddAlbumDialogOpen(false);
-          try {
-            const response = await new UnpersistedParseAlbum(
-              attributes
-            ).saveNew();
-            await refetchAlbums();
-            enqueueSuccessSnackbar(Strings.success.addingAlbum(response?.name));
-          } catch (error: any) {
-            console.error(error);
-            enqueueErrorSnackbar(Strings.error.addingAlbum);
-          }
-        }}
-      />
     </PageContainer>
   );
 });

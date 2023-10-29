@@ -11,6 +11,10 @@ import CircularProgress, {
 import useRandomColor from "../../hooks/useRandomColor";
 
 const useStyles = makeStyles((theme: Theme) => ({
+  root: {
+    position: "relative",
+    width: "100%",
+  },
   wrapper: {
     pointerEvents: ({ loading }: any) => (loading ? "none" : "auto"),
   },
@@ -105,7 +109,7 @@ const LoadingWrapper = ({
   const variableColor = useRandomColor();
 
   return (
-    <div className={className} onClick={onClick}>
+    <div className={classNames(className, {[classes.root]: !global})} onClick={onClick}>
       <div className={classes.wrapper}>{children}</div>
       {loading && (
         <div

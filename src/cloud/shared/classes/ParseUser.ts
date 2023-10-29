@@ -389,17 +389,17 @@ export class UnpersistedParseUser extends ParseUser {
   }
 
   get objectId(): Attributes<"_User">["objectId"] {
-    console.warn("Unpersisted user has no id");
-    return "";
+    console.debug("Unpersisted user has no id");
+    return "new";
   }
 
   get createdAt(): Attributes<"_User">["createdAt"] {
-    console.warn("Unpersisted user has no createdAt");
+    console.debug("Unpersisted user has no createdAt");
     return new Date();
   }
 
   get updatedAt(): Attributes<"_User">["updatedAt"] {
-    console.warn("Unpersisted user has no updatedAt");
+    console.debug("Unpersisted user has no updatedAt");
     return new Date();
   }
 

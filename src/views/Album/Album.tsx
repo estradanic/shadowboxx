@@ -9,7 +9,7 @@ import Typography from "@material-ui/core/Typography";
 import { makeStyles } from "@material-ui/core/styles";
 import { useQuery } from "@tanstack/react-query";
 import { Strings } from "../../resources";
-import { ParseAlbum } from "../../classes";
+import { ParseAlbum, UnpersistedParseAlbum } from "../../classes";
 import { Void } from "../../components";
 import { useView } from "../View";
 import useRandomColor from "../../hooks/useRandomColor";
@@ -17,6 +17,7 @@ import useQueryConfigs from "../../hooks/Query/useQueryConfigs";
 import { useNetworkDetectionContext } from "../../contexts/NetworkDetectionContext";
 import LoadingContent from "./LoadingContent";
 import SuccessContent from "./SuccessContent";
+import { useUserContext } from "../../contexts/UserContext";
 
 const useStyles = makeStyles(() => ({
   svgContainer: {
@@ -37,16 +38,29 @@ const Album = memo(() => {
   const randomColor = useRandomColor();
   const classes = useStyles({ randomColor });
   const { online } = useNetworkDetectionContext();
+  const {getLoggedInUser} = useUserContext();
   const {
     getAlbumFunction,
     getAlbumQueryKey,
     getAlbumOptions,
   } = useQueryConfigs();
 
+  const isNew = id === "new";
+  const newAlbum = new UnpersistedParseAlbum({
+    owner: getLoggedInUser().toPointer(),
+    images: [],
+    name: Strings.label.untitledAlbum,
+    collaborators: [],
+    viewers: [],
+    captions: {},
+  });
   const { data: album, status: albumStatus } = useQuery<ParseAlbum, Error>(
     getAlbumQueryKey(id),
     () => getAlbumFunction(online, id, { showErrorsInSnackbar: true }),
-    getAlbumOptions()
+    getAlbumOptions({
+      enabled: !isNew,
+      placeholderData: isNew ? newAlbum : undefined,
+    })
   );
 
   return (
@@ -54,7 +68,7 @@ const Album = memo(() => {
       {albumStatus === "loading" ? (
         <LoadingContent randomColor={randomColor} />
       ) : albumStatus === "success" && album ? (
-        <SuccessContent album={album} randomColor={randomColor} />
+        <SuccessContent isNew={isNew} album={album} randomColor={randomColor} />
       ) : (
         <Grid item className={classes.svgContainer}>
           <Void height="40vh" />

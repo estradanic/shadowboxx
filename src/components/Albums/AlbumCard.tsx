@@ -27,7 +27,6 @@ import {
 import UserAvatar from "../User/UserAvatar";
 import Empty from "../Svgs/Empty";
 import { useSnackbar } from "../Snackbar/Snackbar";
-import AlbumFormDialog from "./AlbumFormDialog";
 import Tooltip from "../Tooltip/Tooltip";
 import { useActionDialogContext } from "../Dialog/ActionDialog";
 import ImageField from "../Field/ImageField";
@@ -94,7 +93,6 @@ const useStyles = makeStyles((theme: Theme) => ({
     marginTop: theme.spacing(1),
   },
   loadingWrapper: {
-    position: "relative",
     cursor: "pointer",
   },
 }));
@@ -282,21 +280,18 @@ const AlbumCard = memo(({ value, onChange, borderColor }: AlbumCardProps) => {
                 >
                   <MoreVertIcon className={classes.icon} />
                 </IconButton>
-                <Menu
-                  open={!!anchorEl}
-                  anchorEl={anchorEl}
-                  onClose={closeMenu}
-                  onClick={closeMenu}
-                >
-                  <MenuItem onClick={editAlbum}>
-                    {Strings.action.editAlbum}
-                  </MenuItem>
-                  {isOwner && (
+                {isOwner && (
+                  <Menu
+                    open={!!anchorEl}
+                    anchorEl={anchorEl}
+                    onClose={closeMenu}
+                    onClick={closeMenu}
+                  >
                     <MenuItem onClick={deleteAlbum}>
                       {Strings.action.deleteAlbum}
                     </MenuItem>
-                  )}
-                </Menu>
+                  </Menu>
+                )}
               </Online>
             )
           }
@@ -445,22 +440,6 @@ const AlbumCard = memo(({ value, onChange, borderColor }: AlbumCardProps) => {
           </>
         </CardActions>
       </Card>
-      <AlbumFormDialog
-        value={value.attributes}
-        open={editAlbumDialogOpen}
-        handleCancel={() => setEditAlbumDialogOpen(false)}
-        handleConfirm={async (attributes, changes) => {
-          setEditAlbumDialogOpen(false);
-          try {
-            const response = await value.update(attributes, changes);
-            await onChange(response);
-            enqueueSuccessSnackbar(Strings.success.saved);
-          } catch (error: any) {
-            console.error(error);
-            enqueueErrorSnackbar(Strings.error.editingAlbum);
-          }
-        }}
-      />
     </ImageContextProvider>
   ) : (
     <AlbumCardSkeleton />

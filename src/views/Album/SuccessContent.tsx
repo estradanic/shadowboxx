@@ -5,7 +5,6 @@ import { makeStyles, Theme } from "@material-ui/core/styles";
 import Switch from "@material-ui/core/Switch";
 import { useSearchParams } from "react-router-dom";
 import ParseAlbum from "../../cloud/shared/classes/ParseAlbum";
-import AlbumFormDialog from "../../components/Albums/AlbumFormDialog";
 import Fab from "../../components/Button/Fab";
 import Images from "../../components/Image/Images";
 import Timeline from "../../components/Image/Timeline";
@@ -15,7 +14,7 @@ import { FancyTitleTypography, FancyTypography } from "../../components/Typograp
 import {Strings} from "../../resources";
 import VariableColor from "../../types/VariableColor";
 import EditIcon from "@material-ui/icons/Edit";
-import { ParseImage } from "../../classes";
+import { AlbumSaveContext, ParseImage } from "../../classes";
 import OwnerImageDecoration from "../../components/Image/Decoration/OwnerImageDecoration";
 import ShareImageDecoration from "../../components/Image/Decoration/ShareImageDecoration";
 import FilterBar from "../../components/FilterBar/FilterBar";
@@ -27,6 +26,10 @@ import { useNetworkDetectionContext } from "../../contexts/NetworkDetectionConte
 import { DEFAULT_PAGE_SIZE } from "../../constants";
 import useInfiniteScroll from "../../hooks/useInfiniteScroll";
 import useFlatInfiniteQueryData from "../../hooks/Query/useFlatInfiniteQueryData";
+import EditingContent from "./EditingContent";
+import { HydratedAlbumAttributes } from "../../hooks/useAlbumForm";
+import useNavigate from "../../hooks/useNavigate";
+import { useGlobalLoadingStore } from "../../stores";
 
 type UseStylesParams = {
   randomColor: VariableColor;
@@ -58,15 +61,23 @@ const useStyles = makeStyles((theme: Theme) => ({
 type SuccessContentProps = {
   album: ParseAlbum,
   randomColor: VariableColor,
+  isNew: boolean,
 };
 
-const SuccessContent = ({album, randomColor}: SuccessContentProps) => {
+const SuccessContent = ({album, randomColor, isNew}: SuccessContentProps) => {
   const [editMode, setEditMode] = useState<boolean>(false);
+  const navigate = useNavigate();
   const {enqueueSuccessSnackbar, enqueueErrorSnackbar} = useSnackbar();
   const classes = useStyles({randomColor});
   const [search, setSearch] = useSearchParams();
   const timelineView = search.get("timeline") === "true";
   const { online } = useNetworkDetectionContext();
+  const { startGlobalLoader, stopGlobalLoader } = useGlobalLoadingStore(
+    (state) => ({
+      startGlobalLoader: state.startGlobalLoader,
+      stopGlobalLoader: state.stopGlobalLoader,
+    })
+  );
 
   const {
     getTagsByImageIdFunction,
@@ -78,6 +89,42 @@ const SuccessContent = ({album, randomColor}: SuccessContentProps) => {
     getImagesByIdInfiniteQueryKey,
     getImagesByIdInfiniteOptions,
   } = useInfiniteQueryConfigs();
+
+  const onSubmit = isNew
+    ? async (attributes: HydratedAlbumAttributes) => {
+      startGlobalLoader();
+      try {
+        // Don't spread into this bc that will keep objectId and createdAt
+        album.attributes = {
+          owner: attributes.owner,
+          name: attributes.name,
+          description: attributes.description,
+          collaborators: attributes.collaborators,
+          viewers: attributes.viewers,
+          captions: attributes.captions,
+          coverImage: attributes.coverImage,
+          images: attributes.images.map((image) => image.objectId),
+        };
+        const response = await album.saveNew();
+        navigate(`/album/${response.objectId}`);
+      } catch (error: any) {
+        console.error(error);
+        enqueueErrorSnackbar(Strings.error.addingAlbum);
+      } finally {
+        stopGlobalLoader();
+      }
+    }
+    : async (attributes: HydratedAlbumAttributes, changes: AlbumSaveContext) => {
+      setEditMode(false);
+      try {
+        await album.update({...attributes, images: attributes.images.map((image) => image.objectId)}, changes);
+        await refetch();
+        enqueueSuccessSnackbar(Strings.success.saved);
+      } catch (error: any) {
+        console.error(error);
+        enqueueErrorSnackbar(Strings.error.editingAlbum);
+      }
+    }
 
   const {
     sortDirection,
@@ -123,7 +170,7 @@ const SuccessContent = ({album, randomColor}: SuccessContentProps) => {
       ),
     getImagesByIdInfiniteOptions({ enabled: !!album.images })
   );
-  
+
   useInfiniteScroll(fetchNextPage, { canExecute: !isFetchingNextPage });
 
   const getImageDecorations = useCallback(
@@ -173,76 +220,69 @@ const SuccessContent = ({album, randomColor}: SuccessContentProps) => {
     />
   );
 
-	return (
-    <>
-      <AlbumFormDialog
-        resetOnConfirm
-        value={album.attributes}
-        open={editMode}
-        handleCancel={() => setEditMode(false)}
-        handleConfirm={async (attributes, changes) => {
-          setEditMode(false);
-          try {
-            await album.update(attributes, changes);
-            await refetch();
-            enqueueSuccessSnackbar(Strings.success.saved);
-          } catch (error: any) {
-            console.error(error);
-            enqueueErrorSnackbar(Strings.error.editingAlbum);
-          }
-        }}
-      />
-      <Grid item sm={8}>
-        <FancyTitleTypography outlineColor={randomColor}>
-          {album.name}
-        </FancyTitleTypography>
-      </Grid>
-      <Grid item sm={8} className={classes.controls}>
-        <FormControlLabel
-          control={
-            <Switch
-              classes={{
-                switchBase: classes.switchBase,
-                checked: classes.switchChecked,
-                track: classes.switchTrack,
-              }}
-              checked={!!timelineView}
-              onClick={() =>
-                setSearch({ timeline: timelineView ? "false" : "true" })
-              }
-            />
-          }
-          label={
-            <FancyTypography className={classes.switchText}>
-              {Strings.label.timelineView}
-            </FancyTypography>
-          }
-        />
-      </Grid>
-      {timelineView ? (
-        <Timeline
-          filterBar={filterBar}
-          getImageProps={getImageProps}
-          status={isRefetching ? "refetching" : imagesStatus}
-          images={images}
-          outlineColor={randomColor}
-        />
-      ) : (
-        <Images
-          filterBar={filterBar}
-          getImageProps={getImageProps}
-          status={isRefetching ? "refetching" : imagesStatus}
-          images={images}
-          outlineColor={randomColor}
-        />
-      )}
-      <Online>
-        <Fab onClick={() => setEditMode(true)}>
-          <EditIcon />
-        </Fab>
-      </Online>
-    </>
-	);
+	return (editMode || isNew)
+    ? (
+       <EditingContent
+        isNew={isNew}
+        setEditMode={setEditMode}
+        images={images}
+        onSubmit={onSubmit}
+        album={album}
+        filterBarProps={{tagSearch, sortDirection, tagOptions: tags, ...restFilterBarProps}}
+       />
+    ) : (
+      <>
+        <Grid item sm={8}>
+          <FancyTitleTypography outlineColor={randomColor}>
+            {album.name}
+          </FancyTitleTypography>
+        </Grid>
+        <Grid item sm={8} className={classes.controls}>
+          <FormControlLabel
+            control={
+              <Switch
+                classes={{
+                  switchBase: classes.switchBase,
+                  checked: classes.switchChecked,
+                  track: classes.switchTrack,
+                }}
+                checked={!!timelineView}
+                onClick={() =>
+                  setSearch({ timeline: timelineView ? "false" : "true" })
+                }
+              />
+            }
+            label={
+              <FancyTypography className={classes.switchText}>
+                {Strings.label.timelineView}
+              </FancyTypography>
+            }
+          />
+        </Grid>
+        {timelineView ? (
+          <Timeline
+            filterBar={filterBar}
+            getImageProps={getImageProps}
+            status={isRefetching ? "refetching" : imagesStatus}
+            images={images}
+            outlineColor={randomColor}
+          />
+        ) : (
+          <Images
+            filterBar={filterBar}
+            getImageProps={getImageProps}
+            status={isRefetching ? "refetching" : imagesStatus}
+            images={images}
+            outlineColor={randomColor}
+          />
+        )}
+        <Online>
+          <Fab onClick={() => setEditMode(true)}>
+            <EditIcon />
+          </Fab>
+        </Online>
+      </>
+  	);
 };
 
 export default SuccessContent;

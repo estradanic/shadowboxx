@@ -27,6 +27,13 @@ const useStyles = makeStyles((theme: Theme) => ({
   fabHidden: {
     bottom: theme.spacing(-10),
   },
+  disabled: {
+    "&&": {
+      color: ({ color }: UseStylesProps) => theme.palette[color].contrastText,
+      backgroundColor: ({ color }: UseStylesProps) => theme.palette[color].dark,
+      opacity: 0.25,
+    },
+  },
 }));
 
 export interface FabProps extends Omit<MuiFabProps, "color"> {
@@ -45,6 +52,7 @@ const Fab = ({ children, className, color = "success", ...rest }: FabProps) => {
         [classes.fabVisible]: visible,
         [classes.fabHidden]: !visible,
       })}
+      classes={{disabled: classes.disabled}}
       {...rest}
     >
       {children}
