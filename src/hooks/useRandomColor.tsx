@@ -5,8 +5,6 @@ import { VariableColor } from "../types";
 const useRandomColor = (): VariableColor => {
   const randomColor: VariableColor = useMemo(() => {
     const colors: VariableColor[] = [
-      "primary",
-      "secondary",
       "success",
       "error",
       "warning",

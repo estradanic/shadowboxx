@@ -16,10 +16,10 @@ import { GetImageReturn } from "../../../types";
 
 const useStyles = makeStyles((theme: Theme) => ({
   root: {
-    backgroundColor: theme.palette.info.main,
-    color: theme.palette.info.contrastText,
+    backgroundColor: theme.palette.primary.main,
+    color: theme.palette.primary.contrastText,
     borderRadius: "100%",
-    border: `2px solid ${theme.palette.info.contrastText}`,
+    border: `2px solid ${theme.palette.primary.contrastText}`,
     display: "flex",
     "& > svg": {
       margin: "auto",
@@ -30,10 +30,10 @@ const useStyles = makeStyles((theme: Theme) => ({
 export interface ShareImageDecorationProps
   extends Omit<
     ImageDecorationProps<IconProps>,
-    "Component" | "description" | "corner" | "ComponentProps" | "onClick"
+    "Component" | "description" | "position" | "ComponentProps" | "onClick"
   > {
-  /** Which corner of the image to render the decoration */
-  corner?: ImageDecorationProps<IconProps>["corner"];
+  /** Which position of the image to render the decoration */
+  position?: ImageDecorationProps<IconProps>["position"];
   /** Props to pass down to the icon */
   IconProps?: IconProps;
   /** The image to share */
@@ -52,7 +52,7 @@ const ShareImageDecorationIcon = forwardRef(
 
 /** Image decoration component to share the decorated image */
 const ShareImageDecoration = ({
-  corner = "bottomLeft",
+  position = "bottomLeft",
   className: userClassName,
   IconProps = {},
   image,
@@ -159,7 +159,7 @@ const ShareImageDecoration = ({
 
   return (
     <ImageDecoration<IconProps>
-      corner={corner}
+      position={position}
       Component={ShareImageDecorationIcon}
       description={Strings.action.shareImage}
       ComponentProps={{

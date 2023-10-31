@@ -28,10 +28,10 @@ const useStyles = makeStyles((theme: Theme) => ({
 export interface DateImageDecorationProps
   extends Omit<
     ImageDecorationProps<IconProps>,
-    "Component" | "description" | "corner" | "ComponentProps" | "onClick"
+    "Component" | "description" | "position" | "ComponentProps" | "onClick"
   > {
-  /** Which corner of the image to render the decoration */
-  corner?: ImageDecorationProps<IconProps>["corner"];
+  /** Which position of the image to render the decoration */
+  position?: ImageDecorationProps<IconProps>["position"];
   /** Props to pass down to the icon */
   IconProps?: IconProps;
   /** The initial state of the date */
@@ -50,7 +50,7 @@ const DateImageDecorationIcon = forwardRef(
 
 /** Image decoration component to add/edit dates */
 const DateImageDecoration = ({
-  corner = "topRight",
+  position = "topRight",
   className: userClassName,
   IconProps = {},
   initialDate: piInitialDate = new Date(),
@@ -91,7 +91,7 @@ const DateImageDecoration = ({
             confirmButtonColor: "success",
           });
         }}
-        corner={corner}
+        position={position}
         Component={DateImageDecorationIcon}
         description={Strings.action.dateImage}
         ComponentProps={{

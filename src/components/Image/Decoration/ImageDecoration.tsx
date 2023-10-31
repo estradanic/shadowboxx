@@ -15,6 +15,7 @@ const useStyles = makeStyles((theme: Theme) => ({
     "& > svg": {
       height: "100%",
     },
+    boxShadow: theme.shadows[5],
   },
   top: {
     top: theme.spacing(0),
@@ -28,6 +29,12 @@ const useStyles = makeStyles((theme: Theme) => ({
   bottom: {
     bottom: theme.spacing(0),
   },
+  middle: {
+    top: "calc(50% - 18px)",
+  },
+  center: {
+    left: "calc(50% - 18px)",
+  },
 }));
 
 export interface ImageDecorationProps<P> {
@@ -36,7 +43,7 @@ export interface ImageDecorationProps<P> {
   /** Props to pass down to the rendered component */
   ComponentProps: P;
   /** Which corner of the image to render the decoration */
-  corner: "topLeft" | "bottomLeft" | "topRight" | "bottomRight";
+  position: `${"top" | "bottom" | "middle"}${"Right" | "Left" | "Center"}`;
   /** Description to show in a tooltip */
   description?: string;
   /** Class name to apply to the root element */
@@ -51,7 +58,7 @@ export interface ImageDecorationProps<P> {
 const ImageDecoration = <P,>({
   Component,
   ComponentProps,
-  corner,
+  position,
   description,
   className: piClassName,
   children,
@@ -59,15 +66,19 @@ const ImageDecoration = <P,>({
 }: ImageDecorationProps<P>) => {
   const classes = useStyles();
   const cornerClasses = [];
-  if (corner.includes("top")) {
+  if (position.includes("top")) {
     cornerClasses.push(classes.top);
-  } else {
+  } else if (position.includes("bottom")) {
     cornerClasses.push(classes.bottom);
-  }
-  if (corner.includes("Right")) {
-    cornerClasses.push(classes.right);
   } else {
+    cornerClasses.push(classes.middle);
+  }
+  if (position.includes("Right")) {
+    cornerClasses.push(classes.right);
+  } else if (position.includes("Left")) {
     cornerClasses.push(classes.left);
+  } else {
+    cornerClasses.push(classes.center)
   }
   const className = classNames(...cornerClasses, classes.root, piClassName);
 

@@ -23,10 +23,10 @@ const useStyles = makeStyles((theme: Theme) => ({
 export interface CoverImageDecorationProps
   extends Omit<
     ImageDecorationProps<IconProps>,
-    "Component" | "description" | "corner" | "ComponentProps"
+    "Component" | "description" | "position" | "ComponentProps"
   > {
-  /** Which corner of the image to render the decoration */
-  corner?: ImageDecorationProps<IconProps>["corner"];
+  /** Which position of the image to render the decoration */
+  position?: ImageDecorationProps<IconProps>["position"];
   /** Whether the image is the cover image */
   checked: boolean;
   /** Props to pass down to the icon */
@@ -43,7 +43,7 @@ const CoverImageDecorationIcon = forwardRef(
 
 const CoverImageDecoration = ({
   checked,
-  corner = "bottomRight",
+  position = "bottomRight",
   IconProps = {},
   className: piClassName,
   ...rest
@@ -52,7 +52,7 @@ const CoverImageDecoration = ({
 
   return (
     <ImageDecoration<IconProps>
-      corner={corner}
+      position={position}
       Component={CoverImageDecorationIcon}
       description={
         checked

@@ -172,7 +172,7 @@ const Memories = memo(() => {
             }}
           />,
           <DateImageDecoration
-            corner="topLeft"
+            position="topLeft"
             initialDate={image.dateTaken}
             onConfirm={async (date) => {
               image.dateTaken = date;

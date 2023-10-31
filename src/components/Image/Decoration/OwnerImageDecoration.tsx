@@ -5,24 +5,24 @@ import ImageDecoration, { ImageDecorationProps } from "./ImageDecoration";
 export interface OwnerImageDecorationProps
   extends Omit<
     ImageDecorationProps<UserAvatarProps>,
-    "Component" | "description" | "corner" | "ComponentProps"
+    "Component" | "description" | "position" | "ComponentProps"
   > {
-  /** Which corner of the image to render the decoration */
-  corner?: ImageDecorationProps<UserAvatarProps>["corner"];
+  /** Which position of the image to render the decoration */
+  position?: ImageDecorationProps<UserAvatarProps>["position"];
   /** Props to pass down to the UserAvatar component */
   UserAvatarProps: UserAvatarProps;
 }
 
 /** Image decoration to display the profile picture of the owner of the image */
 const OwnerImageDecoration = ({
-  corner = "bottomRight",
+  position = "bottomRight",
   UserAvatarProps,
   ...rest
 }: OwnerImageDecorationProps) => {
   return (
     <ImageDecoration
       ComponentProps={UserAvatarProps}
-      corner={corner}
+      position={position}
       Component={UserAvatar}
       {...rest}
     />

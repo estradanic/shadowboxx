@@ -28,10 +28,10 @@ const useStyles = makeStyles((theme: Theme) => ({
 export interface CaptionImageDecorationProps
   extends Omit<
     ImageDecorationProps<IconProps>,
-    "Component" | "description" | "corner" | "ComponentProps" | "onClick"
+    "Component" | "description" | "position" | "ComponentProps" | "onClick"
   > {
-  /** Which corner of the image to render the decoration */
-  corner?: ImageDecorationProps<IconProps>["corner"];
+  /** Which position of the image to render the decoration */
+  position?: ImageDecorationProps<IconProps>["position"];
   /** Props to pass down to the icon */
   IconProps?: IconProps;
   /** The initial state of the caption */
@@ -50,7 +50,7 @@ const CaptionImageDecorationIcon = forwardRef(
 
 /** Image decoration component to add/edit captions */
 const CaptionImageDecoration = ({
-  corner = "bottomLeft",
+  position = "bottomLeft",
   className: piClassName,
   IconProps = {},
   initialCaption: piInitialCaption = "",
@@ -88,7 +88,7 @@ const CaptionImageDecoration = ({
             confirmButtonColor: "success",
           });
         }}
-        corner={corner}
+        position={position}
         Component={CaptionImageDecorationIcon}
         description={Strings.action.captionImage}
         ComponentProps={{

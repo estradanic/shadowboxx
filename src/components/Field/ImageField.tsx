@@ -43,6 +43,7 @@ import FilterBar, { FilterBarProps } from "../FilterBar/FilterBar";
 import { useJobContext } from "../../contexts/JobContext";
 import { Skeleton } from "../Skeleton";
 import { LoadingWrapper } from "../Loader";
+import TagsImageDecoration from "../Image/Decoration/TagsImageDecoration";
 
 const useStyles = makeStyles((theme: Theme) => ({
   endAdornment: {
@@ -393,6 +394,14 @@ const ImageField = memo(
                         image.dateTaken = date;
                         await image.save();
                       }}
+                    />,
+                    <TagsImageDecoration
+                      initialTags={image.tags}
+                      onConfirm={async (tags) => {
+                        image.tags = tags;
+                        await image.save();
+                      }}
+                      position="topCenter"
                     />,
                   ];
                   if (getCaption && setCaption) {

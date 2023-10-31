@@ -20,10 +20,14 @@ const useStyles = makeStyles((theme: Theme) => ({
     width: "100%",
   },
   saveFab: {
-    transform: ({isNew}: UseStylesParams) => isNew ? undefined : `translateX(calc(-100% - ${theme.spacing(1)}px))`,
+    transform: ({isNew}: UseStylesParams) => isNew
+    ? undefined :
+    `translateX(calc(-100% - ${theme.spacing(1)}px))`,
   },
   resetFab: {
-    transform: ({isNew}: UseStylesParams) => isNew ? `translateX(calc(-100% - ${theme.spacing(1)}px))` : `translateX(calc(-200% - ${theme.spacing(2)}px))`,
+    transform: ({isNew}: UseStylesParams) => isNew
+      ? `translateX(calc(-100% - ${theme.spacing(1)}px))`
+      : `translateX(calc(-200% - ${theme.spacing(2)}px))`,
   }
 }));
 

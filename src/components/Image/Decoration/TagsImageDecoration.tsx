@@ -21,6 +21,9 @@ import useRefState from "../../../hooks/useRefState";
 import Tag from "../../Tag/Tag";
 import { IconButton } from "../../Button";
 import { dedupe } from "../../../utils";
+import useQueryConfigs from "../../../hooks/Query/useQueryConfigs";
+import { useQueryClient } from "@tanstack/react-query";
+import QueryCacheGroups from "../../../hooks/Query/QueryCacheGroups";
 
 const useStyles = makeStyles((theme: Theme) => ({
   root: {
@@ -38,10 +41,10 @@ const useStyles = makeStyles((theme: Theme) => ({
 export interface TagsImageDecorationProps
   extends Omit<
     ImageDecorationProps<IconProps>,
-    "Component" | "description" | "corner" | "ComponentProps" | "onClick"
+    "Component" | "description" | "position" | "ComponentProps" | "onClick"
   > {
-  /** Which corner of the image to render the decoration */
-  corner?: ImageDecorationProps<IconProps>["corner"];
+  /** Which position of the image to render the decoration */
+  position?: ImageDecorationProps<IconProps>["position"];
   /** Props to pass down to the icon */
   IconProps?: IconProps;
   /** The initial state of the tags */
@@ -62,7 +65,7 @@ const TagsImageDecorationIcon = forwardRef(
 
 /** Image decoration component to add/remove tags */
 const TagsImageDecoration = ({
-  corner = "bottomRight",
+  position = "bottomRight",
   className: piClassName,
   IconProps = {},
   initialTags: piInitialTags = [],
@@ -76,9 +79,14 @@ const TagsImageDecoration = ({
   const [initialTags, setInitialTags] = useState(piInitialTags);
   const [tagsRef, tags, setTags] = useRefState(initialTags);
 
+  const {getAllTagsQueryKey} = useQueryConfigs();
+  const queryClient = useQueryClient();
+
   const handleConfirm = useCallback(async () => {
     onConfirm(tagsRef.current);
     setInitialTags(tagsRef.current);
+    queryClient.invalidateQueries(getAllTagsQueryKey());
+    queryClient.invalidateQueries([QueryCacheGroups.GET_TAGS_BY_IMAGE_ID]);
   }, [onConfirm, tagsRef]);
 
   const handleCancel = useCallback(async () => {
@@ -170,7 +178,7 @@ const TagsImageDecoration = ({
             confirmButtonColor: "success",
           });
         }}
-        corner={corner}
+        position={position}
         Component={TagsImageDecorationIcon}
         description={Strings.action.tagImage}
         ComponentProps={{
