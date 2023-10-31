@@ -109,7 +109,10 @@ const LoadingWrapper = ({
   const variableColor = useRandomColor();
 
   return (
-    <div className={classNames(className, {[classes.root]: !global})} onClick={onClick}>
+    <div
+      className={classNames(className, { [classes.root]: !global })}
+      onClick={onClick}
+    >
       <div className={classes.wrapper}>{children}</div>
       {loading && (
         <div

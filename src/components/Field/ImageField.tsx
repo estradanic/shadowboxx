@@ -369,13 +369,25 @@ const ImageField = memo(
               <Grid container className={classes.multiImageContainer}>
                 {!!filterBarProps && <FilterBar {...filterBarProps!} />}
                 {jobsForAlbum.map((job) => (
-                  <Grid key={`job-${job.id}`} item xs={12} md={6} lg={4} xl={3} className={classes.imageWrapper}>
+                  <Grid
+                    key={`job-${job.id}`}
+                    item
+                    xs={12}
+                    md={6}
+                    lg={4}
+                    xl={3}
+                    className={classes.imageWrapper}
+                  >
                     <LoadingWrapper
                       className={classes.skeletonWrapper}
                       loading={true}
                       global={false}
                       progress={job.progress}
-                      type={[0, 100, undefined].includes(job.progress) ? "indeterminate" : "determinate"}
+                      type={
+                        [0, 100, undefined].includes(job.progress)
+                          ? "indeterminate"
+                          : "determinate"
+                      }
                     >
                       <Skeleton variant="rect" width="100%" height="300px" />
                     </LoadingWrapper>

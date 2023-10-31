@@ -8,6 +8,7 @@ import React, {
 } from "react";
 import { makeStyles, Theme } from "@material-ui/core/styles";
 import NotesIcon from "@material-ui/icons/Notes";
+import StyleIcon from "@material-ui/icons/Style";
 import Popper from "@material-ui/core/Popper";
 import classNames from "classnames";
 import { VariableColor } from "../../types";
@@ -20,6 +21,7 @@ import { DEFAULT_IMAGE_SKELETON_HEIGHT } from "../Skeleton/ImageSkeleton";
 import Typography from "@material-ui/core/Typography";
 import useQueryConfigs from "../../hooks/Query/useQueryConfigs";
 import { useQuery } from "@tanstack/react-query";
+import Chip from "../Chip/Chip";
 
 interface UseStylesParams {
   borderColor: VariableColor;
@@ -104,6 +106,17 @@ const useStyles = makeStyles((theme: Theme) => ({
     color: theme.palette.text.primary,
     fontSize: "large",
     marginRight: theme.spacing(1),
+  },
+  tag: {
+    outline: `1px solid ${theme.palette.primary.contrastText}`,
+  },
+  tags: {
+    maxWidth: "90vw",
+    display: "flex",
+    justifyContent: "space-around",
+    margin: "0 auto",
+    gap: theme.spacing(2),
+    transform: `translateY(calc(-100% - ${theme.spacing(2)}px))`,
   },
 }));
 
@@ -339,6 +352,15 @@ const Image = memo(
                 />
               </picture>
             )}
+            <div className={classes.tags}>
+              {parseImage.tags?.map?.((tag) => (
+                <Chip
+                  className={classes.tag}
+                  label={tag}
+                  icon={<StyleIcon />}
+                />
+              ))}
+            </div>
             <Typography
               className={classNames(classes.caption, {
                 [classes.displayNone]:

@@ -78,7 +78,7 @@ const ImageDecoration = <P,>({
   } else if (position.includes("Left")) {
     cornerClasses.push(classes.left);
   } else {
-    cornerClasses.push(classes.center)
+    cornerClasses.push(classes.center);
   }
   const className = classNames(...cornerClasses, classes.root, piClassName);
 

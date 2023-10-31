@@ -52,7 +52,7 @@ const Fab = ({ children, className, color = "success", ...rest }: FabProps) => {
         [classes.fabVisible]: visible,
         [classes.fabHidden]: !visible,
       })}
-      classes={{disabled: classes.disabled}}
+      classes={{ disabled: classes.disabled }}
       {...rest}
     >
       {children}

@@ -1,18 +1,27 @@
-import React, { Dispatch, ReactNode, SetStateAction, useEffect, useMemo } from "react";
+import React, { Dispatch, SetStateAction, useEffect, useMemo } from "react";
 import Grid from "@material-ui/core/Grid";
 import CloseIcon from "@material-ui/icons/Close";
 import SaveIcon from "@material-ui/icons/Save";
 import RestoreIcon from "@material-ui/icons/Restore";
 import { AlbumSaveContext, ParseAlbum, ParseImage } from "../../classes";
-import useAlbumForm, { HydratedAlbumAttributes } from "../../hooks/useAlbumForm";
-import { Fab, ImageField, TextField, Tooltip, UserField, useSnackbar } from "../../components";
+import useAlbumForm, {
+  HydratedAlbumAttributes,
+} from "../../hooks/useAlbumForm";
+import {
+  Fab,
+  ImageField,
+  TextField,
+  Tooltip,
+  UserField,
+  useSnackbar,
+} from "../../components";
 import { useUserContext } from "../../contexts/UserContext";
 import { Strings } from "../../resources";
-import { ImageContextProvider } from "../../contexts/ImageContext"; 
+import { ImageContextProvider } from "../../contexts/ImageContext";
 import { FilterBarProps } from "../../components/FilterBar/FilterBar";
 import { makeStyles, Theme } from "@material-ui/core/styles";
 
-type UseStylesParams = {isNew: boolean};
+type UseStylesParams = { isNew: boolean };
 
 const useStyles = makeStyles((theme: Theme) => ({
   fieldGrid: {
@@ -20,28 +29,38 @@ const useStyles = makeStyles((theme: Theme) => ({
     width: "100%",
   },
   saveFab: {
-    transform: ({isNew}: UseStylesParams) => isNew
-    ? undefined :
-    `translateX(calc(-100% - ${theme.spacing(1)}px))`,
+    transform: ({ isNew }: UseStylesParams) =>
+      isNew ? undefined : `translateX(calc(-100% - ${theme.spacing(1)}px))`,
   },
   resetFab: {
-    transform: ({isNew}: UseStylesParams) => isNew
-      ? `translateX(calc(-100% - ${theme.spacing(1)}px))`
-      : `translateX(calc(-200% - ${theme.spacing(2)}px))`,
-  }
+    transform: ({ isNew }: UseStylesParams) =>
+      isNew
+        ? `translateX(calc(-100% - ${theme.spacing(1)}px))`
+        : `translateX(calc(-200% - ${theme.spacing(2)}px))`,
+  },
 }));
 
 interface EditingContentProps {
-  album: ParseAlbum,
-  onSubmit: (attributes: HydratedAlbumAttributes, changes: AlbumSaveContext) => Promise<void>,
-  images: ParseImage[],
-  setEditMode: Dispatch<SetStateAction<boolean>>,
-  filterBarProps: FilterBarProps,
-  isNew: boolean,
+  album: ParseAlbum;
+  onSubmit: (
+    attributes: HydratedAlbumAttributes,
+    changes: AlbumSaveContext
+  ) => Promise<void>;
+  images: ParseImage[];
+  setEditMode: Dispatch<SetStateAction<boolean>>;
+  filterBarProps: FilterBarProps;
+  isNew: boolean;
 }
 
-const EditingContent = ({setEditMode, album, onSubmit: piOnSubmit, images, filterBarProps, isNew}: EditingContentProps) => {
-  const classes = useStyles({isNew});
+const EditingContent = ({
+  setEditMode,
+  album,
+  onSubmit: piOnSubmit,
+  images,
+  filterBarProps,
+  isNew,
+}: EditingContentProps) => {
+  const classes = useStyles({ isNew });
   const {
     name,
     setName,
@@ -61,13 +80,13 @@ const EditingContent = ({setEditMode, album, onSubmit: piOnSubmit, images, filte
     onCancel,
     isDirty,
     images: formImages,
-  } = useAlbumForm({...album.attributes, images}, {onSubmit: piOnSubmit});
+  } = useAlbumForm({ ...album.attributes, images }, { onSubmit: piOnSubmit });
   const { getLoggedInUser } = useUserContext();
   const isCollaborator = useMemo(
     () => getLoggedInUser().objectId !== album.owner?.id,
     [getLoggedInUser, album.owner?.id]
   );
-  const {enqueueWarningSnackbar, closeSnackbar} = useSnackbar();
+  const { enqueueWarningSnackbar, closeSnackbar } = useSnackbar();
 
   useEffect(() => {
     const snackbarKey = enqueueWarningSnackbar(Strings.label.editMode, {
@@ -141,23 +160,36 @@ const EditingContent = ({setEditMode, album, onSubmit: piOnSubmit, images, filte
           />
         </ImageContextProvider>
       </Grid>
-      <Fab disabled={!isDirty} className={classes.resetFab} color="primary" onClick={onCancel}>
+      <Fab
+        disabled={!isDirty}
+        className={classes.resetFab}
+        color="primary"
+        onClick={onCancel}
+      >
         <RestoreIcon />
       </Fab>
-      <Fab disabled={!isDirty} className={classes.saveFab} color="success" onClick={async () => {
-        setEditMode(false);
-        await onSubmit();
-      }}>
+      <Fab
+        disabled={!isDirty}
+        className={classes.saveFab}
+        color="success"
+        onClick={async () => {
+          setEditMode(false);
+          await onSubmit();
+        }}
+      >
         <SaveIcon />
       </Fab>
-      {!isNew &&
-        <Fab color="error" onClick={async () => {
-          setEditMode(false);
-          await onCancel();
-        }}>
+      {!isNew && (
+        <Fab
+          color="error"
+          onClick={async () => {
+            setEditMode(false);
+            await onCancel();
+          }}
+        >
           <CloseIcon />
         </Fab>
-      }
+      )}
     </>
   );
 };

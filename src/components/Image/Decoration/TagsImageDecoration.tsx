@@ -79,7 +79,7 @@ const TagsImageDecoration = ({
   const [initialTags, setInitialTags] = useState(piInitialTags);
   const [tagsRef, tags, setTags] = useRefState(initialTags);
 
-  const {getAllTagsQueryKey} = useQueryConfigs();
+  const { getAllTagsQueryKey } = useQueryConfigs();
   const queryClient = useQueryClient();
 
   const handleConfirm = useCallback(async () => {

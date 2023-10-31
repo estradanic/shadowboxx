@@ -10,8 +10,11 @@ import Images from "../../components/Image/Images";
 import Timeline from "../../components/Image/Timeline";
 import Online from "../../components/NetworkDetector/Online";
 import { useSnackbar } from "../../components/Snackbar";
-import { FancyTitleTypography, FancyTypography } from "../../components/Typography";
-import {Strings} from "../../resources";
+import {
+  FancyTitleTypography,
+  FancyTypography,
+} from "../../components/Typography";
+import { Strings } from "../../resources";
 import VariableColor from "../../types/VariableColor";
 import EditIcon from "@material-ui/icons/Edit";
 import { AlbumSaveContext, ParseImage } from "../../classes";
@@ -59,16 +62,16 @@ const useStyles = makeStyles((theme: Theme) => ({
 }));
 
 type SuccessContentProps = {
-  album: ParseAlbum,
-  randomColor: VariableColor,
-  isNew: boolean,
+  album: ParseAlbum;
+  randomColor: VariableColor;
+  isNew: boolean;
 };
 
-const SuccessContent = ({album, randomColor, isNew}: SuccessContentProps) => {
+const SuccessContent = ({ album, randomColor, isNew }: SuccessContentProps) => {
   const [editMode, setEditMode] = useState<boolean>(false);
   const navigate = useNavigate();
-  const {enqueueSuccessSnackbar, enqueueErrorSnackbar} = useSnackbar();
-  const classes = useStyles({randomColor});
+  const { enqueueSuccessSnackbar, enqueueErrorSnackbar } = useSnackbar();
+  const classes = useStyles({ randomColor });
   const [search, setSearch] = useSearchParams();
   const timelineView = search.get("timeline") === "true";
   const { online } = useNetworkDetectionContext();
@@ -92,39 +95,48 @@ const SuccessContent = ({album, randomColor, isNew}: SuccessContentProps) => {
 
   const onSubmit = isNew
     ? async (attributes: HydratedAlbumAttributes) => {
-      startGlobalLoader();
-      try {
-        // Don't spread into this bc that will keep objectId and createdAt
-        album.attributes = {
-          owner: attributes.owner,
-          name: attributes.name,
-          description: attributes.description,
-          collaborators: attributes.collaborators,
-          viewers: attributes.viewers,
-          captions: attributes.captions,
-          coverImage: attributes.coverImage,
-          images: attributes.images.map((image) => image.objectId),
-        };
-        const response = await album.saveNew();
-        navigate(`/album/${response.objectId}`);
-      } catch (error: any) {
-        console.error(error);
-        enqueueErrorSnackbar(Strings.error.addingAlbum);
-      } finally {
-        stopGlobalLoader();
+        startGlobalLoader();
+        try {
+          // Don't spread into this bc that will keep objectId and createdAt
+          album.attributes = {
+            owner: attributes.owner,
+            name: attributes.name,
+            description: attributes.description,
+            collaborators: attributes.collaborators,
+            viewers: attributes.viewers,
+            captions: attributes.captions,
+            coverImage: attributes.coverImage,
+            images: attributes.images.map((image) => image.objectId),
+          };
+          const response = await album.saveNew();
+          navigate(`/album/${response.objectId}`);
+        } catch (error: any) {
+          console.error(error);
+          enqueueErrorSnackbar(Strings.error.addingAlbum);
+        } finally {
+          stopGlobalLoader();
+        }
       }
-    }
-    : async (attributes: HydratedAlbumAttributes, changes: AlbumSaveContext) => {
-      setEditMode(false);
-      try {
-        await album.update({...attributes, images: attributes.images.map((image) => image.objectId)}, changes);
-        await refetch();
-        enqueueSuccessSnackbar(Strings.success.saved);
-      } catch (error: any) {
-        console.error(error);
-        enqueueErrorSnackbar(Strings.error.editingAlbum);
-      }
-    }
+    : async (
+        attributes: HydratedAlbumAttributes,
+        changes: AlbumSaveContext
+      ) => {
+        setEditMode(false);
+        try {
+          await album.update(
+            {
+              ...attributes,
+              images: attributes.images.map((image) => image.objectId),
+            },
+            changes
+          );
+          await refetch();
+          enqueueSuccessSnackbar(Strings.success.saved);
+        } catch (error: any) {
+          console.error(error);
+          enqueueErrorSnackbar(Strings.error.editingAlbum);
+        }
+      };
 
   const {
     sortDirection,
@@ -220,69 +232,73 @@ const SuccessContent = ({album, randomColor, isNew}: SuccessContentProps) => {
     />
   );
 
-	return (editMode || isNew)
-    ? (
-       <EditingContent
-        isNew={isNew}
-        setEditMode={setEditMode}
-        images={images}
-        onSubmit={onSubmit}
-        album={album}
-        filterBarProps={{tagSearch, sortDirection, tagOptions: tags, ...restFilterBarProps}}
-       />
-    ) : (
-      <>
-        <Grid item sm={8}>
-          <FancyTitleTypography outlineColor={randomColor}>
-            {album.name}
-          </FancyTitleTypography>
-        </Grid>
-        <Grid item sm={8} className={classes.controls}>
-          <FormControlLabel
-            control={
-              <Switch
-                classes={{
-                  switchBase: classes.switchBase,
-                  checked: classes.switchChecked,
-                  track: classes.switchTrack,
-                }}
-                checked={!!timelineView}
-                onClick={() =>
-                  setSearch({ timeline: timelineView ? "false" : "true" })
-                }
-              />
-            }
-            label={
-              <FancyTypography className={classes.switchText}>
-                {Strings.label.timelineView}
-              </FancyTypography>
-            }
-          />
-        </Grid>
-        {timelineView ? (
-          <Timeline
-            filterBar={filterBar}
-            getImageProps={getImageProps}
-            status={isRefetching ? "refetching" : imagesStatus}
-            images={images}
-            outlineColor={randomColor}
-          />
-        ) : (
-          <Images
-            filterBar={filterBar}
-            getImageProps={getImageProps}
-            status={isRefetching ? "refetching" : imagesStatus}
-            images={images}
-            outlineColor={randomColor}
-          />
-        )}
-        <Online>
-          <Fab onClick={() => setEditMode(true)}>
-            <EditIcon />
-          </Fab>
-        </Online>
-      </>
-  	);
+  return editMode || isNew ? (
+    <EditingContent
+      isNew={isNew}
+      setEditMode={setEditMode}
+      images={images}
+      onSubmit={onSubmit}
+      album={album}
+      filterBarProps={{
+        tagSearch,
+        sortDirection,
+        tagOptions: tags,
+        ...restFilterBarProps,
+      }}
+    />
+  ) : (
+    <>
+      <Grid item sm={8}>
+        <FancyTitleTypography outlineColor={randomColor}>
+          {album.name}
+        </FancyTitleTypography>
+      </Grid>
+      <Grid item sm={8} className={classes.controls}>
+        <FormControlLabel
+          control={
+            <Switch
+              classes={{
+                switchBase: classes.switchBase,
+                checked: classes.switchChecked,
+                track: classes.switchTrack,
+              }}
+              checked={!!timelineView}
+              onClick={() =>
+                setSearch({ timeline: timelineView ? "false" : "true" })
+              }
+            />
+          }
+          label={
+            <FancyTypography className={classes.switchText}>
+              {Strings.label.timelineView}
+            </FancyTypography>
+          }
+        />
+      </Grid>
+      {timelineView ? (
+        <Timeline
+          filterBar={filterBar}
+          getImageProps={getImageProps}
+          status={isRefetching ? "refetching" : imagesStatus}
+          images={images}
+          outlineColor={randomColor}
+        />
+      ) : (
+        <Images
+          filterBar={filterBar}
+          getImageProps={getImageProps}
+          status={isRefetching ? "refetching" : imagesStatus}
+          images={images}
+          outlineColor={randomColor}
+        />
+      )}
+      <Online>
+        <Fab onClick={() => setEditMode(true)}>
+          <EditIcon />
+        </Fab>
+      </Online>
+    </>
+  );
 };
 
 export default SuccessContent;

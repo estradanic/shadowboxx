@@ -1,8 +1,5 @@
 import React, { memo } from "react";
-import {
-  BackButton,
-  PageContainer,
-} from "../../components";
+import { BackButton, PageContainer } from "../../components";
 import { useLocation, useParams } from "react-router-dom";
 import Grid from "@material-ui/core/Grid";
 import Typography from "@material-ui/core/Typography";
@@ -38,12 +35,9 @@ const Album = memo(() => {
   const randomColor = useRandomColor();
   const classes = useStyles({ randomColor });
   const { online } = useNetworkDetectionContext();
-  const {getLoggedInUser} = useUserContext();
-  const {
-    getAlbumFunction,
-    getAlbumQueryKey,
-    getAlbumOptions,
-  } = useQueryConfigs();
+  const { getLoggedInUser } = useUserContext();
+  const { getAlbumFunction, getAlbumQueryKey, getAlbumOptions } =
+    useQueryConfigs();
 
   const isNew = id === "new";
   const newAlbum = new UnpersistedParseAlbum({

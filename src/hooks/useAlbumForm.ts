@@ -1,5 +1,10 @@
 import { useCallback, useMemo, useState } from "react";
-import { AlbumAttributes, AlbumSaveContext, ParseImage, ParseUser } from "../classes";
+import {
+  AlbumAttributes,
+  AlbumSaveContext,
+  ParseImage,
+  ParseUser,
+} from "../classes";
 import { useSnackbar } from "../components";
 import { Strings } from "../resources";
 import { dedupe, ErrorState, isNullOrWhitespace, deepEqual } from "../utils";
@@ -8,8 +13,8 @@ import { useActionDialogContext } from "../components/Dialog/ActionDialog";
 export type AlbumFormChanges = AlbumSaveContext;
 
 export type HydratedAlbumAttributes = Omit<AlbumAttributes, "images"> & {
-  images: ParseImage[],
-}
+  images: ParseImage[];
+};
 
 export type UseAlbumFormOptions = {
   /** Whether to reset the form after submitting */
@@ -69,14 +74,15 @@ const useAlbumForm = (
   );
   const [errors, setErrors] = useState<ErrorState<"name">>(defaultErrors);
 
-  const isDirty = removedImages.length > 0
-    || allImages.length !== album.images.length
-    || coverImage?.id !== album.coverImage?.id
-    || name !== album.name
-    || description !== album.description
-    || !deepEqual(captions, (album.captions ?? {}))
-    || !deepEqual(collaborators, album.collaborators)
-    || !deepEqual(viewers, album.viewers);
+  const isDirty =
+    removedImages.length > 0 ||
+    allImages.length !== album.images.length ||
+    coverImage?.id !== album.coverImage?.id ||
+    name !== album.name ||
+    description !== album.description ||
+    !deepEqual(captions, album.captions ?? {}) ||
+    !deepEqual(collaborators, album.collaborators) ||
+    !deepEqual(viewers, album.viewers);
 
   const reinitialize = useCallback(() => {
     setName(album.name);
@@ -224,9 +230,7 @@ const useAlbumForm = (
 
   const onAdd = async (...images: ParseImage[]) => {
     setAllImages(dedupe([...images, ...allImages]));
-    setRemovedImages(
-      removedImages.filter((image) => !images.includes(image))
-    );
+    setRemovedImages(removedImages.filter((image) => !images.includes(image)));
   };
 
   const onRemove = async (...images: ParseImage[]) => {

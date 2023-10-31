@@ -269,7 +269,12 @@ export default class ParseAlbum
     };
   }
 
-  set attributes(attributes: Omit<Attributes<"Album">, "objectId" | "createdAt" | "updatedAt">) {
+  set attributes(
+    attributes: Omit<
+      Attributes<"Album">,
+      "objectId" | "createdAt" | "updatedAt"
+    >
+  ) {
     this._album.set({
       ...attributes,
       owner: attributes.owner.toNativePointer(),
