@@ -113,8 +113,6 @@ export interface AlbumCardProps {
 /** Component for displaying detailed information about an album */
 const AlbumCard = memo(({ value, onChange, borderColor }: AlbumCardProps) => {
   const [anchorEl, setAnchorEl] = useState<Element>();
-  const [editAlbumDialogOpen, setEditAlbumDialogOpen] =
-    useState<boolean>(false);
   const { online } = useNetworkDetectionContext();
 
   const {
@@ -240,10 +238,6 @@ const AlbumCard = memo(({ value, onChange, borderColor }: AlbumCardProps) => {
     );
   };
 
-  const editAlbum = () => {
-    setEditAlbumDialogOpen(true);
-  };
-
   const closeMenu = () => setAnchorEl(undefined);
 
   const navigateToAlbum = () => {
@@ -324,7 +318,12 @@ const AlbumCard = memo(({ value, onChange, borderColor }: AlbumCardProps) => {
             />
           </LoadingWrapper>
         ) : (
-          <Empty height={300} />
+          <CardMedia
+            className={classes.media}
+            component={Empty}
+            height={300}
+            onClick={navigateToAlbum}
+          />
         )}
         <CardContent className={classes.cardContent}>
           <Grid container>

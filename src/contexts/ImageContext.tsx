@@ -13,7 +13,6 @@ import { useUserContext } from "./UserContext";
 import AddImageDialog from "../components/Images/AddImageDialog";
 import LinearProgress from "../components/Progress/LinearProgress";
 import Typography from "../components/Typography/Typography";
-import { useGlobalLoadingStore } from "../stores";
 import { Notification, useNotificationsContext } from "./NotificationsContext";
 import { UpdateJobInfo, useJobContext } from "./JobContext";
 import useRandomColor from "../hooks/useRandomColor";
@@ -99,12 +98,6 @@ export const ImageContextProvider = ({
   const { addNotification } = useNotificationsContext();
   const { enqueueErrorSnackbar } = useSnackbar();
   const { getLoggedInUser } = useUserContext();
-  const { startGlobalLoader, stopGlobalLoader } = useGlobalLoadingStore(
-    (state) => ({
-      startGlobalLoader: state.startGlobalLoader,
-      stopGlobalLoader: state.stopGlobalLoader,
-    })
-  );
   const [alreadySelected, setAlreadySelected] = useState<ParseImage[]>([]);
   const [multiple, setMultiple] = useState<boolean>(true);
   const [selectionDialogOpen, setSelectionDialogOpen] = useState(false);
@@ -425,14 +418,11 @@ export const ImageContextProvider = ({
   };
 
   const deleteImage = async (parseImage: ParseImage) => {
-    startGlobalLoader();
     try {
       await parseImage.destroy();
     } catch (e: any) {
       console.error(e);
       enqueueErrorSnackbar(Strings.error.deletingImage(parseImage.name));
-    } finally {
-      stopGlobalLoader();
     }
   };
 

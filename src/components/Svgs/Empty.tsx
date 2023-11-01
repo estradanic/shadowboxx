@@ -3,11 +3,11 @@ import Svg, { SvgProps } from "./Svg";
 import { useTheme } from "@material-ui/core/styles";
 
 /** Svg to use when an album has no images */
-const Empty = ({ height }: Omit<SvgProps, "children">) => {
+const Empty = (props: Omit<SvgProps, "children">) => {
   const theme = useTheme();
 
   return (
-    <Svg height={height}>
+    <Svg {...props}>
       <svg
         style={{ height: "100%", width: "100%" }}
         id="9af98f83-10c5-4067-bc84-20554b2827d8"

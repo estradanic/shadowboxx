@@ -4,7 +4,6 @@ import Grid from "@material-ui/core/Grid";
 import CloseIcon from "@material-ui/icons/Close";
 import EditIcon from "@material-ui/icons/Edit";
 import DeleteIcon from "@material-ui/icons/Delete";
-import AddIcon from "@material-ui/icons/Add";
 import { makeStyles, Theme } from "@material-ui/core/styles";
 import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
 import { SnackbarKey } from "notistack";
@@ -15,7 +14,6 @@ import {
   Fab,
   useImageStyles,
   useSnackbar,
-  Button,
   Online,
   useActionDialogContext,
 } from "../../components";
@@ -38,70 +36,76 @@ import FilterBar from "../../components/FilterBar/FilterBar";
 import TagsImageDecoration from "../../components/Image/Decoration/TagsImageDecoration";
 import DateImageDecoration from "../../components/Image/Decoration/DateImageDecoration";
 import useQueryConfigs from "../../hooks/Query/useQueryConfigs";
+import { useGlobalLoadingStore } from "../../stores";
 
 const useStyles = makeStyles((theme: Theme) => ({
-  actionContainer: {
-    backgroundColor: theme.palette.background.paper,
-    padding: theme.spacing(0.5, 1),
-    borderRadius: "4px",
-    position: "absolute",
-    bottom: theme.spacing(7),
-    zIndex: theme.zIndex.modal,
+  deleteFab: {
+    transform: `translateX(calc(-100% - ${theme.spacing(1)}px))`,
+    backgroundColor: theme.palette.error.contrastText,
+    color: theme.palette.error.main,
+    "&:hover, &:focus, &:active": {
+      backgroundColor: theme.palette.error.contrastText,
+      color: theme.palette.error.dark,
+    },
+    "&[disabled]": {
+      backgroundColor: theme.palette.error.contrastText,
+      color: theme.palette.error.dark,
+      opacity: 0.25,
+      cursor: "default",
+    }
   },
 }));
 
-type ActionBarProps = {
-  selectedImages: string[];
+interface DeleteFabProps {
+  imagesToDelete: ParseImage[];
   onDelete: () => Promise<void>;
-  images: ParseImage[];
-};
+}
 
-const ActionBar = ({ selectedImages, images, onDelete }: ActionBarProps) => {
+const DeleteFab = ({imagesToDelete, onDelete}: DeleteFabProps) => {
   const classes = useStyles();
-  const { deleteImage } = useImageContext();
-  const { openConfirm } = useActionDialogContext();
-  const { enqueueInfoSnackbar } = useSnackbar();
+  const {deleteImage} = useImageContext();
+  const {openConfirm} = useActionDialogContext();
+  const {startGlobalLoader, stopGlobalLoader, updateGlobalLoader} = useGlobalLoadingStore((store) => ({
+    startGlobalLoader: store.startGlobalLoader,
+    stopGlobalLoader: store.stopGlobalLoader,
+    updateGlobalLoader: store.updateGlobalLoader,
+  }));
   return (
-    <Grid item sm={6} className={classes.actionContainer}>
-      <Button
-        variant="text"
-        color="error"
-        disabled={selectedImages.length === 0}
-        onClick={() => {
-          openConfirm(
-            Strings.message.deleteImagesConfirm,
-            async () => {
-              const imagesToDelete = images.filter((image) =>
-                selectedImages.includes(image.objectId)
-              );
-              await Promise.all(
-                imagesToDelete.map((image) => deleteImage(image))
-              );
-              await onDelete();
-            },
-            () => {},
-            {
-              confirmButtonText: Strings.action.delete,
-              confirmButtonColor: "error",
-            }
-          );
-        }}
-      >
-        <DeleteIcon fontSize="small" />
-        {Strings.action.delete}
-      </Button>
-      <Button
-        variant="text"
-        color="success"
-        disabled={selectedImages.length === 0}
-        onClick={() => enqueueInfoSnackbar("Feature coming soon!")}
-      >
-        <AddIcon fontSize="small" />
-        {Strings.action.addToAlbum}
-      </Button>
-    </Grid>
+    <Fab
+      className={classes.deleteFab}
+      onClick={() => {
+        openConfirm(
+          Strings.message.deleteImagesConfirm,
+          async () => {
+            startGlobalLoader({
+              type: "determinate",
+              progress: 0,
+            });
+            const increment = 100 / imagesToDelete.length;
+            let progress = 0;
+            await Promise.all(
+              imagesToDelete.map(async (image) => {
+                await deleteImage(image);
+                progress += increment;
+                updateGlobalLoader({progress});
+              })
+            );
+            await onDelete();
+            stopGlobalLoader();
+          },
+          () => {},
+          {
+            confirmButtonText: Strings.action.delete,
+            confirmButtonColor: "error",
+          }
+        );
+      }}
+      disabled={imagesToDelete.length === 0}
+    >
+      <DeleteIcon />
+    </Fab>
   );
-};
+}
 
 /**
  * Page for viewing all the logged in users's images/videos
@@ -231,15 +235,6 @@ const Memories = memo(() => {
           {Strings.label.memories}
         </FancyTitleTypography>
       </Grid>
-      {editMode && (
-        <ImageContextProvider>
-          <ActionBar
-            selectedImages={selectedImages}
-            images={images}
-            onDelete={onDelete}
-          />
-        </ImageContextProvider>
-      )}
       <Images
         filterBar={
           <FilterBar
@@ -266,6 +261,7 @@ const Memories = memo(() => {
               );
             } else {
               closeSnackbar(snackbarKey);
+              setSelectedImages([]);
             }
             setEditMode((prev) => !prev);
           }}
@@ -273,6 +269,11 @@ const Memories = memo(() => {
         >
           {editMode ? <CloseIcon /> : <EditIcon />}
         </Fab>
+        {editMode &&
+          <ImageContextProvider>
+            <DeleteFab imagesToDelete={images.filter((image) => selectedImages.includes(image.objectId))} onDelete={onDelete} />
+          </ImageContextProvider>
+        }
       </Online>
     </PageContainer>
   );
