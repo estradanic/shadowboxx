@@ -87,7 +87,9 @@ const FilterBar = ({
           setTagSearch(tagSearch.concat([tagSearchInputValue]));
           setTagSearchInputValue("");
         }
-        event.preventDefault();
+        if (event.key !== "Tab") {
+          event.preventDefault();
+        }
         break;
       }
       default:

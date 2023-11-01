@@ -104,11 +104,11 @@ export default class ParseAlbum
 
   constructor(
     album: Parse.Object<ParsifyPointers<"Album">>,
-    noPin: boolean = false
+    cloud: boolean = false
   ) {
-    super(album);
+    super(album, cloud);
     this._album = album;
-    if (!noPin) {
+    if (!cloud) {
       this.pin();
     }
   }
@@ -223,12 +223,14 @@ export default class ParseAlbum
     const coverImage = this._album.get(ParseAlbum.COLUMNS.coverImage);
     if (coverImage) {
       return new ParsePointer<"Image">(coverImage);
+    } else if (this.images[0]) {
+      return new ParsePointer<"Image">({
+        objectId: this.images[0],
+        className: "Image",
+        __type: "Object",
+      });
     }
-    return new ParsePointer<"Image">({
-      objectId: this.images[0],
-      className: "Image",
-      __type: "Object",
-    });
+    return undefined;
   }
 
   set coverImage(coverImage) {

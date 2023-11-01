@@ -105,7 +105,9 @@ const TagsImageDecoration = ({
           setTags(tags.concat([inputValue]));
           setInputValue("");
         }
-        event.preventDefault();
+        if (event.key !== "Tab") {
+          event.preventDefault();
+        }
         break;
       }
       default:

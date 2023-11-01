@@ -79,7 +79,7 @@ const resolveDuplicates = async (
         }
       }
       if (user) {
-        await user.cloudFetch();
+        await user.fetch();
         if (getObjectId(user.profilePicture) === imageToDelete.objectId) {
           console.log("Fixing profile picture for user", user.email);
           user.profilePicture = imageToKeep.toPointer();

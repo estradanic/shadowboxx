@@ -125,11 +125,11 @@ export default class ParseImage
 
   constructor(
     image: Parse.Object<ParsifyPointers<"Image">>,
-    noPin: boolean = false
+    cloud: boolean = false
   ) {
-    super(image);
+    super(image, cloud);
     this._image = image;
-    if (!noPin) {
+    if (!cloud) {
       this.pin();
     }
   }
