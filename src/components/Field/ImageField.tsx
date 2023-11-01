@@ -108,10 +108,12 @@ export type ImageFieldProps = Omit<
   getCaption?: (image: ParseImage) => string;
   /** Id of the album associated with this field */
   albumId?: string;
+  /** Function to run when an image is updated */
+  onUpdate?: (...images: ParseImage[]) => void;
 } & (
     | {
         /** Function to run when an image is removed */
-        onRemove: (...image: ParseImage[]) => Promise<void> | void;
+        onRemove: (...images: ParseImage[]) => Promise<void> | void;
         /** Variant for how to display the field */
         variant?: "field";
         /** Whether multiple images can be selected */
@@ -145,6 +147,7 @@ export type ImageFieldProps = Omit<
 const ImageField = memo(
   ({
     onAdd,
+    onUpdate,
     onRemove,
     label,
     value = [],
@@ -404,14 +407,17 @@ const ImageField = memo(
                       initialDate={image.dateTaken}
                       onConfirm={async (date) => {
                         image.dateTaken = date;
-                        await image.save();
+                        const newImage = await image.save();
+                        onUpdate?.(newImage);
                       }}
                     />,
                     <TagsImageDecoration
+                      options={filterBarProps?.tagOptions ?? []}
                       initialTags={image.tags}
                       onConfirm={async (tags) => {
                         image.tags = tags;
-                        await image.save();
+                        const newImage = await image.save();
+                        onUpdate?.(newImage);
                       }}
                       position="topCenter"
                     />,

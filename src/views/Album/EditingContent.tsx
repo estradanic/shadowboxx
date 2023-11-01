@@ -80,6 +80,7 @@ const EditingContent = ({
     onCancel,
     isDirty,
     images: formImages,
+    onUpdate,
   } = useAlbumForm({ ...album.attributes, images }, { onSubmit: piOnSubmit });
   const { getLoggedInUser } = useUserContext();
   const isCollaborator = useMemo(
@@ -157,6 +158,7 @@ const EditingContent = ({
             value={formImages}
             onRemove={onRemove}
             onAdd={onAdd}
+            onUpdate={onUpdate}
           />
         </ImageContextProvider>
       </Grid>

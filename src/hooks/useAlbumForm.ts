@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import {
   AlbumAttributes,
   AlbumSaveContext,
@@ -46,6 +46,10 @@ const useAlbumForm = (
     () => allImages.filter((imageId) => !removedImages.includes(imageId)),
     [allImages, removedImages]
   );
+
+  useEffect(() => {
+    setAllImages(dedupe([...album.images, ...allImages]));
+  }, [album.images]);
 
   const [coverImage, setCoverImage] = useState<AlbumAttributes["coverImage"]>(
     album.coverImage
@@ -228,16 +232,27 @@ const useAlbumForm = (
     await piOnCancel?.();
   };
 
-  const onAdd = async (...images: ParseImage[]) => {
+  const onAdd = (...images: ParseImage[]) => {
     setAllImages(dedupe([...images, ...allImages]));
     setRemovedImages(removedImages.filter((image) => !images.includes(image)));
   };
 
-  const onRemove = async (...images: ParseImage[]) => {
+  const onRemove = (...images: ParseImage[]) => {
     setRemovedImages(dedupe([...removedImages, ...images]));
   };
 
+  const onUpdate = (...images: ParseImage[]) => {
+    setAllImages((prev) =>
+      prev.map(
+        (prevImage) =>
+          images.find((image) => image.objectId === prevImage.objectId) ??
+          prevImage
+      )
+    );
+  };
+
   return {
+    onUpdate,
     images,
     allImages,
     removedImages,
