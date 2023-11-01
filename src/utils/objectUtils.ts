@@ -15,11 +15,14 @@ const hashString = <T extends Hashable | string>(entry: T) => {
 /**
  * Function for deduping a collection of items if they have a `hashString` method
  */
-export const dedupe = <T extends Hashable | string>(
+export const dedupe = <T extends Hashable | string | undefined | null>(
   collection: Iterable<T> | ArrayLike<T>
 ): T[] => {
   const deduped: Map<string, T> = new Map();
   for (const entry of Array.from(collection)) {
+    if (entry === undefined || entry === null) {
+      continue;
+    }
     deduped.set(hashString(entry), entry);
   }
   return Array.from(deduped.values());

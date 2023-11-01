@@ -83,13 +83,13 @@ const TagsImageDecoration = ({
   const queryClient = useQueryClient();
 
   const handleConfirm = useCallback(async () => {
-    onConfirm(tagsRef.current);
+    await onConfirm(tagsRef.current);
     setInitialTags(tagsRef.current);
     queryClient.invalidateQueries(getAllTagsQueryKey());
     queryClient.invalidateQueries([QueryCacheGroups.GET_TAGS_BY_IMAGE_ID]);
-  }, [onConfirm, tagsRef]);
+  }, [onConfirm, tagsRef, setInitialTags, queryClient, getAllTagsQueryKey]);
 
-  const handleCancel = useCallback(async () => {
+  const handleCancel = useCallback(() => {
     setTags(initialTags);
   }, [initialTags, setTags]);
 
