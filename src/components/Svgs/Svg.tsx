@@ -8,6 +8,10 @@ export interface SvgProps {
 }
 
 /** A component to display an SVG */
-const Svg = ({ height, children, ...rest }: SvgProps) => <div {...rest} style={{ height }}>{children}</div>;
+const Svg = ({ height, children, ...rest }: SvgProps) => (
+  <div {...rest} style={{ height }}>
+    {children}
+  </div>
+);
 
 export default Svg;
