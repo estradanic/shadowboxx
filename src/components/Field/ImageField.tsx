@@ -5,6 +5,7 @@ import React, {
   ChangeEventHandler,
   useCallback,
   useRef,
+  ReactElement,
 } from "react";
 import InputAdornment from "@material-ui/core/InputAdornment";
 import Avatar from "@material-ui/core/Avatar";
@@ -28,7 +29,7 @@ import { ParseImage, ParsePointer } from "../../classes";
 import TextField, { TextFieldProps } from "../Field/TextField";
 import Tooltip from "../Tooltip/Tooltip";
 import { useSnackbar } from "../Snackbar/Snackbar";
-import Image from "../Image/Image";
+import Image, { ImageProps } from "../Image/Image";
 import RemoveImageDecoration from "../Image/Decoration/RemoveImageDecoration";
 import CoverImageDecoration from "../Image/Decoration/CoverImageDecoration";
 import { useActionDialogContext } from "../Dialog/ActionDialog";
@@ -44,6 +45,7 @@ import { useJobContext } from "../../contexts/JobContext";
 import { Skeleton } from "../Skeleton";
 import { LoadingWrapper } from "../Loader";
 import TagsImageDecoration from "../Image/Decoration/TagsImageDecoration";
+import { ImageDecorationProps } from "../Image/Decoration/ImageDecoration";
 
 const useStyles = makeStyles((theme: Theme) => ({
   endAdornment: {
@@ -110,6 +112,12 @@ export type ImageFieldProps = Omit<
   albumId?: string;
   /** Function to run when an image is updated */
   onUpdate?: (...images: ParseImage[]) => void;
+  /** Override image decoration getter */
+  getImageDecorations?: (
+    image: ParseImage
+  ) => ReactElement<ImageDecorationProps<any>>[];
+  /** Override image props getter */
+  getImageProps?: (image: ParseImage) => Promise<Partial<ImageProps>>;
 } & (
     | {
         /** Function to run when an image is removed */
@@ -162,6 +170,8 @@ const ImageField = memo(
     setCaption,
     filterBarProps,
     albumId,
+    getImageProps,
+    getImageDecorations: piGetImageDecorations,
     ...rest
   }: ImageFieldProps) => {
     const classes = useStyles();
@@ -253,6 +263,61 @@ const ImageField = memo(
       () => createHtmlPortalNode(),
       []
     );
+
+    const getImageDecorations = (image: ParseImage) => {
+      if (piGetImageDecorations) {
+        return piGetImageDecorations(image);
+      }
+      const imageDecorations = [
+        <RemoveImageDecoration
+          onClick={async () => {
+            await onRemove!(image);
+          }}
+        />,
+        <DateImageDecoration
+          initialDate={image.dateTaken}
+          onConfirm={async (date) => {
+            image.dateTaken = date;
+            const newImage = await image.save();
+            onUpdate?.(newImage);
+          }}
+        />,
+        <TagsImageDecoration
+          options={filterBarProps?.tagOptions ?? []}
+          initialTags={image.tags}
+          onConfirm={async (tags) => {
+            image.tags = tags;
+            const newImage = await image.save();
+            onUpdate?.(newImage);
+          }}
+          position="topCenter"
+        />,
+      ];
+      if (getCaption && setCaption) {
+        imageDecorations.push(
+          <CaptionImageDecoration
+            initialCaption={getCaption(image)}
+            onConfirm={(caption) => setCaption(image, caption)}
+          />
+        );
+      }
+      if (coverImage) {
+        const checked = coverImage.id === image.objectId;
+        imageDecorations.push(
+          <CoverImageDecoration
+            checked={checked}
+            onClick={() => {
+              if (checked) {
+                setCoverImage?.(value[0].toPointer());
+              } else {
+                setCoverImage?.(image.toPointer());
+              }
+            }}
+          />
+        );
+      }
+      return imageDecorations;
+    };
 
     return (
       <>
@@ -397,54 +462,6 @@ const ImageField = memo(
                   </Grid>
                 ))}
                 {value.map((image) => {
-                  const imageDecorations = [
-                    <RemoveImageDecoration
-                      onClick={async () => {
-                        await onRemove!(image);
-                      }}
-                    />,
-                    <DateImageDecoration
-                      initialDate={image.dateTaken}
-                      onConfirm={async (date) => {
-                        image.dateTaken = date;
-                        const newImage = await image.save();
-                        onUpdate?.(newImage);
-                      }}
-                    />,
-                    <TagsImageDecoration
-                      options={filterBarProps?.tagOptions ?? []}
-                      initialTags={image.tags}
-                      onConfirm={async (tags) => {
-                        image.tags = tags;
-                        const newImage = await image.save();
-                        onUpdate?.(newImage);
-                      }}
-                      position="topCenter"
-                    />,
-                  ];
-                  if (getCaption && setCaption) {
-                    imageDecorations.push(
-                      <CaptionImageDecoration
-                        initialCaption={getCaption(image)}
-                        onConfirm={(caption) => setCaption(image, caption)}
-                      />
-                    );
-                  }
-                  if (coverImage) {
-                    const checked = coverImage.id === image.objectId;
-                    imageDecorations.push(
-                      <CoverImageDecoration
-                        checked={checked}
-                        onClick={() => {
-                          if (checked) {
-                            setCoverImage?.(value[0].toPointer());
-                          } else {
-                            setCoverImage?.(image.toPointer());
-                          }
-                        }}
-                      />
-                    );
-                  }
                   return (
                     <Grid
                       xs={12}
@@ -457,7 +474,8 @@ const ImageField = memo(
                       <Image
                         borderColor={randomColor}
                         parseImage={image}
-                        decorations={imageDecorations}
+                        decorations={getImageDecorations(image)}
+                        {...(getImageProps?.(image) ?? {})}
                       />
                     </Grid>
                   );
