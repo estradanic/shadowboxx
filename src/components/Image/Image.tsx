@@ -5,6 +5,8 @@ import React, {
   useRef,
   useState,
   MouseEvent,
+  ReactElement,
+  cloneElement,
 } from "react";
 import { makeStyles, Theme } from "@material-ui/core/styles";
 import NotesIcon from "@material-ui/icons/Notes";
@@ -126,7 +128,7 @@ export type ImageProps = ImgHTMLAttributes<HTMLImageElement> & {
   /** Image to display */
   parseImage: ParseImage;
   /** Array of ImageDecorations */
-  decorations?: React.ReactElement<ImageDecorationProps<any>>[];
+  decorations?: ReactElement<ImageDecorationProps<any>>[];
   /** CSS border color */
   borderColor?: VariableColor;
   /** Whether to show full resolution popup when the image is clicked */
@@ -289,7 +291,7 @@ const Image = memo(
           )}
         </Tooltip>
         {decorations?.map((decoration, index) =>
-          React.cloneElement(decoration, { key: `decoration${index}` })
+          cloneElement(decoration, { key: `decoration${index}` })
         )}
         {showFullResolutionOnClick && (
           <Popper

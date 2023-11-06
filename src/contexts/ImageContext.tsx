@@ -1,4 +1,10 @@
-import React, { createContext, useCallback, useContext, useState } from "react";
+import React, {
+  createContext,
+  useCallback,
+  useContext,
+  useState,
+  ReactNode,
+} from "react";
 import Parse from "parse";
 import { readAndCompressImage } from "browser-image-resizer";
 import { createFFmpeg } from "@ffmpeg/ffmpeg";
@@ -55,7 +61,7 @@ const ImageContext = createContext<ImageContextValue | undefined>(undefined);
 /** Interface defining props for the ImageContextProvider */
 interface ImageContextProviderProps {
   /** Child node */
-  children: React.ReactNode;
+  children: ReactNode;
 }
 
 const ACCEPTABLE_IMAGE_EXTENSIONS = ["png", "jpg", "jpeg", "webp", "bmp"];

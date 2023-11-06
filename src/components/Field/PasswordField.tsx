@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, ChangeEvent } from "react";
 import InputAdornment from "@material-ui/core/InputAdornment";
 import { makeStyles, Theme } from "@material-ui/core/styles";
 import VisibilityIcon from "@material-ui/icons/Visibility";
@@ -53,7 +53,7 @@ const PasswordField = ({
   const [value, setValue] = useState(piValue);
   const [helperText, setHelperText] = useState(piHelperText);
   const [error, setError] = useState(piError);
-  const onChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const onChange = (event: ChangeEvent<HTMLInputElement>) => {
     if (
       validate &&
       !validatePassword(event.target.value) &&

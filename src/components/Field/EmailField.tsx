@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, ChangeEvent } from "react";
 import { validateEmail } from "../../utils";
 import { Strings } from "../../resources";
 import TextField, { TextFieldProps } from "./TextField";
@@ -25,7 +25,7 @@ const EmailField = ({
   const [value, setValue] = useState(piValue);
   const [helperText, setHelperText] = useState(piHelperText);
   const [error, setError] = useState(piError);
-  const onChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const onChange = (event: ChangeEvent<HTMLInputElement>) => {
     if (
       validate &&
       !validateEmail(event.target.value) &&

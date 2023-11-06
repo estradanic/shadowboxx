@@ -1,9 +1,9 @@
-import React from "react";
+import React, { ReactNode } from "react";
 import { useNetworkDetectionContext } from "../../contexts/NetworkDetectionContext";
 
 export interface OnlineProps {
   /** Child node */
-  children: React.ReactNode;
+  children: ReactNode;
 }
 
 /** Component that only renders its children when online */

@@ -1,10 +1,6 @@
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, MutableRefObject } from "react";
 
-export type RefStateReturn<T> = [
-  React.MutableRefObject<T>,
-  T,
-  (newState: T) => void
-];
+export type RefStateReturn<T> = [MutableRefObject<T>, T, (newState: T) => void];
 
 /**
  * Returns state and ref together with a function that updates both of them.

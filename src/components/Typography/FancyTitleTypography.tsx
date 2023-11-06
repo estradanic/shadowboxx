@@ -1,4 +1,4 @@
-import React from "react";
+import React, { ReactNode } from "react";
 import { makeStyles, Theme } from "@material-ui/core/styles";
 import FancyTypography from "./FancyTypography";
 import classNames from "classnames";
@@ -83,7 +83,7 @@ export interface FancyTitleTypographyProps {
   /** The color of the outline */
   outlineColor?: VariableColor;
   /** The text to display */
-  children: React.ReactNode;
+  children: ReactNode;
 }
 
 /** A component to display a fancy title */

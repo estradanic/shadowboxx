@@ -1,4 +1,4 @@
-import React from "react";
+import React, { MouseEvent } from "react";
 import {
   Card,
   CardContent,
@@ -48,9 +48,7 @@ export interface SmallAlbumCardProps {
   /** Border color for the card */
   borderColor: VariableColor;
   /** Function to run when card is clicked */
-  onClick?: (
-    event: React.MouseEvent<HTMLDivElement, MouseEvent>
-  ) => void | Promise<void>;
+  onClick?: (event: MouseEvent<HTMLDivElement>) => void | Promise<void>;
   /** Custom css class */
   className?: string;
 }

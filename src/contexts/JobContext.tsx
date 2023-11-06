@@ -4,6 +4,7 @@ import React, {
   useEffect,
   useRef,
   useState,
+  ReactNode,
 } from "react";
 import PQueue from "p-queue";
 
@@ -37,7 +38,7 @@ export interface JobContextValue {
 }
 
 export interface JobContextProviderProps {
-  children: React.ReactNode;
+  children: ReactNode;
 }
 
 const MAX_CURRENT_JOBS = 4 as const;

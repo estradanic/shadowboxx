@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, ReactNode } from "react";
 import Grid from "@material-ui/core/Grid";
 import { VariableColor } from "../../types";
 import { ParseImage } from "../../classes";
@@ -17,7 +17,7 @@ export type ImagesProps = {
   /** Function to get ImageProps given a particulat image */
   getImageProps?: (image: ParseImage) => Promise<Partial<ImageProps>>;
   /** Node to use as the FilterBar */
-  filterBar?: React.ReactNode;
+  filterBar?: ReactNode;
 };
 
 /** Component showing a list of images */
@@ -47,7 +47,7 @@ const Images = ({
     }
   }, [images, getImageProps, setImageProps]);
 
-  let content: React.ReactNode;
+  let content: ReactNode;
   if (status === "loading" || (!images && status !== "error")) {
     content = <ImagesSkeleton />;
   } else if (status === "error" || !images?.length) {
