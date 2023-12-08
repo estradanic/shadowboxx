@@ -32,6 +32,8 @@ import FilterBar from "../../components/FilterBar/FilterBar";
 import TagsImageDecoration from "../../components/Image/Decoration/TagsImageDecoration";
 import DateImageDecoration from "../../components/Image/Decoration/DateImageDecoration";
 import useQueryConfigs from "../../hooks/Query/useQueryConfigs";
+import { useLocation } from "react-router-dom";
+import useNavigate from "../../hooks/useNavigate";
 
 /**
  * Page for viewing all the logged in users's images/videos
@@ -39,7 +41,16 @@ import useQueryConfigs from "../../hooks/Query/useQueryConfigs";
 const Memories = memo(() => {
   useView("Memories");
   const imageClasses = useImageStyles();
-  const [editMode, setEditMode] = useState<boolean>(false);
+  const navigate = useNavigate();
+  const location = useLocation();
+  const editMode = location.pathname.endsWith("edit");
+  const setEditMode = (value: boolean) => {
+    if (value) {
+      navigate("edit");
+    } else {
+      navigate("/memories");
+    }
+  };
   const randomColor = useRandomColor();
   const { online } = useNetworkDetectionContext();
   const { sortDirection, tagSearch, ...restFilterBarProps } = useFilterBar();
@@ -189,7 +200,7 @@ const Memories = memo(() => {
               closeSnackbar(snackbarKey);
               setSelectedImages([]);
             }
-            setEditMode((prev) => !prev);
+            setEditMode(!editMode);
           }}
           color={editMode ? "error" : "success"}
         >

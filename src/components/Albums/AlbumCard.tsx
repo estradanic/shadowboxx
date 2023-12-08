@@ -242,7 +242,7 @@ const AlbumCard = memo(({ value, onChange, borderColor }: AlbumCardProps) => {
 
   const navigateToAlbum = () => {
     if (value?.objectId) {
-      navigate(routes.Album.path.replace(":id", value.objectId), location);
+      navigate(routes.Album.path.replace("*", value.objectId), location);
     }
   };
 

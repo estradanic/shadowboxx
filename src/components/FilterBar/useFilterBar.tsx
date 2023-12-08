@@ -1,12 +1,14 @@
-import { useState } from "react";
 import { SortDirection } from "../../types";
 import { useDebounce } from "use-debounce";
+import useUrlState from "../../hooks/useUrlState";
 
 const useFilterBar = () => {
-  const [captionSearch, setCaptionSearch] = useState("");
-  const [sortDirection, setSortDirection] =
-    useState<SortDirection>("descending");
-  const [tagSearch, setTagSearch] = useState<string[]>([]);
+  const [captionSearch, setCaptionSearch] = useUrlState<string>("c", "");
+  const [sortDirection, setSortDirection] = useUrlState<SortDirection>(
+    "d",
+    "descending"
+  );
+  const [tagSearch, setTagSearch] = useUrlState<string[]>("t", []);
   const [debouncedCaptionSearch] = useDebounce(captionSearch, 300);
 
   return {

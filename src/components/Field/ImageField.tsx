@@ -188,7 +188,7 @@ const ImageField = memo(
         )
       : [];
     const [showUrlInput, setShowUrlInput] = useState<boolean>(false);
-    const [imageUrlRef, imageUrl, setImageUrl] = useRefState("");
+    const [imageUrlRef, imageUrl, setImageUrl] = useRefState<string>("");
 
     const { getImageUrlFunction, getImageUrlOptions, getImageUrlQueryKey } =
       useQueryConfigs();

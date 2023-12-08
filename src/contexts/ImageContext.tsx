@@ -28,10 +28,11 @@ export type PromptImageSelectionDialogProps = {
   handleCancel?: () => Promise<void>;
   /** Function to run when selection is confirmed */
   handleConfirm?: (newValue: ParseImage[]) => Promise<void>;
-  /** IImages already selected */
+  /** Images already selected */
   alreadySelected: ParseImage[];
-  /** Whether the image selection dialog allows multiple selections.
-   *  Defaults to true
+  /**
+   * Whether the image selection dialog allows multiple selections.
+   * Defaults to true
    */
   multiple?: boolean;
 };
@@ -181,7 +182,7 @@ export const ImageContextProvider = ({
   const compressVideo = async (
     file: File,
     notification: Notification,
-    update: UpdateJobInfo
+    update: UpdateJobInfo<ParseImage | undefined>
   ) => {
     const videoEl = document.createElement("video");
     videoEl.preload = "metadata";
@@ -259,7 +260,7 @@ export const ImageContextProvider = ({
   const processFile = (
     file: File,
     notification: Notification,
-    update: UpdateJobInfo
+    update: UpdateJobInfo<ParseImage | undefined>
   ) => {
     if (ACCEPTABLE_VIDEO_TYPES.includes(file.type)) {
       return compressVideo(file, notification, update);
@@ -298,7 +299,7 @@ export const ImageContextProvider = ({
   const processAndUploadFile = async (
     file: File,
     notification: Notification,
-    update: UpdateJobInfo,
+    update: UpdateJobInfo<ParseImage | undefined>,
     acl?: Parse.ACL
   ) => {
     const processedFile = await processFile(file, notification, update);
@@ -336,7 +337,7 @@ export const ImageContextProvider = ({
                 <LinearProgress color={variableColor} variant="indeterminate" />
               ),
             });
-            const { result } = addJob(
+            const { result } = addJob<ParseImage | undefined>(
               (update) => async () => {
                 try {
                   const uploadedImage = await processAndUploadFile(

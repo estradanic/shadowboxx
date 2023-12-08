@@ -357,6 +357,7 @@ const Image = memo(
             <div className={classes.tags}>
               {parseImage.tags?.map?.((tag) => (
                 <Chip
+                  key={tag}
                   className={classes.tag}
                   label={tag}
                   icon={<StyleIcon />}

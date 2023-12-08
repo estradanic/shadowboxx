@@ -2,6 +2,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import {
   AlbumAttributes,
   AlbumSaveContext,
+  ParseAlbum,
   ParseImage,
   ParseUser,
 } from "../classes";
@@ -9,6 +10,7 @@ import { useSnackbar } from "../components";
 import { Strings } from "../resources";
 import { dedupe, ErrorState, isNullOrWhitespace, deepEqual } from "../utils";
 import { useActionDialogContext } from "../components/Dialog/ActionDialog";
+import { JobInfo, useJobContext } from "../contexts/JobContext";
 
 export type AlbumFormChanges = AlbumSaveContext;
 
@@ -30,7 +32,8 @@ export type UseAlbumFormOptions = {
 
 /** Hook to manage an album form */
 const useAlbumForm = (
-  album: HydratedAlbumAttributes,
+  album: ParseAlbum,
+  albumImages: ParseImage[],
   {
     resetOnSubmit = true,
     onSubmit: piOnSubmit,
@@ -40,7 +43,12 @@ const useAlbumForm = (
   const { openConfirm } = useActionDialogContext();
   const { enqueueErrorSnackbar } = useSnackbar();
 
-  const [allImages, setAllImages] = useState<ParseImage[]>(album.images);
+  const { jobInfo } = useJobContext();
+  const albumJobs = Object.values(jobInfo).filter(
+    (job) => job.albumId === album.objectId
+  );
+
+  const [allImages, setAllImages] = useState<ParseImage[]>(albumImages);
   const [removedImages, setRemovedImages] = useState<ParseImage[]>([]);
   const images = useMemo(
     () => allImages.filter((imageId) => !removedImages.includes(imageId)),
@@ -48,8 +56,8 @@ const useAlbumForm = (
   );
 
   useEffect(() => {
-    setAllImages(dedupe([...album.images, ...allImages]));
-  }, [album.images]);
+    setAllImages(dedupe([...albumImages, ...allImages]));
+  }, [albumImages]);
 
   const [coverImage, setCoverImage] = useState<AlbumAttributes["coverImage"]>(
     album.coverImage
@@ -95,7 +103,7 @@ const useAlbumForm = (
     setViewers(album.viewers);
     setErrors(defaultErrors);
     setCaptions(album.captions ?? {});
-    setAllImages(album.images);
+    setAllImages(albumImages);
   }, [
     setName,
     setDescription,
@@ -148,7 +156,7 @@ const useAlbumForm = (
       album.viewers.filter((viewer) => !viewers.includes(viewer))
     );
     const addedImages = dedupe(
-      images.filter((imageId) => !album.images.includes(imageId))
+      images.filter((image) => !album.images.includes(image.objectId))
     );
     const changes: AlbumFormChanges = {};
     if (addedCollaborators.length > 0) {
@@ -184,6 +192,39 @@ const useAlbumForm = (
     return changes;
   };
 
+  const submit = async () => {
+    albumJobs.forEach((job) => {
+      job.update?.({
+        onComplete: async (result: ParseImage, info: JobInfo<ParseImage>) => {
+          await job.onComplete?.(result, info);
+          await piOnSubmit(
+            {
+              ...album.attributes,
+              images: [...images, result],
+            },
+            { addedImages: [result.objectId] }
+          );
+        },
+      });
+    });
+    await piOnSubmit(
+      {
+        ...album.attributes,
+        images: images,
+        name,
+        description,
+        collaborators,
+        viewers,
+        coverImage,
+        captions,
+      },
+      calculateChanges()
+    );
+    if (resetOnSubmit) {
+      reinitialize();
+    }
+  };
+
   const onSubmit = async () => {
     if (validate()) {
       const userEmails = new Set([...viewers, ...collaborators]);
@@ -191,38 +232,9 @@ const useAlbumForm = (
         .containedIn(ParseUser.COLUMNS.email, [...viewers, ...collaborators])
         .count();
       if (signedUpUserCount < userEmails.size) {
-        openConfirm(Strings.message.nonExistentUserWarning, async () => {
-          await piOnSubmit(
-            {
-              ...album,
-              images: images,
-              name,
-              description,
-              collaborators,
-              viewers,
-              coverImage,
-              captions,
-            },
-            calculateChanges()
-          );
-          if (resetOnSubmit) {
-            reinitialize();
-          }
-        });
+        openConfirm(Strings.message.nonExistentUserWarning, submit);
       } else {
-        await piOnSubmit(
-          {
-            ...album,
-            images: images,
-            name,
-            description,
-            collaborators,
-            viewers,
-            coverImage,
-            captions,
-          },
-          calculateChanges()
-        );
+        submit();
       }
     }
   };

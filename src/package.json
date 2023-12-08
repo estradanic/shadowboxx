@@ -40,7 +40,7 @@
   "scripts": {
     "build": "vite build --mode development",
     "build:prod": "vite build",
-    "start": "vite serve",
+    "start": "vite --force",
     "start:prod": "yarn build:prod && vite preview",
     "compileCloud": "cd ./cloud && tsc && cd ..",
     "format": "prettier --write '{@types,app,cloud,components,contexts,hooks,resources,types,utils,views,serviceWorker}/**/*.{ts,tsx,js,json,jsx}' && prettier --write '*.{ts,tsx,js,json,jsx}'",
