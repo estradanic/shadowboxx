@@ -29,6 +29,7 @@ const useStyles = makeStyles((theme: Theme) => ({
     marginBottom: theme.spacing(2),
     backgroundColor: theme.palette.primary.main,
     borderRadius: theme.shape.borderRadius,
+    boxShadow: theme.shadows[5],
   },
   buttonText: {
     color: theme.palette.primary.contrastText,

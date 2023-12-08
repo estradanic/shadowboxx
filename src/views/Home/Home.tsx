@@ -7,7 +7,6 @@ import CloseIcon from "@material-ui/icons/Close";
 import {
   PageContainer,
   AlbumCard,
-  useSnackbar,
   AlbumCardSkeleton,
   Fab,
   Online,
@@ -25,7 +24,6 @@ import useFlatInfiniteQueryData from "../../hooks/Query/useFlatInfiniteQueryData
 import useInfiniteScroll from "../../hooks/useInfiniteScroll";
 import useInfiniteQueryConfigs from "../../hooks/Query/useInfiniteQueryConfigs";
 import { useNetworkDetectionContext } from "../../contexts/NetworkDetectionContext";
-import { useUserContext } from "../../contexts/UserContext";
 import { OwnershipFilter, SortDirection } from "../../types";
 import { useDebounce } from "use-debounce";
 import useNavigate from "../../hooks/useNavigate";
@@ -39,6 +37,7 @@ const useStyles = makeStyles((theme: Theme) => ({
     backgroundColor: theme.palette.primary.main,
     padding: theme.spacing(1),
     borderRadius: theme.shape.borderRadius,
+    boxShadow: theme.shadows[5],
   },
   albumsContainer: {
     display: "flex",
@@ -126,8 +125,6 @@ const Home = memo(() => {
     getAllAlbumsInfiniteOptions()
   );
   useInfiniteScroll(fetchNextPage, { canExecute: !isFetchingNextPage });
-
-  const { getLoggedInUser } = useUserContext();
 
   const albums = useFlatInfiniteQueryData(data);
 
