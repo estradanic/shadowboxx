@@ -23,6 +23,8 @@ import { makeStyles, Theme } from "@material-ui/core/styles";
 import useNavigate from "../../hooks/useNavigate";
 import { useQueryClient } from "@tanstack/react-query";
 import useQueryConfigs from "../../hooks/Query/useQueryConfigs";
+import useImageJobs from "../../hooks/useImageJobs";
+import { JobInfo } from "../../contexts/JobContext";
 
 const useStyles = makeStyles((theme: Theme) => ({
   fieldGrid: {
@@ -50,6 +52,8 @@ const EditingContent = ({
 }: EditingContentProps) => {
   const classes = useStyles();
 
+  const albumJobs = useImageJobs(album.objectId);
+
   const {
     enqueueSuccessSnackbar,
     enqueueErrorSnackbar,
@@ -62,6 +66,25 @@ const EditingContent = ({
     attributes: HydratedAlbumAttributes,
     changes: AlbumSaveContext
   ) => {
+    albumJobs.forEach((job) => {
+      job.update?.({
+        onComplete: async (result: ParseImage, info: JobInfo<ParseImage>) => {
+          await job.onComplete?.(result, info);
+          await album.update(
+            {
+              ...attributes,
+              images: [
+                ...attributes.images.map((image) => image.objectId),
+                result.objectId,
+              ],
+            },
+            {
+              addedImages: [result.objectId],
+            }
+          );
+        },
+      });
+    });
     try {
       await album.update(
         {
@@ -75,6 +98,7 @@ const EditingContent = ({
         album
       );
       enqueueSuccessSnackbar(Strings.success.saved);
+      navigate("..");
     } catch (error: any) {
       console.error(error);
       enqueueErrorSnackbar(Strings.error.editingAlbum);
@@ -199,7 +223,6 @@ const EditingContent = ({
         color="success"
         onClick={async () => {
           await onSubmit();
-          navigate("..");
         }}
       >
         <SaveIcon />

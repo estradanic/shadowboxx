@@ -65,8 +65,14 @@ interface ImageContextProviderProps {
   children: ReactNode;
 }
 
-const ACCEPTABLE_IMAGE_EXTENSIONS = ["png", "jpg", "jpeg", "webp", "bmp"];
-const ACCEPTABLE_VIDEO_EXTENSIONS = [
+export const ACCEPTABLE_IMAGE_EXTENSIONS = [
+  "png",
+  "jpg",
+  "jpeg",
+  "webp",
+  "bmp",
+];
+export const ACCEPTABLE_VIDEO_EXTENSIONS = [
   "mp4",
   "avi",
   "flv",
@@ -77,13 +83,13 @@ const ACCEPTABLE_VIDEO_EXTENSIONS = [
   "mkv",
   "gif",
 ];
-const ACCEPTABLE_IMAGE_TYPES = [
+export const ACCEPTABLE_IMAGE_TYPES = [
   "image/png",
   "image/jpeg",
   "image/jpg",
   "image/webp",
 ];
-const ACCEPTABLE_VIDEO_TYPES = [
+export const ACCEPTABLE_VIDEO_TYPES = [
   "video/mp4",
   "video/x-msvideo",
   "video/x-flv",

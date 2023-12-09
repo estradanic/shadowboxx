@@ -6,6 +6,9 @@ import ImagesSkeleton from "../Skeleton/ImagesSkeleton";
 import Image, { ImageProps } from "./Image";
 import NoImages from "./NoImages";
 import useImageStyles from "./useImageStyles";
+import { useJobContext } from "../../contexts/JobContext";
+import useImageJobs from "../../hooks/useImageJobs";
+import ImageJobPlaceholder from "./ImageJobPlaceholder";
 
 export type ImagesProps = {
   /** Images to show */
@@ -18,6 +21,8 @@ export type ImagesProps = {
   getImageProps?: (image: ParseImage) => Promise<Partial<ImageProps>>;
   /** Node to use as the FilterBar */
   filterBar?: ReactNode;
+  /** Album id associated with these images */
+  albumId?: string;
 };
 
 /** Component showing a list of images */
@@ -27,11 +32,14 @@ const Images = ({
   outlineColor,
   getImageProps,
   filterBar,
+  albumId,
 }: ImagesProps) => {
   const imageClasses = useImageStyles();
   const [imageProps, setImageProps] = useState<
     Record<string, Partial<ImageProps>>
   >({});
+
+  const imageJobs = useImageJobs(albumId);
 
   useEffect(() => {
     if (images) {
@@ -55,6 +63,9 @@ const Images = ({
   } else {
     content = (
       <>
+        {imageJobs.map((job) => (
+          <ImageJobPlaceholder key={`job-${job.id}`} job={job} />
+        ))}
         {images.map((image) => (
           <Grid key={image.objectId} item xs={12} md={6} lg={4} xl={3}>
             <Image

@@ -10,7 +10,7 @@ import { useSnackbar } from "../components";
 import { Strings } from "../resources";
 import { dedupe, ErrorState, isNullOrWhitespace, deepEqual } from "../utils";
 import { useActionDialogContext } from "../components/Dialog/ActionDialog";
-import { JobInfo, useJobContext } from "../contexts/JobContext";
+import { JobInfo } from "../contexts/JobContext";
 
 export type AlbumFormChanges = AlbumSaveContext;
 
@@ -42,11 +42,6 @@ const useAlbumForm = (
 ) => {
   const { openConfirm } = useActionDialogContext();
   const { enqueueErrorSnackbar } = useSnackbar();
-
-  const { jobInfo } = useJobContext();
-  const albumJobs = Object.values(jobInfo).filter(
-    (job) => job.albumId === album.objectId
-  );
 
   const [allImages, setAllImages] = useState<ParseImage[]>(albumImages);
   const [removedImages, setRemovedImages] = useState<ParseImage[]>([]);
@@ -193,20 +188,6 @@ const useAlbumForm = (
   };
 
   const submit = async () => {
-    albumJobs.forEach((job) => {
-      job.update?.({
-        onComplete: async (result: ParseImage, info: JobInfo<ParseImage>) => {
-          await job.onComplete?.(result, info);
-          await piOnSubmit(
-            {
-              ...album.attributes,
-              images: [...images, result],
-            },
-            { addedImages: [result.objectId] }
-          );
-        },
-      });
-    });
     await piOnSubmit(
       {
         ...album.attributes,

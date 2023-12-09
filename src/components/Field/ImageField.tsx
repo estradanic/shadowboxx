@@ -41,11 +41,12 @@ import { useImageContext } from "../../contexts/ImageContext";
 import useQueryConfigs from "../../hooks/Query/useQueryConfigs";
 import { useQuery } from "@tanstack/react-query";
 import FilterBar, { FilterBarProps } from "../FilterBar/FilterBar";
-import { useJobContext } from "../../contexts/JobContext";
 import { Skeleton } from "../Skeleton";
 import { LoadingWrapper } from "../Loader";
 import TagsImageDecoration from "../Image/Decoration/TagsImageDecoration";
 import { ImageDecorationProps } from "../Image/Decoration/ImageDecoration";
+import useImageJobs from "../../hooks/useImageJobs";
+import ImageJobPlaceholder from "../Image/ImageJobPlaceholder";
 
 const useStyles = makeStyles((theme: Theme) => ({
   endAdornment: {
@@ -181,12 +182,7 @@ const ImageField = memo(
       uploadImagesFromFiles,
       uploadImageFromUrl,
     } = useImageContext();
-    const { jobInfo } = useJobContext();
-    const jobsForAlbum = albumId
-      ? Object.values(jobInfo).filter(
-          (job) => job.albumId === albumId && !!job.file
-        )
-      : [];
+    const imageJobs = useImageJobs(albumId);
     const [showUrlInput, setShowUrlInput] = useState<boolean>(false);
     const [imageUrlRef, imageUrl, setImageUrl] = useRefState<string>("");
 
@@ -436,30 +432,12 @@ const ImageField = memo(
             {multiple && (
               <Grid container className={classes.multiImageContainer}>
                 {!!filterBarProps && <FilterBar {...filterBarProps!} />}
-                {jobsForAlbum.map((job) => (
-                  <Grid
+                {imageJobs.map((job) => (
+                  <ImageJobPlaceholder
                     key={`job-${job.id}`}
-                    item
-                    xs={12}
-                    md={6}
-                    lg={4}
-                    xl={3}
                     className={classes.imageWrapper}
-                  >
-                    <LoadingWrapper
-                      className={classes.skeletonWrapper}
-                      loading={true}
-                      global={false}
-                      progress={job.progress}
-                      type={
-                        [0, 100, undefined].includes(job.progress)
-                          ? "indeterminate"
-                          : "determinate"
-                      }
-                    >
-                      <Skeleton variant="rect" width="100%" height="300px" />
-                    </LoadingWrapper>
-                  </Grid>
+                    job={job}
+                  />
                 ))}
                 {value.map((image) => {
                   return (
