@@ -4,7 +4,7 @@ import { ParseImage } from "../../classes";
 import { JobInfo } from "../../contexts/JobContext";
 import LoadingWrapper from "../Loader/LoadingWrapper";
 import { Skeleton } from "../Skeleton";
-import { makeStyles, Theme } from "@material-ui/core";
+import { makeStyles, Theme } from "@material-ui/core/styles";
 import { ACCEPTABLE_VIDEO_TYPES } from "../../contexts/ImageContext";
 
 const useStyles = makeStyles((theme: Theme) => ({

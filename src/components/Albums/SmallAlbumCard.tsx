@@ -1,12 +1,9 @@
 import React, { MouseEvent } from "react";
-import {
-  Card,
-  CardContent,
-  CardMedia,
-  makeStyles,
-  Theme,
-  Typography,
-} from "@material-ui/core";
+import Card from "@material-ui/core/Card";
+import CardContent from "@material-ui/core/CardContent";
+import CardMedia from "@material-ui/core/CardMedia";
+import Typography from "@material-ui/core/Typography";
+import { makeStyles, Theme } from "@material-ui/core/styles";
 import { useQuery } from "@tanstack/react-query";
 import classNames from "classnames";
 import { ParseAlbum } from "../../classes";

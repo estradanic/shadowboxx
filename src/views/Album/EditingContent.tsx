@@ -221,9 +221,7 @@ const EditingContent = ({
         disabled={!isDirty}
         className={classes.saveFab}
         color="success"
-        onClick={async () => {
-          await onSubmit();
-        }}
+        onClick={onSubmit}
       >
         <SaveIcon />
       </Fab>

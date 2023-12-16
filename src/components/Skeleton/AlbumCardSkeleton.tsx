@@ -10,7 +10,7 @@ import Grid from "@material-ui/core/Grid";
 import AddAPhotoIcon from "@material-ui/icons/AddAPhoto";
 import StarIcon from "@material-ui/icons/Star";
 import AvatarSkeleton from "./AvatarSkeleton";
-import { CardMedia } from "@material-ui/core";
+import CardMedia from "@material-ui/core/CardMedia";
 import Skeleton from "./Skeleton";
 
 const useStyles = makeStyles((theme: Theme) => ({

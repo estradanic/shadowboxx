@@ -100,7 +100,7 @@ export default class ParseAlbum
     return new parse.Query<Parse.Object<ParsifyPointers<"Album">>>("Album");
   }
 
-  private _album: Parse.Object<ParsifyPointers<"Album">>;
+  protected _album: Parse.Object<ParsifyPointers<"Album">>;
 
   constructor(
     album: Parse.Object<ParsifyPointers<"Album">>,
@@ -227,7 +227,7 @@ export default class ParseAlbum
       return new ParsePointer<"Image">({
         objectId: this.images[0],
         className: "Image",
-        __type: "Object",
+        __type: "Pointer",
       });
     }
     return undefined;

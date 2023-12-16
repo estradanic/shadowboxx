@@ -294,20 +294,18 @@ const AlbumCard = memo(({ value, onChange, borderColor }: AlbumCardProps) => {
             value?.description ?? ""
           }`}
         />
-        {coverImage ? (
-          <LoadingWrapper
-            className={classes.loadingWrapper}
-            global={false}
-            loading={!!jobsForAlbum.length}
-            type={
-              [0, -1, 100].includes(jobProgress)
-                ? "indeterminate"
-                : "determinate"
-            }
-            progress={jobProgress}
-            onClick={navigateToAlbum}
-            color={borderColor}
-          >
+        <LoadingWrapper
+          className={classes.loadingWrapper}
+          global={false}
+          loading={!!jobsForAlbum.length}
+          type={
+            [0, -1, 100].includes(jobProgress) ? "indeterminate" : "determinate"
+          }
+          progress={jobProgress}
+          onClick={navigateToAlbum}
+          color={borderColor}
+        >
+          {coverImage ? (
             <CardMedia
               className={classes.media}
               parseImage={coverImage}
@@ -316,15 +314,15 @@ const AlbumCard = memo(({ value, onChange, borderColor }: AlbumCardProps) => {
               title={coverImage?.name}
               onClick={navigateToAlbum}
             />
-          </LoadingWrapper>
-        ) : (
-          <CardMedia
-            className={classes.media}
-            component={Empty}
-            height={300}
-            onClick={navigateToAlbum}
-          />
-        )}
+          ) : (
+            <CardMedia
+              className={classes.media}
+              component={Empty}
+              height={300}
+              onClick={navigateToAlbum}
+            />
+          )}
+        </LoadingWrapper>
         <CardContent className={classes.cardContent}>
           <Grid container>
             <Grid item xs={6}>

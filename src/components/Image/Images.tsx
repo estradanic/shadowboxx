@@ -6,7 +6,6 @@ import ImagesSkeleton from "../Skeleton/ImagesSkeleton";
 import Image, { ImageProps } from "./Image";
 import NoImages from "./NoImages";
 import useImageStyles from "./useImageStyles";
-import { useJobContext } from "../../contexts/JobContext";
 import useImageJobs from "../../hooks/useImageJobs";
 import ImageJobPlaceholder from "./ImageJobPlaceholder";
 
@@ -58,7 +57,7 @@ const Images = ({
   let content: ReactNode;
   if (status === "loading" || (!images && status !== "error")) {
     content = <ImagesSkeleton />;
-  } else if (status === "error" || !images?.length) {
+  } else if (status === "error" || (!images?.length && !imageJobs.length)) {
     content = <NoImages />;
   } else {
     content = (
@@ -66,7 +65,7 @@ const Images = ({
         {imageJobs.map((job) => (
           <ImageJobPlaceholder key={`job-${job.id}`} job={job} />
         ))}
-        {images.map((image) => (
+        {images?.map((image) => (
           <Grid key={image.objectId} item xs={12} md={6} lg={4} xl={3}>
             <Image
               borderColor={outlineColor}

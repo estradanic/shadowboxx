@@ -10,7 +10,7 @@ import { useSnackbar } from "../components";
 import { Strings } from "../resources";
 import { dedupe, ErrorState, isNullOrWhitespace, deepEqual } from "../utils";
 import { useActionDialogContext } from "../components/Dialog/ActionDialog";
-import { JobInfo } from "../contexts/JobContext";
+import { useGlobalLoadingStore } from "../stores";
 
 export type AlbumFormChanges = AlbumSaveContext;
 
@@ -42,6 +42,7 @@ const useAlbumForm = (
 ) => {
   const { openConfirm } = useActionDialogContext();
   const { enqueueErrorSnackbar } = useSnackbar();
+  const { startGlobalLoader, stopGlobalLoader } = useGlobalLoadingStore();
 
   const [allImages, setAllImages] = useState<ParseImage[]>(albumImages);
   const [removedImages, setRemovedImages] = useState<ParseImage[]>([]);
@@ -188,21 +189,26 @@ const useAlbumForm = (
   };
 
   const submit = async () => {
-    await piOnSubmit(
-      {
-        ...album.attributes,
-        images: images,
-        name,
-        description,
-        collaborators,
-        viewers,
-        coverImage,
-        captions,
-      },
-      calculateChanges()
-    );
-    if (resetOnSubmit) {
-      reinitialize();
+    startGlobalLoader();
+    try {
+      await piOnSubmit(
+        {
+          ...album.attributes,
+          images: images,
+          name,
+          description,
+          collaborators,
+          viewers,
+          coverImage,
+          captions,
+        },
+        calculateChanges()
+      );
+      if (resetOnSubmit) {
+        reinitialize();
+      }
+    } finally {
+      stopGlobalLoader();
     }
   };
 

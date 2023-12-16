@@ -237,6 +237,7 @@ const SuccessContent = ({ album, randomColor }: SuccessContentProps) => {
                 status={isRefetching ? "refetching" : imagesStatus}
                 images={images}
                 outlineColor={randomColor}
+                albumId={album.objectId}
               />
             )}
             <Online>
