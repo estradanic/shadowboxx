@@ -11,6 +11,8 @@ import { Strings } from "../resources";
 import { dedupe, ErrorState, isNullOrWhitespace, deepEqual } from "../utils";
 import { useActionDialogContext } from "../components/Dialog/ActionDialog";
 import { useGlobalLoadingStore } from "../stores";
+import { useQueryClient } from "@tanstack/react-query";
+import QueryCacheGroups from "./Query/QueryCacheGroups";
 
 export type AlbumFormChanges = AlbumSaveContext;
 
@@ -43,6 +45,7 @@ const useAlbumForm = (
   const { openConfirm } = useActionDialogContext();
   const { enqueueErrorSnackbar } = useSnackbar();
   const { startGlobalLoader, stopGlobalLoader } = useGlobalLoadingStore();
+  const queryClient = useQueryClient();
 
   const [allImages, setAllImages] = useState<ParseImage[]>(albumImages);
   const [removedImages, setRemovedImages] = useState<ParseImage[]>([]);
@@ -208,6 +211,7 @@ const useAlbumForm = (
         reinitialize();
       }
     } finally {
+      queryClient.invalidateQueries([QueryCacheGroups.GET_ALL_ALBUMS_INFINITE]);
       stopGlobalLoader();
     }
   };
