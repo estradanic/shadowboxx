@@ -100,15 +100,15 @@ export default class ParseAlbum
     return new parse.Query<Parse.Object<ParsifyPointers<"Album">>>("Album");
   }
 
-  private _album: Parse.Object<ParsifyPointers<"Album">>;
+  protected _album: Parse.Object<ParsifyPointers<"Album">>;
 
   constructor(
     album: Parse.Object<ParsifyPointers<"Album">>,
-    noPin: boolean = false
+    cloud: boolean = false
   ) {
-    super(album);
+    super(album, cloud);
     this._album = album;
-    if (!noPin) {
+    if (!cloud) {
       this.pin();
     }
   }
@@ -223,12 +223,14 @@ export default class ParseAlbum
     const coverImage = this._album.get(ParseAlbum.COLUMNS.coverImage);
     if (coverImage) {
       return new ParsePointer<"Image">(coverImage);
+    } else if (this.images[0]) {
+      return new ParsePointer<"Image">({
+        objectId: this.images[0],
+        className: "Image",
+        __type: "Pointer",
+      });
     }
-    return new ParsePointer<"Image">({
-      objectId: this.images[0],
-      className: "Image",
-      __type: "Object",
-    });
+    return undefined;
   }
 
   set coverImage(coverImage) {
@@ -268,6 +270,19 @@ export default class ParseAlbum
       updatedAt: this.updatedAt,
     };
   }
+
+  set attributes(
+    attributes: Omit<
+      Attributes<"Album">,
+      "objectId" | "createdAt" | "updatedAt"
+    >
+  ) {
+    this._album.set({
+      ...attributes,
+      owner: attributes.owner.toNativePointer(),
+      coverImage: attributes.coverImage?.toNativePointer(),
+    });
+  }
 }
 
 /** Class for unpersisted ParseAlbums */
@@ -293,17 +308,17 @@ export class UnpersistedParseAlbum extends ParseAlbum {
   }
 
   get objectId(): Attributes<"Album">["objectId"] {
-    console.warn("Unpersisted album has no id");
-    return "";
+    console.debug("UnpersistedParseAlbum has no id");
+    return "new";
   }
 
   get createdAt(): Attributes<"Album">["createdAt"] {
-    console.warn("Unpersisted album has no createdAt");
+    console.debug("UnpersistedParseAlbum has no createdAt");
     return new Date();
   }
 
   get updatedAt(): Attributes<"Album">["updatedAt"] {
-    console.warn("Unpersisted album has no updatedAt");
+    console.debug("UnpersistedParseAlbum has no updatedAt");
     return new Date();
   }
 }

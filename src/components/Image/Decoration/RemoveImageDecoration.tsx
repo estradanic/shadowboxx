@@ -19,10 +19,10 @@ const useStyles = makeStyles((theme: Theme) => ({
 export interface RemoveImageDecorationProps
   extends Omit<
     ImageDecorationProps<IconProps>,
-    "Component" | "description" | "corner" | "ComponentProps"
+    "Component" | "description" | "position" | "ComponentProps"
   > {
-  /** Which corner of the image to render the decoration */
-  corner?: ImageDecorationProps<IconProps>["corner"];
+  /** Which position of the image to render the decoration */
+  position?: ImageDecorationProps<IconProps>["position"];
   /** Props to pass down to the icon */
   IconProps?: IconProps;
 }
@@ -37,7 +37,7 @@ const RemoveImageDecorationIcon = forwardRef(
 
 /** Image decoration component to remove the decorated image */
 const RemoveImageDecoration = ({
-  corner = "topLeft",
+  position = "topLeft",
   className: userClassName,
   IconProps = {},
   ...rest
@@ -46,7 +46,7 @@ const RemoveImageDecoration = ({
 
   return (
     <ImageDecoration<IconProps>
-      corner={corner}
+      position={position}
       Component={RemoveImageDecorationIcon}
       description={Strings.action.removeImage}
       ComponentProps={{

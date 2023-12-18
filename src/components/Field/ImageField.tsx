@@ -5,6 +5,7 @@ import React, {
   ChangeEventHandler,
   useCallback,
   useRef,
+  ReactElement,
 } from "react";
 import InputAdornment from "@material-ui/core/InputAdornment";
 import Avatar from "@material-ui/core/Avatar";
@@ -28,7 +29,7 @@ import { ParseImage, ParsePointer } from "../../classes";
 import TextField, { TextFieldProps } from "../Field/TextField";
 import Tooltip from "../Tooltip/Tooltip";
 import { useSnackbar } from "../Snackbar/Snackbar";
-import Image from "../Image/Image";
+import Image, { ImageProps } from "../Image/Image";
 import RemoveImageDecoration from "../Image/Decoration/RemoveImageDecoration";
 import CoverImageDecoration from "../Image/Decoration/CoverImageDecoration";
 import { useActionDialogContext } from "../Dialog/ActionDialog";
@@ -40,9 +41,12 @@ import { useImageContext } from "../../contexts/ImageContext";
 import useQueryConfigs from "../../hooks/Query/useQueryConfigs";
 import { useQuery } from "@tanstack/react-query";
 import FilterBar, { FilterBarProps } from "../FilterBar/FilterBar";
-import { useJobContext } from "../../contexts/JobContext";
-import { ImageSkeleton } from "../Skeleton";
+import { Skeleton } from "../Skeleton";
 import { LoadingWrapper } from "../Loader";
+import TagsImageDecoration from "../Image/Decoration/TagsImageDecoration";
+import { ImageDecorationProps } from "../Image/Decoration/ImageDecoration";
+import useImageJobs from "../../hooks/useImageJobs";
+import ImageJobPlaceholder from "../Image/ImageJobPlaceholder";
 
 const useStyles = makeStyles((theme: Theme) => ({
   endAdornment: {
@@ -79,6 +83,9 @@ const useStyles = makeStyles((theme: Theme) => ({
   success: {
     color: theme.palette.success.main,
   },
+  skeletonWrapper: {
+    padding: theme.spacing(2),
+  },
 }));
 
 /** Interface defining props for ImageField */
@@ -104,16 +111,24 @@ export type ImageFieldProps = Omit<
   getCaption?: (image: ParseImage) => string;
   /** Id of the album associated with this field */
   albumId?: string;
+  /** Function to run when an image is updated */
+  onUpdate?: (...images: ParseImage[]) => void;
+  /** Override image decoration getter */
+  getImageDecorations?: (
+    image: ParseImage
+  ) => ReactElement<ImageDecorationProps<any>>[];
+  /** Override image props getter */
+  getImageProps?: (image: ParseImage) => Promise<Partial<ImageProps>>;
 } & (
     | {
         /** Function to run when an image is removed */
-        onRemove: (...image: ParseImage[]) => Promise<void> | void;
+        onRemove: (...images: ParseImage[]) => Promise<void> | void;
         /** Variant for how to display the field */
         variant?: "field";
         /** Whether multiple images can be selected */
         multiple: true;
         /** Props to pass down to the FilterBar component */
-        filterBarProps: FilterBarProps;
+        filterBarProps?: FilterBarProps;
       }
     | {
         /** Function to run when an image is removed */
@@ -141,6 +156,7 @@ export type ImageFieldProps = Omit<
 const ImageField = memo(
   ({
     onAdd,
+    onUpdate,
     onRemove,
     label,
     value = [],
@@ -155,6 +171,8 @@ const ImageField = memo(
     setCaption,
     filterBarProps,
     albumId,
+    getImageProps,
+    getImageDecorations: piGetImageDecorations,
     ...rest
   }: ImageFieldProps) => {
     const classes = useStyles();
@@ -164,14 +182,9 @@ const ImageField = memo(
       uploadImagesFromFiles,
       uploadImageFromUrl,
     } = useImageContext();
-    const { jobInfo } = useJobContext();
-    const jobsForAlbum = albumId
-      ? Object.values(jobInfo).filter(
-          (job) => job.albumId === albumId && !!job.file
-        )
-      : [];
+    const imageJobs = useImageJobs(albumId);
     const [showUrlInput, setShowUrlInput] = useState<boolean>(false);
-    const [imageUrlRef, imageUrl, setImageUrl] = useRefState("");
+    const [imageUrlRef, imageUrl, setImageUrl] = useRefState<string>("");
 
     const { getImageUrlFunction, getImageUrlOptions, getImageUrlQueryKey } =
       useQueryConfigs();
@@ -246,6 +259,61 @@ const ImageField = memo(
       () => createHtmlPortalNode(),
       []
     );
+
+    const getImageDecorations = (image: ParseImage) => {
+      if (piGetImageDecorations) {
+        return piGetImageDecorations(image);
+      }
+      const imageDecorations = [
+        <RemoveImageDecoration
+          onClick={async () => {
+            await onRemove!(image);
+          }}
+        />,
+        <DateImageDecoration
+          initialDate={image.dateTaken}
+          onConfirm={async (date) => {
+            image.dateTaken = date;
+            const newImage = await image.save();
+            onUpdate?.(newImage);
+          }}
+        />,
+        <TagsImageDecoration
+          options={filterBarProps?.tagOptions ?? []}
+          initialTags={image.tags}
+          onConfirm={async (tags) => {
+            image.tags = tags;
+            const newImage = await image.save();
+            onUpdate?.(newImage);
+          }}
+          position="topCenter"
+        />,
+      ];
+      if (getCaption && setCaption) {
+        imageDecorations.push(
+          <CaptionImageDecoration
+            initialCaption={getCaption(image)}
+            onConfirm={(caption) => setCaption(image, caption)}
+          />
+        );
+      }
+      if (coverImage) {
+        const checked = coverImage.id === image.objectId;
+        imageDecorations.push(
+          <CoverImageDecoration
+            checked={checked}
+            onClick={() => {
+              if (checked) {
+                setCoverImage?.(value[0].toPointer());
+              } else {
+                setCoverImage?.(image.toPointer());
+              }
+            }}
+          />
+        );
+      }
+      return imageDecorations;
+    };
 
     return (
       <>
@@ -361,61 +429,17 @@ const ImageField = memo(
               disabled={disabled}
               {...rest}
             />
-            {multiple && !!value.length && (
+            {multiple && (
               <Grid container className={classes.multiImageContainer}>
-                <FilterBar {...filterBarProps!} />
-                {jobsForAlbum.map((job) => (
-                  <ImageSkeleton
-                    key={job.id}
+                {!!filterBarProps && <FilterBar {...filterBarProps!} />}
+                {imageJobs.map((job) => (
+                  <ImageJobPlaceholder
+                    key={`job-${job.id}`}
                     className={classes.imageWrapper}
-                    height="300px"
-                  >
-                    <LoadingWrapper
-                      loading={![0, 100, undefined].includes(job.progress)}
-                      global={false}
-                      progress={job.progress}
-                      type="determinate"
-                    />
-                  </ImageSkeleton>
+                    job={job}
+                  />
                 ))}
                 {value.map((image) => {
-                  const imageDecorations = [
-                    <RemoveImageDecoration
-                      onClick={async () => {
-                        await onRemove!(image);
-                      }}
-                    />,
-                    <DateImageDecoration
-                      initialDate={image.dateTaken}
-                      onConfirm={async (date) => {
-                        image.dateTaken = date;
-                        await image.save();
-                      }}
-                    />,
-                  ];
-                  if (getCaption && setCaption) {
-                    imageDecorations.push(
-                      <CaptionImageDecoration
-                        initialCaption={getCaption(image)}
-                        onConfirm={(caption) => setCaption(image, caption)}
-                      />
-                    );
-                  }
-                  if (coverImage) {
-                    const checked = coverImage.id === image.objectId;
-                    imageDecorations.push(
-                      <CoverImageDecoration
-                        checked={checked}
-                        onClick={() => {
-                          if (checked) {
-                            setCoverImage?.(value[0].toPointer());
-                          } else {
-                            setCoverImage?.(image.toPointer());
-                          }
-                        }}
-                      />
-                    );
-                  }
                   return (
                     <Grid
                       xs={12}
@@ -428,7 +452,8 @@ const ImageField = memo(
                       <Image
                         borderColor={randomColor}
                         parseImage={image}
-                        decorations={imageDecorations}
+                        decorations={getImageDecorations(image)}
+                        {...(getImageProps?.(image) ?? {})}
                       />
                     </Grid>
                   );

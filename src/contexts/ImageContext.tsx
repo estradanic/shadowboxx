@@ -1,4 +1,10 @@
-import React, { createContext, useCallback, useContext, useState } from "react";
+import React, {
+  createContext,
+  useCallback,
+  useContext,
+  useState,
+  ReactNode,
+} from "react";
 import Parse from "parse";
 import { readAndCompressImage } from "browser-image-resizer";
 import { createFFmpeg } from "@ffmpeg/ffmpeg";
@@ -13,7 +19,6 @@ import { useUserContext } from "./UserContext";
 import AddImageDialog from "../components/Images/AddImageDialog";
 import LinearProgress from "../components/Progress/LinearProgress";
 import Typography from "../components/Typography/Typography";
-import { useGlobalLoadingStore } from "../stores";
 import { Notification, useNotificationsContext } from "./NotificationsContext";
 import { UpdateJobInfo, useJobContext } from "./JobContext";
 import useRandomColor from "../hooks/useRandomColor";
@@ -23,10 +28,11 @@ export type PromptImageSelectionDialogProps = {
   handleCancel?: () => Promise<void>;
   /** Function to run when selection is confirmed */
   handleConfirm?: (newValue: ParseImage[]) => Promise<void>;
-  /** IImages already selected */
+  /** Images already selected */
   alreadySelected: ParseImage[];
-  /** Whether the image selection dialog allows multiple selections.
-   *  Defaults to true
+  /**
+   * Whether the image selection dialog allows multiple selections.
+   * Defaults to true
    */
   multiple?: boolean;
 };
@@ -56,11 +62,17 @@ const ImageContext = createContext<ImageContextValue | undefined>(undefined);
 /** Interface defining props for the ImageContextProvider */
 interface ImageContextProviderProps {
   /** Child node */
-  children: React.ReactNode;
+  children: ReactNode;
 }
 
-const ACCEPTABLE_IMAGE_EXTENSIONS = ["png", "jpg", "jpeg", "webp", "bmp"];
-const ACCEPTABLE_VIDEO_EXTENSIONS = [
+export const ACCEPTABLE_IMAGE_EXTENSIONS = [
+  "png",
+  "jpg",
+  "jpeg",
+  "webp",
+  "bmp",
+];
+export const ACCEPTABLE_VIDEO_EXTENSIONS = [
   "mp4",
   "avi",
   "flv",
@@ -71,13 +83,13 @@ const ACCEPTABLE_VIDEO_EXTENSIONS = [
   "mkv",
   "gif",
 ];
-const ACCEPTABLE_IMAGE_TYPES = [
+export const ACCEPTABLE_IMAGE_TYPES = [
   "image/png",
   "image/jpeg",
   "image/jpg",
   "image/webp",
 ];
-const ACCEPTABLE_VIDEO_TYPES = [
+export const ACCEPTABLE_VIDEO_TYPES = [
   "video/mp4",
   "video/x-msvideo",
   "video/x-flv",
@@ -99,12 +111,6 @@ export const ImageContextProvider = ({
   const { addNotification } = useNotificationsContext();
   const { enqueueErrorSnackbar } = useSnackbar();
   const { getLoggedInUser } = useUserContext();
-  const { startGlobalLoader, stopGlobalLoader } = useGlobalLoadingStore(
-    (state) => ({
-      startGlobalLoader: state.startGlobalLoader,
-      stopGlobalLoader: state.stopGlobalLoader,
-    })
-  );
   const [alreadySelected, setAlreadySelected] = useState<ParseImage[]>([]);
   const [multiple, setMultiple] = useState<boolean>(true);
   const [selectionDialogOpen, setSelectionDialogOpen] = useState(false);
@@ -182,7 +188,7 @@ export const ImageContextProvider = ({
   const compressVideo = async (
     file: File,
     notification: Notification,
-    update: UpdateJobInfo
+    update: UpdateJobInfo<ParseImage | undefined>
   ) => {
     const videoEl = document.createElement("video");
     videoEl.preload = "metadata";
@@ -260,7 +266,7 @@ export const ImageContextProvider = ({
   const processFile = (
     file: File,
     notification: Notification,
-    update: UpdateJobInfo
+    update: UpdateJobInfo<ParseImage | undefined>
   ) => {
     if (ACCEPTABLE_VIDEO_TYPES.includes(file.type)) {
       return compressVideo(file, notification, update);
@@ -299,7 +305,7 @@ export const ImageContextProvider = ({
   const processAndUploadFile = async (
     file: File,
     notification: Notification,
-    update: UpdateJobInfo,
+    update: UpdateJobInfo<ParseImage | undefined>,
     acl?: Parse.ACL
   ) => {
     const processedFile = await processFile(file, notification, update);
@@ -337,7 +343,7 @@ export const ImageContextProvider = ({
                 <LinearProgress color={variableColor} variant="indeterminate" />
               ),
             });
-            const { result } = addJob(
+            const { result } = addJob<ParseImage | undefined>(
               (update) => async () => {
                 try {
                   const uploadedImage = await processAndUploadFile(
@@ -425,14 +431,11 @@ export const ImageContextProvider = ({
   };
 
   const deleteImage = async (parseImage: ParseImage) => {
-    startGlobalLoader();
     try {
       await parseImage.destroy();
     } catch (e: any) {
       console.error(e);
       enqueueErrorSnackbar(Strings.error.deletingImage(parseImage.name));
-    } finally {
-      stopGlobalLoader();
     }
   };
 

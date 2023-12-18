@@ -5,7 +5,7 @@
   "private": true,
   "type": "module",
   "engines": {
-    "node": "16.x"
+    "node": "18.x"
   },
   "resolutions": {
     "glob-parent": "^6.0.1",
@@ -40,7 +40,7 @@
   "scripts": {
     "build": "vite build --mode development",
     "build:prod": "vite build",
-    "start": "vite serve",
+    "start": "vite --force",
     "start:prod": "yarn build:prod && vite preview",
     "compileCloud": "cd ./cloud && tsc && cd ..",
     "format": "prettier --write '{@types,app,cloud,components,contexts,hooks,resources,types,utils,views,serviceWorker}/**/*.{ts,tsx,js,json,jsx}' && prettier --write '*.{ts,tsx,js,json,jsx}'",

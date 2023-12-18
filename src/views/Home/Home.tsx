@@ -7,8 +7,6 @@ import CloseIcon from "@material-ui/icons/Close";
 import {
   PageContainer,
   AlbumCard,
-  AlbumFormDialog,
-  useSnackbar,
   AlbumCardSkeleton,
   Fab,
   Online,
@@ -21,15 +19,14 @@ import { ParseAlbum } from "../../classes";
 import { useView } from "../View";
 import { DEFAULT_PAGE_SIZE } from "../../constants";
 import NoAlbums from "../../components/Albums/NoAlbums";
-import { UnpersistedParseAlbum } from "../../classes";
 import useRandomColor from "../../hooks/useRandomColor";
 import useFlatInfiniteQueryData from "../../hooks/Query/useFlatInfiniteQueryData";
 import useInfiniteScroll from "../../hooks/useInfiniteScroll";
 import useInfiniteQueryConfigs from "../../hooks/Query/useInfiniteQueryConfigs";
 import { useNetworkDetectionContext } from "../../contexts/NetworkDetectionContext";
-import { useUserContext } from "../../contexts/UserContext";
 import { OwnershipFilter, SortDirection } from "../../types";
 import { useDebounce } from "use-debounce";
+import useNavigate from "../../hooks/useNavigate";
 
 const useStyles = makeStyles((theme: Theme) => ({
   title: {
@@ -40,6 +37,7 @@ const useStyles = makeStyles((theme: Theme) => ({
     backgroundColor: theme.palette.primary.main,
     padding: theme.spacing(1),
     borderRadius: theme.shape.borderRadius,
+    boxShadow: theme.shadows[5],
   },
   albumsContainer: {
     display: "flex",
@@ -91,8 +89,6 @@ const Home = memo(() => {
   useView("Home");
 
   const classes = useStyles();
-  const [addAlbumDialogOpen, setAddAlbumDialogOpen] = useState(false);
-  const { enqueueErrorSnackbar, enqueueSuccessSnackbar } = useSnackbar();
   const {
     getAllAlbumsInfiniteFunction,
     getAllAlbumsInfiniteQueryKey,
@@ -130,11 +126,11 @@ const Home = memo(() => {
   );
   useInfiniteScroll(fetchNextPage, { canExecute: !isFetchingNextPage });
 
-  const { getLoggedInUser } = useUserContext();
-
   const albums = useFlatInfiniteQueryData(data);
 
   const randomColor = useRandomColor();
+
+  const navigate = useNavigate();
 
   return (
     <PageContainer>
@@ -280,36 +276,10 @@ const Home = memo(() => {
         </>
       )}
       <Online>
-        <Fab onClick={() => setAddAlbumDialogOpen(true)}>
+        <Fab onClick={() => navigate("/album/new")}>
           <AddIcon />
         </Fab>
       </Online>
-      <AlbumFormDialog
-        resetOnConfirm
-        value={{
-          owner: getLoggedInUser().toPointer(),
-          images: [],
-          name: Strings.label.untitledAlbum,
-          collaborators: [],
-          viewers: [],
-          captions: {},
-        }}
-        open={addAlbumDialogOpen}
-        handleCancel={() => setAddAlbumDialogOpen(false)}
-        handleConfirm={async (attributes) => {
-          setAddAlbumDialogOpen(false);
-          try {
-            const response = await new UnpersistedParseAlbum(
-              attributes
-            ).saveNew();
-            await refetchAlbums();
-            enqueueSuccessSnackbar(Strings.success.addingAlbum(response?.name));
-          } catch (error: any) {
-            console.error(error);
-            enqueueErrorSnackbar(Strings.error.addingAlbum);
-          }
-        }}
-      />
     </PageContainer>
   );
 });

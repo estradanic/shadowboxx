@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, ReactNode } from "react";
 import Grid from "@material-ui/core/Grid";
 import MuiTimeline from "@material-ui/lab/Timeline";
 import TimelineConnector from "@material-ui/lab/TimelineConnector";
@@ -8,6 +8,7 @@ import TimelineItem from "@material-ui/lab/TimelineItem";
 import TimelineOppositeContent from "@material-ui/lab/TimelineOppositeContent";
 import TimelineSeparator from "@material-ui/lab/TimelineSeparator";
 import { makeStyles, Theme } from "@material-ui/core/styles";
+import NotesIcon from "@material-ui/icons/Notes";
 import Typography from "@material-ui/core/Typography";
 import { VariableColor } from "../../types";
 import { ParseImage } from "../../classes";
@@ -42,10 +43,19 @@ const useStyles = makeStyles((theme: Theme) => ({
     borderRadius: "4px",
     border: ({ color }: UseStylesParams) =>
       `2px solid ${theme.palette[color ?? "primary"].main}`,
+    marginTop: theme.spacing(0.5),
     [theme.breakpoints.up("md")]: {
       fontSize: "large",
     },
-    boxShadow: theme.shadows[3],
+    boxShadow: theme.shadows[5],
+    width: "100%",
+    textAlign: "center",
+    position: "relative",
+  },
+  captionIcon: {
+    position: "absolute",
+    left: theme.spacing(1.75),
+    top: theme.spacing(1.75),
   },
   captionContainer: {
     display: "flex",
@@ -77,7 +87,7 @@ export type TimelineProps = {
   /** Function to get ImageProps given a particulat image */
   getImageProps?: (image: ParseImage) => Promise<Partial<ImageProps>>;
   /** Node to use as the FilterBar */
-  filterBar?: React.ReactNode;
+  filterBar?: ReactNode;
 };
 
 /** Component showing a list of images in a timeline */
@@ -108,7 +118,7 @@ const Timeline = ({
     }
   }, [images, getImageProps, setImageProps]);
 
-  let content: React.ReactNode;
+  let content: ReactNode;
   if (status === "loading" || (!images && status !== "error")) {
     content = <ImagesSkeleton />;
   } else if (status === "error" || !images?.length) {
@@ -151,14 +161,8 @@ const Timeline = ({
                   />
                   {imageProps[image.objectId]?.caption && (
                     <div className={classes.captionContainer}>
-                      <Typography
-                        className={classes.caption}
-                        style={
-                          right
-                            ? { marginLeft: "auto" }
-                            : { marginRight: "auto" }
-                        }
-                      >
+                      <Typography className={classes.caption}>
+                        <NotesIcon className={classes.captionIcon} />
                         {imageProps[image.objectId]?.caption}
                       </Typography>
                     </div>

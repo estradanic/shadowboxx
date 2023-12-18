@@ -125,11 +125,11 @@ export default class ParseImage
 
   constructor(
     image: Parse.Object<ParsifyPointers<"Image">>,
-    noPin: boolean = false
+    cloud: boolean = false
   ) {
-    super(image);
+    super(image, cloud);
     this._image = image;
-    if (!noPin) {
+    if (!cloud) {
       this.pin();
     }
   }
@@ -304,32 +304,32 @@ export class UnpersistedParseImage extends ParseImage {
   }
 
   get objectId(): Attributes<"Image">["objectId"] {
-    console.warn("Unpersisted image has no id");
-    return "";
+    console.debug("Unpersisted image has no id");
+    return "new";
   }
 
   get createdAt(): Attributes<"Image">["createdAt"] {
-    console.warn("Unpersisted image has no createdAt");
+    console.debug("Unpersisted image has no createdAt");
     return new Date();
   }
 
   get updatedAt(): Attributes<"Image">["updatedAt"] {
-    console.warn("Unpersisted image has no updatedAt");
+    console.debug("Unpersisted image has no updatedAt");
     return new Date();
   }
 
   get fileLegacy(): Attributes<"Image">["fileLegacy"] {
-    console.warn("Unpersisted image has no fileLegacy");
+    console.debug("Unpersisted image has no fileLegacy");
     return new Parse.File("", [0]);
   }
 
   get fileMobile(): Attributes<"Image">["fileMobile"] {
-    console.warn("Unpersisted image has no fileMobile");
+    console.debug("Unpersisted image has no fileMobile");
     return new Parse.File("", [0]);
   }
 
   get fileThumb(): Attributes<"Image">["fileThumb"] {
-    console.warn("Unpersisted image has no fileThumb");
+    console.debug("Unpersisted image has no fileThumb");
     return new Parse.File("", [0]);
   }
 }

@@ -1,18 +1,31 @@
-import { useCallback, useMemo, useState } from "react";
-import { AlbumAttributes, AlbumSaveContext, ParseUser } from "../classes";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import {
+  AlbumAttributes,
+  AlbumSaveContext,
+  ParseAlbum,
+  ParseImage,
+  ParseUser,
+} from "../classes";
 import { useSnackbar } from "../components";
 import { Strings } from "../resources";
 import { dedupe, ErrorState, isNullOrWhitespace, deepEqual } from "../utils";
 import { useActionDialogContext } from "../components/Dialog/ActionDialog";
+import { useGlobalLoadingStore } from "../stores";
+import { useQueryClient } from "@tanstack/react-query";
+import QueryCacheGroups from "./Query/QueryCacheGroups";
 
 export type AlbumFormChanges = AlbumSaveContext;
+
+export type HydratedAlbumAttributes = Omit<AlbumAttributes, "images"> & {
+  images: ParseImage[];
+};
 
 export type UseAlbumFormOptions = {
   /** Whether to reset the form after submitting */
   resetOnSubmit?: boolean;
   /** Callback when the form is submitted */
   onSubmit: (
-    album: AlbumAttributes,
+    album: HydratedAlbumAttributes,
     changes: AlbumFormChanges
   ) => Promise<void> | void;
   /** Callback when the form is cancelled */
@@ -21,7 +34,8 @@ export type UseAlbumFormOptions = {
 
 /** Hook to manage an album form */
 const useAlbumForm = (
-  album: AlbumAttributes,
+  album: ParseAlbum,
+  albumImages: ParseImage[],
   {
     resetOnSubmit = true,
     onSubmit: piOnSubmit,
@@ -30,13 +44,19 @@ const useAlbumForm = (
 ) => {
   const { openConfirm } = useActionDialogContext();
   const { enqueueErrorSnackbar } = useSnackbar();
+  const { startGlobalLoader, stopGlobalLoader } = useGlobalLoadingStore();
+  const queryClient = useQueryClient();
 
-  const [allImageIds, setAllImageIds] = useState<string[]>(album.images);
-  const [removedImages, setRemovedImageIds] = useState<string[]>([]);
-  const imageIds = useMemo(
-    () => allImageIds.filter((imageId) => !removedImages.includes(imageId)),
-    [allImageIds, removedImages]
+  const [allImages, setAllImages] = useState<ParseImage[]>(albumImages);
+  const [removedImages, setRemovedImages] = useState<ParseImage[]>([]);
+  const images = useMemo(
+    () => allImages.filter((imageId) => !removedImages.includes(imageId)),
+    [allImages, removedImages]
   );
+
+  useEffect(() => {
+    setAllImages(dedupe([...albumImages, ...allImages]));
+  }, [albumImages]);
 
   const [coverImage, setCoverImage] = useState<AlbumAttributes["coverImage"]>(
     album.coverImage
@@ -65,6 +85,16 @@ const useAlbumForm = (
   );
   const [errors, setErrors] = useState<ErrorState<"name">>(defaultErrors);
 
+  const isDirty =
+    removedImages.length > 0 ||
+    allImages.length !== album.images.length ||
+    coverImage?.id !== album.coverImage?.id ||
+    name !== album.name ||
+    description !== album.description ||
+    !deepEqual(captions, album.captions ?? {}) ||
+    !deepEqual(collaborators, album.collaborators) ||
+    !deepEqual(viewers, album.viewers);
+
   const reinitialize = useCallback(() => {
     setName(album.name);
     setDescription(album.description);
@@ -72,7 +102,7 @@ const useAlbumForm = (
     setViewers(album.viewers);
     setErrors(defaultErrors);
     setCaptions(album.captions ?? {});
-    setAllImageIds(album.images);
+    setAllImages(albumImages);
   }, [
     setName,
     setDescription,
@@ -125,7 +155,7 @@ const useAlbumForm = (
       album.viewers.filter((viewer) => !viewers.includes(viewer))
     );
     const addedImages = dedupe(
-      imageIds.filter((imageId) => !album.images.includes(imageId))
+      images.filter((image) => !album.images.includes(image.objectId))
     );
     const changes: AlbumFormChanges = {};
     if (addedCollaborators.length > 0) {
@@ -150,15 +180,40 @@ const useAlbumForm = (
       changes.description = description;
     }
     if (removedImages.length > 0) {
-      changes.removedImages = removedImages;
+      changes.removedImages = removedImages.map((image) => image.objectId);
     }
     if (addedImages.length > 0) {
-      changes.addedImages = addedImages;
+      changes.addedImages = addedImages.map((image) => image.objectId);
     }
     if (!deepEqual(captions, album.captions)) {
       changes.captions = captions;
     }
     return changes;
+  };
+
+  const submit = async () => {
+    startGlobalLoader();
+    try {
+      await piOnSubmit(
+        {
+          ...album.attributes,
+          images: images,
+          name,
+          description,
+          collaborators,
+          viewers,
+          coverImage,
+          captions,
+        },
+        calculateChanges()
+      );
+      if (resetOnSubmit) {
+        reinitialize();
+      }
+    } finally {
+      queryClient.invalidateQueries([QueryCacheGroups.GET_ALL_ALBUMS_INFINITE]);
+      stopGlobalLoader();
+    }
   };
 
   const onSubmit = async () => {
@@ -168,38 +223,9 @@ const useAlbumForm = (
         .containedIn(ParseUser.COLUMNS.email, [...viewers, ...collaborators])
         .count();
       if (signedUpUserCount < userEmails.size) {
-        openConfirm(Strings.message.nonExistentUserWarning, async () => {
-          await piOnSubmit(
-            {
-              ...album,
-              images: imageIds,
-              name,
-              description,
-              collaborators,
-              viewers,
-              coverImage,
-              captions,
-            },
-            calculateChanges()
-          );
-          if (resetOnSubmit) {
-            reinitialize();
-          }
-        });
+        openConfirm(Strings.message.nonExistentUserWarning, submit);
       } else {
-        await piOnSubmit(
-          {
-            ...album,
-            images: imageIds,
-            name,
-            description,
-            collaborators,
-            viewers,
-            coverImage,
-            captions,
-          },
-          calculateChanges()
-        );
+        submit();
       }
     }
   };
@@ -209,21 +235,30 @@ const useAlbumForm = (
     await piOnCancel?.();
   };
 
-  const onAdd = async (...imageIds: string[]) => {
-    setAllImageIds(dedupe([...allImageIds, ...imageIds]));
-    setRemovedImageIds(
-      removedImages.filter((imageId) => !imageIds.includes(imageId))
+  const onAdd = (...images: ParseImage[]) => {
+    setAllImages(dedupe([...images, ...allImages]));
+    setRemovedImages(removedImages.filter((image) => !images.includes(image)));
+  };
+
+  const onRemove = (...images: ParseImage[]) => {
+    setRemovedImages(dedupe([...removedImages, ...images]));
+  };
+
+  const onUpdate = (...images: ParseImage[]) => {
+    setAllImages((prev) =>
+      prev.map(
+        (prevImage) =>
+          images.find((image) => image.objectId === prevImage.objectId) ??
+          prevImage
+      )
     );
   };
 
-  const onRemove = async (...imageIds: string[]) => {
-    setRemovedImageIds(dedupe([...removedImages, ...imageIds]));
-  };
-
   return {
-    imageIds,
-    allImageIds,
-    removedImageIds: removedImages,
+    onUpdate,
+    images,
+    allImages,
+    removedImages,
     coverImage,
     name,
     description,
@@ -243,6 +278,7 @@ const useAlbumForm = (
     setCaptions,
     onAdd,
     onRemove,
+    isDirty,
   };
 };
 

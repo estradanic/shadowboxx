@@ -59,7 +59,7 @@ const AppMenuList = ({ collapse = false }: AppMenuListProps) => {
         </ListItemIcon>
         <ListItemText primary={Strings.label.home} />
       </ListItemLink>
-      <ListItemLink to={routes.Memories.path}>
+      <ListItemLink to="/memories">
         <ListItemIcon className={classes.listItemIcon}>
           <InsertPhotoIcon />
         </ListItemIcon>

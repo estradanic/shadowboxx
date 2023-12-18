@@ -77,7 +77,7 @@ export default class ParseObject<C extends ClassName>
   static COLUMNS = new Columns();
 
   private _object: Parse.Object<ParsifyPointers<C>>;
-  private _cloud: boolean;
+  protected _cloud: boolean;
 
   constructor(
     object: Parse.Object<ParsifyPointers<C>>,
@@ -193,12 +193,7 @@ export default class ParseObject<C extends ClassName>
 
   /** Updates this object with latest version from the db. For client code only */
   async fetch(options?: Parse.Object.FetchOptions) {
-    return new ParseObject(await this._object.fetch(options));
-  }
-
-  /** Updates this object with latest version from the db. For cloud code only */
-  async cloudFetch(options?: Parse.Object.FetchOptions) {
-    return new ParseObject(await this._object.fetch(options), true);
+    return new ParseObject(await this._object.fetch(options), this._cloud);
   }
 
   /** Function to set multiple attributes at once */

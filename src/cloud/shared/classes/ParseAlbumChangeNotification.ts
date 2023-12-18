@@ -173,17 +173,17 @@ export class UnpersistedParseAlbumChangeNotification extends ParseAlbumChangeNot
   }
 
   get objectId(): Attributes<"AlbumChangeNotification">["objectId"] {
-    console.warn("Unpersisted albumChangeNotification has no id");
-    return "";
+    console.debug("Unpersisted albumChangeNotification has no id");
+    return "new";
   }
 
   get createdAt(): Attributes<"AlbumChangeNotification">["createdAt"] {
-    console.warn("Unpersisted albumChangeNotification has no createdAt");
+    console.debug("Unpersisted albumChangeNotification has no createdAt");
     return new Date();
   }
 
   get updatedAt(): Attributes<"AlbumChangeNotification">["updatedAt"] {
-    console.warn("Unpersisted albumChangeNotification has no updatedAt");
+    console.debug("Unpersisted albumChangeNotification has no updatedAt");
     return new Date();
   }
 }

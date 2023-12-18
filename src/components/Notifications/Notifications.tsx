@@ -37,7 +37,7 @@ const useStyles = makeStyles((theme: Theme) => ({
     maxWidth: "900px",
     left: "auto !important",
     right: theme.spacing(3),
-    boxShadow: theme.shadows[3],
+    boxShadow: theme.shadows[5],
   },
   menuItem: {
     backgroundColor: theme.palette.primary.main,

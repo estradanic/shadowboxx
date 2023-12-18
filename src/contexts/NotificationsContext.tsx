@@ -4,6 +4,8 @@ import React, {
   useContext,
   ReactNode,
   useCallback,
+  Dispatch,
+  SetStateAction,
 } from "react";
 import NotificationsIcon from "@material-ui/icons/Notifications";
 
@@ -16,7 +18,7 @@ export interface Notification {
   /** Custom icon of the notification */
   icon?: ReactNode;
   /** Detailed message or interactive content */
-  detail?: React.ReactNode;
+  detail?: ReactNode;
   /** Function to remove the notification */
   remove: () => void | Promise<void>;
   /** Function to update the notification */
@@ -39,9 +41,7 @@ interface NotificationsContextValue {
   /** An array of notifications */
   notifications: Record<string, Notification>;
   /** React state setter for notifications */
-  setNotifications: React.Dispatch<
-    React.SetStateAction<Record<string, Notification>>
-  >;
+  setNotifications: Dispatch<SetStateAction<Record<string, Notification>>>;
   /**
    * Function to easily add a new notification.
    * If notification with id already exists, it is updated to the new one
@@ -50,7 +50,7 @@ interface NotificationsContextValue {
   /** Whether the notification menu is open */
   notificationMenuOpen: boolean;
   /** React state setter for notificationMenuOpen */
-  setNotificationMenuOpen: React.Dispatch<React.SetStateAction<boolean>>;
+  setNotificationMenuOpen: Dispatch<SetStateAction<boolean>>;
 }
 
 /** Context to manage Notifications */
@@ -61,7 +61,7 @@ const NotificationsContext = createContext<
 /** Interface defining props for the NotificationsContextProvider */
 interface NotificationsContextProviderProps {
   /** Child node */
-  children: React.ReactNode;
+  children: ReactNode;
 }
 
 /** Custom context provider for NotificationsContext */

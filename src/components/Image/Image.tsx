@@ -5,9 +5,12 @@ import React, {
   useRef,
   useState,
   MouseEvent,
+  ReactElement,
+  cloneElement,
 } from "react";
 import { makeStyles, Theme } from "@material-ui/core/styles";
 import NotesIcon from "@material-ui/icons/Notes";
+import StyleIcon from "@material-ui/icons/Style";
 import Popper from "@material-ui/core/Popper";
 import classNames from "classnames";
 import { VariableColor } from "../../types";
@@ -20,6 +23,7 @@ import { DEFAULT_IMAGE_SKELETON_HEIGHT } from "../Skeleton/ImageSkeleton";
 import Typography from "@material-ui/core/Typography";
 import useQueryConfigs from "../../hooks/Query/useQueryConfigs";
 import { useQuery } from "@tanstack/react-query";
+import Chip from "../Chip/Chip";
 
 interface UseStylesParams {
   borderColor: VariableColor;
@@ -105,6 +109,17 @@ const useStyles = makeStyles((theme: Theme) => ({
     fontSize: "large",
     marginRight: theme.spacing(1),
   },
+  tag: {
+    outline: `1px solid ${theme.palette.primary.contrastText}`,
+  },
+  tags: {
+    maxWidth: "90vw",
+    display: "flex",
+    justifyContent: "space-around",
+    margin: "0 auto",
+    gap: theme.spacing(2),
+    transform: `translateY(calc(-100% - ${theme.spacing(2)}px))`,
+  },
 }));
 
 export type ImageProps = ImgHTMLAttributes<HTMLImageElement> & {
@@ -113,7 +128,7 @@ export type ImageProps = ImgHTMLAttributes<HTMLImageElement> & {
   /** Image to display */
   parseImage: ParseImage;
   /** Array of ImageDecorations */
-  decorations?: React.ReactElement<ImageDecorationProps<any>>[];
+  decorations?: ReactElement<ImageDecorationProps<any>>[];
   /** CSS border color */
   borderColor?: VariableColor;
   /** Whether to show full resolution popup when the image is clicked */
@@ -276,7 +291,7 @@ const Image = memo(
           )}
         </Tooltip>
         {decorations?.map((decoration, index) =>
-          React.cloneElement(decoration, { key: `decoration${index}` })
+          cloneElement(decoration, { key: `decoration${index}` })
         )}
         {showFullResolutionOnClick && (
           <Popper
@@ -339,6 +354,16 @@ const Image = memo(
                 />
               </picture>
             )}
+            <div className={classes.tags}>
+              {parseImage.tags?.map?.((tag) => (
+                <Chip
+                  key={tag}
+                  className={classes.tag}
+                  label={tag}
+                  icon={<StyleIcon />}
+                />
+              ))}
+            </div>
             <Typography
               className={classNames(classes.caption, {
                 [classes.displayNone]:

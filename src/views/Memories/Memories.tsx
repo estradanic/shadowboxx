@@ -3,9 +3,6 @@ import classNames from "classnames";
 import Grid from "@material-ui/core/Grid";
 import CloseIcon from "@material-ui/icons/Close";
 import EditIcon from "@material-ui/icons/Edit";
-import DeleteIcon from "@material-ui/icons/Delete";
-import AddIcon from "@material-ui/icons/Add";
-import { makeStyles, Theme } from "@material-ui/core/styles";
 import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
 import { SnackbarKey } from "notistack";
 import {
@@ -15,9 +12,9 @@ import {
   Fab,
   useImageStyles,
   useSnackbar,
-  Button,
   Online,
-  useActionDialogContext,
+  DeleteFab,
+  TagFab,
 } from "../../components";
 import { Strings } from "../../resources";
 import { ParseImage } from "../../classes";
@@ -28,80 +25,15 @@ import useFlatInfiniteQueryData from "../../hooks/Query/useFlatInfiniteQueryData
 import useInfiniteScroll from "../../hooks/useInfiniteScroll";
 import useInfiniteQueryConfigs from "../../hooks/Query/useInfiniteQueryConfigs";
 import useRandomColor from "../../hooks/useRandomColor";
-import {
-  ImageContextProvider,
-  useImageContext,
-} from "../../contexts/ImageContext";
+import { ImageContextProvider } from "../../contexts/ImageContext";
 import { useNetworkDetectionContext } from "../../contexts/NetworkDetectionContext";
 import useFilterBar from "../../components/FilterBar/useFilterBar";
 import FilterBar from "../../components/FilterBar/FilterBar";
 import TagsImageDecoration from "../../components/Image/Decoration/TagsImageDecoration";
 import DateImageDecoration from "../../components/Image/Decoration/DateImageDecoration";
 import useQueryConfigs from "../../hooks/Query/useQueryConfigs";
-
-const useStyles = makeStyles((theme: Theme) => ({
-  actionContainer: {
-    backgroundColor: theme.palette.background.paper,
-    padding: theme.spacing(0.5, 1),
-    borderRadius: "4px",
-    position: "absolute",
-    bottom: theme.spacing(7),
-    zIndex: theme.zIndex.modal,
-  },
-}));
-
-type ActionBarProps = {
-  selectedImages: string[];
-  onDelete: () => Promise<void>;
-  images: ParseImage[];
-};
-
-const ActionBar = ({ selectedImages, images, onDelete }: ActionBarProps) => {
-  const classes = useStyles();
-  const { deleteImage } = useImageContext();
-  const { openConfirm } = useActionDialogContext();
-  const { enqueueInfoSnackbar } = useSnackbar();
-  return (
-    <Grid item sm={6} className={classes.actionContainer}>
-      <Button
-        variant="text"
-        color="error"
-        disabled={selectedImages.length === 0}
-        onClick={() => {
-          openConfirm(
-            Strings.message.deleteImagesConfirm,
-            async () => {
-              const imagesToDelete = images.filter((image) =>
-                selectedImages.includes(image.objectId)
-              );
-              await Promise.all(
-                imagesToDelete.map((image) => deleteImage(image))
-              );
-              await onDelete();
-            },
-            () => {},
-            {
-              confirmButtonText: Strings.action.delete,
-              confirmButtonColor: "error",
-            }
-          );
-        }}
-      >
-        <DeleteIcon fontSize="small" />
-        {Strings.action.delete}
-      </Button>
-      <Button
-        variant="text"
-        color="success"
-        disabled={selectedImages.length === 0}
-        onClick={() => enqueueInfoSnackbar("Feature coming soon!")}
-      >
-        <AddIcon fontSize="small" />
-        {Strings.action.addToAlbum}
-      </Button>
-    </Grid>
-  );
-};
+import { useLocation } from "react-router-dom";
+import useNavigate from "../../hooks/useNavigate";
 
 /**
  * Page for viewing all the logged in users's images/videos
@@ -109,7 +41,16 @@ const ActionBar = ({ selectedImages, images, onDelete }: ActionBarProps) => {
 const Memories = memo(() => {
   useView("Memories");
   const imageClasses = useImageStyles();
-  const [editMode, setEditMode] = useState<boolean>(false);
+  const navigate = useNavigate();
+  const location = useLocation();
+  const editMode = location.pathname.endsWith("edit");
+  const setEditMode = (value: boolean) => {
+    if (value) {
+      navigate("edit");
+    } else {
+      navigate("/memories");
+    }
+  };
   const randomColor = useRandomColor();
   const { online } = useNetworkDetectionContext();
   const { sortDirection, tagSearch, ...restFilterBarProps } = useFilterBar();
@@ -172,7 +113,7 @@ const Memories = memo(() => {
             }}
           />,
           <DateImageDecoration
-            corner="topLeft"
+            position="topLeft"
             initialDate={image.dateTaken}
             onConfirm={async (date) => {
               image.dateTaken = date;
@@ -231,15 +172,6 @@ const Memories = memo(() => {
           {Strings.label.memories}
         </FancyTitleTypography>
       </Grid>
-      {editMode && (
-        <ImageContextProvider>
-          <ActionBar
-            selectedImages={selectedImages}
-            images={images}
-            onDelete={onDelete}
-          />
-        </ImageContextProvider>
-      )}
       <Images
         filterBar={
           <FilterBar
@@ -266,13 +198,31 @@ const Memories = memo(() => {
               );
             } else {
               closeSnackbar(snackbarKey);
+              setSelectedImages([]);
             }
-            setEditMode((prev) => !prev);
+            setEditMode(!editMode);
           }}
           color={editMode ? "error" : "success"}
         >
           {editMode ? <CloseIcon /> : <EditIcon />}
         </Fab>
+        {editMode && (
+          <>
+            <ImageContextProvider>
+              <DeleteFab
+                imagesToDelete={images.filter((image) =>
+                  selectedImages.includes(image.objectId)
+                )}
+                onDelete={onDelete}
+              />
+            </ImageContextProvider>
+            <TagFab
+              imagesToTag={images.filter((image) =>
+                selectedImages.includes(image.objectId)
+              )}
+            />
+          </>
+        )}
       </Online>
     </PageContainer>
   );

@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from "react";
+import React, { useMemo, useState, MouseEvent } from "react";
 import LockIcon from "@material-ui/icons/Lock";
 import UnlockIcon from "@material-ui/icons/LockOpen";
 import Button, { ButtonProps } from "./Button";
@@ -15,7 +15,7 @@ const LockedButton = ({
   const onClick = useMemo(() => {
     return isLocked
       ? () => setIsLocked(false)
-      : async (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+      : async (e: MouseEvent<HTMLButtonElement>) => {
           await userOnClick?.(e);
           setIsLocked(true);
         };

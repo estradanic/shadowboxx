@@ -76,7 +76,9 @@ const UserField = forwardRef(
             onChange(value.concat([inputValue]));
             setInputValue("");
           }
-          event.preventDefault();
+          if (event.key !== "Tab") {
+            event.preventDefault();
+          }
           break;
         }
         default:

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { StrictMode } from "react";
 import ReactDOM from "react-dom";
 import { BrowserRouter } from "react-router-dom";
 import {
@@ -28,7 +28,7 @@ const queryClient = new QueryClient({
 const theme = createMuiTheme(lightThemeSettings);
 
 ReactDOM.render(
-  <React.StrictMode>
+  <StrictMode>
     <MuiThemeProvider theme={theme}>
       <NetworkDetectionContextProvider>
         <QueryClientProvider client={queryClient}>
@@ -46,6 +46,6 @@ ReactDOM.render(
         </QueryClientProvider>
       </NetworkDetectionContextProvider>
     </MuiThemeProvider>
-  </React.StrictMode>,
+  </StrictMode>,
   document.getElementById("root")
 );

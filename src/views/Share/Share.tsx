@@ -100,7 +100,7 @@ const AlbumsToShareTo = ({ albums, classes, files }: AlbumsListProps) => {
                     },
                   });
                   enqueueSuccessSnackbar(Strings.message.startedUploading);
-                  navigate(routes.Album.path.replace(":id", album.objectId));
+                  navigate(routes.Album.path.replace("*", album.objectId));
                 } catch (e) {
                   console.error(e);
                   enqueueErrorSnackbar(Strings.error.editingAlbum);

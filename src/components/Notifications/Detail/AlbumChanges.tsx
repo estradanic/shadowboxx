@@ -74,7 +74,7 @@ const AlbumChangesNotificationDetail = ({
     );
     notificationRef.current?.remove();
     setNotificationMenuOpen(false);
-    navigate(routes.Album.path.replace(":id", albumChange.album.id));
+    navigate(routes.Album.path.replace("*", albumChange.album.id));
   };
 
   return (

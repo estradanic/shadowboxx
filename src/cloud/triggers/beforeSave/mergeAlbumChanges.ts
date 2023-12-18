@@ -25,7 +25,7 @@ const mergeAlbumChanges = async (
 
   const attributes = album.attributes;
 
-  await album.cloudFetch({ useMasterKey: true });
+  await album.fetch({ useMasterKey: true });
 
   const images: string[] = album.images;
   const collaborators: string[] = album.collaborators;

@@ -109,11 +109,11 @@ export default class ParseUser
 
   constructor(
     user: Parse.User<ParsifyPointers<"_User">>,
-    noPin: boolean = false
+    cloud: boolean = false
   ) {
-    super(user);
+    super(user, cloud);
     this._user = user;
-    if (!noPin) {
+    if (!cloud) {
       this.pin();
     }
   }
@@ -157,15 +157,7 @@ export default class ParseUser
    * @returns The fetched ParseUser
    */
   async fetch(options?: Parse.Object.FetchOptions) {
-    return new ParseUser(await this._user.fetch(options));
-  }
-
-  /**
-   * Fetches the ParseUser from the db
-   * @returns The fetched ParseUser
-   */
-  async cloudFetch(options?: Parse.Object.FetchOptions) {
-    return new ParseUser(await this._user.fetch(options), true);
+    return new ParseUser(await this._user.fetch(options), this._cloud);
   }
 
   /**
@@ -389,17 +381,17 @@ export class UnpersistedParseUser extends ParseUser {
   }
 
   get objectId(): Attributes<"_User">["objectId"] {
-    console.warn("Unpersisted user has no id");
-    return "";
+    console.debug("Unpersisted user has no id");
+    return "new";
   }
 
   get createdAt(): Attributes<"_User">["createdAt"] {
-    console.warn("Unpersisted user has no createdAt");
+    console.debug("Unpersisted user has no createdAt");
     return new Date();
   }
 
   get updatedAt(): Attributes<"_User">["updatedAt"] {
-    console.warn("Unpersisted user has no updatedAt");
+    console.debug("Unpersisted user has no updatedAt");
     return new Date();
   }
 

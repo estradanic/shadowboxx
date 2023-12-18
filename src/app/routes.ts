@@ -40,7 +40,7 @@ const routes = {
   Album: {
     viewId: "Album",
     viewName: "Album",
-    path: "/album/:id",
+    path: "/album/*",
     tryAuthenticate: true,
     redirectOnAuthFail: true,
     queryCacheGroups: [
@@ -77,7 +77,7 @@ const routes = {
   Memories: {
     viewId: "Memories",
     viewName: "Memories",
-    path: "/memories",
+    path: "/memories/*",
     tryAuthenticate: true,
     redirectOnAuthFail: true,
     queryCacheGroups: [

@@ -27,7 +27,6 @@ import {
 import UserAvatar from "../User/UserAvatar";
 import Empty from "../Svgs/Empty";
 import { useSnackbar } from "../Snackbar/Snackbar";
-import AlbumFormDialog from "./AlbumFormDialog";
 import Tooltip from "../Tooltip/Tooltip";
 import { useActionDialogContext } from "../Dialog/ActionDialog";
 import ImageField from "../Field/ImageField";
@@ -94,7 +93,6 @@ const useStyles = makeStyles((theme: Theme) => ({
     marginTop: theme.spacing(1),
   },
   loadingWrapper: {
-    position: "relative",
     cursor: "pointer",
   },
 }));
@@ -115,8 +113,6 @@ export interface AlbumCardProps {
 /** Component for displaying detailed information about an album */
 const AlbumCard = memo(({ value, onChange, borderColor }: AlbumCardProps) => {
   const [anchorEl, setAnchorEl] = useState<Element>();
-  const [editAlbumDialogOpen, setEditAlbumDialogOpen] =
-    useState<boolean>(false);
   const { online } = useNetworkDetectionContext();
 
   const {
@@ -242,15 +238,11 @@ const AlbumCard = memo(({ value, onChange, borderColor }: AlbumCardProps) => {
     );
   };
 
-  const editAlbum = () => {
-    setEditAlbumDialogOpen(true);
-  };
-
   const closeMenu = () => setAnchorEl(undefined);
 
   const navigateToAlbum = () => {
     if (value?.objectId) {
-      navigate(routes.Album.path.replace(":id", value.objectId), location);
+      navigate(routes.Album.path.replace("*", value.objectId), location);
     }
   };
 
@@ -282,21 +274,18 @@ const AlbumCard = memo(({ value, onChange, borderColor }: AlbumCardProps) => {
                 >
                   <MoreVertIcon className={classes.icon} />
                 </IconButton>
-                <Menu
-                  open={!!anchorEl}
-                  anchorEl={anchorEl}
-                  onClose={closeMenu}
-                  onClick={closeMenu}
-                >
-                  <MenuItem onClick={editAlbum}>
-                    {Strings.action.editAlbum}
-                  </MenuItem>
-                  {isOwner && (
+                {isOwner && (
+                  <Menu
+                    open={!!anchorEl}
+                    anchorEl={anchorEl}
+                    onClose={closeMenu}
+                    onClick={closeMenu}
+                  >
                     <MenuItem onClick={deleteAlbum}>
                       {Strings.action.deleteAlbum}
                     </MenuItem>
-                  )}
-                </Menu>
+                  </Menu>
+                )}
               </Online>
             )
           }
@@ -305,20 +294,18 @@ const AlbumCard = memo(({ value, onChange, borderColor }: AlbumCardProps) => {
             value?.description ?? ""
           }`}
         />
-        {coverImage ? (
-          <LoadingWrapper
-            className={classes.loadingWrapper}
-            global={false}
-            loading={!!jobsForAlbum.length}
-            type={
-              [0, -1, 100].includes(jobProgress)
-                ? "indeterminate"
-                : "determinate"
-            }
-            progress={jobProgress}
-            onClick={navigateToAlbum}
-            color={borderColor}
-          >
+        <LoadingWrapper
+          className={classes.loadingWrapper}
+          global={false}
+          loading={!!jobsForAlbum.length}
+          type={
+            [0, -1, 100].includes(jobProgress) ? "indeterminate" : "determinate"
+          }
+          progress={jobProgress}
+          onClick={navigateToAlbum}
+          color={borderColor}
+        >
+          {coverImage ? (
             <CardMedia
               className={classes.media}
               parseImage={coverImage}
@@ -327,10 +314,15 @@ const AlbumCard = memo(({ value, onChange, borderColor }: AlbumCardProps) => {
               title={coverImage?.name}
               onClick={navigateToAlbum}
             />
-          </LoadingWrapper>
-        ) : (
-          <Empty height={300} />
-        )}
+          ) : (
+            <CardMedia
+              className={classes.media}
+              component={Empty}
+              height={300}
+              onClick={navigateToAlbum}
+            />
+          )}
+        </LoadingWrapper>
         <CardContent className={classes.cardContent}>
           <Grid container>
             <Grid item xs={6}>
@@ -445,22 +437,6 @@ const AlbumCard = memo(({ value, onChange, borderColor }: AlbumCardProps) => {
           </>
         </CardActions>
       </Card>
-      <AlbumFormDialog
-        value={value.attributes}
-        open={editAlbumDialogOpen}
-        handleCancel={() => setEditAlbumDialogOpen(false)}
-        handleConfirm={async (attributes, changes) => {
-          setEditAlbumDialogOpen(false);
-          try {
-            const response = await value.update(attributes, changes);
-            await onChange(response);
-            enqueueSuccessSnackbar(Strings.success.saved);
-          } catch (error: any) {
-            console.error(error);
-            enqueueErrorSnackbar(Strings.error.editingAlbum);
-          }
-        }}
-      />
     </ImageContextProvider>
   ) : (
     <AlbumCardSkeleton />

@@ -1,4 +1,10 @@
-import React, { createContext, useContext } from "react";
+import React, {
+  createContext,
+  useContext,
+  ReactNode,
+  useState,
+  useEffect,
+} from "react";
 
 interface NetworkDetectionContextValue {
   /** Whether the browser is online */
@@ -11,15 +17,15 @@ const NetworkDetectionContext = createContext<
 
 interface NetworkDetectionContextProviderProps {
   /** Child node */
-  children: React.ReactNode;
+  children: ReactNode;
 }
 
 /** Context to provide the network status */
 export const NetworkDetectionContextProvider = ({
   children,
 }: NetworkDetectionContextProviderProps) => {
-  const [online, setOnline] = React.useState<boolean>(true);
-  React.useEffect(() => {
+  const [online, setOnline] = useState<boolean>(true);
+  useEffect(() => {
     const handler = () => setOnline(navigator.onLine);
     window.addEventListener("online", handler);
     window.addEventListener("offline", handler);

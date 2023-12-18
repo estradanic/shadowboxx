@@ -4,6 +4,8 @@
  */
 const Strings = {
   error: {
+    taggingMemories: "Error tagging memories",
+    deletingMemories: "Error deleting memories",
     gettingTags: "Error getting tags",
     verifyingEmail: "Error verifying email",
     resendingVerificationEmail: "Error resending verification email",
@@ -68,7 +70,6 @@ const Strings = {
     dateImage: "Date Image",
     delete: "Delete",
     deleteAlbum: "Delete Album",
-    editAlbum: "Edit Album",
     goBack: "Go Back",
     goSee: "Take me there!",
     install: "Install App",
@@ -93,6 +94,8 @@ const Strings = {
     tagImage: "Tag Image",
   },
   message: {
+    deletingMemories: "Deleting memories...",
+    taggingMemories: "Tagging memories...",
     startedUploading: "Started uploading...",
     uploading: (fileName: string) => `Uploading ${fileName}`,
     processing: (fileName: string) => `Processing ${fileName}`,

@@ -3,11 +3,11 @@ import Svg, { SvgProps } from "./Svg";
 import { useTheme } from "@material-ui/core/styles";
 
 /** Svg used on the homepage when the user has no albums to show */
-const BlankCanvas = ({ height }: Omit<SvgProps, "children">) => {
+const BlankCanvas = (props: Omit<SvgProps, "children">) => {
   const theme = useTheme();
 
   return (
-    <Svg height={height}>
+    <Svg {...props}>
       <svg
         style={{ height: "100%", width: "100%" }}
         id="ffe6bee8-e793-4e33-a4ab-3e285c6a5a44"

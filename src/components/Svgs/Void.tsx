@@ -3,11 +3,11 @@ import Svg, { SvgProps } from "./Svg";
 import { useTheme } from "@material-ui/core/styles";
 
 /** Svg to use when an album isn't found */
-const Void = ({ height }: Omit<SvgProps, "children">) => {
+const Void = (props: Omit<SvgProps, "children">) => {
   const theme = useTheme();
 
   return (
-    <Svg height={height}>
+    <Svg {...props}>
       <svg
         style={{ height: "100%", width: "100%" }}
         xmlns="http://www.w3.org/2000/svg"

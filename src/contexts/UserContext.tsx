@@ -5,6 +5,9 @@ import React, {
   useEffect,
   useRef,
   useState,
+  ReactNode,
+  Dispatch,
+  SetStateAction,
 } from "react";
 import Parse from "parse";
 import { useLocation } from "react-router-dom";
@@ -38,7 +41,7 @@ interface UserContextValue {
   /** Path to redirect the user to after login */
   redirectPath?: string;
   /** Function to set the redirectPath */
-  setRedirectPath: React.Dispatch<React.SetStateAction<string | undefined>>;
+  setRedirectPath: Dispatch<SetStateAction<string | undefined>>;
 }
 
 /**
@@ -51,7 +54,7 @@ const UserContext = createContext<UserContextValue | undefined>(undefined);
  */
 interface UserContextProviderProps {
   /** Child node */
-  children: React.ReactNode;
+  children: ReactNode;
 }
 
 /** Custom context provider for UserContext */
