@@ -15,6 +15,11 @@ const updateEmail = async (user: ParseUser) => {
     );
   }
 
+  if (!oldUser.email) {
+    console.log("Old email doesn't exist, No need to update");
+    return;
+  }
+
   console.log("Old email", oldUser.email);
 
   const oldEmail = oldUser.email;

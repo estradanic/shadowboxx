@@ -4,10 +4,10 @@ import { ParseUser, Strings } from "../../shared";
 
 /** Function to send verification email when email changes */
 const sendVerificationEmail = async (user: ParseUser) => {
-  const oldUser = await ParseUser.cloudQuery(Parse).get(user.objectId, {
-    useMasterKey: true,
-  });
-  if (oldUser.email === user.email) {
+  const oldUser = await ParseUser.cloudQuery(Parse)
+    .equalTo("objectId", user.objectId)
+    .first({ useMasterKey: true });
+  if (oldUser?.email === user.email) {
     return;
   }
 
@@ -35,7 +35,7 @@ const sendVerificationEmail = async (user: ParseUser) => {
     .padStart(6, "0");
   user.verificationCode = code;
 
-  if (user.isNew()) {
+  if (user.isNew() || !oldUser) {
     user.email = user.username;
   } else {
     user.oldEmail = oldUser.email;

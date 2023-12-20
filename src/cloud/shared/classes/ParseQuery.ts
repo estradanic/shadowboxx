@@ -43,13 +43,13 @@ const getParseObject = <C extends ClassName>(
   cloud: boolean
 ): PO<C> => {
   if (className === "_User") {
-    return new ParseUser(obj as P<"_User">, !cloud) as PO<C>;
+    return new ParseUser(obj as P<"_User">, cloud) as PO<C>;
   }
   if (className === "Album") {
-    return new ParseAlbum(obj as P<"Album">, !cloud) as PO<C>;
+    return new ParseAlbum(obj as P<"Album">, cloud) as PO<C>;
   }
   if (className === "Image") {
-    return new ParseImage(obj as P<"Image">, !cloud) as PO<C>;
+    return new ParseImage(obj as P<"Image">, cloud) as PO<C>;
   }
   if (className === "AlbumChangeNotification") {
     return new ParseAlbumChangeNotification(
