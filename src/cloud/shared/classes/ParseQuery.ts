@@ -72,36 +72,72 @@ type QueryJSON = {
  * Object wrapping the Parse.Query class
  * providing built-in conversion to ParseObject children from Parse.Object results
  */
-export default class ParseQuery<C extends ClassName> {
-  static for<Fc extends ClassName>(className: Fc, parse: typeof Parse = Parse) {
+export default class ParseQuery<C extends ClassName, Cloud extends boolean> {
+  static for<Fc extends ClassName>(className: Fc, parse?: typeof Parse) {
+    const parseToUse = parse ?? Parse;
     const query = (
       className === "_User"
-        ? new parse.Query<Parse.User<ParsifyPointers<Fc>>>(className)
-        : new parse.Query<Parse.Object<ParsifyPointers<Fc>>>(className)
+        ? new parseToUse.Query<Parse.User<ParsifyPointers<Fc>>>(className)
+        : new parseToUse.Query<Parse.Object<ParsifyPointers<Fc>>>(className)
     ) as Parse.Query<P<Fc>>;
-    return new ParseQuery<Fc>(query, true);
+    return new ParseQuery(query, !!parse);
   }
 
   private _query: Parse.Query<P<C>>;
   private _className: C;
-  private _cloud: boolean;
+  private _cloud: Cloud;
 
-  constructor(query: Parse.Query<P<C>>, cloud = false) {
+  constructor(query: Parse.Query<P<C>>, cloud: Cloud) {
     this._query = query;
     this._className = query.className as C;
     this._cloud = cloud;
   }
 
   /** Constructs a ParseQuery that is the OR of the passed in queries */
-  static or<C extends ClassName>(...queries: ParseQuery<C>[]) {
-    const orQuery = Parse.Query.or(...queries.map((q) => q._query));
-    return new ParseQuery(orQuery as Parse.Query<P<C>>);
+  static or<C extends ClassName, Cloud extends boolean>(
+    cloud: Cloud,
+    ...queries: ParseQuery<C, Cloud>[]
+  ): ParseQuery<C, Cloud>;
+  static or<C extends ClassName>(
+    ...queries: ParseQuery<C, boolean>[]
+  ): ParseQuery<C, boolean>;
+  static or<C extends ClassName, Cloud extends boolean = boolean>(
+    ...queries: [Cloud, ...ParseQuery<C, Cloud>[]] | ParseQuery<C, Cloud>[]
+  ) {
+    let actualQueries: ParseQuery<C, Cloud>[] = queries as ParseQuery<
+      C,
+      Cloud
+    >[];
+    let cloud: Cloud | undefined;
+    const first = queries[0];
+    if (typeof first === "boolean") {
+      actualQueries = queries.slice(1) as ParseQuery<C, Cloud>[];
+      cloud = first;
+    }
+    const orQuery = Parse.Query.or(...actualQueries.map((q) => q._query));
+    if (cloud !== undefined) {
+      if (actualQueries.findIndex((query) => query.cloud !== cloud)) {
+        throw new Error(
+          "Cannot use a Cloud Query to create a Client Query or vice versa"
+        );
+      }
+      return new ParseQuery<C, Cloud>(orQuery as Parse.Query<P<C>>, cloud);
+    }
+    // Should be a cloud query if _any_ of the passed in queries are cloud queries.
+    return new ParseQuery<C, Cloud>(
+      orQuery as Parse.Query<P<C>>,
+      (actualQueries.findIndex((query) => query.cloud) !== -1) as Cloud
+    );
   }
 
   /** Creates a new instance of ParseQuery from a JSON represenatation */
-  static fromJSON<C extends ClassName>(className: C, json: QueryJSON) {
+  static fromJSON<C extends ClassName, Cloud extends boolean>(
+    className: C,
+    json: QueryJSON,
+    cloud: Cloud
+  ) {
     const query = Parse.Query.fromJSON(className, json);
-    return new ParseQuery(query as Parse.Query<P<C>>);
+    return new ParseQuery(query as Parse.Query<P<C>>, cloud);
   }
 
   /**
@@ -396,8 +432,9 @@ export default class ParseQuery<C extends ClassName> {
   }
 
   /** Sets the limit of the number of results to return. The default limit is 100 */
-  limit(n: number): ParseQuery<C> {
-    return new ParseQuery(this._query.limit(n));
+  limit(n: number): this {
+    this._query = this._query.limit(n);
+    return this;
   }
 
   /** Adds a regular expression constraint for finding string values that match the provided regular expression */
@@ -441,8 +478,9 @@ export default class ParseQuery<C extends ClassName> {
    * Sets the number of results to skip before returning any results for paging
    * Default is to skip zero results
    */
-  skip(n: number): ParseQuery<C> {
-    return new ParseQuery(this._query.skip(n));
+  skip(n: number): this {
+    this._query = this._query.skip(n);
+    return this;
   }
 
   /**
@@ -484,5 +522,9 @@ export default class ParseQuery<C extends ClassName> {
   /** Get the underlying Parse.Query */
   toNativeQuery() {
     return this._query;
+  }
+
+  get cloud() {
+    return this._cloud;
   }
 }

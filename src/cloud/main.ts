@@ -188,9 +188,10 @@ Parse.Cloud.define<
     .sort()
     .reverse()
     .forEach((key) => {
+      const thisLog = request.params.logs[key] ?? [];
       log(
         `[${request.params.user}] [${request.params.name}] ${key}`,
-        ...request.params.logs[key]
+        ...thisLog
       );
     });
 });

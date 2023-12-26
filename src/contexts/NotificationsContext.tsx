@@ -86,8 +86,9 @@ export const NotificationsContextProvider = ({
         setNotifications((prev) => {
           const newNotifications: Record<string, Notification> = {};
           for (const key of Object.keys(prev)) {
-            if (key !== id) {
-              newNotifications[key] = prev[key];
+            const prevKey = prev[key];
+            if (key !== id && prevKey) {
+              newNotifications[key] = prevKey;
             }
           }
           return newNotifications;
@@ -99,11 +100,16 @@ export const NotificationsContextProvider = ({
           setNotifications((prev) => {
             const newNotifications: Record<string, Notification> = {};
             for (const key of Object.keys(prev)) {
+              const prevKey = prev[key];
+              if (!prevKey) {
+                continue;
+              }
               if (key !== id) {
-                newNotifications[key] = prev[key];
+                newNotifications[key] = prevKey;
               } else {
-                newNotifications[key] = updater(prev[key]);
-                resolve(newNotifications[key]);
+                const newKey = updater(prevKey);
+                newNotifications[key] = newKey;
+                resolve(newKey);
               }
             }
             return newNotifications;

@@ -13,6 +13,7 @@
     "isolatedModules": true,
     "outDir": "../../cloud",
     "skipLibCheck": true,
-    "downlevelIteration": true
+    "downlevelIteration": true,
+    "noUncheckedIndexedAccess": true
   }
 }

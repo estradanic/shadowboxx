@@ -210,9 +210,12 @@ export const ImageContextProvider = ({
         return;
       }
       if (message.startsWith("frame=")) {
-        const time = message.split("time=")[1].split("bitrate=")[0].trim();
-        const [hours, minutes, seconds] = time.split(":").map(Number);
-        const totalSeconds = hours * 3600 + minutes * 60 + seconds;
+        const time = message.split("time=")[1]?.split("bitrate=")[0]?.trim();
+        const [hours, minutes, seconds] = time?.split(":").map(Number) ?? [
+          0, 0, 0,
+        ];
+        const totalSeconds =
+          (hours ?? 0) * 3600 + (minutes ?? 0) * 60 + (seconds ?? 0);
         const progressPercentage = (totalSeconds / duration) * 100;
         update({ progress: progressPercentage });
         notification.update((prev) => ({

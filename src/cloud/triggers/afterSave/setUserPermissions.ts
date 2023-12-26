@@ -12,7 +12,7 @@ const setUserPermissions = async (user: ParseUser) => {
       .find({ useMasterKey: true });
     if (collaboratorAlbums.length > 0) {
       const readWriteRoleNames = collaboratorAlbums.map(
-        (album) => `${album.id}_rw`
+        (album) => `${album.objectId}_rw`
       );
       const readWriteRoles = await new Parse.Query(Parse.Role)
         .containedIn("name", readWriteRoleNames)
@@ -27,7 +27,7 @@ const setUserPermissions = async (user: ParseUser) => {
       );
     }
     if (viewerAlbums.length > 0) {
-      const readRoleNames = viewerAlbums.map((album) => `${album.id}_r`);
+      const readRoleNames = viewerAlbums.map((album) => `${album.objectId}_r`);
       const readRoles = await new Parse.Query(Parse.Role)
         .containedIn("name", readRoleNames)
         .find({ useMasterKey: true });

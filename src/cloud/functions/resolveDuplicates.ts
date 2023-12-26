@@ -49,33 +49,25 @@ const resolveDuplicates = async (
         .find({ useMasterKey: true });
       for (const album of albumsToCorrect) {
         try {
-          console.log("Correcting album", album.get(ParseAlbum.COLUMNS.name));
-          const imageIds: string[] = album.get(ParseAlbum.COLUMNS.images);
+          console.log("Correcting album", album.name);
+          const imageIds: string[] = album.images;
           if (imageIds.includes(imageToKeep.objectId)) {
-            album.set(
-              ParseAlbum.COLUMNS.images,
-              imageIds.filter((id) => id !== imageToDelete.objectId)
+            album.images = imageIds.filter(
+              (id) => id !== imageToDelete.objectId
             );
           } else {
-            album.set(
-              ParseAlbum.COLUMNS.images,
-              imageIds.map((id) =>
-                id === imageToDelete.objectId ? imageToKeep.objectId : id
-              )
+            album.images = imageIds.map((id) =>
+              id === imageToDelete.objectId ? imageToKeep.objectId : id
             );
           }
-          await album.save(null, {
+          await album.cloudSave({
             useMasterKey: true,
             context: {
               removedImages: [imageToDelete.objectId],
             },
           });
         } catch (error) {
-          console.error(
-            "Error correcting album",
-            album.get(ParseAlbum.COLUMNS.name),
-            error
-          );
+          console.error("Error correcting album", album.name, error);
         }
       }
       if (user) {

@@ -131,12 +131,15 @@ const Notifications = ({ className }: NotificationsProps) => {
         open={notificationMenuOpen}
       >
         {Object.keys(notifications).length ? (
-          Object.keys(notifications).map((key) => (
-            <NotificationMenuItem
-              key={notifications[key].id}
-              {...notifications[key]}
-            />
-          ))
+          Object.keys(notifications).map((key) => {
+            const notification = notifications[key];
+            if (!notification) {
+              return null;
+            }
+            return (
+              <NotificationMenuItem key={notification.id} {...notification} />
+            );
+          })
         ) : (
           <MenuItem className={classes.menuItem}>
             <Typography>{Strings.message.noNotifications}</Typography>

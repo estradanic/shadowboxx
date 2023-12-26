@@ -58,23 +58,25 @@ const useAlbumChangeNotifications = () => {
           notificationRef.current[albumChangeNotification.objectId] = {
             current: undefined,
           };
-          notificationRef.current[albumChangeNotification.objectId].current =
-            addNotification({
-              id: albumChangeNotification.objectId,
-              title: Strings.message.albumChangeNotificationTitle(
-                albumChangeNotification.count
-              ),
-              detail: (
-                <AlbumChangesNotificationDetail
-                  albumChange={albumChangeNotification}
-                  notificationRef={
-                    notificationRef.current[albumChangeNotification.objectId]
-                  }
-                />
-              ),
-              icon: <FiberNewIcon />,
-              onRemove: async () => await onRemove(albumChangeNotification),
-            });
+          const thisRef =
+            notificationRef.current[albumChangeNotification.objectId];
+          if (!thisRef) {
+            return;
+          }
+          thisRef.current = addNotification({
+            id: albumChangeNotification.objectId,
+            title: Strings.message.albumChangeNotificationTitle(
+              albumChangeNotification.count
+            ),
+            detail: (
+              <AlbumChangesNotificationDetail
+                albumChange={albumChangeNotification}
+                notificationRef={thisRef}
+              />
+            ),
+            icon: <FiberNewIcon />,
+            onRemove: async () => await onRemove(albumChangeNotification),
+          });
         }
       });
     }
