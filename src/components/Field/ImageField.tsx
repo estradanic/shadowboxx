@@ -41,8 +41,6 @@ import { useImageContext } from "../../contexts/ImageContext";
 import useQueryConfigs from "../../hooks/Query/useQueryConfigs";
 import { useQuery } from "@tanstack/react-query";
 import FilterBar, { FilterBarProps } from "../FilterBar/FilterBar";
-import { Skeleton } from "../Skeleton";
-import { LoadingWrapper } from "../Loader";
 import TagsImageDecoration from "../Image/Decoration/TagsImageDecoration";
 import { ImageDecorationProps } from "../Image/Decoration/ImageDecoration";
 import useImageJobs from "../../hooks/useImageJobs";
@@ -104,11 +102,11 @@ export type ImageFieldProps = Omit<
   /** Cover image for the album */
   coverImage?: ParsePointer<"Image">;
   /** Function to set coverImage */
-  setCoverImage?: (newCoverImage: ParsePointer<"Image">) => void;
+  setCoverImage?: (newCoverImage: ParsePointer<"Image"> | undefined) => void;
   /** Function to set caption on an image */
   setCaption?: (image: ParseImage, caption: string) => void;
   /** Function to get caption for an image */
-  getCaption?: (image: ParseImage) => string;
+  getCaption?: (image: ParseImage) => string | undefined;
   /** Id of the album associated with this field */
   albumId?: string;
   /** Function to run when an image is updated */
@@ -216,9 +214,13 @@ const ImageField = memo(
 
     const addFromFile: ChangeEventHandler<HTMLInputElement> = async (event) => {
       if (event.target.files?.[0]) {
-        const files = [];
+        const files: File[] = [];
         for (let i = 0; i < event.target.files.length; i++) {
-          files[i] = event.target.files[i];
+          const file = event.target.files[i];
+          if (!file) {
+            continue;
+          }
+          files[i] = file;
         }
         try {
           await uploadImagesFromFiles(files, {
@@ -292,7 +294,7 @@ const ImageField = memo(
       if (getCaption && setCaption) {
         imageDecorations.push(
           <CaptionImageDecoration
-            initialCaption={getCaption(image)}
+            initialCaption={getCaption(image) ?? ""}
             onConfirm={(caption) => setCaption(image, caption)}
           />
         );
@@ -304,7 +306,7 @@ const ImageField = memo(
             checked={checked}
             onClick={() => {
               if (checked) {
-                setCoverImage?.(value[0].toPointer());
+                setCoverImage?.(value[0]?.toPointer());
               } else {
                 setCoverImage?.(image.toPointer());
               }
@@ -409,7 +411,7 @@ const ImageField = memo(
                         <Avatar
                           className={classes.endAdornmentAvatar}
                           src={mobileUrl}
-                          alt={value[0].name}
+                          alt={value[0]?.name}
                         />
                       </InputAdornment>
                     )}
@@ -420,7 +422,7 @@ const ImageField = memo(
                     <Typography variant="body1">
                       {value.length > 1 && multiple
                         ? Strings.label.multipleImages
-                        : elide(value[0].name, 20, 3)}
+                        : elide(value[0]?.name, 20, 3)}
                     </Typography>
                   </InputAdornment>
                 ),

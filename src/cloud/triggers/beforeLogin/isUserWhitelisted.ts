@@ -9,7 +9,7 @@ const isUserWhitelisted = async (user: ParseUser): Promise<boolean> => {
   return (
     whitelist.findIndex((entry) => {
       const pattern = new RegExp(entry.get("pattern"));
-      return pattern.test(user.email);
+      return pattern.test(user.username);
     }) !== -1
   );
 };

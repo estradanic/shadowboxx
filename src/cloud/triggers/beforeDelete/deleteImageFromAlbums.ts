@@ -14,20 +14,17 @@ const deleteImageFromAlbums = async (image: ParseImage) => {
   console.log("Found albums", albums);
   await Promise.all(
     albums.map(async (album) => {
-      console.log(`Deleting image ${image.objectId} from album`, album.id);
-      const images = album.get(ParseAlbum.COLUMNS.images) as string[];
-      album.set(
-        ParseAlbum.COLUMNS.images,
-        images.filter((id) => id !== image.objectId)
-      );
-      console.log("Saving album", album.id);
-      await album.save(null, {
+      console.log(`Deleting image ${image.objectId} from album`, album.name);
+      const images = album.images;
+      album.images = images.filter((id) => id !== image.objectId);
+      console.log("Saving album", album.name);
+      await album.cloudSave({
         useMasterKey: true,
         context: {
           removedImages: [image.objectId],
         },
       });
-      console.log("Saved album", album.id);
+      console.log("Saved album", album.name);
     })
   );
   console.log(`Deleted image ${image.objectId} from albums`);

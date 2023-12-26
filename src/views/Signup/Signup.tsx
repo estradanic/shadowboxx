@@ -135,7 +135,7 @@ const Signup = memo(() => {
         navigate(`${routes.VerifyEmail.path}?${params.toString()}`);
       } catch (error: any) {
         console.error(error);
-        enqueueErrorSnackbar(Strings.error.signingUp);
+        enqueueErrorSnackbar(error?.message ?? Strings.error.signingUp);
       } finally {
         stopGlobalLoader();
       }

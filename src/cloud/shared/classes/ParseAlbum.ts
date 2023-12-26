@@ -88,7 +88,7 @@ export default class ParseAlbum
     if (!online) {
       nativeQuery.fromLocalDatastore();
     }
-    return new ParseQuery(nativeQuery);
+    return new ParseQuery(nativeQuery, false);
   }
 
   /**
@@ -97,7 +97,7 @@ export default class ParseAlbum
    * @returns Parse.Query for Albums
    */
   static cloudQuery(parse: typeof Parse) {
-    return new parse.Query<Parse.Object<ParsifyPointers<"Album">>>("Album");
+    return ParseQuery.for("Album", parse);
   }
 
   protected _album: Parse.Object<ParsifyPointers<"Album">>;
@@ -255,7 +255,7 @@ export default class ParseAlbum
   }
 
   /** Get caption for an image */
-  getCaption(imageId: string): string {
+  getCaption(imageId: string): string | undefined {
     return this.captions[imageId];
   }
 

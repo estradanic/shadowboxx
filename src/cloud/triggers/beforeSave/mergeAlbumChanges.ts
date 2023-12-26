@@ -79,10 +79,15 @@ const mergeAlbumChanges = async (
   }
 
   let coverImage = attributes.coverImage;
-  if (images && (!coverImage || !images.includes(getObjectId(coverImage)))) {
+  const firstImage = images?.[0];
+  if (
+    images &&
+    (!coverImage || !images.includes(getObjectId(coverImage))) &&
+    firstImage
+  ) {
     console.log("Setting fallback for cover image");
     const image = await ParseImage.cloudQuery(Parse)
-      .equalTo(ParseImage.COLUMNS.objectId, images[0])
+      .equalTo(ParseImage.COLUMNS.objectId, firstImage)
       .first({ useMasterKey: true });
     coverImage = image?.toPointer();
   }

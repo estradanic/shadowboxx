@@ -93,7 +93,7 @@ export default class ParseUser
         Parse.User
       ).fromLocalDatastore();
     }
-    return new ParseQuery(nativeQuery);
+    return new ParseQuery(nativeQuery, false);
   }
 
   /**

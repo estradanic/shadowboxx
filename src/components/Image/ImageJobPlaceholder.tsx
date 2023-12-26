@@ -57,7 +57,12 @@ const ImageJobPlaceholder = ({ job, className }: ImageJobPlaceholderProps) => {
           type === "image" ? (
             <img src={dataUrl} className={classes.image} />
           ) : (
-            <video preload="metadata" controls={false} src={dataUrl} className={classes.image} />
+            <video
+              preload="metadata"
+              controls={false}
+              src={dataUrl}
+              className={classes.image}
+            />
           )
         ) : (
           <Skeleton variant="rect" width="100%" height="300px" />

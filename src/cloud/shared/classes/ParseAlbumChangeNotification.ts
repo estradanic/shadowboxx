@@ -59,7 +59,7 @@ export default class ParseAlbumChangeNotification
         Parse.Object<ParsifyPointers<"AlbumChangeNotification">>
       >("AlbumChangeNotification").fromLocalDatastore();
     }
-    return new ParseQuery(nativeQuery);
+    return new ParseQuery(nativeQuery, false);
   }
 
   /**

@@ -26,9 +26,12 @@ app.use((req, res, next) => {
 
 app.use((req, res, next) => {
   const pathParts = req.path.split("/").filter((pathPart) => pathPart !== "");
+  const firstPathPart = pathParts[0];
   const serveIndex =
     req.method === "GET" &&
-    (frontendRoutes.includes(pathParts[0]) || pathParts.length === 0);
+    (!firstPathPart ||
+      frontendRoutes.includes(firstPathPart) ||
+      pathParts.length === 0);
   if (serveIndex) {
     res
       .header("Cross-Origin-Opener-Policy", "same-origin")

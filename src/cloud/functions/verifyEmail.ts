@@ -11,7 +11,8 @@ export interface VerifyEmailParams {
 
 /** Function to verify email */
 const verifyEmail = async ({ code, email }: VerifyEmailParams) => {
-  const user = await ParseUser.cloudQuery(Parse)
+  console.log(`Verifying email ${email}`);
+  let user = await ParseUser.cloudQuery(Parse)
     .equalTo(ParseUser.COLUMNS.email, email)
     .first({ useMasterKey: true });
   if (!user) {
@@ -20,6 +21,7 @@ const verifyEmail = async ({ code, email }: VerifyEmailParams) => {
       Strings.cloud.error.userNotFound
     );
   }
+  console.log(`Found user:`, user.attributes);
   if (user.verificationCode !== code) {
     throw new Parse.Error(
       Parse.Error.INVALID_QUERY,
@@ -27,8 +29,13 @@ const verifyEmail = async ({ code, email }: VerifyEmailParams) => {
     );
   }
   user.verificationCode = undefined;
-  await user.cloudSave({ useMasterKey: true });
+  console.log("Going to save user:", user.attributes);
+  user = await user.cloudSave({
+    useMasterKey: true,
+    context: { noTrigger: true },
+  });
 
+  user.email = email;
   await updateEmail(user);
 };
 

@@ -16,12 +16,12 @@ const equal = <T extends ParseObject<ClassName>>(a: In<T>, b: In<T>) => {
   }
   let equal = true;
   a?.pages?.forEach((page, i) => {
-    if (page.length !== b?.pages[i].length) {
+    if (page.length !== b?.pages[i]?.length) {
       equal = false;
       return false;
     }
     page.forEach((object, j) => {
-      if (object.objectId !== b?.pages[i][j].objectId) {
+      if (object.objectId !== b?.pages[i]?.[j]?.objectId) {
         equal = false;
         return false;
       }

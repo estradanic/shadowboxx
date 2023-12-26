@@ -1,5 +1,5 @@
 import loggerWrapper from "../../loggerWrapper";
-import { ParseAlbum, ParseUser, Strings } from "../../shared";
+import { ParseAlbum, ParseQuery, ParseUser, Strings } from "../../shared";
 
 /** Function to update references to a user's email address when it changes */
 const updateEmail = async (user: ParseUser) => {
@@ -15,6 +15,11 @@ const updateEmail = async (user: ParseUser) => {
     );
   }
 
+  if (!oldUser.email) {
+    console.log("Old email doesn't exist, No need to update");
+    return;
+  }
+
   console.log("Old email", oldUser.email);
 
   const oldEmail = oldUser.email;
@@ -26,7 +31,7 @@ const updateEmail = async (user: ParseUser) => {
   }
 
   console.log("Getting albums referencing old email for user", user.objectId);
-  const albumsReferencingOldEmail = await Parse.Query.or(
+  const albumsReferencingOldEmail = await ParseQuery.or(
     ParseAlbum.cloudQuery(Parse).contains(
       ParseAlbum.COLUMNS.collaborators,
       oldEmail
@@ -36,24 +41,21 @@ const updateEmail = async (user: ParseUser) => {
 
   console.log("Updating albums referencing old email for user", user.objectId);
   for (const album of albumsReferencingOldEmail) {
-    console.log("Updating album", album.get(ParseAlbum.COLUMNS.name));
-    const collaborators = album.get(ParseAlbum.COLUMNS.collaborators);
-    const viewers = album.get(ParseAlbum.COLUMNS.viewers);
-    album.set(
-      ParseAlbum.COLUMNS.collaborators,
-      collaborators.map((email: string) =>
-        email === oldEmail ? newEmail : email
-      )
+    console.log("Updating album", album.name);
+    const collaborators = album.collaborators;
+    const viewers = album.viewers;
+    album.collaborators = collaborators.map((email: string) =>
+      email === oldEmail ? newEmail : email
     );
-    album.set(
-      ParseAlbum.COLUMNS.viewers,
-      viewers.map((email: string) => (email === oldEmail ? newEmail : email))
+    album.viewers = viewers.map((email: string) =>
+      email === oldEmail ? newEmail : email
     );
-    await album.save(null, {
+
+    await album.cloudSave({
       useMasterKey: true,
       context: { noTrigger: true },
     });
-    console.log("Updated album", album.get(ParseAlbum.COLUMNS.name));
+    console.log("Updated album", album.name);
   }
   console.log("Updated albums referencing old email for user", user.objectId);
 };

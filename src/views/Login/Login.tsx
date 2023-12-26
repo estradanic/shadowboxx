@@ -96,14 +96,9 @@ const Login = memo(() => {
             navigate(`${routes.VerifyEmail.path}?${params.toString()}`);
             enqueueWarningSnackbar(error.message);
             return;
-          } else if (
-            error?.message === Strings.cloud.error.userNotWhitelisted
-          ) {
-            enqueueErrorSnackbar(error.message);
-            return;
           }
           console.error(error);
-          enqueueErrorSnackbar(Strings.error.loggingIn);
+          enqueueErrorSnackbar(error?.message ?? Strings.error.loggingIn);
         })
         .finally(() => {
           stopGlobalLoader();

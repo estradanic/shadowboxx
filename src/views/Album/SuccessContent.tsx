@@ -30,6 +30,7 @@ import useInfiniteScroll from "../../hooks/useInfiniteScroll";
 import useFlatInfiniteQueryData from "../../hooks/Query/useFlatInfiniteQueryData";
 import EditingContent from "./EditingContent";
 import useNavigate from "../../hooks/useNavigate";
+import { useUserContext } from "../../contexts/UserContext";
 
 type UseStylesParams = {
   randomColor: VariableColor;
@@ -69,6 +70,11 @@ const SuccessContent = ({ album, randomColor }: SuccessContentProps) => {
   const [search, setSearch] = useSearchParams();
   const timelineView = search.get("timeline") === "true";
   const { online } = useNetworkDetectionContext();
+  const { getLoggedInUser } = useUserContext();
+
+  const canEdit =
+    getLoggedInUser().objectId == album.owner.id ||
+    album.collaborators.includes(getLoggedInUser().email);
 
   const {
     getTagsByImageIdFunction,
@@ -240,11 +246,13 @@ const SuccessContent = ({ album, randomColor }: SuccessContentProps) => {
                 albumId={album.objectId}
               />
             )}
-            <Online>
-              <Fab onClick={() => navigate("edit")}>
-                <EditIcon />
-              </Fab>
-            </Online>
+            {canEdit && (
+              <Online>
+                <Fab onClick={() => navigate("edit")}>
+                  <EditIcon />
+                </Fab>
+              </Online>
+            )}
           </>
         }
       />

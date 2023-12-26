@@ -82,7 +82,7 @@ export default class ParseImage
         "Image"
       ).fromLocalDatastore();
     }
-    return new ParseQuery(nativeQuery);
+    return new ParseQuery(nativeQuery, false);
   }
 
   /**

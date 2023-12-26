@@ -110,7 +110,10 @@ const useQueryConfigHelpers = () => {
   };
 
   /** Mutates query to apply the given tagSearch to it */
-  const applyTagSearch = (query: ParseQuery<"Image">, tagSearch?: string[]) => {
+  const applyTagSearch = (
+    query: ParseQuery<"Image", false>,
+    tagSearch?: string[]
+  ) => {
     if (tagSearch?.includes("video")) {
       query.equalTo(ParseImage.COLUMNS.type, "video");
       tagSearch = tagSearch.filter((tag) => tag !== "video");
@@ -128,14 +131,14 @@ const useQueryConfigHelpers = () => {
 
   /** Mutates query to apply the given captionSearch to it */
   const applyCaptionSearch = (
-    query: ParseQuery<"Image">,
+    query: ParseQuery<"Image", false>,
     captionSearch?: string,
     captions?: Record<string, string>
   ) => {
     if (captionSearch && captions) {
       const search = captionSearch.toLowerCase();
       const captionsToApply = Object.keys(captions).filter((key) =>
-        captions?.[key].toLowerCase().includes(search)
+        captions?.[key]?.toLowerCase().includes(search)
       );
       query.containedIn(ParseImage.COLUMNS.objectId, captionsToApply);
     }
@@ -143,7 +146,7 @@ const useQueryConfigHelpers = () => {
 
   /** Mutates query to apply the given OwnershipFilter to it */
   const applyOwnershipFilter = (
-    query: ParseQuery<"Album">,
+    query: ParseQuery<"Album", false>,
     ownership: OwnershipFilter
   ) => {
     if (ownership === "mine") {
@@ -161,7 +164,7 @@ const useQueryConfigHelpers = () => {
 
   /** Returns new query w/ the given name/description search applied to it */
   const applyNameDescriptionSearch = (
-    query: ParseQuery<"Album">,
+    query: ParseQuery<"Album", false>,
     nameDescriptionSearch?: string
   ) => {
     if (nameDescriptionSearch) {
@@ -177,7 +180,7 @@ const useQueryConfigHelpers = () => {
         )
       ).toJSON();
       queryJSON.where.$or = orJSON.where.$or;
-      return ParseQuery.fromJSON("Album", queryJSON);
+      return ParseQuery.fromJSON("Album", queryJSON, false);
     }
     return query;
   };
